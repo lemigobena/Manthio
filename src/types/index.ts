@@ -1,0 +1,130 @@
+export type CourseFormat = 'self-paced' | 'cohort' | 'flipped';
+export type CourseLevel = 'Foundation' | 'Intermediate' | 'Advanced';
+export type LessonType = 'Video' | 'Article' | 'Quiz' | 'Code' | 'H5P' | 'Assignment' | 'External' | 'Live Event';
+export type LessonStatus = 'completed' | 'in_progress' | 'not_started' | 'locked';
+export type ModuleStatus = 'Completed' | 'In progress' | 'Open' | 'Locked';
+export type ModuleType = 'Self-study' | 'Live online session' | 'In-person session';
+export type BloomLevel = 'Remember' | 'Understand' | 'Apply' | 'Analyse' | 'Evaluate' | 'Create';
+
+export interface Trainer {
+  id: string;
+  name: string;
+  title: string;
+  avatar: string;
+  bio: string;
+  linkedIn?: string;
+  website?: string;
+}
+
+export interface Lesson {
+  id: string;
+  title: string;
+  type: LessonType;
+  duration: string;
+  status: LessonStatus;
+  difficulty?: 1 | 2 | 3;
+  bloomLevel?: BloomLevel;
+  required: boolean;
+  contentUrl?: string;
+  estimatedRemainingTime?: string;
+}
+
+export interface Module {
+  id: string;
+  number: number;
+  title: string;
+  description: string;
+  duration: string;
+  status: ModuleStatus;
+  type: ModuleType;
+  lessons: Lesson[];
+  scheduledTime?: string;
+  venue?: string;
+}
+
+export interface Course {
+  id: string;
+  title: string;
+  description: string;
+  longDescription?: string;
+  level: CourseLevel;
+  format: CourseFormat;
+  xpReward: number;
+  price: string;
+  rating?: number;
+  ratingCount?: number;
+  enrolled: boolean;
+  progress: number; // percentage
+  imageUrl: string;
+  trainer: Trainer;
+  learningOutcomes?: string[];
+  modules: Module[];
+}
+
+export interface CareerTrack {
+  id: string;
+  title: string;
+  outcomeStatement: string;
+  estimatedTime: string;
+  coursesCount: number;
+  progress: number; // percentage
+  milestones: {
+    id: string;
+    title: string;
+    description: string;
+    courseIds: string[];
+    status: 'completed' | 'active' | 'locked';
+  }[];
+}
+
+export interface UserProfile {
+  name: string;
+  email: string;
+  avatar: string;
+  bio: string;
+  level: number;
+  xp: number;
+  currentXpInLevel: number;
+  xpNeededForNextLevel: number;
+  streak: number;
+  lastActiveDate?: string;
+  streakFreezeAvailable: boolean;
+}
+
+export interface ChatMessage {
+  id: string;
+  sender: 'user' | 'tutor' | 'system';
+  text: string;
+  timestamp: string;
+  source?: 'Course docs' | 'Cloud AI';
+  documents?: {
+    title: string;
+    location: string;
+    url: string;
+  }[];
+}
+
+export interface ResourceFile {
+  id: string;
+  name: string;
+  type: 'pdf' | 'video' | 'archive' | 'notebook' | 'code' | 'office' | 'image';
+  courseName: string;
+  uploadDate: string;
+  accessLevel: 'All Learners' | 'Trainers Only' | 'Cohort Only';
+  size: string;
+  downloadUrl?: string;
+}
+
+export interface ForumThread {
+  id: string;
+  title: string;
+  author: string;
+  body: string;
+  category: string;
+  moduleName?: string;
+  upvotes: number;
+  commentsCount: number;
+  hasAcceptedAnswer: boolean;
+  timestamp: string;
+  isAnonymous?: boolean;
+}

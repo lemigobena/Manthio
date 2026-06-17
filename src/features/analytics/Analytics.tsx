@@ -1,0 +1,230 @@
+import React, { useState } from 'react';
+import { useXP } from '../../context/XPContext';
+import { Award, Clock, Flame, Sparkles, AlertTriangle, FileSpreadsheet } from 'lucide-react';
+
+interface AnalyticsProps {
+  onNavigate: (page: string) => void;
+}
+
+export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
+  const { streak, addToast } = useXP();
+  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('week');
+
+  // Generate mock data for the 90-day learning activity heatmap
+  const renderHeatmap = () => {
+    const cells = [];
+    const intensityClasses = ['bg-bg border border-line', 'bg-cyan/20 border border-cyan/10', 'bg-cyan/40 border border-cyan/25', 'bg-cyan/70 border border-cyan/50', 'bg-cyan border border-cyan2'];
+    
+    for (let i = 0; i < 90; i++) {
+      // Simulate random intensity
+      const val = Math.floor(Math.sin(i * 0.15) * 2 + 2) % 5;
+      cells.push(
+        <div 
+          key={i} 
+          className={`w-3.5 h-3.5 rounded-sm ${intensityClasses[val]} transition-colors hover:scale-110`}
+          title={`Tag ${i + 1}: ${val * 15} Minuten gelernt`}
+        />
+      );
+    }
+    return cells;
+  };
+
+  const exportCSV = () => {
+    addToast('success', 'Lernstatistiken erfolgreich als CSV exportiert!');
+  };
+
+  return (
+    <div className="space-y-6 pb-12">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-text">Analysen & Fortschritt</h1>
+          <p className="text-muted text-sm mt-1">Detaillierte Einblicke in deine Lernaktivitäten und Kompetenzen.</p>
+        </div>
+        
+        {/* Time selector and Export button */}
+        <div className="flex items-center space-x-3">
+          <select 
+            value={timeRange} 
+            onChange={(e) => setTimeRange(e.target.value as any)}
+            className="bg-panel border border-line text-xs rounded-lg px-3 py-2 text-text focus:outline-none focus:border-cyan cursor-pointer"
+          >
+            <option value="week">Diese Woche</option>
+            <option value="month">Diesen Monat</option>
+            <option value="year">Dieses Jahr</option>
+          </select>
+          
+          <button 
+            onClick={exportCSV}
+            className="bg-bg hover:bg-line border border-line text-xs font-semibold px-3 py-2 rounded-lg flex items-center space-x-1.5 transition-colors cursor-pointer"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-muted" />
+            <span>CSV Export</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-panel border border-line p-5 rounded-2xl">
+          <div className="flex justify-between items-start text-muted text-xs">
+            <span>LERNZEIT</span>
+            <Clock className="w-4 h-4 text-cyan" />
+          </div>
+          <div className="text-2xl font-bold mt-2">18.5 Std</div>
+          <span className="text-[10px] text-green font-semibold mt-1 block">+12% ggu. Vorwoche</span>
+        </div>
+        
+        <div className="bg-panel border border-line p-5 rounded-2xl">
+          <div className="flex justify-between items-start text-muted text-xs">
+            <span>STREAK RECORD</span>
+            <Flame className="w-4 h-4 text-yellow" />
+          </div>
+          <div className="text-2xl font-bold mt-2">{streak} Tage</div>
+          <span className="text-[10px] text-muted mt-1 block">Aktueller Streak aktiv</span>
+        </div>
+        
+        <div className="bg-panel border border-line p-5 rounded-2xl">
+          <div className="flex justify-between items-start text-muted text-xs">
+            <span>ABGESCHLOSSEN</span>
+            <Award className="w-4 h-4 text-green" />
+          </div>
+          <div className="text-2xl font-bold mt-2">2 Module</div>
+          <span className="text-[10px] text-muted mt-1 block">In 1 aktiven Kursen</span>
+        </div>
+
+        <div className="bg-panel border border-line p-5 rounded-2xl">
+          <div className="flex justify-between items-start text-muted text-xs">
+            <span>ABONNEMENT</span>
+            <Sparkles className="w-4 h-4 text-purple" />
+          </div>
+          <div className="text-2xl font-bold mt-2">Premium</div>
+          <span className="text-[10px] text-muted mt-1 block">Aktiv via Arbeitgeber</span>
+        </div>
+      </div>
+
+      {/* Chart Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Weekly Activity Line Representation */}
+        <div className="lg:col-span-2 bg-panel border border-line rounded-2xl p-6 space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="font-bold text-base">Wöchentliche Aktivität</h3>
+            <span className="text-xs text-muted">Durchschnitt: 2.6 Std / Tag</span>
+          </div>
+          
+          {/* Simulating a graphic line chart with divs */}
+          <div className="h-48 flex items-end justify-between pt-6 border-b border-line px-4 relative">
+            {/* Background grids */}
+            <div className="absolute inset-x-0 top-1/4 border-t border-line/40 text-[9px] text-muted/60 pt-0.5">3 Std</div>
+            <div className="absolute inset-x-0 top-2/4 border-t border-line/40 text-[9px] text-muted/60 pt-0.5">2 Std</div>
+            <div className="absolute inset-x-0 top-3/4 border-t border-line/40 text-[9px] text-muted/60 pt-0.5">1 Std</div>
+
+            {/* Days Bars */}
+            {[
+              { day: 'Mo', min: 38 },
+              { day: 'Di', min: 62 },
+              { day: 'Mi', min: 86 },
+              { day: 'Do', min: 100 },
+              { day: 'Fr', min: 28 },
+              { day: 'Sa', min: 16 },
+              { day: 'So', min: 52 }
+            ].map((d, idx) => (
+              <div key={idx} className="flex flex-col items-center space-y-2 z-10 w-full">
+                <span className="text-[10px] text-cyan font-bold">{d.min}m</span>
+                <div 
+                  className="w-8 bg-cyan/85 hover:bg-cyan rounded-t-md transition-all duration-300"
+                  style={{ height: `${(d.min / 120) * 120}px` }}
+                />
+                <span className="text-[10px] text-muted">{d.day}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Skill Profile Radar Simulator */}
+        <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
+          <h3 className="font-bold text-base">Python Kompetenzprofil</h3>
+          
+          <div className="space-y-3 pt-2">
+            {[
+              { skill: 'Abstrakte Logik', pct: 88 },
+              { skill: 'Python Syntax', pct: 70 },
+              { skill: 'OOP Konzepte', pct: 45 },
+              { skill: 'Fehlerbehandlung', pct: 38 }
+            ].map((s, idx) => (
+              <div key={idx} className="space-y-1.5 text-xs">
+                <div className="flex justify-between">
+                  <span className="font-medium text-text">{s.skill}</span>
+                  <span className="text-cyan font-bold">{s.pct}%</span>
+                </div>
+                <div className="w-full h-1.5 bg-bg rounded-full overflow-hidden border border-line">
+                  <div className="h-full bg-cyan" style={{ width: `${s.pct}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* GitHub-style Heatmap */}
+      <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="font-bold text-base">Lernaktivität (Letzte 90 Tage)</h3>
+          <div className="flex items-center space-x-2 text-[10px] text-muted">
+            <span>Weniger</span>
+            <div className="w-3.5 h-3.5 rounded-sm bg-bg border border-line" />
+            <div className="w-3.5 h-3.5 rounded-sm bg-cyan/20 border border-cyan/10" />
+            <div className="w-3.5 h-3.5 rounded-sm bg-cyan/40 border border-cyan/25" />
+            <div className="w-3.5 h-3.5 rounded-sm bg-cyan/70 border border-cyan/50" />
+            <div className="w-3.5 h-3.5 rounded-sm bg-cyan border border-cyan2" />
+            <span>Mehr</span>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5 pt-2">
+          {renderHeatmap()}
+        </div>
+      </div>
+
+      {/* Weakness Deep-Dive */}
+      <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
+        <h3 className="font-bold text-base">Schwachpunkt-Analyse</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-bg border border-line p-4 rounded-xl flex items-start space-x-3">
+            <AlertTriangle className="w-5 h-5 text-red shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <h4 className="font-bold text-sm text-text">OOP Konzepte</h4>
+              <p className="text-xs text-muted leading-relaxed">
+                Schwierigkeiten beim Verständnis von Vererbung und Klasseninstanziierung in Modul 6.
+              </p>
+              <button 
+                onClick={() => onNavigate('ai-tutor')}
+                className="text-cyan hover:underline text-xs font-semibold mt-2 block"
+              >
+                Übung mit KI-Tutor starten
+              </button>
+            </div>
+          </div>
+          
+          <div className="bg-bg border border-line p-4 rounded-xl flex items-start space-x-3">
+            <AlertTriangle className="w-5 h-5 text-red shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <h4 className="font-bold text-sm text-text">Fehlerbehandlung</h4>
+              <p className="text-xs text-muted leading-relaxed">
+                Exceptions und try-except Blöcke wurden bei den letzten Quizfragen mehrfach falsch beantwortet.
+              </p>
+              <button 
+                onClick={() => onNavigate('ai-tutor')}
+                className="text-cyan hover:underline text-xs font-semibold mt-2 block"
+              >
+                Remediation-Sitzung starten
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  );
+};

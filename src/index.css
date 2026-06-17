@@ -1,1 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Syne:wght@400..800&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
 @import "tailwindcss";
+
+:root {
+  /* Dark Mode (default theme) */
+  --bg: #060809;
+  --panel: #0F1417;
+  --panel2: #161B1F;
+  --line: #1E2A32;
+  --muted: #7A8FA0;
+  --text: #EDF2F6;
+  --cyan: #00F5E4;
+  --cyan2: #00C4B7;
+  --purple: #9D6CFF;
+  --yellow: #FFCF3F;
+  --red: #FF5561;
+  --green: #2BDE7E;
+  --orange: #FF8C42;
+  
+  --font-display: 'Syne', sans-serif;
+  --font-sans: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+[data-theme='light'] {
+  /* Light Mode (sand-toned, premium direction) */
+  --bg: #FAF6EE;
+  --panel: #FFFFFF;
+  --panel2: #F0EAD9;
+  --line: #D8CFB8;
+  --muted: #6E6650;
+  --text: #2A221A;
+  --cyan: #0D7D6E;
+  --cyan2: #0A5E54;
+  --purple: #6830C0;
+  --yellow: #B88800;
+  --red: #B91C1C;
+  --green: #15803D;
+  --orange: #C2410C;
+}
+
+@theme {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel2: var(--panel2);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-text: var(--text);
+  --color-cyan: var(--cyan);
+  --color-cyan2: var(--cyan2);
+  --color-purple: var(--purple);
+  --color-yellow: var(--yellow);
+  --color-red: var(--red);
+  --color-green: var(--green);
+  --color-orange: var(--orange);
+  
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+/* Custom scrollbars matching the dark/light premium aesthetic */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 15px; /* Baseline professional size */
+  transition: background-color 0.2s ease, color 0.2s ease;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}
+
+code, pre {
+  font-family: var(--font-mono);
+}
+
+/* Base focus style for WCAG accessibility (REQ-NFR-022) */
+*:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
