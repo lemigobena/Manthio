@@ -25,7 +25,7 @@ export const Community: React.FC<CommunityProps> = () => {
     e.stopPropagation();
     setThreads(prev => prev.map(t => {
       if (t.id === id) {
-        addToast('success', 'Beitrag bewertet.');
+        addToast('success', 'Post rated.');
         return { ...t, upvotes: t.upvotes + 1 };
       }
       return t;
@@ -45,15 +45,15 @@ export const Community: React.FC<CommunityProps> = () => {
       upvotes: 1,
       commentsCount: 0,
       hasAcceptedAnswer: false,
-      timestamp: 'Gerade eben'
+      timestamp: 'Just now'
     };
 
     setThreads(prev => [newThread, ...prev]);
     setNewTitle('');
     setNewBody('');
     setNewThreadOpen(false);
-    addXp(25, 'Community Thread erstellt');
-    addToast('success', '+25 XP — Community Thread erstellt!');
+    addXp(25, 'Community thread created');
+    addToast('success', '+25 XP — Community thread created!');
   };
 
   return (
@@ -61,7 +61,7 @@ export const Community: React.FC<CommunityProps> = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-text">Community & Forum</h1>
-          <p className="text-muted text-sm mt-1">Stelle Fragen, hilf Kommilitonen und diskutiere Kursinhalte.</p>
+          <p className="text-muted text-sm mt-1">Ask questions, help classmates, and discuss course content.</p>
         </div>
 
         <button 
@@ -69,7 +69,7 @@ export const Community: React.FC<CommunityProps> = () => {
           className="bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-4 py-2.5 rounded-xl flex items-center space-x-1.5 transition-colors cursor-pointer self-start"
         >
           <Plus className="w-4 h-4" />
-          <span>FRAGE STELLEN</span>
+          <span>ASK A QUESTION</span>
         </button>
       </div>
 
@@ -80,7 +80,7 @@ export const Community: React.FC<CommunityProps> = () => {
             onClick={() => setActiveThread(null)}
             className="text-cyan hover:underline text-xs font-semibold"
           >
-            &larr; Zurück zum Forum
+            &larr; Back to forum
           </button>
 
           <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
@@ -90,7 +90,7 @@ export const Community: React.FC<CommunityProps> = () => {
               </span>
               <h2 className="text-xl font-bold text-text mt-3">{activeThread.title}</h2>
               <span className="text-[10px] text-muted block mt-1">
-                Gepostet von {activeThread.author} &bull; {activeThread.timestamp}
+                Posted by {activeThread.author} &bull; {activeThread.timestamp}
               </span>
             </div>
 
@@ -100,7 +100,7 @@ export const Community: React.FC<CommunityProps> = () => {
 
             <div className="flex items-center space-x-4 pt-2 border-t border-line text-xs text-muted">
               <span>{activeThread.upvotes} Upvotes</span>
-              <span>{activeThread.commentsCount} Kommentare</span>
+              <span>{activeThread.commentsCount} Comments</span>
             </div>
           </div>
 
@@ -109,10 +109,10 @@ export const Community: React.FC<CommunityProps> = () => {
             <div className="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-purple/5 to-transparent pointer-events-none" />
             <div className="flex items-center space-x-2">
               <Sparkles className="w-4 h-4 text-purple" />
-              <span className="text-[10px] text-purple uppercase font-bold tracking-wider">KI-Tutor Auto-Antwort</span>
+              <span className="text-[10px] text-purple uppercase font-bold tracking-wider">AI Tutor Auto-Answer</span>
             </div>
             <p className="text-xs text-text leading-relaxed italic bg-bg/40 p-3.5 rounded-xl border border-line">
-              Sokratische Hilfestellung: Um diesen PowerShell ExecutionPolicy-Fehler zu beheben, musst du eventuell die Richtlinie für deinen lokalen Benutzer anpassen. Öffne die PowerShell als Administrator und gib `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` ein. Weißt du, warum PowerShell standardmäßig Skripte blockiert?
+              Socratic assistance: To fix this PowerShell ExecutionPolicy error, you might need to adjust the policy for your local user. Open PowerShell as an administrator and enter `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`. Do you know why PowerShell blocks scripts by default?
             </p>
           </div>
 
@@ -120,7 +120,7 @@ export const Community: React.FC<CommunityProps> = () => {
           <div className="bg-panel border border-line rounded-2xl p-4 flex items-center space-x-2">
             <input 
               type="text" 
-              placeholder="Schreibe eine Antwort..." 
+              placeholder="Write a reply..." 
               value={replyInput}
               onChange={(e) => setReplyInput(e.target.value)}
               className="flex-1 bg-bg border border-line text-xs rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-cyan"
@@ -128,8 +128,8 @@ export const Community: React.FC<CommunityProps> = () => {
             <button 
               onClick={() => {
                 if (!replyInput.trim()) return;
-                addXp(10, 'Forum-Antwort gepostet');
-                addToast('success', 'Antwort erfolgreich gepostet!');
+                addXp(10, 'Forum reply posted');
+                addToast('success', 'Reply successfully posted!');
                 setReplyInput('');
               }}
               className="bg-cyan hover:bg-cyan2 text-bg p-2.5 rounded-xl transition-colors cursor-pointer"
@@ -159,20 +159,20 @@ export const Community: React.FC<CommunityProps> = () => {
                 <p className="text-muted text-xs line-clamp-2 leading-relaxed">
                   {thread.body}
                 </p>
-                <div className="flex items-center space-x-4 pt-1 text-[10px] text-muted">
-                  <span>Autor: {thread.author}</span>
-                  <span>{thread.timestamp}</span>
-                  <span className="flex items-center space-x-1">
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    <span>{thread.commentsCount}</span>
-                  </span>
-                  {thread.hasAcceptedAnswer && (
-                    <span className="text-green font-semibold flex items-center space-x-0.5">
-                      <Check className="w-3.5 h-3.5 stroke-[3px]" />
-                      <span>Gelöst</span>
+                  <span className="flex items-center space-x-4 pt-1 text-[10px] text-muted">
+                    <span>Author: {thread.author}</span>
+                    <span>{thread.timestamp}</span>
+                    <span className="flex items-center space-x-1">
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>{thread.commentsCount}</span>
                     </span>
-                  )}
-                </div>
+                    {thread.hasAcceptedAnswer && (
+                      <span className="text-green font-semibold flex items-center space-x-0.5">
+                        <Check className="w-3.5 h-3.5 stroke-[3px]" />
+                        <span>Solved</span>
+                      </span>
+                    )}
+                  </span>
               </div>
 
               {/* Vote block */}
@@ -192,24 +192,24 @@ export const Community: React.FC<CommunityProps> = () => {
       {newThreadOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg/85 backdrop-blur-sm">
           <div className="bg-panel border border-line p-6 rounded-2xl max-w-lg w-full space-y-4 shadow-2xl">
-            <h3 className="font-bold text-base text-text border-b border-line pb-3">Neues Forum-Thema erstellen</h3>
+            <h3 className="font-bold text-base text-text border-b border-line pb-3">Create new forum topic</h3>
             
             <div className="space-y-3">
               <div className="space-y-1.5 text-xs">
-                <label className="text-[10px] text-muted font-bold uppercase">Titel der Frage</label>
+                <label className="text-[10px] text-muted font-bold uppercase">Question Title</label>
                 <input 
                   type="text" 
-                  placeholder="Wie verwende ich *args in Funktionen?" 
+                  placeholder="How do I use *args in functions?" 
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-text focus:outline-none focus:border-cyan"
                 />
               </div>
-
+...
               <div className="space-y-1.5 text-xs">
-                <label className="text-[10px] text-muted font-bold uppercase">Beschreibung</label>
+                <label className="text-[10px] text-muted font-bold uppercase">Description</label>
                 <textarea 
-                  placeholder="Beschreibe deine Frage ausführlich. Code-Snippets können im Markdown-Format eingefügt werden..."
+                  placeholder="Describe your question in detail. Code snippets can be inserted in Markdown format..."
                   value={newBody}
                   onChange={(e) => setNewBody(e.target.value)}
                   className="w-full h-32 bg-bg border border-line rounded-xl px-3 py-2 text-text focus:outline-none focus:border-cyan resize-none"
@@ -222,13 +222,13 @@ export const Community: React.FC<CommunityProps> = () => {
                 onClick={() => setNewThreadOpen(false)}
                 className="flex-1 bg-bg hover:bg-line border border-line text-xs font-semibold py-2.5 rounded-lg text-center"
               >
-                Abbrechen
+                Cancel
               </button>
               <button 
                 onClick={handleCreateThread}
                 className="flex-1 bg-cyan hover:bg-cyan2 text-bg text-xs font-bold py-2.5 rounded-lg text-center cursor-pointer"
               >
-                Erstellen (+25 XP)
+                Create (+25 XP)
               </button>
             </div>
           </div>

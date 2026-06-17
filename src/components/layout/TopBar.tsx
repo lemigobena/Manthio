@@ -28,9 +28,9 @@ export const TopBar: React.FC<TopBarProps> = ({ onNavigate }) => {
   }, []);
 
   const notifications = [
-    { id: 1, text: 'Live-Session startet in 5 Minuten!', time: 'Vor 2 Min', critical: true },
-    { id: 2, text: 'Glückwunsch! Du hast Modul 2 abgeschlossen.', time: 'Vor 1 Std', critical: false },
-    { id: 3, text: 'KI-Tutor hat deine Code-Aufgabe bewertet.', time: 'Vor 3 Std', critical: false }
+    { id: 1, text: 'Live session starts in 5 minutes!', time: '2 min ago', critical: true },
+    { id: 2, text: 'Congratulations! You have completed Module 2.', time: '1 hr ago', critical: false },
+    { id: 3, text: 'AI Tutor has rated your code task.', time: '3 hrs ago', critical: false }
   ];
 
   return (
@@ -41,7 +41,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onNavigate }) => {
         <input 
           ref={searchInputRef}
           type="text" 
-          placeholder="Suche... (Cmd+K)" 
+          placeholder="Search... (Cmd+K)" 
           className="w-full bg-bg border border-line rounded-xl pl-9 pr-4 py-1.5 text-xs text-text focus:outline-none focus:border-cyan focus:ring-1 focus:ring-cyan transition-colors"
         />
         <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-muted" />
@@ -53,17 +53,17 @@ export const TopBar: React.FC<TopBarProps> = ({ onNavigate }) => {
         <button 
           onClick={() => onNavigate('analytics')}
           className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-bg border border-line hover:border-yellow group transition-all duration-300 cursor-pointer"
-          title="Deine tägliche Aktivität"
+          title="Your daily activity"
         >
           <Flame className="w-4 h-4 text-yellow group-hover:animate-bounce transition-transform duration-500 fill-yellow/10" />
-          <span className="text-xs font-bold text-text">{streak} Tage</span>
+          <span className="text-xs font-bold text-text">{streak} Days</span>
         </button>
 
         {/* Theme Toggle (REQ-NFR-053) */}
         <button 
           onClick={toggleTheme}
           className="p-2 rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer"
-          title={theme === 'dark' ? 'Helles Design einschalten' : 'Dunkles Design einschalten'}
+          title={theme === 'dark' ? 'Switch to light design' : 'Switch to dark design'}
         >
           {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </button>
@@ -82,12 +82,12 @@ export const TopBar: React.FC<TopBarProps> = ({ onNavigate }) => {
           {notificationsOpen && (
             <div className="absolute right-0 mt-2 w-80 bg-panel border border-line rounded-2xl shadow-xl p-4 space-y-3 z-50">
               <div className="flex justify-between items-center border-b border-line pb-2">
-                <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Benachrichtigungen</h4>
+                <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Notifications</h4>
                 <button 
                   onClick={() => setNotificationsOpen(false)}
                   className="text-[10px] text-cyan hover:underline"
                 >
-                  Alle gelesen
+                  Mark all as read
                 </button>
               </div>
               <div className="space-y-2">

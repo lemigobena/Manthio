@@ -15,7 +15,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
     { 
       id: 'm1', 
       sender: 'tutor', 
-      text: 'Hallo Alex! Ich bin dein persönlicher KI-Tutor. Wie kann ich dir heute beim Python Bootcamp helfen?', 
+      text: 'Hello Alex! I am your personal AI Tutor. How can I help you today with the Python Bootcamp?', 
       timestamp: '14:30', 
       source: 'Course docs' 
     }
@@ -23,9 +23,9 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
   const [isTyping, setIsTyping] = useState(false);
 
   const pastChats = [
-    { id: 'chat-1', title: 'Unterschied List vs Tuple', date: 'Gestern' },
-    { id: 'chat-2', title: 'Fehler bei venv PowerShell', date: '12. Jun' },
-    { id: 'chat-3', title: 'Einfache arithmetische Operatoren', date: '08. Jun' }
+    { id: 'chat-1', title: 'Difference List vs Tuple', date: 'Yesterday' },
+    { id: 'chat-2', title: 'Error with venv PowerShell', date: 'Jun 12' },
+    { id: 'chat-3', title: 'Simple arithmetic operators', date: 'Jun 08' }
   ];
 
   const handleSendMessage = () => {
@@ -48,10 +48,10 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
       let source: ChatMessage['source'] = 'Course docs';
 
       if (aiMode === 'full') {
-        replyText = 'Hier ist die Erklärung aus dem allgemeinen LLM-Wissen: Rekursion ist eine Programmiermethode, bei der eine Funktion sich selbst aufruft. In Python müssen wir immer eine Abbruchbedingung (Base Case) definieren, sonst kommt es zu einem RecursionError.';
+        replyText = 'Here is the explanation from general LLM knowledge: Recursion is a programming method in which a function calls itself. In Python, we must always define a termination condition (Base Case), otherwise a RecursionError occurs.';
         source = 'Cloud AI';
       } else {
-        replyText = 'Sokratischer Hinweis: Du versuchst, eine Summe über eine Liste rekursiv zu bilden. Was ist dein Base Case (also der einfachste Fall, bei dem die Funktion sofort stoppt)?';
+        replyText = 'Socratic hint: You are trying to form a sum over a list recursively. What is your Base Case (the simplest case where the function stops immediately)?';
         source = 'Course docs';
       }
 
@@ -62,11 +62,11 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         source,
         documents: source === 'Course docs' ? [
-          { title: 'Modul 6 - Funktionen und Rekursion', location: 'Section 4.1', url: '#' }
+          { title: 'Module 6 - Functions and Recursion', location: 'Section 4.1', url: '#' }
         ] : undefined
       };
       setChatMessages(prev => [...prev, tutorMsg]);
-      addXp(10, 'KI-Tutor Anfrage gestellt');
+      addXp(10, 'Asked AI Tutor a question');
     }, 1200);
   };
 
@@ -76,7 +76,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
       {/* Left Column: Chat Sessions History */}
       <div className="w-full md:w-64 bg-panel border-r border-line flex flex-col shrink-0">
         <div className="p-4 border-b border-line">
-          <h3 className="font-bold text-xs uppercase text-muted tracking-wider">Verlauf</h3>
+          <h3 className="font-bold text-xs uppercase text-muted tracking-wider">History</h3>
         </div>
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {pastChats.map(chat => (
@@ -100,7 +100,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
         {/* Header Mode Controls */}
         <div className="bg-panel border-b border-line px-6 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 z-10 shrink-0">
           <div>
-            <h1 className="text-sm font-bold text-text">KI-Tutor Chat</h1>
+            <h1 className="text-sm font-bold text-text">AI Tutor Chat</h1>
             <span className="text-[10px] text-muted">Alex Chen • Level 42 Explorer</span>
           </div>
 
@@ -115,11 +115,11 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
             <button 
               onClick={() => {
                 setAiMode('docs');
-                addToast('info', 'Fragen bleiben auf apigenio Infrastruktur.');
+                addToast('info', 'Questions remain on apigenio infrastructure.');
               }}
               className={`px-3 py-1 rounded font-semibold transition-colors cursor-pointer ${aiMode === 'docs' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
             >
-              Unterlagen
+              Documents
             </button>
             <button 
               onClick={() => setAiMode('full')}
@@ -152,7 +152,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
               {/* Citations if Local AI */}
               {msg.documents && msg.documents.length > 0 && (
                 <div className="pl-4 border-l border-cyan text-[10px] text-muted mt-2 space-y-1">
-                  <span className="font-semibold block">Verweise:</span>
+                  <span className="font-semibold block">References:</span>
                   {msg.documents.map((doc, idx) => (
                     <a key={idx} href={doc.url} className="text-cyan hover:underline block">
                       {doc.title} ({doc.location})
@@ -165,7 +165,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
           {isTyping && (
             <div className="text-[10px] text-muted flex items-center space-x-1.5 italic px-2">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan animate-bounce" />
-              <span>KI-Tutor antwortet...</span>
+              <span>AI Tutor is responding...</span>
             </div>
           )}
         </div>
@@ -175,7 +175,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
           <div className="max-w-3xl mx-auto flex items-center space-x-2">
             <input 
               type="text" 
-              placeholder="Stell eine Frage oder füge ein Code-Snippet ein..." 
+              placeholder="Ask a question or paste a code snippet..." 
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
@@ -189,7 +189,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
             </button>
           </div>
           <div className="text-center text-[10px] text-muted mt-2">
-            KI-Tutor kann Fehler machen. Grounding-Daten stammen primär aus dem Python Bootcamp.
+            AI Tutor can make mistakes. Grounding data primarily comes from the Python Bootcamp.
           </div>
         </div>
 
@@ -200,21 +200,21 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
         <div className="space-y-3">
           <div className="flex items-center space-x-1.5">
             <BookOpen className="w-4 h-4 text-cyan" />
-            <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Aktives Modul</h4>
+            <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Active Module</h4>
           </div>
           <div className="bg-bg border border-line p-3 rounded-xl text-xs space-y-1">
-            <div className="font-bold text-text">Modul 3: Workshop A</div>
-            <p className="text-muted">Fortschritt: 60%</p>
+            <div className="font-bold text-text">Module 3: Workshop A</div>
+            <p className="text-muted">Progress: 60%</p>
           </div>
         </div>
 
         <div className="space-y-3">
           <div className="flex items-center space-x-1.5">
             <AlertCircle className="w-4 h-4 text-yellow" />
-            <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Schwachstellen</h4>
+            <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Weak Points</h4>
           </div>
           <div className="space-y-2">
-            {['OOP Konzepte', 'Rekursion'].map((weak, idx) => (
+            {['OOP Concepts', 'Recursion'].map((weak, idx) => (
               <div key={idx} className="bg-bg border border-line p-2.5 rounded-xl text-xs text-text flex items-center justify-between">
                 <span>{weak}</span>
                 <span className="w-2 h-2 rounded-full bg-red" />
@@ -226,18 +226,18 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
         <div className="space-y-3">
           <div className="flex items-center space-x-1.5">
             <HelpCircle className="w-4 h-4 text-purple" />
-            <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Empfohlene Übungen</h4>
+            <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Recommended Exercises</h4>
           </div>
           <div className="bg-bg border border-line p-3 rounded-xl text-xs text-text space-y-2">
-            <p className="text-muted">Basierend auf deinem OOP-Gap:</p>
+            <p className="text-muted">Based on your OOP gap:</p>
             <button 
               onClick={() => {
-                addToast('info', 'Übung gestartet');
+                addToast('info', 'Exercise started');
                 onNavigate('content-player');
               }}
               className="w-full bg-cyan text-bg py-1.5 rounded font-bold uppercase text-[10px]"
             >
-              Start: Klassen-Quiz
+              Start: Class Quiz
             </button>
           </div>
         </div>

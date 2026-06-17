@@ -21,10 +21,10 @@ export const Footer: React.FC = () => {
         </div>
         
         <div className="flex flex-wrap gap-4 justify-center md:justify-end">
-          <a href="#" className="hover:text-text transition-colors">Datenschutz</a>
-          <a href="#" className="hover:text-text transition-colors">Nutzungsbedingungen</a>
-          <a href="#" className="hover:text-text transition-colors">Cookie-Einstellungen</a>
-          <a href="#" className="hover:text-text transition-colors">Impressum</a>
+          <a href="#" className="hover:text-text transition-colors">Privacy Policy</a>
+          <a href="#" className="hover:text-text transition-colors">Terms of Use</a>
+          <a href="#" className="hover:text-text transition-colors">Cookie Settings</a>
+          <a href="#" className="hover:text-text transition-colors">Imprint</a>
         </div>
       </div>
     </footer>

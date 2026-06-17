@@ -83,9 +83,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             </div>
             
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-text uppercase tracking-tight">Level Aufstieg! 🎉</h2>
+              <h2 className="text-2xl font-black text-text uppercase tracking-tight">Level Up! 🎉</h2>
               <p className="text-muted text-xs leading-relaxed">
-                Glückwunsch Alex! Du hast Level {levelUpTo} erreicht. Dein Fleiß zahlt sich aus.
+                Congratulations Alex! You have reached Level {levelUpTo}. Your hard work is paying off.
               </p>
             </div>
             
@@ -93,7 +93,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               onClick={dismissCelebration}
               className="w-full bg-cyan hover:bg-cyan2 text-bg font-bold py-3 rounded-xl transition-all cursor-pointer"
             >
-              WEITER LERNEN
+              CONTINUE LEARNING
             </button>
           </div>
         </div>

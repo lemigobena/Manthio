@@ -26,13 +26,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
-    { id: 'catalog', label: 'Kurse durchsuchen', icon: <Compass className="w-4 h-4" /> },
-    { id: 'learning-path', label: 'Lernpfad', icon: <BookOpen className="w-4 h-4" /> },
-    { id: 'ai-tutor', label: 'KI-Tutor', icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'analytics', label: 'Analysen', icon: <LineChart className="w-4 h-4" /> },
-    { id: 'resources', label: 'Dateien', icon: <FolderKanban className="w-4 h-4" /> },
+    { id: 'catalog', label: 'Browse Courses', icon: <Compass className="w-4 h-4" /> },
+    { id: 'learning-path', label: 'Learning Path', icon: <BookOpen className="w-4 h-4" /> },
+    { id: 'ai-tutor', label: 'AI Tutor', icon: <Sparkles className="w-4 h-4" /> },
+    { id: 'analytics', label: 'Analytics', icon: <LineChart className="w-4 h-4" /> },
+    { id: 'resources', label: 'Files', icon: <FolderKanban className="w-4 h-4" /> },
     { id: 'community', label: 'Community', icon: <MessageSquare className="w-4 h-4" /> },
-    { id: 'settings', label: 'Einstellungen', icon: <Settings className="w-4 h-4" /> }
+    { id: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> }
   ];
 
   return (
@@ -126,7 +126,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button 
                 onClick={signOut}
                 className="text-muted hover:text-red transition-colors p-1"
-                title="Abmelden"
+                title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />
               </button>

@@ -12,10 +12,10 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete }) => {
   const [submitted, setSubmitted] = useState(false);
 
   const question = {
-    text: 'Welches Schlüsselwort wird verwendet, um eine Funktion in Python zu definieren?',
+    text: 'Which keyword is used to define a function in Python?',
     options: ['function', 'def', 'func', 'define'],
     correctIndex: 1,
-    explanation: 'Das def Schlüsselwort leitet in Python eine Funktionsdefinition (Definition) ein.'
+    explanation: 'The def keyword introduces a function definition in Python.'
   };
 
   const handleSubmit = () => {
@@ -23,10 +23,10 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete }) => {
     setSubmitted(true);
     
     if (selectedAnswer === question.correctIndex) {
-      addXp(25, 'Quizfrage richtig beantwortet');
-      addToast('success', '+25 XP — Richtig!');
+      addXp(25, 'Quiz question answered correctly');
+      addToast('success', '+25 XP — Correct!');
     } else {
-      addToast('error', 'Falsche Antwort. Siehe Erklärung.');
+      addToast('error', 'Wrong answer. See explanation.');
     }
 
     if (onComplete) {
@@ -38,7 +38,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete }) => {
     <div className="bg-panel border border-line rounded-2xl p-5 space-y-4 max-w-lg">
       <div className="flex items-center space-x-2 border-b border-line pb-3">
         <HelpCircle className="w-4 h-4 text-cyan" />
-        <h3 className="font-bold text-xs uppercase text-muted tracking-wider">Quiz: Python Grundlagen</h3>
+        <h3 className="font-bold text-xs uppercase text-muted tracking-wider">Quiz: Python Basics</h3>
       </div>
 
       <div className="space-y-4">
@@ -82,7 +82,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete }) => {
 
         {submitted && (
           <div className="p-3 bg-bg/50 border border-line rounded-xl text-[11px] text-muted leading-relaxed">
-            <span className="font-bold text-text block mb-1">Erklärung:</span>
+            <span className="font-bold text-text block mb-1">Explanation:</span>
             {question.explanation}
           </div>
         )}
@@ -95,7 +95,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete }) => {
               selectedAnswer === null ? 'bg-line text-muted cursor-not-allowed' : 'bg-cyan hover:bg-cyan2 text-bg'
             }`}
           >
-            Antwort prüfen (+25 XP)
+            Check Answer (+25 XP)
           </button>
         )}
       </div>

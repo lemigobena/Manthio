@@ -34,7 +34,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
     { 
       id: 'm1', 
       sender: 'tutor', 
-      text: `Hallo Alex! Willkommen bei der Lektion **"${currentLesson.title}"**. Ich bin dein KI-Tutor. Stell mir gerne Fragen zum Inhalt dieser Lektion!`, 
+      text: `Hello Alex! Welcome to the lesson **"${currentLesson.title}"**. I am your AI Tutor. Feel free to ask me questions about the content of this lesson!`, 
       timestamp: '14:30', 
       source: 'Course docs' 
     }
@@ -48,7 +48,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
 
   const handleSaveNote = () => {
     localStorage.setItem(`note-${currentLesson.id}`, noteText);
-    addToast('success', 'Notiz automatisch gespeichert.');
+    addToast('success', 'Note automatically saved.');
   };
 
   const handleSendMessage = () => {
@@ -68,9 +68,9 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
     // Simulated streaming response from Local RAG vs Cloud fallback
     setTimeout(() => {
       setIsTyping(false);
-      const replyText = chatInput.toLowerCase().includes('oop') || chatInput.toLowerCase().includes('klasse')
-        ? 'In Python ist eine Klasse eine Vorlage zur Erstellung von Objekten. Objekte haben Eigenschaften (Attribute) und Verhalten (Methoden). Möchtest du ein Codebeispiel dazu?'
-        : `Gute Frage zu "${currentLesson.title}"! Lass uns das Sokratisch betrachten. Was vermutest du, wie dieser Code abläuft?`;
+      const replyText = chatInput.toLowerCase().includes('oop') || chatInput.toLowerCase().includes('class')
+        ? 'In Python, a class is a template for creating objects. Objects have properties (attributes) and behavior (methods). Would you like a code example for this?'
+        : `Good question about "${currentLesson.title}"! Let's look at it socratically. What do you think happens when this code runs?`;
 
       const tutorMsg: ChatMessage = {
         id: Math.random().toString(),
@@ -79,26 +79,19 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         source: 'Course docs',
         documents: [
-          { title: 'Modul 1 Skript - Grundlagen', location: 'Section 3.2', url: '#' }
+          { title: 'Module 1 Script - Basics', location: 'Section 3.2', url: '#' }
         ]
       };
       setChatMessages(prev => [...prev, tutorMsg]);
-      addXp(10, 'KI-Tutor Frage gestellt');
+      addXp(10, 'Asked AI Tutor a question');
     }, 1500);
   };
 
   const markLessonComplete = () => {
     if (currentLesson.status !== 'completed') {
-      currentLesson.status = 'completed';
-      addXp(50, `Lektion "${currentLesson.title}" abgeschlossen`);
-      addToast('success', '+50 XP — Lektion abgeschlossen!');
-      
-      // Calculate new overall progress
-      const totalLessons = course.modules.reduce((sum, m) => sum + m.lessons.length, 0);
-      const completedLessons = course.modules.reduce(
-        (sum, m) => sum + m.lessons.filter(l => l.status === 'completed').length, 0
-      );
-      course.progress = Math.round((completedLessons / totalLessons) * 100);
+      // In a real app, this would update the global state or database
+      addXp(50, `Lesson "${currentLesson.title}" completed`);
+      addToast('success', '+50 XP — Lesson completed!');
     }
   };
 
@@ -142,14 +135,14 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
         {curriculumOpen && (
           <div className="w-72 bg-panel border-r border-line flex flex-col overflow-y-auto shrink-0 transition-all">
             <div className="p-4 border-b border-line">
-              <h3 className="font-bold text-xs uppercase text-muted tracking-wider">Lehrplan Übersicht</h3>
+              <h3 className="font-bold text-xs uppercase text-muted tracking-wider">Curriculum Overview</h3>
             </div>
             
             <div className="p-2 space-y-4">
               {course.modules.map(mod => (
                 <div key={mod.id} className="space-y-1">
                   <div className="px-3 py-1.5 text-xs font-semibold text-text bg-bg/50 rounded-lg">
-                    Modul {mod.number}: {mod.title}
+                    Module {mod.number}: {mod.title}
                   </div>
                   <div className="space-y-0.5">
                     {mod.lessons.map(les => {
@@ -193,9 +186,9 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
                 <div className="absolute bottom-4 left-4 right-4 bg-bg/85 backdrop-blur border border-line p-3 rounded-xl flex items-center justify-between text-xs text-text">
                   <div className="flex items-center space-x-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-cyan animate-pulse" />
-                    <span>Video fortsetzen bei 04:23</span>
+                    <span>Resume video at 04:23</span>
                   </div>
-                  <span className="font-bold text-muted">12:30 Gesamt</span>
+                  <span className="font-bold text-muted">12:30 Total</span>
                 </div>
               </div>
             ) : currentLesson.type === 'Code' ? (
@@ -211,16 +204,16 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
                   <p className="text-text pl-4">return [n**2 for n in numbers if n % 2 == 0]</p>
                 </div>
                 <div className="bg-bg border-t border-line px-4 py-3 flex items-center justify-between">
-                  <span className="text-xs text-muted">Prüfung bestanden: 3/3 Testfälle</span>
+                  <span className="text-xs text-muted">Test passed: 3/3 test cases</span>
                   <div className="flex space-x-2">
                     <button className="bg-bg hover:bg-line border border-line text-xs font-semibold px-4 py-2 rounded-xl transition-colors">
-                      Ausführen
+                      Run
                     </button>
                     <button 
-                      onClick={() => addXp(75, 'Code-Aufgabe eingereicht')}
+                      onClick={() => addXp(75, 'Code exercise submitted')}
                       className="bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-4 py-2 rounded-xl transition-colors cursor-pointer"
                     >
-                      Code einreichen (+75 XP)
+                      Submit Code (+75 XP)
                     </button>
                   </div>
                 </div>
@@ -229,8 +222,8 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
               <div className="bg-panel border border-line rounded-2xl p-6 md:p-8 space-y-6 prose prose-invert max-w-none">
                 <h2 className="text-xl md:text-2xl font-bold">{currentLesson.title}</h2>
                 <div className="text-xs text-muted flex items-center space-x-4">
-                  <span>Lesezeit: {currentLesson.duration}</span>
-                  <span>Schwierigkeit: {currentLesson.difficulty || 1}/3</span>
+                  <span>Reading time: {currentLesson.duration}</span>
+                  <span>Difficulty: {currentLesson.difficulty || 1}/3</span>
                 </div>
                 <p className="text-sm leading-relaxed text-text">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam elementum, urna et pretium dictum,
@@ -255,7 +248,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
                 onClick={() => onNavigate('learning-path')}
                 className="bg-bg hover:bg-line border border-line text-xs font-bold px-4 py-2.5 rounded-xl transition-colors"
               >
-                Zurück zur Übersicht
+                Back to Overview
               </button>
               
               <button 
@@ -265,10 +258,10 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
                 {currentLesson.status === 'completed' ? (
                   <>
                     <Check className="w-4 h-4 stroke-[3px]" />
-                    <span>ABGESCHLOSSEN</span>
+                    <span>COMPLETED</span>
                   </>
                 ) : (
-                  <span>ALS ERLEDIGT MARKIEREN (+50 XP)</span>
+                  <span>MARK AS DONE (+50 XP)</span>
                 )}
               </button>
             </div>
@@ -285,19 +278,19 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
                 onClick={() => setActiveTab('ai')}
                 className={`flex-1 text-center py-2 text-[10px] font-bold rounded uppercase ${activeTab === 'ai' ? 'bg-panel text-cyan border border-line' : 'text-muted hover:text-text'}`}
               >
-                KI-Tutor
+                AI Tutor
               </button>
               <button 
                 onClick={() => setActiveTab('notes')}
                 className={`flex-1 text-center py-2 text-[10px] font-bold rounded uppercase ${activeTab === 'notes' ? 'bg-panel text-cyan border border-line' : 'text-muted hover:text-text'}`}
               >
-                Notizen
+                Notes
               </button>
               <button 
                 onClick={() => setActiveTab('transcript')}
                 className={`flex-1 text-center py-2 text-[10px] font-bold rounded uppercase ${activeTab === 'transcript' ? 'bg-panel text-cyan border border-line' : 'text-muted hover:text-text'}`}
               >
-                Abschrift
+                Transcript
               </button>
             </div>
 
@@ -328,7 +321,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
                     {isTyping && (
                       <div className="text-[10px] text-muted flex items-center space-x-1.5 italic px-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-cyan animate-bounce" />
-                        <span>KI-Tutor antwortet...</span>
+                        <span>AI Tutor is responding...</span>
                       </div>
                     )}
                   </div>
@@ -337,7 +330,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
                   <div className="pt-4 border-t border-line mt-4 flex items-center space-x-2">
                     <input 
                       type="text" 
-                      placeholder="Stell eine Frage..." 
+                      placeholder="Ask a question..." 
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
@@ -356,11 +349,11 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
               {activeTab === 'notes' && (
                 <div className="space-y-4 flex flex-col h-full justify-between">
                   <div className="space-y-2 flex-1 flex flex-col">
-                    <label className="text-[10px] text-muted font-bold uppercase">Deine persönlichen Notizen</label>
+                    <label className="text-[10px] text-muted font-bold uppercase">Your personal notes</label>
                     <textarea 
                       value={noteText}
                       onChange={(e) => setNoteText(e.target.value)}
-                      placeholder="Schreibe hier wichtige Notizen auf. Markdown wird unterstützt..."
+                      placeholder="Write important notes here. Markdown is supported..."
                       className="flex-1 w-full p-3 bg-bg border border-line rounded-xl text-xs text-text focus:outline-none focus:border-cyan resize-none h-64 font-mono"
                     />
                   </div>
@@ -368,7 +361,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
                     onClick={handleSaveNote}
                     className="w-full bg-cyan hover:bg-cyan2 text-bg text-xs font-semibold py-2.5 rounded-lg transition-colors cursor-pointer"
                   >
-                    Notiz speichern
+                    Save note
                   </button>
                 </div>
               )}
@@ -376,16 +369,16 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
               {activeTab === 'transcript' && (
                 <div className="space-y-3 text-xs leading-relaxed text-muted">
                   <p>
-                    <span className="text-cyan font-bold block">00:15 - Einführung</span>
-                    Willkommen zu dieser Lektion. Wir werden uns heute mit der Syntax und den ersten Skripten beschäftigen.
+                    <span className="text-cyan font-bold block">00:15 - Introduction</span>
+                    Welcome to this lesson. Today we will focus on syntax and the first scripts.
                   </p>
                   <p>
-                    <span className="text-cyan font-bold block">04:23 - Variablen definieren</span>
-                    In Python weisen wir Werte mit dem einfachen Gleichheitszeichen zu. Variablen haben keinen festen Typ.
+                    <span className="text-cyan font-bold block">04:23 - Defining Variables</span>
+                    In Python, we assign values using the single equals sign. Variables do not have a fixed type.
                   </p>
                   <p>
-                    <span className="text-cyan font-bold block">08:45 - Zusammenfassung</span>
-                    Abschließend erstellen wir eine eigene virtuelle Umgebung mit dem venv Modul.
+                    <span className="text-cyan font-bold block">08:45 - Summary</span>
+                    Finally, we will create our own virtual environment using the venv module.
                   </p>
                 </div>
               )}

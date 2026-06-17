@@ -18,9 +18,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
   const getGreeting = () => {
     const hours = new Date().getHours();
-    if (hours < 12) return 'Guten Morgen';
-    if (hours < 18) return 'Guten Tag';
-    return 'Guten Abend';
+    if (hours < 12) return 'Good Morning';
+    if (hours < 18) return 'Good Afternoon';
+    return 'Good Evening';
   };
 
   return (
@@ -36,9 +36,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           </div>
           {activeCourse && (
             <p className="text-muted text-sm md:text-base">
-              Du lernst gerade <span className="text-cyan font-semibold">{activeCourse.title}</span>. Aktives Modul:{' '}
+              You are currently learning <span className="text-cyan font-semibold">{activeCourse.title}</span>. Active module:{' '}
               <span className="text-text font-semibold">
-                Modul {activeCourse.modules.find(m => m.status === 'In progress')?.number || 1}:{' '}
+                Module {activeCourse.modules.find(m => m.status === 'In progress')?.number || 1}:{' '}
                 {activeCourse.modules.find(m => m.status === 'In progress')?.title}
               </span>.
             </p>
@@ -62,19 +62,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 <span>STREAK</span>
                 <Flame className="w-4 h-4 text-yellow" />
               </div>
-              <div className="text-xl font-bold">{streak} Tage</div>
-              <span className="text-xs text-muted">Rekord: 15 Tage</span>
+              <div className="text-xl font-bold">{streak} Days</div>
+              <span className="text-xs text-muted">Record: 15 Days</span>
             </div>
             <button 
               onClick={() => onNavigate('analytics')}
               className="bg-bg border border-line p-4 rounded-xl text-left hover:border-cyan transition-colors"
             >
               <div className="flex items-center justify-between text-muted mb-1 text-xs">
-                <span>XP GESAMT</span>
+                <span>TOTAL XP</span>
                 <Sparkles className="w-4 h-4 text-purple" />
               </div>
               <div className="text-xl font-bold">{xp.toLocaleString()}</div>
-              <span className="text-xs text-muted">Nächstes Level in {10000 - (xp % 10000)} XP</span>
+              <span className="text-xs text-muted">Next level in {10000 - (xp % 10000)} XP</span>
             </button>
             <button 
               onClick={() => onNavigate('learning-path')}
@@ -85,7 +85,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 <BookOpen className="w-4 h-4 text-green" />
               </div>
               <div className="text-xl font-bold">2/10</div>
-              <span className="text-xs text-muted">Abgeschlossen</span>
+              <span className="text-xs text-muted">Completed</span>
             </button>
           </div>
         </div>
@@ -103,7 +103,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               <div className="flex justify-between items-start">
                 <div>
                   <span className="bg-orange/20 text-orange border border-orange/30 text-xs px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider">
-                    Aktiver Kurs
+                    Active Course
                   </span>
                   <h2 className="text-xl font-bold mt-2">{activeCourse.title}</h2>
                   <p className="text-muted text-sm mt-1">{activeCourse.description}</p>
@@ -127,7 +127,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-line">
                 <div className="text-xs text-muted">
-                  Weiter mit: <span className="text-text font-medium">Variablen, Datentypen & Operatoren</span>
+                  Continue with: <span className="text-text font-medium">Variables, Data Types & Operators</span>
                 </div>
                 <button 
                   onClick={() => {
@@ -137,7 +137,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   className="bg-cyan hover:bg-cyan2 text-bg font-semibold px-5 py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-colors cursor-pointer"
                 >
                   <Play className="w-4 h-4 fill-current" />
-                  <span>LERNPFAD ÖFFNEN</span>
+                  <span>OPEN LEARNING PATH</span>
                 </button>
               </div>
             </div>
@@ -146,12 +146,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           {/* Enrolled Courses Grid */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold">Deine Kurse</h3>
+              <h3 className="text-lg font-bold">Your Courses</h3>
               <button 
                 onClick={() => onNavigate('catalog')}
                 className="text-cyan hover:text-cyan2 text-sm font-semibold flex items-center space-x-1"
               >
-                <span>Alle anzeigen</span>
+                <span>Show all</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -182,7 +182,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                       }}
                       className="text-cyan hover:underline text-xs font-bold"
                     >
-                      Kurs fortsetzen
+                      Resume course
                     </button>
                   </div>
                 </div>
@@ -198,15 +198,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           <div className="bg-gradient-to-r from-red/20 to-orange/20 border border-red/40 rounded-xl p-4 flex items-start space-x-3">
             <AlertCircle className="w-5 h-5 text-red shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <h4 className="font-bold text-sm text-text">Nächster Termin</h4>
+              <h4 className="font-bold text-sm text-text">Next Session</h4>
               <p className="text-xs text-muted">
-                Live-Session startet in 5 Minuten — Python Bootcamp Day 1 Morning
+                Live session starts in 5 minutes — Python Bootcamp Day 1 Morning
               </p>
               <button 
                 onClick={() => onNavigate('live-session')}
                 className="text-cyan hover:text-cyan2 text-xs font-semibold flex items-center space-x-1 pt-1"
               >
-                <span>Teilnehmen</span>
+                <span>Join</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -216,25 +216,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           <div className="bg-panel border border-line rounded-xl p-5 space-y-4">
             <div className="flex items-center space-x-2">
               <Sparkles className="w-4 h-4 text-purple" />
-              <h3 className="font-bold text-sm uppercase tracking-wider text-muted">KI-Tutor Empfehlungen</h3>
+              <h3 className="font-bold text-sm uppercase tracking-wider text-muted">AI Tutor Recommendations</h3>
             </div>
             <div className="space-y-3">
               <div className="bg-bg border border-line rounded-lg p-3 text-xs space-y-2">
-                <span className="text-[10px] bg-cyan/15 text-cyan px-2 py-0.5 rounded font-semibold">Aktuelles Modul</span>
-                <p className="font-medium text-text">Übe jetzt: OOP Konzepte • 10 Min</p>
-                <p className="text-muted">Basierend auf deinem Lernpfad: "Klassen und Objekte in Python"</p>
+                <span className="text-[10px] bg-cyan/15 text-cyan px-2 py-0.5 rounded font-semibold">Current Module</span>
+                <p className="font-medium text-text">Practice now: OOP Concepts • 10 min</p>
+                <p className="text-muted">Based on your learning path: "Classes and Objects in Python"</p>
               </div>
               <div className="bg-bg border border-line rounded-lg p-3 text-xs space-y-2">
-                <span className="text-[10px] bg-purple/15 text-purple px-2 py-0.5 rounded font-semibold">Schwachpunkte</span>
-                <p className="font-medium text-text">Wiederhole: Rekursions-Quiz • 8 Min</p>
-                <p className="text-muted">Schließe deine Wissenslücke bei rekursiven Funktionsaufrufen.</p>
+                <span className="text-[10px] bg-purple/15 text-purple px-2 py-0.5 rounded font-semibold">Weak Points</span>
+                <p className="font-medium text-text">Review: Recursion Quiz • 8 min</p>
+                <p className="text-muted">Close your knowledge gap with recursive function calls.</p>
               </div>
             </div>
             <button 
               onClick={() => onNavigate('ai-tutor')}
               className="w-full bg-bg hover:bg-line border border-line hover:border-cyan text-text text-xs font-semibold py-2.5 rounded-lg transition-colors cursor-pointer"
             >
-              Mit KI-Tutor sprechen
+              Talk to AI Tutor
             </button>
           </div>
 
@@ -243,12 +243,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
                 <AlertCircle className="w-4 h-4 text-yellow" />
-                <h3 className="font-bold text-sm uppercase tracking-wider text-muted">Meine Schwachpunkte</h3>
+                <h3 className="font-bold text-sm uppercase tracking-wider text-muted">My Weak Points</h3>
               </div>
               <span className="bg-yellow/20 text-yellow text-[10px] px-2 py-0.5 rounded font-bold">3 Gaps</span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {['OOP Konzepte', 'Rekursion', 'List Comprehensions'].map((weakness, idx) => (
+              {['OOP Concepts', 'Recursion', 'List Comprehensions'].map((weakness, idx) => (
                 <span key={idx} className="bg-bg border border-line text-xs px-3 py-1.5 rounded-lg text-text flex items-center space-x-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-red" />
                   <span>{weakness}</span>
@@ -266,7 +266,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 onClick={() => onNavigate('ai-tutor')}
                 className="flex-1 bg-cyan hover:bg-cyan2 text-bg text-xs font-semibold py-2 rounded-lg text-center"
               >
-                Analysieren
+                Analyze
               </button>
             </div>
           </div>

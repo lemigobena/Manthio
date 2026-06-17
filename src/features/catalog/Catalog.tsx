@@ -36,15 +36,15 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text">Kurskatalog</h1>
-          <p className="text-muted text-sm mt-1">Entdecke neue Themen oder führe deine bestehenden Kurse fort.</p>
+          <h1 className="text-2xl font-bold text-text">Course Catalog</h1>
+          <p className="text-muted text-sm mt-1">Discover new topics or continue your existing courses.</p>
         </div>
         
         {/* Search Bar */}
         <div className="relative w-full md:w-80">
           <input 
             type="text" 
-            placeholder="Nach Kursen oder Themen suchen..." 
+            placeholder="Search for courses or topics..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-panel border border-line rounded-xl pl-10 pr-4 py-2 text-sm text-text focus:border-cyan focus:outline-none transition-colors"
@@ -60,19 +60,19 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
             onClick={() => setActiveTab('all')}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'all' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
           >
-            Alle Kurse ({COURSES.length})
+            All Courses ({COURSES.length})
           </button>
           <button 
             onClick={() => setActiveTab('enrolled')}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'enrolled' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
           >
-            Meine Kurse ({COURSES.filter(c => c.enrolled).length})
+            My Courses ({COURSES.filter(c => c.enrolled).length})
           </button>
           <button 
             onClick={() => setActiveTab('completed')}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'completed' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
           >
-            Abgeschlossen ({COURSES.filter(c => c.progress === 100).length})
+            Completed ({COURSES.filter(c => c.progress === 100).length})
           </button>
         </div>
 
@@ -85,10 +85,10 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
             onChange={(e) => setSelectedLevel(e.target.value)}
             className="bg-panel border border-line text-xs rounded-lg px-3 py-1.5 text-text focus:outline-none focus:border-cyan"
           >
-            <option value="All">Alle Niveaus</option>
-            <option value="Foundation">Grundlagen</option>
-            <option value="Intermediate">Mittelstufe</option>
-            <option value="Advanced">Fortgeschritten</option>
+            <option value="All">All Levels</option>
+            <option value="Foundation">Foundation</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
           </select>
 
           <select 
@@ -96,10 +96,10 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
             onChange={(e) => setSelectedFormat(e.target.value)}
             className="bg-panel border border-line text-xs rounded-lg px-3 py-1.5 text-text focus:outline-none focus:border-cyan"
           >
-            <option value="All">Alle Formate</option>
+            <option value="All">All Formats</option>
             <option value="flipped">Flipped (Hybrid)</option>
-            <option value="self-paced">Selbstgesteuert</option>
-            <option value="cohort">Kohorte</option>
+            <option value="self-paced">Self-paced</option>
+            <option value="cohort">Cohort</option>
           </select>
         </div>
       </div>
@@ -108,13 +108,13 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
       {filteredCourses.length === 0 ? (
         <div className="text-center py-12 bg-panel border border-line rounded-2xl">
           <BookOpen className="w-12 h-12 text-muted mx-auto mb-3" />
-          <h3 className="font-bold text-text">Keine Kurse gefunden</h3>
-          <p className="text-muted text-sm mt-1">Passe deine Such- oder Filtereinstellungen an.</p>
+          <h3 className="font-bold text-text">No courses found</h3>
+          <p className="text-muted text-sm mt-1">Adjust your search or filter settings.</p>
           <button 
             onClick={() => { setSelectedLevel('All'); setSelectedFormat('All'); setSearchQuery(''); setActiveTab('all'); }}
             className="mt-4 bg-cyan hover:bg-cyan2 text-bg text-xs font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer"
           >
-            Filter zurücksetzen
+            Reset Filters
           </button>
         </div>
       ) : (
@@ -154,7 +154,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                     </div>
                     <div className="flex items-center space-x-1">
                       <Clock className="w-3.5 h-3.5" />
-                      <span>{course.format === 'flipped' ? '2 Tage + Self-study' : 'Selbstgesteuert'}</span>
+                      <span>{course.format === 'flipped' ? '2 Days + Self-study' : 'Self-paced'}</span>
                     </div>
                   </div>
                 </div>
@@ -165,8 +165,8 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                 <div>
                   {course.enrolled ? (
                     <div className="space-y-1">
-                      <span className="text-[10px] text-muted font-semibold block">Fortschritt</span>
-                      <span className="text-xs font-bold text-cyan">{course.progress}% abgeschlossen</span>
+                      <span className="text-[10px] text-muted font-semibold block">Progress</span>
+                      <span className="text-xs font-bold text-cyan">{course.progress}% completed</span>
                     </div>
                   ) : (
                     <span className="text-sm font-bold text-text">{course.price}</span>
@@ -184,7 +184,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                   }}
                   className="bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-4 py-2 rounded-xl transition-colors cursor-pointer"
                 >
-                  {course.enrolled ? 'Fortsetzen' : 'Details & Buchung'}
+                  {course.enrolled ? 'Continue' : 'Details & Booking'}
                 </button>
               </div>
             </div>

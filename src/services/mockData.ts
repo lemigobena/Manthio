@@ -47,10 +47,10 @@ export const COURSES: Course[] = [
         status: 'Completed',
         type: 'Self-study',
         lessons: [
-          { id: 'py-les-1-1', title: 'Python installieren & IDE einrichten', type: 'Video', duration: '20min', status: 'completed', required: true, bloomLevel: 'Remember' },
-          { id: 'py-les-1-2', title: 'REPL, Skripte & venv', type: 'Video', duration: '25min', status: 'completed', required: true, bloomLevel: 'Remember' },
-          { id: 'py-les-1-3', title: 'Variablen & Datentypen', type: 'Article', duration: '25min', status: 'completed', required: true, bloomLevel: 'Understand' },
-          { id: 'py-les-1-4', title: 'Dein erstes Skript', type: 'Code', duration: '20min', status: 'completed', required: true, bloomLevel: 'Apply' }
+          { id: 'py-les-1-1', title: 'Install Python & Set up IDE', type: 'Video', duration: '20min', status: 'completed', required: true, bloomLevel: 'Remember' },
+          { id: 'py-les-1-2', title: 'REPL, Scripts & venv', type: 'Video', duration: '25min', status: 'completed', required: true, bloomLevel: 'Remember' },
+          { id: 'py-les-1-3', title: 'Variables & Data Types', type: 'Article', duration: '25min', status: 'completed', required: true, bloomLevel: 'Understand' },
+          { id: 'py-les-1-4', title: 'Your first script', type: 'Code', duration: '20min', status: 'completed', required: true, bloomLevel: 'Apply' }
         ]
       },
       {
@@ -62,10 +62,10 @@ export const COURSES: Course[] = [
         status: 'Completed',
         type: 'Self-study',
         lessons: [
-          { id: 'py-les-2-1', title: 'Arithmetische & logische Operatoren', type: 'Video', duration: '15min', status: 'completed', required: true, bloomLevel: 'Remember' },
-          { id: 'py-les-2-2', title: 'String-Manipulation & f-Strings', type: 'Article', duration: '30min', status: 'completed', required: true, bloomLevel: 'Understand' },
-          { id: 'py-les-2-3', title: 'Konsoleneingabe und -ausgabe', type: 'Code', duration: '25min', status: 'completed', required: true, bloomLevel: 'Apply' },
-          { id: 'py-les-2-4', title: 'Wiederholungsquiz: Grundlagen', type: 'Quiz', duration: '20min', status: 'completed', required: true, bloomLevel: 'Remember' }
+          { id: 'py-les-2-1', title: 'Arithmetic & Logical Operators', type: 'Video', duration: '15min', status: 'completed', required: true, bloomLevel: 'Remember' },
+          { id: 'py-les-2-2', title: 'String Manipulation & f-Strings', type: 'Article', duration: '30min', status: 'completed', required: true, bloomLevel: 'Understand' },
+          { id: 'py-les-2-3', title: 'Console Input and Output', type: 'Code', duration: '25min', status: 'completed', required: true, bloomLevel: 'Apply' },
+          { id: 'py-les-2-4', title: 'Review Quiz: Basics', type: 'Quiz', duration: '20min', status: 'completed', required: true, bloomLevel: 'Remember' }
         ]
       },
       {
@@ -80,7 +80,7 @@ export const COURSES: Course[] = [
         venue: 'apigenio Training Centre, Muri',
         lessons: [
           { id: 'py-les-3-1', title: 'Setup verification, first scripts live', type: 'Live Event', duration: '120min', status: 'in_progress', required: true, bloomLevel: 'Analyse' },
-          { id: 'py-les-3-2', title: 'Gemeinsames Debugging & Peer Review', type: 'Live Event', duration: '90min', status: 'not_started', required: true, bloomLevel: 'Analyse' }
+          { id: 'py-les-3-2', title: 'Joint Debugging & Peer Review', type: 'Live Event', duration: '90min', status: 'not_started', required: true, bloomLevel: 'Analyse' }
         ]
       },
       {
@@ -92,9 +92,9 @@ export const COURSES: Course[] = [
         status: 'Open',
         type: 'Self-study',
         lessons: [
-          { id: 'py-les-4-1', title: 'Listen & Tuples im Detail', type: 'Video', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'py-les-4-1', title: 'Lists & Tuples in Detail', type: 'Video', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Remember' },
           { id: 'py-les-4-2', title: 'Dictionaries & Sets', type: 'Video', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Understand' },
-          { id: 'py-les-4-3', title: 'Übung: Datenstrukturen manipulieren', type: 'Code', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Apply' }
+          { id: 'py-les-4-3', title: 'Exercise: Manipulating Data Structures', type: 'Code', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Apply' }
         ]
       },
       {
@@ -106,9 +106,9 @@ export const COURSES: Course[] = [
         status: 'Locked',
         type: 'Self-study',
         lessons: [
-          { id: 'py-les-5-1', title: 'Bedingungen & Schleifen', type: 'Video', duration: '25min', status: 'locked', required: true, bloomLevel: 'Remember' },
-          { id: 'py-les-5-2', title: 'List-Comprehensions', type: 'Article', duration: '20min', status: 'locked', required: true, bloomLevel: 'Understand' },
-          { id: 'py-les-5-3', title: 'Übung: Schleifen und Comprehensions', type: 'Code', duration: '45min', status: 'locked', required: true, bloomLevel: 'Apply' }
+          { id: 'py-les-5-1', title: 'Conditions & Loops', type: 'Video', duration: '25min', status: 'locked', required: true, bloomLevel: 'Remember' },
+          { id: 'py-les-5-2', title: 'List Comprehensions', type: 'Article', duration: '20min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'py-les-5-3', title: 'Exercise: Loops and Comprehensions', type: 'Code', duration: '45min', status: 'locked', required: true, bloomLevel: 'Apply' }
         ]
       },
       {
@@ -120,8 +120,8 @@ export const COURSES: Course[] = [
         status: 'Locked',
         type: 'Self-study',
         lessons: [
-          { id: 'py-les-6-1', title: 'Funktionen definieren', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
-          { id: 'py-les-6-2', title: 'Lokaler vs globaler Scope', type: 'Article', duration: '20min', status: 'locked', required: true, bloomLevel: 'Remember' },
+          { id: 'py-les-6-1', title: 'Defining Functions', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'py-les-6-2', title: 'Local vs Global Scope', type: 'Article', duration: '20min', status: 'locked', required: true, bloomLevel: 'Remember' },
           { id: 'py-les-6-3', title: 'Worked Example: Faded Guidance Exercise', type: 'Code', duration: '40min', status: 'locked', required: true, bloomLevel: 'Apply' }
         ]
       },
@@ -134,8 +134,8 @@ export const COURSES: Course[] = [
         status: 'Locked',
         type: 'Self-study',
         lessons: [
-          { id: 'py-les-7-1', title: 'Standardbibliothek nutzen', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
-          { id: 'py-les-7-2', title: 'Eigene Module schreiben', type: 'Article', duration: '25min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'py-les-7-1', title: 'Using the Standard Library', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'py-les-7-2', title: 'Writing Own Modules', type: 'Article', duration: '25min', status: 'locked', required: true, bloomLevel: 'Understand' },
           { id: 'py-les-7-3', title: 'Pip & requirements.txt', type: 'Video', duration: '20min', status: 'locked', required: true, bloomLevel: 'Understand' }
         ]
       },
@@ -148,9 +148,9 @@ export const COURSES: Course[] = [
         status: 'Locked',
         type: 'Self-study',
         lessons: [
-          { id: 'py-les-8-1', title: 'Ausnahmebehandlung (try/except)', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Remember' },
-          { id: 'py-les-8-2', title: 'Dateien lesen & schreiben', type: 'Article', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
-          { id: 'py-les-8-3', title: 'Übung: CSV-Daten verarbeiten', type: 'Code', duration: '30min', status: 'locked', required: true, bloomLevel: 'Apply' }
+          { id: 'py-les-8-1', title: 'Exception Handling (try/except)', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Remember' },
+          { id: 'py-les-8-2', title: 'Reading & Writing Files', type: 'Article', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'py-les-8-3', title: 'Exercise: Processing CSV Data', type: 'Code', duration: '30min', status: 'locked', required: true, bloomLevel: 'Apply' }
         ]
       },
       {
@@ -188,7 +188,7 @@ export const COURSES: Course[] = [
   },
   {
     id: 'react-web-development',
-    title: 'Webentwicklung mit React',
+    title: 'Web Development with React',
     description: 'Learn dynamic UI state management, hooks, routing, and structuring scalable Single Page Applications with React.',
     level: 'Intermediate',
     format: 'self-paced',
@@ -221,37 +221,37 @@ export const TRACKS: CareerTrack[] = [
 ];
 
 export const RESOURCES: ResourceFile[] = [
-  { id: 'file-1', name: 'Python Bootcamp - Modul 1 Unterlagen', type: 'pdf', courseName: 'Python Bootcamp', uploadDate: '15. Jan 2026', accessLevel: 'All Learners', size: '2.4 MB' },
-  { id: 'file-2', name: 'Vorlesungsskript KI Woche 03.pdf', type: 'pdf', courseName: 'KI Grundlagen', uploadDate: 'Gestern, 14:30', accessLevel: 'Cohort Only', size: '1.8 MB' },
-  { id: 'file-3', name: 'React Hooks Crashcourse.mp4', type: 'video', courseName: 'Webentwicklung mit React', uploadDate: '10. Jan 2026', accessLevel: 'All Learners', size: '45 MB' },
-  { id: 'file-4', name: 'Python_Übungen_Set_2.zip', type: 'archive', courseName: 'Python Bootcamp', uploadDate: '08. Jan 2026', accessLevel: 'All Learners', size: '1.2 MB' },
-  { id: 'file-5', name: 'IT Security Cheatsheet.pdf', type: 'pdf', courseName: 'IT Security Basics', uploadDate: '05. Jan 2026', accessLevel: 'All Learners', size: '420 KB' }
+  { id: 'file-1', name: 'Python Bootcamp - Module 1 Materials', type: 'pdf', courseName: 'Python Bootcamp', uploadDate: 'Jan 15, 2026', accessLevel: 'All Learners', size: '2.4 MB' },
+  { id: 'file-2', name: 'Lecture Script AI Week 03.pdf', type: 'pdf', courseName: 'AI Fundamentals', uploadDate: 'Yesterday, 14:30', accessLevel: 'Cohort Only', size: '1.8 MB' },
+  { id: 'file-3', name: 'React Hooks Crashcourse.mp4', type: 'video', courseName: 'Web Development with React', uploadDate: 'Jan 10, 2026', accessLevel: 'All Learners', size: '45 MB' },
+  { id: 'file-4', name: 'Python_Exercises_Set_2.zip', type: 'archive', courseName: 'Python Bootcamp', uploadDate: 'Jan 08, 2026', accessLevel: 'All Learners', size: '1.2 MB' },
+  { id: 'file-5', name: 'IT Security Cheatsheet.pdf', type: 'pdf', courseName: 'IT Security Basics', uploadDate: 'Jan 05, 2026', accessLevel: 'All Learners', size: '420 KB' }
 ];
 
 export const FORUM_THREADS: ForumThread[] = [
   {
     id: 'thread-1',
-    title: 'Was ist der Unterschied zwischen einer Liste und einem Tuple?',
+    title: 'What is the difference between a list and a tuple?',
     author: 'Marc K.',
-    body: 'Ich lerne gerade das Datenstruktur-Modul in Python und frage mich, wann man ein Tuple statt einer Liste verwenden sollte. Die Unveränderlichkeit ist klar, aber gibt es Performance-Unterschiede oder andere Faustregeln?',
+    body: "I'm currently learning the data structure module in Python and wondering when to use a tuple instead of a list. Immutability is clear, but are there performance differences or other rules of thumb?",
     category: 'Python Bootcamp',
     moduleName: 'Data Structures',
     upvotes: 8,
     commentsCount: 3,
     hasAcceptedAnswer: true,
-    timestamp: '14. Jun 2026'
+    timestamp: 'Jun 14, 2026'
   },
   {
     id: 'thread-2',
-    title: 'Fehlermeldung bei "venv" Aktivierung unter Windows PowerShell',
+    title: 'Error message when activating "venv" under Windows PowerShell',
     author: 'Tanya S.',
-    body: 'Wenn ich versuche mein venv zu aktivieren via `.\\venv\\Scripts\\Activate.ps1`, bekomme ich einen Execution_Policies Fehler von Windows. Was kann ich tun?',
+    body: 'When I try to activate my venv via `.\\venv\\Scripts\\Activate.ps1`, I get an Execution_Policies error from Windows. What can I do?',
     category: 'Python Bootcamp',
     moduleName: 'Setup & Python Basics',
     upvotes: 12,
     commentsCount: 5,
     hasAcceptedAnswer: true,
-    timestamp: 'Gestern, 18:22',
+    timestamp: 'Yesterday, 18:22',
     isAnonymous: false
   }
 ];

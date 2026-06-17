@@ -22,7 +22,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
         <div 
           key={i} 
           className={`w-3.5 h-3.5 rounded-sm ${intensityClasses[val]} transition-colors hover:scale-110`}
-          title={`Tag ${i + 1}: ${val * 15} Minuten gelernt`}
+          title={`Day ${i + 1}: ${val * 15} minutes studied`}
         />
       );
     }
@@ -30,15 +30,15 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
   };
 
   const exportCSV = () => {
-    addToast('success', 'Lernstatistiken erfolgreich als CSV exportiert!');
+    addToast('success', 'Learning statistics successfully exported as CSV!');
   };
 
   return (
     <div className="space-y-6 pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text">Analysen & Fortschritt</h1>
-          <p className="text-muted text-sm mt-1">Detaillierte Einblicke in deine Lernaktivitäten und Kompetenzen.</p>
+          <h1 className="text-2xl font-bold text-text">Analytics & Progress</h1>
+          <p className="text-muted text-sm mt-1">Detailed insights into your learning activities and skills.</p>
         </div>
         
         {/* Time selector and Export button */}
@@ -48,9 +48,9 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
             onChange={(e) => setTimeRange(e.target.value as any)}
             className="bg-panel border border-line text-xs rounded-lg px-3 py-2 text-text focus:outline-none focus:border-cyan cursor-pointer"
           >
-            <option value="week">Diese Woche</option>
-            <option value="month">Diesen Monat</option>
-            <option value="year">Dieses Jahr</option>
+            <option value="week">This week</option>
+            <option value="month">This month</option>
+            <option value="year">This year</option>
           </select>
           
           <button 
@@ -67,11 +67,11 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-panel border border-line p-5 rounded-2xl">
           <div className="flex justify-between items-start text-muted text-xs">
-            <span>LERNZEIT</span>
+            <span>STUDY TIME</span>
             <Clock className="w-4 h-4 text-cyan" />
           </div>
-          <div className="text-2xl font-bold mt-2">18.5 Std</div>
-          <span className="text-[10px] text-green font-semibold mt-1 block">+12% ggu. Vorwoche</span>
+          <div className="text-2xl font-bold mt-2">18.5 Hrs</div>
+          <span className="text-[10px] text-green font-semibold mt-1 block">+12% vs. previous week</span>
         </div>
         
         <div className="bg-panel border border-line p-5 rounded-2xl">
@@ -79,26 +79,26 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
             <span>STREAK RECORD</span>
             <Flame className="w-4 h-4 text-yellow" />
           </div>
-          <div className="text-2xl font-bold mt-2">{streak} Tage</div>
-          <span className="text-[10px] text-muted mt-1 block">Aktueller Streak aktiv</span>
+          <div className="text-2xl font-bold mt-2">{streak} Days</div>
+          <span className="text-[10px] text-muted mt-1 block">Current streak active</span>
         </div>
         
         <div className="bg-panel border border-line p-5 rounded-2xl">
           <div className="flex justify-between items-start text-muted text-xs">
-            <span>ABGESCHLOSSEN</span>
+            <span>COMPLETED</span>
             <Award className="w-4 h-4 text-green" />
           </div>
-          <div className="text-2xl font-bold mt-2">2 Module</div>
-          <span className="text-[10px] text-muted mt-1 block">In 1 aktiven Kursen</span>
+          <div className="text-2xl font-bold mt-2">2 Modules</div>
+          <span className="text-[10px] text-muted mt-1 block">In 1 active courses</span>
         </div>
 
         <div className="bg-panel border border-line p-5 rounded-2xl">
           <div className="flex justify-between items-start text-muted text-xs">
-            <span>ABONNEMENT</span>
+            <span>SUBSCRIPTION</span>
             <Sparkles className="w-4 h-4 text-purple" />
           </div>
           <div className="text-2xl font-bold mt-2">Premium</div>
-          <span className="text-[10px] text-muted mt-1 block">Aktiv via Arbeitgeber</span>
+          <span className="text-[10px] text-muted mt-1 block">Active via employer</span>
         </div>
       </div>
 
@@ -108,26 +108,26 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
         {/* Weekly Activity Line Representation */}
         <div className="lg:col-span-2 bg-panel border border-line rounded-2xl p-6 space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-bold text-base">Wöchentliche Aktivität</h3>
-            <span className="text-xs text-muted">Durchschnitt: 2.6 Std / Tag</span>
+            <h3 className="font-bold text-base">Weekly Activity</h3>
+            <span className="text-xs text-muted">Average: 2.6 Hrs / Day</span>
           </div>
           
           {/* Simulating a graphic line chart with divs */}
           <div className="h-48 flex items-end justify-between pt-6 border-b border-line px-4 relative">
             {/* Background grids */}
-            <div className="absolute inset-x-0 top-1/4 border-t border-line/40 text-[9px] text-muted/60 pt-0.5">3 Std</div>
-            <div className="absolute inset-x-0 top-2/4 border-t border-line/40 text-[9px] text-muted/60 pt-0.5">2 Std</div>
-            <div className="absolute inset-x-0 top-3/4 border-t border-line/40 text-[9px] text-muted/60 pt-0.5">1 Std</div>
+            <div className="absolute inset-x-0 top-1/4 border-t border-line/40 text-[9px] text-muted/60 pt-0.5">3 Hrs</div>
+            <div className="absolute inset-x-0 top-2/4 border-t border-line/40 text-[9px] text-muted/60 pt-0.5">2 Hrs</div>
+            <div className="absolute inset-x-0 top-3/4 border-t border-line/40 text-[9px] text-muted/60 pt-0.5">1 Hr</div>
 
             {/* Days Bars */}
             {[
-              { day: 'Mo', min: 38 },
-              { day: 'Di', min: 62 },
-              { day: 'Mi', min: 86 },
-              { day: 'Do', min: 100 },
-              { day: 'Fr', min: 28 },
-              { day: 'Sa', min: 16 },
-              { day: 'So', min: 52 }
+              { day: 'Mon', min: 38 },
+              { day: 'Tue', min: 62 },
+              { day: 'Wed', min: 86 },
+              { day: 'Thu', min: 100 },
+              { day: 'Fri', min: 28 },
+              { day: 'Sat', min: 16 },
+              { day: 'Sun', min: 52 }
             ].map((d, idx) => (
               <div key={idx} className="flex flex-col items-center space-y-2 z-10 w-full">
                 <span className="text-[10px] text-cyan font-bold">{d.min}m</span>
@@ -143,14 +143,14 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
 
         {/* Skill Profile Radar Simulator */}
         <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
-          <h3 className="font-bold text-base">Python Kompetenzprofil</h3>
+          <h3 className="font-bold text-base">Python Competence Profile</h3>
           
           <div className="space-y-3 pt-2">
             {[
-              { skill: 'Abstrakte Logik', pct: 88 },
+              { skill: 'Abstract Logic', pct: 88 },
               { skill: 'Python Syntax', pct: 70 },
-              { skill: 'OOP Konzepte', pct: 45 },
-              { skill: 'Fehlerbehandlung', pct: 38 }
+              { skill: 'OOP Concepts', pct: 45 },
+              { skill: 'Error Handling', pct: 38 }
             ].map((s, idx) => (
               <div key={idx} className="space-y-1.5 text-xs">
                 <div className="flex justify-between">
@@ -169,15 +169,15 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
       {/* GitHub-style Heatmap */}
       <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
         <div className="flex justify-between items-center">
-          <h3 className="font-bold text-base">Lernaktivität (Letzte 90 Tage)</h3>
+          <h3 className="font-bold text-base">Learning Activity (Last 90 Days)</h3>
           <div className="flex items-center space-x-2 text-[10px] text-muted">
-            <span>Weniger</span>
+            <span>Less</span>
             <div className="w-3.5 h-3.5 rounded-sm bg-bg border border-line" />
             <div className="w-3.5 h-3.5 rounded-sm bg-cyan/20 border border-cyan/10" />
             <div className="w-3.5 h-3.5 rounded-sm bg-cyan/40 border border-cyan/25" />
             <div className="w-3.5 h-3.5 rounded-sm bg-cyan/70 border border-cyan/50" />
             <div className="w-3.5 h-3.5 rounded-sm bg-cyan border border-cyan2" />
-            <span>Mehr</span>
+            <span>More</span>
           </div>
         </div>
 
@@ -188,21 +188,21 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
 
       {/* Weakness Deep-Dive */}
       <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
-        <h3 className="font-bold text-base">Schwachpunkt-Analyse</h3>
+        <h3 className="font-bold text-base">Weakness Analysis</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-bg border border-line p-4 rounded-xl flex items-start space-x-3">
             <AlertTriangle className="w-5 h-5 text-red shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <h4 className="font-bold text-sm text-text">OOP Konzepte</h4>
+              <h4 className="font-bold text-sm text-text">OOP Concepts</h4>
               <p className="text-xs text-muted leading-relaxed">
-                Schwierigkeiten beim Verständnis von Vererbung und Klasseninstanziierung in Modul 6.
+                Difficulties in understanding inheritance and class instantiation in Module 6.
               </p>
               <button 
                 onClick={() => onNavigate('ai-tutor')}
                 className="text-cyan hover:underline text-xs font-semibold mt-2 block"
               >
-                Übung mit KI-Tutor starten
+                Start exercise with AI Tutor
               </button>
             </div>
           </div>
@@ -210,15 +210,15 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
           <div className="bg-bg border border-line p-4 rounded-xl flex items-start space-x-3">
             <AlertTriangle className="w-5 h-5 text-red shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <h4 className="font-bold text-sm text-text">Fehlerbehandlung</h4>
+              <h4 className="font-bold text-sm text-text">Error Handling</h4>
               <p className="text-xs text-muted leading-relaxed">
-                Exceptions und try-except Blöcke wurden bei den letzten Quizfragen mehrfach falsch beantwortet.
+                Exceptions and try-except blocks were answered incorrectly several times in the last quiz questions.
               </p>
               <button 
                 onClick={() => onNavigate('ai-tutor')}
                 className="text-cyan hover:underline text-xs font-semibold mt-2 block"
               >
-                Remediation-Sitzung starten
+                Start remediation session
               </button>
             </div>
           </div>

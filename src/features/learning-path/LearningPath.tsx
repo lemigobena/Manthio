@@ -34,7 +34,7 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
 
   const startLesson = (lesson: Lesson) => {
     if (lesson.status === 'locked') return;
-    addXp(10, `Lektion ${lesson.title} gestartet`);
+    addXp(10, `Lesson ${lesson.title} started`);
     onNavigate('content-player');
   };
 
@@ -47,12 +47,12 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
             <span className="text-[10px] text-cyan font-bold uppercase tracking-wider bg-bg px-2 py-0.5 rounded border border-line">
               {course.level} • {course.format === 'flipped' ? 'Flipped Bootcamp' : 'Self-Paced'}
             </span>
-            <h1 className="text-2xl font-bold text-text mt-2">{course.title} Lernpfad</h1>
+            <h1 className="text-2xl font-bold text-text mt-2">{course.title} Learning Path</h1>
             <p className="text-muted text-xs mt-1">{course.description}</p>
           </div>
           
           <div className="text-right">
-            <span className="text-xs text-muted">Kursfortschritt</span>
+            <span className="text-xs text-muted">Course Progress</span>
             <div className="text-2xl font-bold text-cyan">{course.progress}%</div>
           </div>
         </div>
@@ -102,11 +102,11 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
                         <span className="text-[10px] text-cyan font-bold uppercase tracking-wider">
-                          Modul {mod.number} • {mod.type}
+                          Module {mod.number} • {mod.type}
                         </span>
                         {isInProgress && (
                           <span className="bg-cyan/15 text-cyan text-[9px] px-2 py-0.5 rounded font-bold uppercase">
-                            In Bearbeitung
+                            In Progress
                           </span>
                         )}
                       </div>
@@ -145,7 +145,7 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                         onClick={() => onNavigate('live-session')}
                         className="bg-purple text-white text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider"
                       >
-                        Wegbeschreibung & Details
+                        Directions & Details
                       </button>
                     </div>
                   )}
@@ -173,11 +173,11 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                                 <span className="font-bold text-sm text-text">{les.title}</span>
                                 {les.required && (
                                   <span className="text-[9px] bg-red/10 text-red px-1.5 py-0.5 rounded font-bold uppercase">
-                                    Erforderlich
+                                    Required
                                   </span>
                                 )}
                               </div>
-                              <span className="text-xs text-muted mt-1 block">Lektionstyp: {les.type} • Dauer: {les.duration}</span>
+                              <span className="text-xs text-muted mt-1 block">Lesson type: {les.type} • Duration: {les.duration}</span>
                             </div>
                           </div>
 
@@ -191,13 +191,13 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                             {les.status === 'completed' ? (
                               <span className="text-green text-xs font-bold flex items-center space-x-1">
                                 <Check className="w-4 h-4 stroke-[3px]" />
-                                <span>Erledigt</span>
+                                <span>Done</span>
                               </span>
                             ) : les.status === 'locked' ? (
                               <Lock className="w-4 h-4 text-muted" />
                             ) : (
                               <button className="bg-cyan hover:bg-cyan2 text-bg text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase transition-colors">
-                                Starten
+                                Start
                               </button>
                             )}
                           </div>

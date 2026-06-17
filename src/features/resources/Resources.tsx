@@ -33,8 +33,8 @@ export const Resources: React.FC<ResourcesProps> = () => {
     <div className="space-y-6 pb-12">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text">Datei-Zentrum (Resources)</h1>
-          <p className="text-muted text-sm mt-1">Zentraler Zugriff auf alle Kursunterlagen, PDF-Dokumente und Referenzdateien.</p>
+          <h1 className="text-2xl font-bold text-text">Resource Center</h1>
+          <p className="text-muted text-sm mt-1">Central access to all course materials, PDF documents, and reference files.</p>
         </div>
 
         {/* Filters */}
@@ -42,7 +42,7 @@ export const Resources: React.FC<ResourcesProps> = () => {
           <div className="relative">
             <input 
               type="text" 
-              placeholder="Suchen..." 
+              placeholder="Search..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-panel border border-line text-xs rounded-lg pl-8 pr-4 py-2 text-text focus:outline-none focus:border-cyan w-48"
@@ -55,17 +55,17 @@ export const Resources: React.FC<ResourcesProps> = () => {
             onChange={(e) => setSelectedType(e.target.value)}
             className="bg-panel border border-line text-xs rounded-lg px-3 py-2 text-text focus:outline-none focus:border-cyan cursor-pointer"
           >
-            <option value="All">Alle Dateitypen</option>
-            <option value="pdf">PDF-Unterlagen</option>
-            <option value="video">Video-Lektionen</option>
-            <option value="archive">Archive (ZIP)</option>
+            <option value="All">All file types</option>
+            <option value="pdf">PDF documents</option>
+            <option value="video">Video lessons</option>
+            <option value="archive">Archives (ZIP)</option>
           </select>
         </div>
       </div>
 
       {/* Info Notice (REQ-RES-007) */}
       <div className="bg-panel/40 border border-line p-3.5 rounded-xl text-xs text-muted">
-        Als Student kannst du Kursressourcen einsehen und herunterladen, aber keine eigenen Dateien hier hochladen. Abgaben erfolgen direkt im Lernpfad.
+        As a student, you can view and download course resources, but you cannot upload your own files here. Submissions are made directly in the learning path.
       </div>
 
       {/* Files Table (REQ-RES-001) */}
@@ -74,11 +74,11 @@ export const Resources: React.FC<ResourcesProps> = () => {
           <thead>
             <tr className="bg-bg/40 border-b border-line text-muted font-bold uppercase tracking-wider text-[10px]">
               <th className="p-4">Name</th>
-              <th className="p-4">Typ</th>
-              <th className="p-4">Zugehörigkeit</th>
-              <th className="p-4">Berechtigung</th>
-              <th className="p-4">Größe</th>
-              <th className="p-4 text-right">Aktionen</th>
+              <th className="p-4">Type</th>
+              <th className="p-4">Affiliation</th>
+              <th className="p-4">Permission</th>
+              <th className="p-4">Size</th>
+              <th className="p-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
@@ -100,14 +100,14 @@ export const Resources: React.FC<ResourcesProps> = () => {
                   <button 
                     onClick={() => setPreviewFile(file)}
                     className="p-1 rounded bg-bg border border-line text-muted hover:text-cyan cursor-pointer inline-flex items-center justify-center"
-                    title="Vorschau"
+                    title="Preview"
                   >
                     <Eye className="w-3.5 h-3.5" />
                   </button>
                   <a 
                     href="#" 
                     className="p-1 rounded bg-bg border border-line text-muted hover:text-cyan inline-flex items-center justify-center"
-                    title="Herunterladen"
+                    title="Download"
                   >
                     <ArrowDownToLine className="w-3.5 h-3.5" />
                   </a>
@@ -125,13 +125,13 @@ export const Resources: React.FC<ResourcesProps> = () => {
             <div className="flex justify-between items-center border-b border-line pb-3">
               <h3 className="font-bold text-sm text-text flex items-center space-x-2">
                 {getFileIcon(previewFile.type)}
-                <span>Dateivorschau</span>
+                <span>File Preview</span>
               </h3>
               <button 
                 onClick={() => setPreviewFile(null)}
                 className="text-muted hover:text-text font-bold text-xs"
               >
-                Schließen
+                Close
               </button>
             </div>
             
@@ -146,13 +146,13 @@ export const Resources: React.FC<ResourcesProps> = () => {
                 onClick={() => setPreviewFile(null)}
                 className="flex-1 bg-bg hover:bg-line border border-line text-xs font-semibold py-2.5 rounded-lg text-center"
               >
-                Abbrechen
+                Cancel
               </button>
               <button 
                 onClick={() => setPreviewFile(null)}
                 className="flex-1 bg-cyan hover:bg-cyan2 text-bg text-xs font-bold py-2.5 rounded-lg text-center cursor-pointer"
               >
-                Herunterladen
+                Download
               </button>
             </div>
           </div>

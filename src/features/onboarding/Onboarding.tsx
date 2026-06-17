@@ -20,7 +20,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
   const handleFinish = () => {
     completeOnboarding({ reason, timePerWeek: timeCommitment });
-    addXp(150, 'Willkommens-Onboarding abgeschlossen');
+    addXp(150, 'Welcome onboarding completed');
     onNavigate('dashboard');
   };
 
@@ -29,8 +29,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
       
       {/* Progress header bar */}
       <div className="flex items-center justify-between text-xs text-muted">
-        <span>Willkommen bei Manthio</span>
-        <span>Schritt {step} von 4</span>
+        <span>Welcome to Manthio</span>
+        <span>Step {step} of 4</span>
       </div>
       <div className="w-full h-1 bg-bg rounded-full overflow-hidden border border-line">
         <div className="h-full bg-cyan transition-all duration-300" style={{ width: `${(step / 4) * 100}%` }} />
@@ -42,16 +42,16 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
             <Sparkles className="w-8 h-8 fill-current" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-black text-text uppercase tracking-tight">Deine Reise beginnt!</h1>
+            <h1 className="text-2xl font-black text-text uppercase tracking-tight">Your journey begins!</h1>
             <p className="text-muted text-xs leading-relaxed max-w-sm mx-auto">
-              Manthio verbindet praxisnahe Bootcamp-Curricula mit intelligenter, auf dich zugeschnittener KI-Unterstützung.
+              Manthio combines hands-on bootcamp curricula with intelligent, personalized AI support.
             </p>
           </div>
           <button 
             onClick={nextStep}
             className="bg-cyan hover:bg-cyan2 text-bg font-bold px-6 py-3 rounded-xl transition-colors cursor-pointer w-full flex items-center justify-center space-x-2"
           >
-            <span>LOSGEHT\'S</span>
+            <span>LETS GO</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -60,18 +60,18 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
       {step === 2 && (
         <div className="space-y-6">
           <div className="space-y-2">
-            <h2 className="text-xl font-bold text-text">Was führt dich zu uns?</h2>
-            <p className="text-muted text-xs">Passe deinen KI-Tutor und deine Ziele an.</p>
+            <h2 className="text-xl font-bold text-text">What brings you to us?</h2>
+            <p className="text-muted text-xs">Personalize your AI tutor and goals.</p>
           </div>
 
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-[10px] text-muted font-bold uppercase">Hauptmotivation</label>
+              <label className="text-[10px] text-muted font-bold uppercase">Primary Motivation</label>
               <div className="grid grid-cols-1 gap-2">
                 {[
-                  { id: 'career', label: 'Karrierewechsel / Berufliche Weiterbildung' },
-                  { id: 'skill', label: 'Eine spezifische Fähigkeit aufbauen' },
-                  { id: 'employer', label: 'Zuweisung durch meinen Arbeitgeber' }
+                  { id: 'career', label: 'Career Change / Professional Development' },
+                  { id: 'skill', label: 'Building a specific skill' },
+                  { id: 'employer', label: 'Assigned by my employer' }
                 ].map(opt => (
                   <button
                     key={opt.id}
@@ -85,9 +85,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
             </div>
 
             <div className="space-y-1.5 pt-2">
-              <label className="text-[10px] text-muted font-bold uppercase">Wöchentliches Zeitbudget</label>
+              <label className="text-[10px] text-muted font-bold uppercase">Weekly Time Budget</label>
               <div className="grid grid-cols-3 gap-2">
-                {['< 2 Std', '2-5 Std', '5-10 Std'].map(time => (
+                {['< 2 Hrs', '2-5 Hrs', '5-10 Hrs'].map(time => (
                   <button
                     key={time}
                     onClick={() => setTimeCommitment(time)}
@@ -105,7 +105,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
             disabled={!reason || !timeCommitment}
             className={`font-bold px-6 py-3 rounded-xl transition-colors cursor-pointer w-full flex items-center justify-center space-x-2 ${(!reason || !timeCommitment) ? 'bg-line text-muted cursor-not-allowed' : 'bg-cyan hover:bg-cyan2 text-bg'}`}
           >
-            <span>WEITER</span>
+            <span>NEXT</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -114,8 +114,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
       {step === 3 && (
         <div className="space-y-6 text-center">
           <div className="space-y-2">
-            <h2 className="text-xl font-bold text-text">Dein Avatar</h2>
-            <p className="text-muted text-xs">Wähle dein Profilbild aus.</p>
+            <h2 className="text-xl font-bold text-text">Your Avatar</h2>
+            <p className="text-muted text-xs">Select your profile picture.</p>
           </div>
 
           <div className="flex justify-center items-center space-x-4 py-4">
@@ -130,7 +130,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
             onClick={nextStep}
             className="bg-cyan hover:bg-cyan2 text-bg font-bold px-6 py-3 rounded-xl transition-colors cursor-pointer w-full flex items-center justify-center space-x-2"
           >
-            <span>WEITER</span>
+            <span>NEXT</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -139,15 +139,15 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
       {step === 4 && (
         <div className="space-y-6">
           <div className="space-y-2">
-            <h2 className="text-xl font-bold text-text">Dein erster empfohlener Kurs</h2>
-            <p className="text-muted text-xs">Basierend auf deinen Antworten empfehlen wir:</p>
+            <h2 className="text-xl font-bold text-text">Your first recommended course</h2>
+            <p className="text-muted text-xs">Based on your answers, we recommend:</p>
           </div>
 
           <div className="bg-bg border border-line rounded-xl p-4 flex gap-4">
             <BookOpen className="w-10 h-10 text-cyan shrink-0" />
             <div>
               <h3 className="font-bold text-sm text-text">Python Bootcamp (Flipped)</h3>
-              <p className="text-muted text-xs mt-1">Ideal für den Einstieg in die strukturierte Entwicklung mit persönlicher Betreuung.</p>
+              <p className="text-muted text-xs mt-1">Ideal for starting structured development with personal guidance.</p>
             </div>
           </div>
 
@@ -156,13 +156,13 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
               onClick={handleFinish}
               className="flex-1 border border-line text-xs font-semibold py-3 rounded-xl text-center hover:border-cyan transition-colors"
             >
-              Katalog durchsuchen
+              Browse Catalog
             </button>
             <button 
               onClick={handleFinish}
               className="flex-1 bg-cyan hover:bg-cyan2 text-bg text-xs font-bold py-3 rounded-xl text-center cursor-pointer"
             >
-              Kurs starten (+150 XP)
+              Start Course (+150 XP)
             </button>
           </div>
         </div>

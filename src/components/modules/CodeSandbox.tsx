@@ -8,7 +8,7 @@ interface CodeSandboxProps {
 }
 
 export const CodeSandbox: React.FC<CodeSandboxProps> = ({ 
-  starterCode = '# Definiere eine Funktion, die die Summe von a und b zurückgibt\ndef summe(a, b):\n    pass', 
+  starterCode = '# Define a function that returns the sum of a and b\ndef sum(a, b):\n    pass', 
   onSuccess 
 }) => {
   const { addXp, addToast } = useXP();
@@ -19,16 +19,16 @@ export const CodeSandbox: React.FC<CodeSandboxProps> = ({
 
   const handleRun = () => {
     setRunning(true);
-    setOutput('Führe Testfälle aus...');
+    setOutput('Running test cases...');
     
     setTimeout(() => {
       setRunning(false);
       // Basic simulation based on code input
       if (code.includes('return a + b') || code.includes('return b+a') || code.includes('a+b')) {
-        setOutput('Ausgabe:\nTestfall 1 (summe(2, 3) == 5): ERFOLGREICH\nTestfall 2 (summe(-1, 5) == 4): ERFOLGREICH\n\nAlle Tests erfolgreich bestanden!');
+        setOutput('Output:\nTest case 1 (sum(2, 3) == 5): SUCCESS\nTest case 2 (sum(-1, 5) == 4): SUCCESS\n\nAll tests passed successfully!');
         setTestsPassed(true);
       } else {
-        setOutput('Ausgabe:\nTestfall 1 (summe(2, 3) == 5): FEHLGESCHLAGEN\nErwartet: 5\nErhalten: None\n\nFehlgeschlagen bei Testfall 1.');
+        setOutput('Output:\nTest case 1 (sum(2, 3) == 5): FAILED\nExpected: 5\nReceived: None\n\nFailed at test case 1.');
         setTestsPassed(false);
       }
     }, 1000);
@@ -36,11 +36,11 @@ export const CodeSandbox: React.FC<CodeSandboxProps> = ({
 
   const handleSubmit = () => {
     if (testsPassed) {
-      addXp(75, 'Code-Aufgabe gelöst');
-      addToast('success', '+75 XP — Aufgabe eingereicht!');
+      addXp(75, 'Code exercise solved');
+      addToast('success', '+75 XP — Exercise submitted!');
       if (onSuccess) onSuccess();
     } else {
-      addToast('error', 'Bitte führe den Code aus und bestehe alle Tests zuerst.');
+      addToast('error', 'Please run the code and pass all tests first.');
     }
   };
 
@@ -64,7 +64,7 @@ export const CodeSandbox: React.FC<CodeSandboxProps> = ({
           className="hover:text-text flex items-center space-x-1 transition-colors cursor-pointer"
         >
           <RotateCcw className="w-3.5 h-3.5" />
-          <span>Zurücksetzen</span>
+          <span>Reset</span>
         </button>
       </div>
 
@@ -80,14 +80,14 @@ export const CodeSandbox: React.FC<CodeSandboxProps> = ({
         {/* Console output */}
         <div className="w-full sm:w-64 bg-[#0a0d10] p-4 flex flex-col justify-between overflow-y-auto border-t sm:border-t-0 border-line">
           <div>
-            <span className="text-[10px] text-muted font-bold block mb-2 uppercase">Konsole</span>
-            <pre className="text-[11px] text-muted whitespace-pre-wrap">{output || 'Noch keine Ausführung.'}</pre>
+            <span className="text-[10px] text-muted font-bold block mb-2 uppercase">Console</span>
+            <pre className="text-[11px] text-muted whitespace-pre-wrap">{output || 'No execution yet.'}</pre>
           </div>
 
           {testsPassed && (
             <div className="text-green text-xs font-semibold flex items-center space-x-1 pt-2">
               <CheckCircle2 className="w-4 h-4" />
-              <span>Bereit zur Abgabe!</span>
+              <span>Ready for submission!</span>
             </div>
           )}
         </div>
@@ -100,7 +100,7 @@ export const CodeSandbox: React.FC<CodeSandboxProps> = ({
           disabled={running}
           className="bg-bg hover:bg-line border border-line text-xs font-semibold px-4 py-2 rounded-xl transition-colors cursor-pointer"
         >
-          {running ? 'Führe aus...' : 'Run Code'}
+          {running ? 'Running...' : 'Run Code'}
         </button>
         <button 
           onClick={handleSubmit}
@@ -109,7 +109,7 @@ export const CodeSandbox: React.FC<CodeSandboxProps> = ({
             testsPassed ? 'bg-cyan hover:bg-cyan2 text-bg' : 'bg-line text-muted cursor-not-allowed'
           }`}
         >
-          Aufgabe abgeben (+75 XP)
+          Submit Exercise (+75 XP)
         </button>
       </div>
 

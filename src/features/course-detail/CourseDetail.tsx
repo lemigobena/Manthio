@@ -23,8 +23,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
   const handleEnroll = async () => {
     if (!enrolled) {
       setEnrolled(true);
-      course.enrolled = true;
-      addXp(100, 'Kursbuchung abgeschlossen');
+      // In a real app, this would update the global state or database
+      addXp(100, 'Course booking completed');
       onNavigate('learning-path');
     }
   };
@@ -56,11 +56,11 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
             <div className="flex items-center space-x-1.5">
               <Star className="w-4 h-4 text-yellow fill-current" />
               <span className="text-text font-bold">{course.rating || 4.8}</span>
-              <span>({course.ratingCount || 100} Bewertungen)</span>
+              <span>({course.ratingCount || 100} ratings)</span>
             </div>
             <div className="flex items-center space-x-1.5">
               <Award className="w-4 h-4 text-purple" />
-              <span>+{course.xpReward} XP Belohnung</span>
+              <span>+{course.xpReward} XP Reward</span>
             </div>
           </div>
 
@@ -70,7 +70,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
                 onClick={() => onNavigate('learning-path')}
                 className="bg-cyan hover:bg-cyan2 text-bg font-bold px-6 py-3 rounded-xl transition-colors cursor-pointer w-full sm:w-auto text-center"
               >
-                LERNPFAD ÖFFNEN
+                OPEN LEARNING PATH
               </button>
             ) : (
               <>
@@ -78,9 +78,9 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
                   onClick={handleEnroll}
                   className="bg-cyan hover:bg-cyan2 text-bg font-bold px-6 py-3 rounded-xl transition-colors cursor-pointer w-full sm:w-auto text-center"
                 >
-                  Jetzt buchen für {course.price}
+                  Book now for {course.price}
                 </button>
-                <span className="text-xs text-muted">Inklusive 2 Monate Premium-KI-Tutor-Zugang</span>
+                <span className="text-xs text-muted">Includes 2 months of premium AI Tutor access</span>
               </>
             )}
           </div>
@@ -96,7 +96,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
           {/* Learning Outcomes */}
           {course.learningOutcomes && (
             <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
-              <h2 className="text-xl font-bold text-text">Was du in diesem Kurs lernst</h2>
+              <h2 className="text-xl font-bold text-text">What you will learn in this course</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {course.learningOutcomes.map((outcome, idx) => (
                   <div key={idx} className="flex items-start space-x-2 text-sm text-text leading-relaxed">
@@ -110,8 +110,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
 
           {/* Curriculum Preview */}
           <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
-            <h2 className="text-xl font-bold text-text">Lehrplan & Module</h2>
-            <p className="text-muted text-xs">Klicke auf ein Modul, um die einzelnen Lektionen (Bausteine) anzuzeigen.</p>
+            <h2 className="text-xl font-bold text-text">Curriculum & Modules</h2>
+            <p className="text-muted text-xs">Click on a module to show individual lessons (building blocks).</p>
             
             <div className="space-y-3">
               {course.modules && course.modules.map((mod, idx) => {
@@ -172,7 +172,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
         <div className="space-y-6">
           {/* Trainer Card */}
           <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
-            <h3 className="font-bold text-sm uppercase tracking-wider text-muted">Dein Trainer</h3>
+            <h3 className="font-bold text-sm uppercase tracking-wider text-muted">Your Trainer</h3>
             <div className="flex items-center space-x-3">
               <img src={course.trainer.avatar} alt={course.trainer.name} className="w-12 h-12 rounded-full border border-line object-cover" />
               <div>
@@ -185,7 +185,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
             </p>
             {course.trainer.linkedIn && (
               <a href={course.trainer.linkedIn} target="_blank" rel="noreferrer" className="text-cyan hover:underline text-xs font-semibold block">
-                LinkedIn-Profil anzeigen
+                View LinkedIn Profile
               </a>
             )}
           </div>
@@ -201,19 +201,19 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
                 <div className="flex items-start space-x-2">
                   <Clock className="w-4 h-4 text-cyan shrink-0 mt-0.5" />
                   <p>
-                    <strong className="text-text">Hybrid-Rhythmus:</strong> 7 Selbststudium-Module online (ca. 10.5 Stunden) + 2 halbtägige Präsenz-Workshops.
+                    <strong className="text-text">Hybrid Rhythm:</strong> 7 self-study modules online (approx. 10.5 hours) + 2 half-day in-person workshops.
                   </p>
                 </div>
                 <div className="flex items-start space-x-2">
                   <CheckCircle className="w-4 h-4 text-cyan shrink-0 mt-0.5" />
                   <p>
-                    <strong className="text-text">Min. Gruppengröße:</strong> Startet ab 3 Teilnehmern, begrenzte Gruppengröße von max. 8 für maximale Betreuung.
+                    <strong className="text-text">Min. Group Size:</strong> Starts from 3 participants, limited group size of max. 8 for maximum support.
                   </p>
                 </div>
                 <div className="flex items-start space-x-2">
                   <Award className="w-4 h-4 text-cyan shrink-0 mt-0.5" />
                   <p>
-                    <strong className="text-text">Zertifikat:</strong> Abschluss des Capstone-Projektes schaltet das verifizierbare Credly-Zertifikat frei.
+                    <strong className="text-text">Certificate:</strong> Completing the capstone project unlocks the verifiable Credly certificate.
                   </p>
                 </div>
               </div>
