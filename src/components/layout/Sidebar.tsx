@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { 
-  LayoutDashboard, BookOpen, Compass, Sparkles, LineChart, 
-  FolderKanban, MessageSquare, Settings, LogOut, ChevronLeft, ChevronRight 
+  LayoutDashboard, BookOpen, Compass, BrainCircuit, PieChart, 
+  Folder, MessagesSquare, Settings, ChevronLeft, Menu, X
 } from 'lucide-react';
+
+interface NavItem {
+  id: string;
+  label: string;
+  icon: React.ElementType;
+}
 
 interface SidebarProps {
   activePage: string;
@@ -19,122 +25,223 @@ export const Sidebar: React.FC<SidebarProps> = ({
   collapsed, 
   setCollapsed 
 }) => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { level, currentXpInLevel, xpNeededForNextLevel } = useXP();
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const progressPercentage = Math.round((currentXpInLevel / xpNeededForNextLevel) * 100);
 
-  const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
-    { id: 'catalog', label: 'Browse Courses', icon: <Compass className="w-4 h-4" /> },
-    { id: 'learning-path', label: 'Learning Path', icon: <BookOpen className="w-4 h-4" /> },
-    { id: 'ai-tutor', label: 'AI Tutor', icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'analytics', label: 'Analytics', icon: <LineChart className="w-4 h-4" /> },
-    { id: 'resources', label: 'Files', icon: <FolderKanban className="w-4 h-4" /> },
-    { id: 'community', label: 'Community', icon: <MessageSquare className="w-4 h-4" /> },
-    { id: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> }
+  const handleNavigate = (id: string) => {
+    onNavigate(id);
+    if (window.innerWidth < 1024) {
+      setIsMobileOpen(false);
+    }
+  };
+
+  const navItems: NavItem[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'catalog', label: 'Browse Courses', icon: Compass },
+    { id: 'learning-path', label: 'Learning Path', icon: BookOpen },
+    { id: 'ai-tutor', label: 'AI Tutor', icon: BrainCircuit },
+    { id: 'analytics', label: 'Analytics', icon: PieChart },
+    { id: 'resources', label: 'Files', icon: Folder },
+    { id: 'community', label: 'Community', icon: MessagesSquare },
+  ];
+
+  const bottomItems: NavItem[] = [
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (
-    <div 
-      className={`bg-panel border-r border-line h-screen flex flex-col justify-between transition-all duration-300 relative ${
-        collapsed ? 'w-20' : 'w-64'
-      }`}
-    >
-      {/* Brand Header */}
-      <div className="p-5 border-b border-line flex items-center justify-between">
-        {!collapsed && (
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-cyan text-xl font-black font-display tracking-tight">MANTHIO</span>
-            </div>
-            <span className="text-[9px] text-muted font-bold block uppercase mt-0.5">by apigenio GmbH</span>
-          </div>
-        )}
-        {collapsed && (
-          <span className="text-cyan text-xl font-black font-display mx-auto">M</span>
-        )}
+    <>
+      {/* Search/Header Mobile Toggle (Floating Hamburger) */}
+      <div className="lg:hidden fixed top-3 left-2 z-[60]">
+        <button 
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          className="w-11 h-11 flex items-center justify-center rounded-xl text-muted hover:text-cyan transition-all"
+        >
+          {isMobileOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </div>
 
-      {/* Level and XP Progress (REQ-SIDEBAR-001) */}
-      {!collapsed && (
-        <div className="px-5 py-4 border-b border-line space-y-2">
-          <div className="flex justify-between text-xs font-semibold">
-            <span className="text-muted">Level {level}</span>
-            <span className="text-cyan">{progressPercentage}%</span>
-          </div>
-          <div className="w-full h-1.5 bg-bg rounded-full overflow-hidden border border-line">
-            <div className="h-full bg-cyan transition-all duration-300" style={{ width: `${progressPercentage}%` }} />
-          </div>
-          <div className="text-[10px] text-muted text-right">
-            {currentXpInLevel.toLocaleString()} / {xpNeededForNextLevel.toLocaleString()} XP
-          </div>
-        </div>
+      {/* Mobile Backdrop Overlay */}
+      {isMobileOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300"
+          onClick={() => setIsMobileOpen(false)}
+        />
       )}
 
-      {/* Main Navigation Items (REQ-SIDEBAR-001) */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-        {navItems.map(item => {
-          const isActive = activePage === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => onNavigate(item.id)}
-              className={`w-full flex items-center p-3 rounded-xl text-xs font-semibold transition-all relative group cursor-pointer ${
-                isActive ? 'bg-cyan/10 text-cyan border-l-2 border-cyan' : 'text-muted hover:text-text hover:bg-bg/40'
+      {/* Actual Sidebar */}
+      <div 
+        className={`bg-panel h-screen flex flex-col transition-all duration-300 border-r border-line z-50
+          ${(collapsed && !isMobileOpen) ? 'w-[68px]' : 'w-64'}
+          ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          fixed lg:relative top-0 left-0
+        `}
+      >
+        {/* Brand Header */}
+        <div className="pt-3 pb-6 px-4 flex flex-col items-center justify-center relative">
+          <div className="overflow-hidden w-full flex justify-center py-2">
+            <img 
+              src="/Branding/primary/logo_7_prio_1_variation.png" 
+              alt="Logo" 
+              className={`transition-all duration-300 mb-[-20px] ${(collapsed && !isMobileOpen) ? 'w-full h-16 scale-[2.2] translate-x-[-2px]' : 'w-[90%] h-auto max-h-32'} object-contain`}
+            />
+          </div>
+          {(!collapsed || isMobileOpen) && (
+            <div className="flex flex-col items-center overflow-hidden">
+              <span className="text-[10px] font-bold text-muted/50 uppercase tracking-[0.4em] whitespace-nowrap overflow-hidden">
+                Premium E-Learning
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Main Navigation */}
+        <div className="flex-1 overflow-y-auto py-2">
+          <div className="flex flex-col">
+            {/* Nav Items */}
+            {[...navItems, ...bottomItems].map((item) => {
+              const isActive = activePage === item.id;
+              const Icon = item.icon;
+              const isWide = !collapsed || isMobileOpen;
+              
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavigate(item.id)}
+                  className={`w-full flex items-center transition-all duration-300 relative group cursor-pointer ${
+                    !isWide ? 'justify-center py-4' : 'px-4 py-3'
+                  } ${
+                    isActive 
+                      ? 'text-cyan bg-gradient-to-r from-cyan/10 to-transparent' 
+                      : 'text-muted hover:text-cyan hover:bg-cyan/5'
+                  }`}
+                >
+                  {isActive && (
+                    <div className="absolute left-0 top-1 bottom-1 w-[3px] bg-cyan shadow-[0_0_10px_var(--cyan)]/40 rounded-r-full" />
+                  )}
+
+                  <div className={`flex items-center relative z-10 ${!isWide ? '' : 'space-x-3'}`}>
+                    <div className="transition-all duration-300">
+                      {isActive ? (
+                        <div className="text-cyan">
+                          {item.id === 'dashboard' && <LayoutDashboard size={16} fill="currentColor" strokeWidth={1.5} />}
+                          {item.id === 'catalog' && (
+                            <div className="relative">
+                              <Compass size={16} strokeWidth={1.5} />
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-1 h-1 bg-cyan rounded-full" />
+                              </div>
+                            </div>
+                          )}
+                          {item.id === 'learning-path' && <BookOpen size={16} fill="currentColor" fillOpacity={0.4} strokeWidth={1.5} />}
+                          {item.id === 'ai-tutor' && <BrainCircuit size={16} fill="currentColor" strokeWidth={1.5} />}
+                          {item.id === 'analytics' && (
+                            <div className="relative">
+                              <PieChart size={16} strokeWidth={1.5} />
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="absolute inset-0 w-4 h-4 text-cyan">
+                                <path d="M21.21 15.89A10 10 0 1 1 8 2.83" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M22 12A10 10 0 0 0 12 2v10z" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            </div>
+                          )}
+                          {item.id === 'settings' && (
+                            <div className="relative">
+                              <Settings size={16} fill="currentColor" strokeWidth={1.5} />
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-[6px] h-[6px] bg-panel rounded-full border border-cyan/30" />
+                              </div>
+                            </div>
+                          )}
+                          {!['dashboard', 'catalog', 'learning-path', 'ai-tutor', 'analytics', 'settings'].includes(item.id) && (
+                            <Icon size={16} fill="currentColor" strokeWidth={1.5} />
+                          )}
+                        </div>
+                      ) : (
+                        <Icon size={16} fill="none" strokeWidth={2} className="text-muted group-hover:text-cyan transition-colors" />
+                      )}
+                    </div>
+                    {isWide && (
+                      <span className={`text-xs font-semibold tracking-wide transition-all duration-300 whitespace-nowrap overflow-hidden ${
+                        isActive ? 'text-cyan' : 'text-muted'
+                      }`}>
+                        {item.label}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Footer Section: Rank & Profile */}
+        <div className="p-3 space-y-2 text-left border-t border-line/30">
+          {(!collapsed || isMobileOpen) && (
+            <div className="pt-2">
+              <div className="flex items-center gap-4 mb-3 px-2">
+                <div className="relative">
+                  <img 
+                    src={user?.avatar || "https://ui-avatars.com/api/?name=Alex+Chen&background=0D1117&color=00F5D4"} 
+                    alt="Avatar" 
+                    className="w-10 h-10 rounded-full object-cover border border-line" 
+                  />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green border-2 border-panel rounded-full" />
+                </div>
+                <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
+                  <div className="flex justify-between items-center mb-0.5 overflow-hidden">
+                    <span className="text-sm font-bold text-text truncate tracking-tight whitespace-nowrap">{user?.name || "Alex Chen"}</span>
+                    <span className="text-[10px] font-bold text-cyan ml-2">LVL {level}</span>
+                  </div>
+                  <div className="flex justify-between items-center mb-1 overflow-hidden">
+                    <span className="text-[9px] font-medium text-muted uppercase tracking-wider whitespace-nowrap">Advancement</span>
+                    <span className="text-[9px] font-bold text-muted">{progressPercentage}%</span>
+                  </div>
+                  <div className="w-full h-[2px] bg-line/30 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-cyan transition-all duration-1000 ease-out"
+                      style={{ width: `${progressPercentage}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {(collapsed && !isMobileOpen) && (
+            <div className="flex flex-col items-center py-2">
+              <div className="relative w-10 h-10">
+                <img 
+                  src={user?.avatar || "https://ui-avatars.com/api/?name=Alex+Chen&background=0D1117&color=00F5D4"} 
+                  alt="Avatar" 
+                  className="w-full h-full rounded-full border border-line object-cover" 
+                />
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-cyan border-2 border-panel rounded-full" />
+              </div>
+            </div>
+          )}
+
+          <div className="hidden lg:flex justify-center w-full">
+            <button 
+              onClick={() => setCollapsed(!collapsed)}
+              className={`flex items-center justify-center border border-line/30 text-muted hover:text-cyan hover:border-cyan/50 hover:bg-cyan/5 transition-all duration-300 group ${
+                collapsed ? 'w-10 h-10 rounded-full' : 'w-full py-2 rounded-xl'
               }`}
             >
-              <div className="flex items-center space-x-3">
-                <div className={isActive ? 'text-cyan' : 'text-muted group-hover:text-text'}>
-                  {item.icon}
+              <div className={`flex items-center gap-3 ${collapsed ? '' : 'w-full px-4 justify-between overflow-hidden'}`}>
+                {!collapsed && <span className="text-[10px] font-black tracking-widest whitespace-nowrap overflow-hidden">Collapse Menu</span>}
+                <div className={`transition-transform duration-500 ${collapsed ? 'rotate-180' : ''}`}>
+                  <ChevronLeft size={16} strokeWidth={2.5} />
                 </div>
-                {!collapsed && <span>{item.label}</span>}
               </div>
-              
-              {/* Tooltip for collapsed mode */}
-              {collapsed && (
-                <div className="absolute left-20 bg-panel border border-line text-text px-2 py-1 rounded text-[10px] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
-                  {item.label}
-                </div>
-              )}
             </button>
-          );
-        })}
-      </div>
-
-      {/* Bottom Section: Collapse Toggle & User Info */}
-      <div className="p-3 border-t border-line space-y-3">
-        {/* Collapse button toggle (REQ-SIDEBAR-004) */}
-        <button 
-          onClick={() => setCollapsed(!collapsed)}
-          className="w-full flex items-center justify-center p-2 rounded-xl bg-bg/50 hover:bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer"
-        >
-          {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-        </button>
-
-        {/* User mini-card */}
-        {user && (
-          <div className={`flex items-center gap-3 p-2 rounded-xl bg-bg/40 border border-line/50 ${collapsed ? 'justify-center' : ''}`}>
-            <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full border border-line object-cover" />
-            {!collapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-text truncate">{user.name}</p>
-                <p className="text-[10px] text-muted truncate">Level {level} Explorer</p>
-              </div>
-            )}
-            {!collapsed && (
-              <button 
-                onClick={signOut}
-                className="text-muted hover:text-red transition-colors p-1"
-                title="Sign Out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            )}
           </div>
-        )}
+        </div>
       </div>
-
-    </div>
+    </>
   );
 };
+
+export default Sidebar;
