@@ -17,6 +17,7 @@ interface AuthContextType {
   updateProfile: (name: string, bio: string) => void;
   activeCourseId: string | null;
   setActiveCourseId: (id: string | null) => void;
+  skipAuth: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,20 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
     const saved = localStorage.getItem('user');
-    if (saved) return JSON.parse(saved);
-    // Return a default mock user (Alex Chen, Level 42) for testing out of the box
-    return {
-      name: 'Alex Chen',
-      email: 'alex.chen@manthio.io',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150',
-      bio: 'Software Developer & Python Enthusiast. Enrolled in Python Bootcamp by Apigenio.',
-      level: 42,
-      xp: 42500,
-      currentXpInLevel: 2500,
-      xpNeededForNextLevel: 10000,
-      streak: 12,
-      streakFreezeAvailable: true
-    };
+    return saved ? JSON.parse(saved) : null;
   });
 
   const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(() => {
@@ -56,7 +44,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string): Promise<boolean> => {
     void password;
-    // Basic mock authentication
     const mockUser: UserProfile = {
       name: 'Alex Chen',
       email: email,
@@ -100,6 +87,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('user');
   };
 
+  const skipAuth = () => {
+    const guestUser: UserProfile = {
+      name: 'Guest Developer',
+      email: 'guest@example.com',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150',
+      bio: 'Exploring the platform as a guest.',
+      level: 1,
+      xp: 0,
+      currentXpInLevel: 0,
+      xpNeededForNextLevel: 10000,
+      streak: 0,
+      streakFreezeAvailable: true
+    };
+    setUser(guestUser);
+    setIsOnboardingCompleted(true);
+    localStorage.setItem('user', JSON.stringify(guestUser));
+    localStorage.setItem('isOnboardingCompleted', 'true');
+  };
+
   const completeOnboarding = (answers: OnboardingAnswers) => {
     setIsOnboardingCompleted(true);
     localStorage.setItem('isOnboardingCompleted', 'true');
@@ -126,7 +132,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       completeOnboarding,
       updateProfile,
       activeCourseId,
-      setActiveCourseId
+      setActiveCourseId,
+      skipAuth
     }}>
       {children}
     </AuthContext.Provider>
