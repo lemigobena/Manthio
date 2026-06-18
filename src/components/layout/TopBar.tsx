@@ -245,6 +245,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <button 
                     onClick={() => {
                       signOut();
+                      onNavigate('signin');
                       setProfileOpen(false);
                     }}
                     className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-red hover:bg-red/10 transition-colors text-left cursor-pointer border-t border-line mt-1 pt-2"

@@ -23,10 +23,14 @@ import { Resources } from './features/resources/Resources';
 import { Community } from './features/community/Community';
 import { Settings } from './features/settings/Settings';
 import { Onboarding } from './features/onboarding/Onboarding';
+import { SignIn } from './features/auth/SignIn';
+import { SignUp } from './features/auth/SignUp';
+import { AuthLayout } from './features/auth/AuthLayout';
 
 const MainApp: React.FC = () => {
-  const { isOnboardingCompleted } = useAuth();
+  const { isAuthenticated, isOnboardingCompleted } = useAuth();
   const [currentPage, setCurrentPage] = useState<string>(() => {
+    if (!isAuthenticated) return 'signin';
     return isOnboardingCompleted ? 'dashboard' : 'onboarding';
   });
 
@@ -34,6 +38,10 @@ const MainApp: React.FC = () => {
 
   const renderPage = () => {
     switch (page) {
+      case 'signin':
+        return <SignIn onNavigate={setCurrentPage} />;
+      case 'signup':
+        return <SignUp onNavigate={setCurrentPage} />;
       case 'onboarding':
         return <Onboarding onNavigate={setCurrentPage} />;
       case 'dashboard':
@@ -70,6 +78,14 @@ const MainApp: React.FC = () => {
         return <Dashboard onNavigate={setCurrentPage} />;
     }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <AuthLayout onNavigate={setCurrentPage}>
+        {page === 'signup' ? <SignUp onNavigate={setCurrentPage} /> : <SignIn onNavigate={setCurrentPage} />}
+      </AuthLayout>
+    );
+  }
 
   if (page === 'onboarding') {
     return <Onboarding onNavigate={setCurrentPage} />;
