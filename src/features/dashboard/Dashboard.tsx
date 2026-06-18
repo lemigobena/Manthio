@@ -472,7 +472,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               </button>
             </div>
           </div>
-        </div>
 
       {/* Modal System Showcase */}
       <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
@@ -569,6 +568,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             <Sparkles className="w-8 h-8 text-purple mb-3 group-hover:scale-110 transition-transform" />
             <span className="font-bold text-purple">Multi-step Quiz</span>
           </button>
+        </div>
         </div>
       </div>
       )}
