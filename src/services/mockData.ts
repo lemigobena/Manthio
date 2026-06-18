@@ -70,7 +70,7 @@ export const COURSES: Course[] = [
       },
       {
         id: 'py-mod-3',
-        number: 3, // In-person session Workshop A
+        number: 3,
         title: 'Workshop A: Setup Verification & Review',
         description: 'Synchronous in-person review of modules 1-2. Troubleshooting setups, live code reviews, and pair debugging.',
         duration: '0.5 day',
@@ -155,7 +155,7 @@ export const COURSES: Course[] = [
       },
       {
         id: 'py-mod-9',
-        number: 9, // Workshop B
+        number: 9,
         title: 'Workshop B: Capstone Project & Feedback',
         description: 'Synchronous in-person final session. Presenting your expense CLI project, pair coding reviews, and final trainer feedback.',
         duration: '0.5 day',
@@ -171,9 +171,186 @@ export const COURSES: Course[] = [
     ]
   },
   {
+    id: 'git-essentials',
+    title: 'Git Essentials',
+    description: 'Master version control basics, commits, branching, merging, and collaboration with GitHub.',
+    longDescription: 'Get up to speed with Git, the industry-standard version control system. In this short course, you will learn how to track file versions, create branches, resolve merge conflicts, and collaborate using GitHub.',
+    level: 'Foundation',
+    format: 'self-paced',
+    xpReward: 150,
+    price: 'CHF 90.00',
+    rating: 4.6,
+    ratingCount: 41,
+    enrolled: true,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1618401471353-b98aedd07871?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['david-pinezich'],
+    learningOutcomes: [
+      'Initialize Git repositories and record changes using commits.',
+      'Navigate branch histories and execute branch merges.',
+      'Resolve merge conflicts confidently.',
+      'Push and pull code using remote repositories on GitHub.'
+    ],
+    modules: [
+      {
+        id: 'git-mod-1',
+        number: 1,
+        title: 'Git Basics & Branching',
+        description: 'Repository setup, commits, branches, merges, and pushing to GitHub.',
+        duration: '2h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'git-les-1-1', title: 'What is Version Control?', type: 'Video', duration: '15min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'git-les-1-2', title: 'Initializing Repos & Committing', type: 'Code', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Apply' },
+          { id: 'git-les-1-3', title: 'Branching and Merging', type: 'Code', duration: '35min', status: 'not_started', required: true, bloomLevel: 'Apply' },
+          { id: 'git-les-1-4', title: 'Quiz: Git Commands', type: 'Quiz', duration: '15min', status: 'not_started', required: true, bloomLevel: 'Remember' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'command-line-basics',
+    title: 'Command Line Basics',
+    description: 'Learn to navigate directories, manipulate files, and run scripts directly from your terminal.',
+    longDescription: 'The command line is a developer\'s best friend. This course covers everything from simple shell commands, file path patterns, piping outputs, to basic environment settings.',
+    level: 'Foundation',
+    format: 'self-paced',
+    xpReward: 120,
+    price: 'CHF 75.00',
+    rating: 4.5,
+    ratingCount: 38,
+    enrolled: true,
+    progress: 100,
+    imageUrl: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['david-pinezich'],
+    learningOutcomes: [
+      'Navigate directory hierarchies using cd, ls, and pwd.',
+      'Create, copy, and delete files and folders using the shell.',
+      'Redirect command outputs and use basic environment variables.'
+    ],
+    modules: [
+      {
+        id: 'cmd-mod-1',
+        number: 1,
+        title: 'Shell Navigation & Operations',
+        description: 'Shell overview, standard commands, directories, and paths.',
+        duration: '1.5h',
+        status: 'Completed',
+        type: 'Self-study',
+        lessons: [
+          { id: 'cmd-les-1-1', title: 'Terminal vs Shell', type: 'Video', duration: '20min', status: 'completed', required: true, bloomLevel: 'Remember' },
+          { id: 'cmd-les-1-2', title: 'Navigation Commands', type: 'Code', duration: '30min', status: 'completed', required: true, bloomLevel: 'Apply' },
+          { id: 'cmd-les-1-3', title: 'File Operations & Wildcards', type: 'Code', duration: '30min', status: 'completed', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'markdown-developers',
+    title: 'Markdown for Developers',
+    description: 'Write beautiful readmes, documentation, and formatted notes using Markdown syntax.',
+    longDescription: 'Learn Markdown, the standard markup language used for writing web-formatted text. Great for document formatting on GitHub, blogs, and corporate wikis.',
+    level: 'Foundation',
+    format: 'self-paced',
+    xpReward: 80,
+    price: 'CHF 40.00',
+    rating: 4.7,
+    ratingCount: 54,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['david-pinezich'],
+    learningOutcomes: [
+      'Format headers, lists, code snippets, and blocks.',
+      'Incorporate hyperlinks, images, and tables.',
+      'Adopt clean README layouts for open source projects.'
+    ],
+    modules: [
+      {
+        id: 'md-mod-1',
+        number: 1,
+        title: 'Markdown Syntax',
+        description: 'Text styles, links, code blocks, lists, and tables.',
+        duration: '1.0h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'md-les-1-1', title: 'Formatting Text & Lists', type: 'Article', duration: '25min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'md-les-1-2', title: 'Embedding Code and Media', type: 'Article', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Understand' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'sql-databases',
+    title: 'SQL & Relational Databases',
+    description: 'Understand schemas, relationships, joins, and write complex queries with SQL.',
+    longDescription: 'Data is the core of every system. Learn the design principles of relational schemas, tables, indices, foreign keys, and write optimal SELECT, JOIN, and aggregation queries in PostgreSQL and SQLite.',
+    level: 'Intermediate',
+    format: 'self-paced',
+    xpReward: 350,
+    price: 'CHF 320.00',
+    rating: 4.7,
+    ratingCount: 93,
+    enrolled: true,
+    progress: 15,
+    imageUrl: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['david-pinezich'],
+    learningOutcomes: [
+      'Model relational databases with 1-to-N and N-to-N schemas.',
+      'Write complex queries using JOIN, WHERE, GROUP BY, and HAVING.',
+      'Optimize queries using indexes and execution analysis.'
+    ],
+    modules: [
+      {
+        id: 'sql-mod-1',
+        number: 1,
+        title: 'Relational Design & Tables',
+        description: 'Database engines, creating tables, primary keys, and data types.',
+        duration: '2.5h',
+        status: 'In progress',
+        type: 'Self-study',
+        lessons: [
+          { id: 'sql-les-1-1', title: 'Database Fundamentals', type: 'Video', duration: '30min', status: 'completed', required: true, bloomLevel: 'Remember' },
+          { id: 'sql-les-1-2', title: 'Defining Schemas & Tables', type: 'Code', duration: '40min', status: 'not_started', required: true, bloomLevel: 'Apply' },
+          { id: 'sql-les-1-3', title: 'Inserting and Selecting Data', type: 'Code', duration: '35min', status: 'not_started', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'sql-mod-2',
+        number: 2,
+        title: 'Joins and Aggregations',
+        description: 'Inner, outer, and left joins, grouping results, and basic math aggregates.',
+        duration: '3h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'sql-les-2-1', title: 'The power of JOIN', type: 'Video', duration: '35min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'sql-les-2-2', title: 'SUM, AVG, COUNT and GROUP BY', type: 'Code', duration: '45min', status: 'locked', required: true, bloomLevel: 'Apply' },
+          { id: 'sql-les-2-3', title: 'Filtering with HAVING', type: 'Quiz', duration: '20min', status: 'locked', required: true, bloomLevel: 'Analyse' }
+        ]
+      },
+      {
+        id: 'sql-mod-3',
+        number: 3,
+        title: 'Performance & Indexes',
+        description: 'How databases find rows, building indexes, and execution plans.',
+        duration: '2.5h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'sql-les-3-1', title: 'Why queries get slow', type: 'Video', duration: '25min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'sql-les-3-2', title: 'Creating Indexes', type: 'Code', duration: '40min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ]
+  },
+  {
     id: 'ai-fundamentals',
     title: 'AI Fundamentals',
     description: 'An introduction to neural networks, embeddings, and prompting techniques for technical professionals.',
+    longDescription: 'Explore artificial intelligence from a practical engineering view. Learn about feed-forward layers, weights, vectors, cosine similarity, embeddings, and prompt structures for LLMs.',
     level: 'Intermediate',
     format: 'self-paced',
     xpReward: 400,
@@ -184,12 +361,60 @@ export const COURSES: Course[] = [
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=800&q=80',
     trainer: TRAINERS['david-pinezich'],
-    modules: []
+    learningOutcomes: [
+      'Articulate basic neural network architectures.',
+      'Explain embeddings and perform vector calculations.',
+      'Draft highly reliable prompt structures using systemic variables.'
+    ],
+    modules: [
+      {
+        id: 'ai-mod-1',
+        number: 1,
+        title: 'Neural Nets & Weights',
+        description: 'Layers, activations, weights, training cycles, and gradients.',
+        duration: '3h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'ai-les-1-1', title: 'Intuition behind Neural Nets', type: 'Video', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'ai-les-1-2', title: 'Weights & Activations', type: 'Article', duration: '35min', status: 'not_started', required: true, bloomLevel: 'Understand' },
+          { id: 'ai-les-1-3', title: 'Review Quiz: Neural Basics', type: 'Quiz', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Remember' }
+        ]
+      },
+      {
+        id: 'ai-mod-2',
+        number: 2,
+        title: 'Embeddings & Vectors',
+        description: 'High-dimensional space, word vectors, similarity metrics.',
+        duration: '3.5h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'ai-les-2-1', title: 'Vectors and Spaces', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Remember' },
+          { id: 'ai-les-2-2', title: 'Calculating Cosine Similarity', type: 'Code', duration: '45min', status: 'locked', required: true, bloomLevel: 'Apply' },
+          { id: 'ai-les-2-3', title: 'Exercise: Embedding Database Query', type: 'Code', duration: '45min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'ai-mod-3',
+        number: 3,
+        title: 'Prompt Engineering',
+        description: 'System instructions, zero-shot/few-shot prompts, RAG architectures.',
+        duration: '3.5h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'ai-les-3-1', title: 'Structuring System Commands', type: 'Article', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'ai-les-3-2', title: 'Zero vs Few-shot Prompting', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' }
+        ]
+      }
+    ]
   },
   {
     id: 'react-web-development',
     title: 'Web Development with React',
     description: 'Learn dynamic UI state management, hooks, routing, and structuring scalable Single Page Applications with React.',
+    longDescription: 'React changed frontend architecture. Learn how to break layouts into functional components, utilize state hooks (useState, useEffect, useContext), configure routing, and optimize bundle sizing.',
     level: 'Intermediate',
     format: 'self-paced',
     xpReward: 450,
@@ -200,7 +425,309 @@ export const COURSES: Course[] = [
     progress: 45,
     imageUrl: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&w=800&q=80',
     trainer: TRAINERS['david-pinezich'],
-    modules: []
+    learningOutcomes: [
+      'Build reusable UI components in JSX.',
+      'Control page states using React Hooks.',
+      'Configure client-side routing and clean layouts.'
+    ],
+    modules: [
+      {
+        id: 'react-mod-1',
+        number: 1,
+        title: 'React Basics & JSX',
+        description: 'Setting up projects, components, properties, and rendering lists.',
+        duration: '3h',
+        status: 'Completed',
+        type: 'Self-study',
+        lessons: [
+          { id: 'react-les-1-1', title: 'React vs Vanilla JS', type: 'Video', duration: '20min', status: 'completed', required: true, bloomLevel: 'Remember' },
+          { id: 'react-les-1-2', title: 'Understanding JSX Structure', type: 'Article', duration: '35min', status: 'completed', required: true, bloomLevel: 'Understand' },
+          { id: 'react-les-1-3', title: 'First Component Exercise', type: 'Code', duration: '45min', status: 'completed', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'react-mod-2',
+        number: 2,
+        title: 'State & Event Handlers',
+        description: 'Using useState, form inputs, handling clicks, and local state lifecycles.',
+        duration: '4h',
+        status: 'In progress',
+        type: 'Self-study',
+        lessons: [
+          { id: 'react-les-2-1', title: 'Why State is Needed', type: 'Video', duration: '30min', status: 'completed', required: true, bloomLevel: 'Understand' },
+          { id: 'react-les-2-2', title: 'The useState Hook in Detail', type: 'Code', duration: '50min', status: 'in_progress', required: true, bloomLevel: 'Apply' },
+          { id: 'react-les-2-3', title: 'Practice: Dynamic Input Fields', type: 'Code', duration: '40min', status: 'not_started', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'react-mod-3',
+        number: 3,
+        title: 'Effects & API Fetching',
+        description: 'Handling side effects with useEffect, loading indicators, and external API requests.',
+        duration: '4h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'react-les-3-1', title: 'Understanding Side Effects', type: 'Video', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Understand' },
+          { id: 'react-les-3-2', title: 'Fetching Data inside useEffect', type: 'Code', duration: '50min', status: 'not_started', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'react-mod-4',
+        number: 4,
+        title: 'Routing with React Router',
+        description: 'Browser routes, dynamic URL parameters, navigation links, and layout templates.',
+        duration: '4h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'react-les-4-1', title: 'Configuring App Routes', type: 'Video', duration: '35min', status: 'locked', required: true, bloomLevel: 'Apply' },
+          { id: 'react-les-4-2', title: 'Dynamic Routes & useParams', type: 'Code', duration: '45min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'docker-containers',
+    title: 'Docker & Containerization',
+    description: 'Package your applications, manage environments, and orchestrate containers with Docker Compose.',
+    longDescription: 'Work environment synchronization can be painful. This course introduces Docker containerization, Dockerfiles, volume bindings, ports exposure, and orchestrating multiple services using Docker Compose.',
+    level: 'Intermediate',
+    format: 'cohort',
+    xpReward: 380,
+    price: 'CHF 550.00',
+    rating: 4.8,
+    ratingCount: 77,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1605745341112-85968b19335b?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['david-pinezich'],
+    learningOutcomes: [
+      'Write Dockerfiles for Node, Python, and Go applications.',
+      'Share local source code folders using volume mounts.',
+      'Deploy database and app services with Docker Compose.'
+    ],
+    modules: [
+      {
+        id: 'dock-mod-1',
+        number: 1,
+        title: 'Containers and Images',
+        description: 'Docker architecture, images vs containers, executing run commands.',
+        duration: '4h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'dock-les-1-1', title: 'The Problem Docker Solves', type: 'Video', duration: '25min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'dock-les-1-2', title: 'Docker CLI commands', type: 'Code', duration: '45min', status: 'not_started', required: true, bloomLevel: 'Apply' },
+          { id: 'dock-les-1-3', title: 'Writing your first Dockerfile', type: 'Code', duration: '50min', status: 'not_started', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'dock-mod-2',
+        number: 2,
+        title: 'Volumes and Networks',
+        description: 'Data persistence, named volumes, bridge networks, and linking containers.',
+        duration: '4h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'dock-les-2-1', title: 'Data Persistence in Container Land', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'dock-les-2-2', title: 'Bridge Networks and Container Resolution', type: 'Code', duration: '45min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'dock-mod-3',
+        number: 3,
+        title: 'Docker Compose',
+        description: 'Defining compose.yml configs, multi-container stacks, environment variables.',
+        duration: '4h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'dock-les-3-1', title: 'Orchestrating stacks with Compose', type: 'Video', duration: '35min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'dock-les-3-2', title: 'Connecting database and app servers', type: 'Code', duration: '50min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'api-design-fastapi',
+    title: 'API Design with FastAPI',
+    description: 'Build high-performance, asynchronous REST APIs with FastAPI, Pydantic, and automatic OpenAPI docs.',
+    longDescription: 'Python APIs must be fast and easy to document. Explore FastAPI, utilize Pydantic models for request validation, configure background workers, and write clean dependency injection schemas.',
+    level: 'Advanced',
+    format: 'cohort',
+    xpReward: 500,
+    price: 'CHF 890.00',
+    rating: 4.9,
+    ratingCount: 52,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['david-pinezich'],
+    learningOutcomes: [
+      'Build robust API endpoints using async/await handlers.',
+      'Implement strict validation models with Pydantic.',
+      'Configure authentication guards using JWT tokens.'
+    ],
+    modules: [
+      {
+        id: 'fast-mod-1',
+        number: 1,
+        title: 'Async Handlers & Pydantic',
+        description: 'FastAPI features, Pydantic type specifications, automatic query parameter extraction.',
+        duration: '4.5h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'fast-les-1-1', title: 'Why FastAPI beats older tools', type: 'Video', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'fast-les-1-2', title: 'Designing Pydantic Schema inputs', type: 'Code', duration: '50min', status: 'not_started', required: true, bloomLevel: 'Apply' },
+          { id: 'fast-les-1-3', title: 'CRUD routes implementation', type: 'Code', duration: '50min', status: 'not_started', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'fast-mod-2',
+        number: 2,
+        title: 'Dependency Injection',
+        description: 'FastAPI Depends parameters, database session injection, reusable auth logic.',
+        duration: '4.5h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'fast-les-2-1', title: 'Dependency Injection Principles', type: 'Video', duration: '35min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'fast-les-2-2', title: 'Writing Custom Dependencies', type: 'Code', duration: '45min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'fast-mod-3',
+        number: 3,
+        title: 'JWT Authentication',
+        description: 'Creating hash functions, signing tokens, authentication header authorization.',
+        duration: '4.5h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'fast-les-3-1', title: 'Securing API Routes with JWT', type: 'Video', duration: '40min', status: 'locked', required: true, bloomLevel: 'Apply' },
+          { id: 'fast-les-3-2', title: 'Token validation logic', type: 'Code', duration: '45min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'fast-mod-4',
+        number: 4,
+        title: 'Background Tasks',
+        description: 'Executing tasks out of request loops, emails dispatch, database triggers.',
+        duration: '4.5h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'fast-les-4-1', title: 'Scheduling background workers', type: 'Video', duration: '35min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'fast-les-4-2', title: 'Deploying workers safely', type: 'Code', duration: '45min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'fullstack-production-arch',
+    title: 'Full Stack Production Architecture',
+    description: 'Master enterprise deployments, caching strategies, load balancing, CI/CD pipelines, and secure cloud setups.',
+    longDescription: 'Take applications to enterprise scale. This comprehensive course covers horizontal scaling, SSL configurations, proxying with Nginx, database replication, caching with Redis, and writing secure CI/CD build scripts.',
+    level: 'Advanced',
+    format: 'cohort',
+    xpReward: 800,
+    price: 'CHF 1\'800.00',
+    rating: 4.9,
+    ratingCount: 37,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['david-pinezich'],
+    learningOutcomes: [
+      'Design horizontally scalable architectures.',
+      'Configure Nginx reverse proxies with SSL certificates.',
+      'Optimize responses using Redis cache layers.',
+      'Deploy applications using fully automated CI/CD pipelines.'
+    ],
+    modules: [
+      {
+        id: 'arch-mod-1',
+        number: 1,
+        title: 'Load Balancing & Nginx',
+        description: 'Reverse proxies, round-robin rules, SSL termination, proxy headers.',
+        duration: '6h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'arch-les-1-1', title: 'Scaling Out vs Scaling Up', type: 'Video', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'arch-les-1-2', title: 'Configuring Nginx reverse proxy', type: 'Code', duration: '60min', status: 'not_started', required: true, bloomLevel: 'Apply' },
+          { id: 'arch-les-1-3', title: 'SSL Certs with Let\'s Encrypt', type: 'Code', duration: '50min', status: 'not_started', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'arch-mod-2',
+        number: 2,
+        title: 'Redis Caching layers',
+        description: 'In-memory stores, string/hash records, cache invalidation protocols.',
+        duration: '6h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'arch-les-2-1', title: 'Why DB queries are slow', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'arch-les-2-2', title: 'Redis client set and get caching', type: 'Code', duration: '60min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'arch-mod-3',
+        number: 3,
+        title: 'Database Replication',
+        description: 'Primary/replica topologies, read-write splitting, connection pools.',
+        duration: '6h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'arch-les-3-1', title: 'Topologies for High Availability', type: 'Video', duration: '35min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'arch-les-3-2', title: 'Configuring Read Splitting', type: 'Code', duration: '50min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'arch-mod-4',
+        number: 4,
+        title: 'CI/CD Automation pipelines',
+        description: 'Runner setups, test environments, docker image repository uploads.',
+        duration: '7h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'arch-les-4-1', title: 'Introduction to GitHub Actions', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'arch-les-4-2', title: 'Building clean multi-stage docker pipelines', type: 'Code', duration: '60min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'arch-mod-5',
+        number: 5,
+        title: 'Docker Swarm & Kubernetes',
+        description: 'Orchestrating containers, rolling updates, health checks.',
+        duration: '7h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'arch-les-5-1', title: 'Orchestration Essentials', type: 'Video', duration: '35min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'arch-les-5-2', title: 'Rolling Updates and Service Health', type: 'Code', duration: '55min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      },
+      {
+        id: 'arch-mod-6',
+        number: 6,
+        title: 'System Security Audits',
+        description: 'DDoS mitigation, SQL injections scanning, firewall rules.',
+        duration: '8h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'arch-les-6-1', title: 'Security Best Practices', type: 'Video', duration: '40min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'arch-les-6-2', title: 'Vulnerability Scanning Tools', type: 'Code', duration: '60min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ]
   }
 ];
 
