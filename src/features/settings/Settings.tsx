@@ -4,11 +4,21 @@ import { useXP } from '../../context/XPContext';
 import { useTheme } from '../../context/ThemeContext';
 import { User, Shield, CreditCard, Sliders } from 'lucide-react';
 
-export const Settings: React.FC = () => {
+interface SettingsProps {
+  initialTab?: 'profile' | 'account' | 'billing' | 'preferences';
+}
+
+export const Settings: React.FC<SettingsProps> = ({ initialTab = 'profile' }) => {
   const { user, updateProfile } = useAuth();
   const { addToast } = useXP();
   const { theme, toggleTheme } = useTheme();
-  const [activeSubTab, setActiveSubTab] = useState<'profile' | 'account' | 'billing' | 'preferences'>('profile');
+  const [activeSubTab, setActiveSubTab] = useState<'profile' | 'account' | 'billing' | 'preferences'>(initialTab);
+  const [prevInitialTab, setPrevInitialTab] = useState(initialTab);
+
+  if (initialTab !== prevInitialTab) {
+    setPrevInitialTab(initialTab);
+    setActiveSubTab(initialTab);
+  }
 
   // Input states
   const [name, setName] = useState(user?.name || '');

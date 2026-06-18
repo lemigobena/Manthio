@@ -23,8 +23,10 @@ const MainApp: React.FC = () => {
     return isOnboardingCompleted ? 'dashboard' : 'onboarding';
   });
 
+  const [page, tab] = currentPage.split(':');
+
   const renderPage = () => {
-    switch (currentPage) {
+    switch (page) {
       case 'onboarding':
         return <Onboarding onNavigate={setCurrentPage} />;
       case 'dashboard':
@@ -46,18 +48,18 @@ const MainApp: React.FC = () => {
       case 'community':
         return <Community onNavigate={setCurrentPage} />;
       case 'settings':
-        return <Settings />;
+        return <Settings initialTab={tab as 'profile' | 'account' | 'billing' | 'preferences'} />;
       default:
         return <Dashboard onNavigate={setCurrentPage} />;
     }
   };
 
-  if (currentPage === 'onboarding') {
+  if (page === 'onboarding') {
     return <Onboarding onNavigate={setCurrentPage} />;
   }
 
   return (
-    <AppLayout activePage={currentPage} onNavigate={setCurrentPage}>
+    <AppLayout activePage={page} onNavigate={setCurrentPage}>
       {renderPage()}
     </AppLayout>
   );

@@ -35,7 +35,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         <TopBar onNavigate={onNavigate} />
 
         {/* Content View Body */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto px-[44px] py-6">
           <div className="max-w-7xl mx-auto min-h-[calc(100vh-180px)]">
             {children}
           </div>

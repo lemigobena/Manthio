@@ -100,3 +100,10 @@ code, pre {
   outline: 2px solid var(--cyan);
   outline-offset: 2px;
 }
+
+/* Disable focus outline specifically for search input in overlay */
+.search-overlay-input:focus,
+.search-overlay-input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
