@@ -69,6 +69,16 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
     onClose();
   }, [onClose]);
 
+  const handleClearOrClose = () => {
+    if (query) {
+      setQuery('');
+      setSelectedIndex(0);
+      inputRef.current?.focus();
+    } else {
+      handleClose();
+    }
+  };
+
   useEffect(() => {
     localStorage.setItem('recent-searches', JSON.stringify(recentSearches));
   }, [recentSearches]);
@@ -272,17 +282,10 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
             onKeyDown={handleKeyDown}
             className="flex-1 bg-transparent border-none outline-none text-text text-sm sm:text-base placeholder:text-muted/50 py-1 search-overlay-input"
           />
-          {query && (
-            <button 
-              onClick={() => { setQuery(''); setSelectedIndex(0); inputRef.current?.focus(); }}
-              className="p-1 hover:bg-bg rounded-lg text-muted hover:text-text transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
           <button 
-            onClick={handleClose} 
+            onClick={handleClearOrClose} 
             className="p-1.5 hover:bg-bg rounded-lg text-muted hover:text-text transition-colors cursor-pointer flex items-center shrink-0"
+            title={query ? "Clear search text" : "Close search"}
           >
             <X className="w-5 h-5" />
           </button>
