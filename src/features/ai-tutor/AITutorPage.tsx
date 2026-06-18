@@ -22,6 +22,25 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
   ]);
   const [isTyping, setIsTyping] = useState(false);
 
+  // Loading & Error States (REQ-LOAD-002, REQ-LOAD-004)
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 850);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleRetry = () => {
+    setIsError(false);
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 850);
+  };
+
   const pastChats = [
     { id: 'chat-1', title: 'Difference List vs Tuple', date: 'Yesterday' },
     { id: 'chat-2', title: 'Error with venv PowerShell', date: 'Jun 12' },
@@ -78,20 +97,32 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
         <div className="p-4 border-b border-line">
           <h3 className="font-bold text-xs uppercase text-muted tracking-wider">History</h3>
         </div>
-        <div className="flex-1 overflow-y-auto p-2 space-y-1">
-          {pastChats.map(chat => (
-            <button 
-              key={chat.id} 
-              className="w-full text-left p-3 rounded-xl text-xs hover:bg-bg/60 transition-colors flex items-center justify-between"
-            >
-              <div className="flex items-center space-x-2 truncate">
-                <MessageSquare className="w-3.5 h-3.5 text-muted shrink-0" />
-                <span className="truncate text-text font-medium">{chat.title}</span>
+        
+        {isLoading ? (
+          <div className="flex-1 p-4 space-y-4">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="flex items-center space-x-2.5 py-1">
+                <div className="w-4 h-4 bg-line rounded-full animate-pulse shrink-0" />
+                <div className="h-3 bg-line rounded w-3/4 animate-pulse" />
               </div>
-              <span className="text-[10px] text-muted ml-2 shrink-0">{chat.date}</span>
-            </button>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto p-2 space-y-1">
+            {pastChats.map(chat => (
+              <button 
+                key={chat.id} 
+                className="w-full text-left p-3 rounded-xl text-xs hover:bg-bg/60 transition-colors flex items-center justify-between"
+              >
+                <div className="flex items-center space-x-2 truncate">
+                  <MessageSquare className="w-3.5 h-3.5 text-muted shrink-0" />
+                  <span className="truncate text-text font-medium">{chat.title}</span>
+                </div>
+                <span className="text-[10px] text-muted ml-2 shrink-0">{chat.date}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Center Panel: Active Chat Feed */}
@@ -101,146 +132,232 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
         <div className="bg-panel border-b border-line px-6 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 z-10 shrink-0">
           <div>
             <h1 className="text-sm font-bold text-text">AI Tutor Chat</h1>
-            <span className="text-[10px] text-muted">Alex Chen • Level 42 Explorer</span>
+            <span className="text-[10px] text-muted block mt-0.5">Alex Chen • Level 42 Explorer</span>
           </div>
 
           {/* AI Mode Selector (REQ-TUTOR-060) */}
           <div className="flex bg-bg border border-line p-0.5 rounded-lg text-xs self-start sm:self-center">
             <button 
+              disabled={isLoading || isError}
               onClick={() => setAiMode('auto')}
-              className={`px-3 py-1 rounded font-semibold transition-colors cursor-pointer ${aiMode === 'auto' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
+              className={`px-3 py-1 rounded font-semibold transition-colors cursor-pointer ${aiMode === 'auto' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'} ${(isLoading || isError) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               Auto
             </button>
             <button 
+              disabled={isLoading || isError}
               onClick={() => {
                 setAiMode('docs');
                 addToast('info', 'Questions remain on apigenio infrastructure.');
               }}
-              className={`px-3 py-1 rounded font-semibold transition-colors cursor-pointer ${aiMode === 'docs' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
+              className={`px-3 py-1 rounded font-semibold transition-colors cursor-pointer ${aiMode === 'docs' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'} ${(isLoading || isError) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               Documents
             </button>
             <button 
+              disabled={isLoading || isError}
               onClick={() => setAiMode('full')}
-              className={`px-3 py-1 rounded font-semibold transition-colors cursor-pointer ${aiMode === 'full' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
+              className={`px-3 py-1 rounded font-semibold transition-colors cursor-pointer ${aiMode === 'full' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'} ${(isLoading || isError) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               Full AI
             </button>
           </div>
         </div>
 
-        {/* Message List */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {chatMessages.map(msg => (
-            <div 
-              key={msg.id} 
-              className={`space-y-1 max-w-[75%] ${msg.sender === 'user' ? 'ml-auto' : 'mr-auto'}`}
+        {/* REQ-LOAD-004: Failed load with retry action */}
+        {isError ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4">
+            <div className="w-12 h-12 rounded-full bg-red/10 border border-red/35 flex items-center justify-center mx-auto text-red animate-pulse">
+              <AlertCircle className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-bold text-text text-base">Failed to connect to AI Tutor</h3>
+              <p className="text-muted text-xs max-w-xs mx-auto">We encountered an issue establishing a secure connection to the AI Tutor service.</p>
+            </div>
+            <button 
+              onClick={handleRetry}
+              className="bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
             >
-              <div className={`p-4 rounded-2xl text-xs md:text-sm leading-relaxed ${msg.sender === 'user' ? 'bg-cyan text-bg font-semibold rounded-tr-none' : 'bg-panel border border-line rounded-tl-none text-text'}`}>
-                {msg.text}
-              </div>
-              <div className="flex items-center space-x-1.5 text-[9px] text-muted justify-between px-1">
-                <span>{msg.timestamp}</span>
-                {msg.source && (
-                  <span className="bg-panel border border-line px-1 rounded-sm">
-                    {msg.source}
-                  </span>
-                )}
+              Retry Connection
+            </button>
+          </div>
+        ) : isLoading ? (
+          /* REQ-LOAD-002: skeleton loader mimicking final content shape */
+          <div className="flex-1 flex flex-col justify-between overflow-hidden">
+            <div className="flex-1 p-6 space-y-6 overflow-y-auto">
+              <div className="flex items-start space-x-3 max-w-[70%] mr-auto">
+                <div className="w-8 h-8 rounded-full bg-line animate-pulse shrink-0" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-3.5 bg-line rounded w-full animate-pulse" />
+                  <div className="h-3.5 bg-line rounded w-5/6 animate-pulse" />
+                  <div className="h-3 bg-line rounded w-1/2 animate-pulse" />
+                </div>
               </div>
               
-              {/* Citations if Local AI */}
-              {msg.documents && msg.documents.length > 0 && (
-                <div className="pl-4 border-l border-cyan text-[10px] text-muted mt-2 space-y-1">
-                  <span className="font-semibold block">References:</span>
-                  {msg.documents.map((doc, idx) => (
-                    <a key={idx} href={doc.url} className="text-cyan hover:underline block">
-                      {doc.title} ({doc.location})
-                    </a>
-                  ))}
+              <div className="flex items-start justify-end max-w-[70%] ml-auto">
+                <div className="space-y-2 flex-1">
+                  <div className="h-3.5 bg-line rounded w-3/4 animate-pulse ml-auto" />
+                  <div className="h-3 bg-line rounded w-1/2 animate-pulse ml-auto" />
+                </div>
+                <div className="w-8 h-8 rounded-full bg-line animate-pulse shrink-0 ml-3" />
+              </div>
+
+              <div className="flex items-start space-x-3 max-w-[70%] mr-auto">
+                <div className="w-8 h-8 rounded-full bg-line animate-pulse shrink-0" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-3.5 bg-line rounded w-full animate-pulse" />
+                  <div className="h-3.5 bg-line rounded w-2/3 animate-pulse" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-panel border-t border-line p-4 shrink-0">
+              <div className="max-w-3xl mx-auto flex items-center space-x-2">
+                <div className="flex-1 h-9 bg-bg border border-line rounded-xl animate-pulse" />
+                <div className="w-9 h-9 bg-line rounded-xl animate-pulse" />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Message List */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {chatMessages.map(msg => (
+                <div 
+                  key={msg.id} 
+                  className={`space-y-1 max-w-[75%] ${msg.sender === 'user' ? 'ml-auto' : 'mr-auto'}`}
+                >
+                  <div className={`p-4 rounded-2xl text-xs md:text-sm leading-relaxed ${msg.sender === 'user' ? 'bg-cyan text-bg font-semibold rounded-tr-none' : 'bg-panel border border-line rounded-tl-none text-text'}`}>
+                    {msg.text}
+                  </div>
+                  <div className="flex items-center space-x-1.5 text-[9px] text-muted justify-between px-1">
+                    <span>{msg.timestamp}</span>
+                    {msg.source && (
+                      <span className="bg-panel border border-line px-1 rounded-sm">
+                        {msg.source}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Citations if Local AI */}
+                  {msg.documents && msg.documents.length > 0 && (
+                    <div className="pl-4 border-l border-cyan text-[10px] text-muted mt-2 space-y-1">
+                      <span className="font-semibold block">References:</span>
+                      {msg.documents.map((doc, idx) => (
+                        <a key={idx} href={doc.url} className="text-cyan hover:underline block">
+                          {doc.title} ({doc.location})
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+              {isTyping && (
+                <div className="text-[10px] text-muted flex items-center space-x-1.5 italic px-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan animate-bounce" />
+                  <span>AI Tutor is responding...</span>
                 </div>
               )}
             </div>
-          ))}
-          {isTyping && (
-            <div className="text-[10px] text-muted flex items-center space-x-1.5 italic px-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan animate-bounce" />
-              <span>AI Tutor is responding...</span>
+
+            {/* Chat Input Area */}
+            <div className="bg-panel border-t border-line p-4 shrink-0">
+              <div className="max-w-3xl mx-auto flex items-center space-x-2">
+                <input 
+                  type="text" 
+                  placeholder="Ask a question or paste a code snippet..." 
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                  className="flex-1 bg-bg border border-line text-xs rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-cyan"
+                />
+                <button 
+                  onClick={handleSendMessage}
+                  className="bg-cyan hover:bg-cyan2 text-bg p-2.5 rounded-xl transition-colors cursor-pointer"
+                >
+                  <Send className="w-4.5 h-4.5" />
+                </button>
+              </div>
+              <div className="text-center text-[10px] text-muted mt-2">
+                AI Tutor can make mistakes. Grounding data primarily comes from the Python Bootcamp.
+              </div>
             </div>
-          )}
-        </div>
-
-        {/* Chat Input Area */}
-        <div className="bg-panel border-t border-line p-4 shrink-0">
-          <div className="max-w-3xl mx-auto flex items-center space-x-2">
-            <input 
-              type="text" 
-              placeholder="Ask a question or paste a code snippet..." 
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1 bg-bg border border-line text-xs rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-cyan"
-            />
-            <button 
-              onClick={handleSendMessage}
-              className="bg-cyan hover:bg-cyan2 text-bg p-2.5 rounded-xl transition-colors cursor-pointer"
-            >
-              <Send className="w-4.5 h-4.5" />
-            </button>
-          </div>
-          <div className="text-center text-[10px] text-muted mt-2">
-            AI Tutor can make mistakes. Grounding data primarily comes from the Python Bootcamp.
-          </div>
-        </div>
-
+          </>
+        )}
       </div>
 
       {/* Right Column: Context Widgets */}
       <div className="w-full md:w-64 bg-panel border-l border-line p-4 shrink-0 space-y-6 overflow-y-auto hidden lg:block">
-        <div className="space-y-3">
-          <div className="flex items-center space-x-1.5">
-            <BookOpen className="w-4 h-4 text-cyan" />
-            <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Active Module</h4>
-          </div>
-          <div className="bg-bg border border-line p-3 rounded-xl text-xs space-y-1">
-            <div className="font-bold text-text">Module 3: Workshop A</div>
-            <p className="text-muted">Progress: 60%</p>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <div className="flex items-center space-x-1.5">
-            <AlertCircle className="w-4 h-4 text-yellow" />
-            <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Weak Points</h4>
-          </div>
-          <div className="space-y-2">
-            {['OOP Concepts', 'Recursion'].map((weak, idx) => (
-              <div key={idx} className="bg-bg border border-line p-2.5 rounded-xl text-xs text-text flex items-center justify-between">
-                <span>{weak}</span>
-                <span className="w-2 h-2 rounded-full bg-red" />
+        {isLoading ? (
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <div className="h-3.5 bg-line rounded w-1/2 animate-pulse" />
+              <div className="h-16 bg-bg border border-line rounded-xl animate-pulse" />
+            </div>
+            <div className="space-y-3">
+              <div className="h-3.5 bg-line rounded w-1/3 animate-pulse" />
+              <div className="space-y-2">
+                <div className="h-10 bg-bg border border-line rounded-xl animate-pulse" />
+                <div className="h-10 bg-bg border border-line rounded-xl animate-pulse" />
               </div>
-            ))}
+            </div>
+            <div className="space-y-3">
+              <div className="h-3.5 bg-line rounded w-1/2 animate-pulse" />
+              <div className="h-24 bg-bg border border-line rounded-xl animate-pulse" />
+            </div>
           </div>
-        </div>
+        ) : isError ? (
+          <div className="text-center py-8 text-xs text-muted">
+            Failed to load context.
+          </div>
+        ) : (
+          <>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-1.5">
+                <BookOpen className="w-4 h-4 text-cyan" />
+                <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Active Module</h4>
+              </div>
+              <div className="bg-bg border border-line p-3 rounded-xl text-xs space-y-1">
+                <div className="font-bold text-text">Module 3: Workshop A</div>
+                <p className="text-muted">Progress: 60%</p>
+              </div>
+            </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center space-x-1.5">
-            <HelpCircle className="w-4 h-4 text-purple" />
-            <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Recommended Exercises</h4>
-          </div>
-          <div className="bg-bg border border-line p-3 rounded-xl text-xs text-text space-y-2">
-            <p className="text-muted">Based on your OOP gap:</p>
-            <button 
-              onClick={() => {
-                addToast('info', 'Exercise started');
-                onNavigate('content-player');
-              }}
-              className="w-full bg-cyan text-bg py-1.5 rounded font-bold uppercase text-[10px]"
-            >
-              Start: Class Quiz
-            </button>
-          </div>
-        </div>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-1.5">
+                <AlertCircle className="w-4 h-4 text-yellow" />
+                <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Weak Points</h4>
+              </div>
+              <div className="space-y-2">
+                {['OOP Concepts', 'Recursion'].map((weak, idx) => (
+                  <div key={idx} className="bg-bg border border-line p-2.5 rounded-xl text-xs text-text flex items-center justify-between">
+                    <span>{weak}</span>
+                    <span className="w-2 h-2 rounded-full bg-red" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center space-x-1.5">
+                <HelpCircle className="w-4 h-4 text-purple" />
+                <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Recommended Exercises</h4>
+              </div>
+              <div className="bg-bg border border-line p-3 rounded-xl text-xs text-text space-y-2">
+                <p className="text-muted">Based on your OOP gap:</p>
+                <button 
+                  onClick={() => {
+                    addToast('info', 'Exercise started');
+                    onNavigate('content-player');
+                  }}
+                  className="w-full bg-cyan text-bg py-1.5 rounded font-bold uppercase text-[10px]"
+                >
+                  Start: Class Quiz
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
     </div>
