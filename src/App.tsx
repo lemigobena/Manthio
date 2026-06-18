@@ -3,6 +3,8 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { XPProvider } from './context/XPContext';
 import { AppLayout } from './components/layout/AppLayout';
+import { ModalProvider } from './context/ModalContext';
+import ModalManager from './components/modal/ModalManager';
 
 // Page Views
 import { Dashboard } from './features/dashboard/Dashboard';
@@ -61,6 +63,7 @@ const MainApp: React.FC = () => {
   return (
     <AppLayout activePage={page} onNavigate={setCurrentPage}>
       {renderPage()}
+      <ModalManager />
     </AppLayout>
   );
 };
@@ -70,7 +73,9 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <XPProvider>
-          <MainApp />
+          <ModalProvider>
+            <MainApp />
+          </ModalProvider>
         </XPProvider>
       </AuthProvider>
     </ThemeProvider>
