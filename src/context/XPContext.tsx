@@ -4,6 +4,8 @@ export interface ToastMessage {
   id: string;
   type: 'xp' | 'success' | 'error' | 'info';
   text: string;
+  onRetry?: () => void;
+  isDismissing?: boolean;
 }
 
 interface XPContextType {
@@ -17,7 +19,7 @@ interface XPContextType {
   incrementStreak: () => void;
   useStreakFreeze: () => boolean;
   toasts: ToastMessage[];
-  addToast: (type: ToastMessage['type'], text: string) => void;
+  addToast: (type: ToastMessage['type'], text: string, onRetry?: () => void) => void;
   removeToast: (id: string) => void;
   celebrationActive: boolean;
   dismissCelebration: () => void;
@@ -90,17 +92,21 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     return false;
   };
 
-  const addToast = (type: ToastMessage['type'], text: string) => {
+  const addToast = (type: ToastMessage['type'], text: string, onRetry?: () => void) => {
     const id = `toast-${++toastIdCounter}`;
     const duration = type === 'error' ? 5000 : 3000; // REQ-TOAST-002
     
     setToasts(prev => {
       // Maximum 3 visible at once (REQ-TOAST-004)
-      const next = [...prev, { id, type, text }];
-      if (next.length > 3) {
-        return next.slice(next.length - 3);
+      const activeToasts = prev.filter(t => !t.isDismissing);
+      if (activeToasts.length >= 3) {
+        const oldestActive = activeToasts[0];
+        // Trigger dismissal for the oldest active toast so it fades out
+        setTimeout(() => {
+          removeToast(oldestActive.id);
+        }, 0);
       }
-      return next;
+      return [...prev, { id, type, text, onRetry, isDismissing: false }];
     });
 
     setTimeout(() => {
@@ -109,7 +115,15 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   };
 
   const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
+    setToasts(prev => {
+      const target = prev.find(t => t.id === id);
+      if (!target || target.isDismissing) return prev;
+      return prev.map(t => t.id === id ? { ...t, isDismissing: true } : t);
+    });
+
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 500); // 500ms matches the slideOut keyframe animation duration
   };
 
   const dismissCelebration = () => {
