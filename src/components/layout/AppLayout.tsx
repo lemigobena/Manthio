@@ -17,22 +17,29 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   onNavigate 
 }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { toasts, removeToast, celebrationActive, dismissCelebration, levelUpTo } = useXP();
   
   return (
-    <div className="flex h-screen overflow-hidden bg-bg text-text">
+    <div className="flex h-[100dvh] overflow-hidden bg-bg text-text">
       {/* Sidebar Navigation */}
       <Sidebar 
         activePage={activePage} 
         onNavigate={onNavigate} 
         collapsed={sidebarCollapsed} 
         setCollapsed={setSidebarCollapsed} 
+        isMobileOpen={isMobileOpen}
+        setIsMobileOpen={setIsMobileOpen}
       />
 
       {/* Main View Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Topbar */}
-        <TopBar onNavigate={onNavigate} />
+        <TopBar 
+          onNavigate={onNavigate} 
+          isMobileOpen={isMobileOpen}
+          setIsMobileOpen={setIsMobileOpen}
+        />
 
         {/* Content View Body */}
         <main className="flex-1 overflow-y-auto px-[44px] py-6">

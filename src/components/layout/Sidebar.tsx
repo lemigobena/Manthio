@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { 
   LayoutDashboard, BookOpen, Compass, BrainCircuit, PieChart, 
-  Folder, MessagesSquare, Settings, ChevronLeft, Menu, X
+  Folder, MessagesSquare, Settings, ChevronLeft, X
 } from 'lucide-react';
 
 interface NavItem {
@@ -17,17 +17,20 @@ interface SidebarProps {
   onNavigate: (page: string) => void;
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
+  isMobileOpen: boolean;
+  setIsMobileOpen: (open: boolean) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
   activePage, 
   onNavigate, 
   collapsed, 
-  setCollapsed 
+  setCollapsed,
+  isMobileOpen,
+  setIsMobileOpen
 }) => {
   const { user } = useAuth();
   const { level, currentXpInLevel, xpNeededForNextLevel } = useXP();
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const progressPercentage = Math.round((currentXpInLevel / xpNeededForNextLevel) * 100);
 
@@ -54,27 +57,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Search/Header Mobile Toggle (Floating Hamburger) */}
-      <div className="lg:hidden fixed top-3 left-2 z-[60]">
-        <button 
-          onClick={() => setIsMobileOpen(!isMobileOpen)}
-          className="w-11 h-11 flex items-center justify-center rounded-xl text-muted hover:text-cyan transition-all"
-        >
-          {isMobileOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </div>
-
       {/* Mobile Backdrop Overlay */}
       {isMobileOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300"
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[65] transition-opacity duration-300"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
 
       {/* Actual Sidebar */}
       <div 
-        className={`bg-panel h-screen flex flex-col transition-all duration-300 border-r border-line z-50
+        className={`bg-panel h-[100dvh] flex flex-col transition-all duration-300 border-r border-line z-[70]
           ${(collapsed && !isMobileOpen) ? 'w-[68px]' : 'w-64'}
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           fixed lg:relative top-0 left-0
@@ -82,6 +75,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       >
         {/* Brand Header */}
         <div className="pt-3 pb-6 px-4 flex flex-col items-center justify-center relative">
+          {/* Mobile/Tablet Close Button inside Sidebar */}
+          <button
+            onClick={() => setIsMobileOpen(false)}
+            className="lg:hidden absolute top-3 right-3 p-1.5 rounded-lg text-muted hover:text-cyan transition-colors cursor-pointer"
+            title="Close menu"
+          >
+            <X size={18} />
+          </button>
+
           <div className="overflow-hidden w-full flex justify-center py-2">
             <img 
               src="/Branding/primary/logo_7_prio_1_variation.png" 
