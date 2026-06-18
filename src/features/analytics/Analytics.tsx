@@ -45,7 +45,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
         <div className="flex items-center space-x-3">
           <select 
             value={timeRange} 
-            onChange={(e) => setTimeRange(e.target.value as any)}
+            onChange={(e) => setTimeRange(e.target.value as 'week' | 'month' | 'year')}
             className="bg-panel border border-line text-xs rounded-lg px-3 py-2 text-text focus:outline-none focus:border-cyan cursor-pointer"
           >
             <option value="week">This week</option>

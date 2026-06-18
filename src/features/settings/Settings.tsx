@@ -5,7 +5,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { User, Shield, CreditCard, Sliders } from 'lucide-react';
 
 export const Settings: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const { addToast } = useXP();
   const { theme, toggleTheme } = useTheme();
   const [activeSubTab, setActiveSubTab] = useState<'profile' | 'account' | 'billing' | 'preferences'>('profile');
@@ -18,9 +18,7 @@ export const Settings: React.FC = () => {
 
   const handleSaveProfile = () => {
     if (user) {
-      user.name = name;
-      user.bio = bio;
-      localStorage.setItem('user', JSON.stringify(user));
+      updateProfile(name, bio);
       addToast('success', 'Profile successfully saved.');
     }
   };

@@ -44,8 +44,8 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
 
     setTimeout(() => {
       setIsTyping(false);
-      let replyText = '';
-      let source: ChatMessage['source'] = 'Course docs';
+      let replyText: string;
+      let source: ChatMessage['source'];
 
       if (aiMode === 'full') {
         replyText = 'Here is the explanation from general LLM knowledge: Recursion is a programming method in which a function calls itself. In Python, we must always define a termination condition (Base Case), otherwise a RecursionError occurs.';

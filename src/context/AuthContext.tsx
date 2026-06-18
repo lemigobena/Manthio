@@ -14,6 +14,7 @@ interface AuthContextType {
   signUp: (name: string, email: string, password: string) => Promise<boolean>;
   signOut: () => void;
   completeOnboarding: (answers: OnboardingAnswers) => void;
+  updateProfile: (name: string, bio: string) => void;
   activeCourseId: string | null;
   setActiveCourseId: (id: string | null) => void;
 }
@@ -53,7 +54,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     else localStorage.removeItem('activeCourseId');
   };
 
-  const signIn = async (email: string, _password: string): Promise<boolean> => {
+  const signIn = async (email: string, password: string): Promise<boolean> => {
+    void password;
     // Basic mock authentication
     const mockUser: UserProfile = {
       name: 'Alex Chen',
@@ -72,7 +74,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const signUp = async (name: string, email: string, _password: string): Promise<boolean> => {
+  const signUp = async (name: string, email: string, password: string): Promise<boolean> => {
+    void password;
     const mockUser: UserProfile = {
       name,
       email,
@@ -103,6 +106,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('onboardingAnswers', JSON.stringify(answers));
   };
 
+  const updateProfile = (name: string, bio: string) => {
+    setUser(prev => {
+      if (!prev) return null;
+      const updated = { ...prev, name, bio };
+      localStorage.setItem('user', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -112,6 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signUp,
       signOut,
       completeOnboarding,
+      updateProfile,
       activeCourseId,
       setActiveCourseId
     }}>
@@ -120,6 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth must be used within an AuthProvider');
