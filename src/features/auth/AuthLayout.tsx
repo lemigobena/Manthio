@@ -36,7 +36,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, onNavigate }) 
   }, []);
 
   return (
-    <div className="h-screen w-full flex bg-bg font-sans selection:bg-cyan/30 overflow-hidden transition-colors duration-500">
+    <div className="fixed inset-0 h-[100dvh] w-full flex bg-bg font-sans selection:bg-cyan/30 overflow-hidden overscroll-none transition-colors duration-500">
       
       {/* Left Side: Visual Panel Container */}
       <section className="hidden lg:flex w-[48%] h-full p-4 shrink-0">
