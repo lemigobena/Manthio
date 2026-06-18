@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { COURSES } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
-import { Search, SlidersHorizontal, BookOpen, Award, Clock } from 'lucide-react';
+import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle } from 'lucide-react';
 
 interface CatalogProps {
   onNavigate: (page: string) => void;
@@ -13,6 +13,39 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<string>('All');
   const [selectedFormat, setSelectedFormat] = useState<string>('All');
+
+  // Loading & Error States (REQ-LOAD-002, REQ-LOAD-004)
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 850);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const simulateLoad = () => {
+    setIsLoading(true);
+    setIsError(false);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 700);
+    return timer;
+  };
+
+  const handleTabChange = (tab: typeof activeTab) => {
+    setActiveTab(tab);
+    simulateLoad();
+  };
+
+  const handleRetry = () => {
+    setIsError(false);
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 850);
+  };
 
   // Filter courses
   const filteredCourses = COURSES.filter(course => {
@@ -46,7 +79,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
             type="text" 
             placeholder="Search for courses or topics..." 
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => { setSearchQuery(e.target.value); simulateLoad(); }}
             className="w-full bg-panel border border-line rounded-xl pl-10 pr-4 py-2 text-sm text-text focus:border-cyan focus:outline-none transition-colors"
           />
           <Search className="absolute left-3 top-2.5 w-4.5 h-4.5 text-muted" />
@@ -57,19 +90,19 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-4">
         <div className="flex space-x-1 bg-panel border border-line p-1 rounded-xl">
           <button 
-            onClick={() => setActiveTab('all')}
+            onClick={() => handleTabChange('all')}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'all' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
           >
             All Courses ({COURSES.length})
           </button>
           <button 
-            onClick={() => setActiveTab('enrolled')}
+            onClick={() => handleTabChange('enrolled')}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'enrolled' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
           >
             My Courses ({COURSES.filter(c => c.enrolled).length})
           </button>
           <button 
-            onClick={() => setActiveTab('completed')}
+            onClick={() => handleTabChange('completed')}
             className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'completed' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
           >
             Completed ({COURSES.filter(c => c.progress === 100).length})
@@ -82,8 +115,8 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
           
           <select 
             value={selectedLevel}
-            onChange={(e) => setSelectedLevel(e.target.value)}
-            className="bg-panel border border-line text-xs rounded-lg px-3 py-1.5 text-text focus:outline-none focus:border-cyan"
+            onChange={(e) => { setSelectedLevel(e.target.value); simulateLoad(); }}
+            className="bg-panel border border-line text-xs rounded-lg px-3 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
           >
             <option value="All">All Levels</option>
             <option value="Foundation">Foundation</option>
@@ -93,8 +126,8 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
 
           <select 
             value={selectedFormat}
-            onChange={(e) => setSelectedFormat(e.target.value)}
-            className="bg-panel border border-line text-xs rounded-lg px-3 py-1.5 text-text focus:outline-none focus:border-cyan"
+            onChange={(e) => { setSelectedFormat(e.target.value); simulateLoad(); }}
+            className="bg-panel border border-line text-xs rounded-lg px-3 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
           >
             <option value="All">All Formats</option>
             <option value="flipped">Flipped (Hybrid)</option>
@@ -104,21 +137,104 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* Grid of Course Cards */}
-      {filteredCourses.length === 0 ? (
-        <div className="text-center py-12 bg-panel border border-line rounded-2xl">
-          <BookOpen className="w-12 h-12 text-muted mx-auto mb-3" />
-          <h3 className="font-bold text-text">No courses found</h3>
-          <p className="text-muted text-sm mt-1">Adjust your search or filter settings.</p>
+      {/* REQ-LOAD-004: Failed load with retry action */}
+      {isError ? (
+        <div className="text-center py-16 max-w-md mx-auto my-6 space-y-4">
+          <div className="w-12 h-12 rounded-full bg-red/10 border border-red/35 flex items-center justify-center mx-auto text-red animate-pulse">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <div className="space-y-1 px-4">
+            <h3 className="font-bold text-text text-base">Failed to load courses</h3>
+            <p className="text-muted text-xs max-w-xs mx-auto">We encountered an issue retrieving the course list. Please check your network connection.</p>
+          </div>
           <button 
-            onClick={() => { setSelectedLevel('All'); setSelectedFormat('All'); setSearchQuery(''); setActiveTab('all'); }}
-            className="mt-4 bg-cyan hover:bg-cyan2 text-bg text-xs font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer"
+            onClick={handleRetry}
+            className="bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
           >
-            Reset Filters
+            Retry Connection
           </button>
         </div>
-      ) : (
+      ) : isLoading ? (
+        /* REQ-LOAD-002: Skeleton loader mimicking layout shape */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map(i => (
+            <div 
+              key={i} 
+              className="bg-panel border border-line rounded-2xl overflow-hidden flex flex-col justify-between h-[400px]"
+            >
+              <div>
+                {/* Header Image Skeleton */}
+                <div className="h-44 bg-bg border-b border-line animate-pulse relative">
+                  <div className="absolute top-3 left-3 flex gap-2">
+                    <div className="h-4 w-14 bg-line rounded animate-pulse" />
+                    <div className="h-4 w-16 bg-line rounded animate-pulse" />
+                  </div>
+                </div>
+
+                {/* Content Skeleton */}
+                <div className="p-5 space-y-4">
+                  <div className="h-5 bg-line rounded w-3/4 animate-pulse" />
+                  <div className="space-y-2">
+                    <div className="h-3 bg-line rounded w-full animate-pulse" />
+                    <div className="h-3 bg-line rounded w-5/6 animate-pulse" />
+                    <div className="h-3 bg-line rounded w-2/3 animate-pulse" />
+                  </div>
+                  <div className="flex items-center space-x-4 pt-3">
+                    <div className="h-3.5 bg-line rounded w-16 animate-pulse" />
+                    <div className="h-3.5 bg-line rounded w-20 animate-pulse" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Bar Skeleton */}
+              <div className="p-5 pt-0 border-t border-line mt-4 flex items-center justify-between">
+                <div className="h-4 bg-line rounded w-16 animate-pulse" />
+                <div className="h-8 bg-line rounded w-28 animate-pulse" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : filteredCourses.length === 0 ? (
+        /* REQ-LOAD-001: Every list view has a defined empty state with primary action */
+        <div className="text-center py-16 bg-panel border border-line rounded-2xl">
+          <BookOpen className="w-12 h-12 text-muted mx-auto mb-3" />
+          {activeTab === 'enrolled' ? (
+            <>
+              <h3 className="font-bold text-text">No active courses</h3>
+              <p className="text-muted text-sm mt-1 max-w-sm mx-auto">You haven't enrolled in any courses yet — browse the catalog to find a course.</p>
+              <button 
+                onClick={() => handleTabChange('all')}
+                className="mt-5 bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
+              >
+                Browse Catalog
+              </button>
+            </>
+          ) : activeTab === 'completed' ? (
+            <>
+              <h3 className="font-bold text-text">No completed courses</h3>
+              <p className="text-muted text-sm mt-1 max-w-sm mx-auto">You haven't completed any courses yet. Resume your learning path to finish.</p>
+              <button 
+                onClick={() => handleTabChange('enrolled')}
+                className="mt-5 bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
+              >
+                Resume Active Course
+              </button>
+            </>
+          ) : (
+            <>
+              <h3 className="font-bold text-text">No courses found</h3>
+              <p className="text-muted text-sm mt-1 max-w-sm mx-auto">Adjust your search query or filter selectors to find matching courses.</p>
+              <button 
+                onClick={() => { setSelectedLevel('All'); setSelectedFormat('All'); setSearchQuery(''); }}
+                className="mt-5 bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
+              >
+                Reset Filters
+              </button>
+            </>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeIn_0.3s_ease-out]">
           {filteredCourses.map(course => (
             <div 
               key={course.id} 
