@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import { ChevronRight, ChevronLeft, CheckCircle2 } from 'lucide-react';
 
-interface Question {
+export interface Question {
   id: number;
   text: string;
   options: string[];
 }
 
-interface QuizModalProps {
+export interface QuizModalProps {
   isOpen: boolean;
   onClose: () => void;
   questions: Question[];

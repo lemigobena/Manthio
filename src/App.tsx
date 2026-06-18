@@ -3,8 +3,13 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { XPProvider } from './context/XPContext';
 import { AppLayout } from './components/layout/AppLayout';
-import { ModalProvider } from './context/ModalContext';
+import { ModalProvider, useModal } from './context/ModalContext';
 import ModalManager from './components/modal/ModalManager';
+// import { HelpCenter } from './features/info/HelpCenter';
+// import { PrivacyPolicy } from './features/info/PrivacyPolicy';
+// import { TermsOfUse } from './features/info/TermsOfUse';
+// import { CookieSettings } from './features/info/CookieSettings';
+// import { Imprint } from './features/info/Imprint';
 
 // Page Views
 import { Dashboard } from './features/dashboard/Dashboard';
@@ -51,6 +56,16 @@ const MainApp: React.FC = () => {
         return <Community onNavigate={setCurrentPage} />;
       case 'settings':
         return <Settings initialTab={tab as 'profile' | 'account' | 'billing' | 'preferences'} />;
+      // case 'help-center':
+      //   return <HelpCenter onNavigate={setCurrentPage} />;
+      // case 'privacy':
+      //   return <PrivacyPolicy onNavigate={setCurrentPage} />;
+      // case 'terms':
+      //   return <TermsOfUse onNavigate={setCurrentPage} />;
+      // case 'cookies':
+      //   return <CookieSettings onNavigate={setCurrentPage} />;
+      // case 'imprint':
+      //   return <Imprint onNavigate={setCurrentPage} />;
       default:
         return <Dashboard onNavigate={setCurrentPage} />;
     }
@@ -60,11 +75,18 @@ const MainApp: React.FC = () => {
     return <Onboarding onNavigate={setCurrentPage} />;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { activeModal } = useModal();
+
   return (
-    <AppLayout activePage={page} onNavigate={setCurrentPage}>
-      {renderPage()}
+    <>
+      <div className={`transition-all duration-300 ${activeModal ? 'blur-sm pointer-events-none select-none' : ''}`}>
+        <AppLayout activePage={page} onNavigate={setCurrentPage}>
+          {renderPage()}
+        </AppLayout>
+      </div>
       <ModalManager />
-    </AppLayout>
+    </>
   );
 };
 

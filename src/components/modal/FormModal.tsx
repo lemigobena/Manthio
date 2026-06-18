@@ -22,7 +22,7 @@ const FormModal: React.FC<FormModalProps> = ({
       onClose={onClose} 
       title={title} 
       size="md"
-      preventCloseOnOverlayClick={true} // REQ-MODAL-002: Data-entry modals require explicit dismissal
+      preventCloseOnOverlayClick={false}
     >
       <div className="space-y-6">
         {children}

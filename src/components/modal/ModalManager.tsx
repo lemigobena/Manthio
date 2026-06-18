@@ -3,7 +3,7 @@ import { useModal } from '../../context/ModalContext';
 import ConfirmationModal from './ConfirmationModal';
 import FormModal from './FormModal';
 import CelebrationModal from './CelebrationModal';
-import QuizModal from './QuizModal';
+import QuizModal, { type QuizModalProps } from './QuizModal';
 
 const ModalManager: React.FC = () => {
   const { activeModal, modalOptions, closeModal } = useModal();
@@ -16,7 +16,7 @@ const ModalManager: React.FC = () => {
         <ConfirmationModal
           isOpen={true}
           onClose={closeModal}
-          onConfirm={modalOptions.props?.onConfirm || (() => {})}
+          onConfirm={(modalOptions.props?.onConfirm as () => void) || (() => {})}
           title={modalOptions.title || 'Confirm Action'}
           message={modalOptions.description || 'Are you sure you want to proceed?'}
           {...modalOptions.props}
@@ -28,10 +28,10 @@ const ModalManager: React.FC = () => {
         <FormModal
           isOpen={true}
           onClose={closeModal}
-          onSubmit={modalOptions.props?.onSubmit || (() => {})}
+          onSubmit={(modalOptions.props?.onSubmit as (data: Record<string, unknown>) => void) || (() => {})}
           title={modalOptions.title || 'Data Entry'}
         >
-          {modalOptions.props?.children}
+          {modalOptions.props?.children as React.ReactNode}
         </FormModal>
       );
 
@@ -47,14 +47,17 @@ const ModalManager: React.FC = () => {
       );
 
     case 'quiz':
-      return (
-        <QuizModal
-          isOpen={true}
-          onClose={closeModal}
-          questions={modalOptions.props?.questions || []}
-          onComplete={modalOptions.props?.onComplete || (() => {})}
-        />
-      );
+      {
+        const props = modalOptions.props as Partial<QuizModalProps>;
+        return (
+          <QuizModal
+            isOpen={true}
+            onClose={closeModal}
+            questions={props?.questions || []}
+            onComplete={props?.onComplete || (() => {})}
+          />
+        );
+      }
 
     default:
       return null;
