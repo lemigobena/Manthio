@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { COURSES } from '../../services/mockData';
+import { useModal } from '../../context/ModalContext';
 import { Play, Flame, Award, BookOpen, AlertCircle, ArrowRight, Sparkles, RefreshCw, X } from 'lucide-react';
 
 interface DashboardProps {
@@ -74,6 +75,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     setSyncStep('');
     addToast('info', 'Sync operation cancelled by user');
   };
+  const { openModal } = useModal();
 
   // Find enrolled courses
   const enrolledCourses = COURSES.filter(c => c.enrolled);
@@ -470,7 +472,105 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               </button>
             </div>
           </div>
+
+      {/* Modal System Showcase */}
+      <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
+        <div className="flex items-center space-x-2">
+          <Sparkles className="w-5 h-5 text-cyan" />
+          <h2 className="text-xl font-bold font-display">Modal System Showcase</h2>
         </div>
+        <p className="text-muted text-sm">
+          Experience the high-fidelity modal overlay system with focus trapping, responsive design, and premium animations.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <button
+            onClick={() => openModal('confirmation', {
+              title: 'Reset Progress?',
+              description: 'This action is irreversible. All your module progress and quiz scores will be permanently deleted.',
+              props: {
+                onConfirm: () => console.log('Reset confirmed'),
+                confirmText: 'Yes, Reset All',
+                variant: 'danger'
+              }
+            })}
+            className="flex flex-col items-center justify-center p-6 bg-red/10 border border-red/20 rounded-xl hover:bg-red/20 transition-all group"
+          >
+            <AlertCircle className="w-8 h-8 text-red mb-3 group-hover:scale-110 transition-transform" />
+            <span className="font-bold text-red">Confirmation</span>
+          </button>
+
+          <button
+            onClick={() => openModal('form', {
+              title: 'Add Learning Note',
+              props: {
+                onSubmit: (data: unknown) => console.log('Form submitted', data),
+                children: (
+                  <div className="space-y-4 text-left">
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-muted">Topic</label>
+                      <input 
+                        className="w-full bg-bg border border-line rounded-xl px-4 py-2.5 text-text focus:border-cyan outline-none transition-all" 
+                        placeholder="e.g. Asynchronous Python"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-muted">Note</label>
+                      <textarea 
+                        className="w-full bg-bg border border-line rounded-xl px-4 py-2.5 text-text focus:border-cyan outline-none transition-all min-h-[120px]" 
+                        placeholder="What did you learn today?"
+                      />
+                    </div>
+                  </div>
+                )
+              }
+            })}
+            className="flex flex-col items-center justify-center p-6 bg-cyan/10 border border-cyan/20 rounded-xl hover:bg-cyan/20 transition-all group"
+          >
+            <BookOpen className="w-8 h-8 text-cyan mb-3 group-hover:scale-110 transition-transform" />
+            <span className="font-bold text-cyan">Form Entry</span>
+          </button>
+
+          <button
+            onClick={() => openModal('celebration', {
+              title: 'New Rank: Alchemist!',
+              description: 'You have mastered the fundamental transformations of code.',
+              props: {
+                achievementName: 'Master of Reactivity',
+                points: 500
+              }
+            })}
+            className="flex flex-col items-center justify-center p-6 bg-yellow/10 border border-yellow/20 rounded-xl hover:bg-yellow/20 transition-all group"
+          >
+            <Award className="w-8 h-8 text-yellow mb-3 group-hover:scale-110 transition-transform" />
+            <span className="font-bold text-yellow">Celebration</span>
+          </button>
+
+          <button
+            onClick={() => openModal('quiz', {
+              props: {
+                questions: [
+                  { 
+                    id: 1, 
+                    text: 'Which hook should be used for side effects in React?', 
+                    options: ['useState', 'useEffect', 'useContext', 'useReducer'] 
+                  },
+                  { 
+                    id: 2, 
+                    text: 'What is the purpose of React.memo()?', 
+                    options: ['State management', 'Routing', 'Performance optimization', 'Styling'] 
+                  }
+                ],
+                onComplete: (answers: unknown) => console.log('Quiz complete', answers)
+              }
+            })}
+            className="flex flex-col items-center justify-center p-6 bg-purple/10 border border-purple/20 rounded-xl hover:bg-purple/20 transition-all group"
+          >
+            <Sparkles className="w-8 h-8 text-purple mb-3 group-hover:scale-110 transition-transform" />
+            <span className="font-bold text-purple">Multi-step Quiz</span>
+          </button>
+        </div>
+        </div>
+      </div>
       )}
     </div>
   );

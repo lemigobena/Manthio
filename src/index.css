@@ -58,7 +58,34 @@
   --font-display: var(--font-display);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+
+  --animate-cel-float: cel-float 4s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  --animate-cel-orbit: cel-orbit 20s linear infinite;
+  --animate-cel-reveal: cel-reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-cel-fall: cel-fall 4s ease-in-out forwards;
 }
+
+
+  @keyframes cel-float {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-12px) scale(1.02); }
+  }
+
+  @keyframes cel-orbit {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes cel-reveal {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes cel-fall {
+    0% { transform: translateY(-20px) rotate(0deg) scale(1); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg) scale(0.5); opacity: 0; }
+  }
 
 /* Custom scrollbars matching the dark/light premium aesthetic */
 ::-webkit-scrollbar {
