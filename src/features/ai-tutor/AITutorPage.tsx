@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useXP } from '../../context/XPContext';
+import { useAuth } from '../../context/AuthContext';
 import { MessageSquare, Send, BookOpen, AlertCircle, HelpCircle } from 'lucide-react';
 import type { ChatMessage } from '../../types';
 
@@ -9,17 +10,26 @@ interface AITutorPageProps {
 
 export const AITutorPage: React.FC<AITutorPageProps> = ({ onNavigate }) => {
   const { addXp, addToast } = useXP();
+  const { user, onboardingAnswers } = useAuth();
   const [aiMode, setAiMode] = useState<'auto' | 'docs' | 'full'>('auto');
   const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    { 
-      id: 'm1', 
-      sender: 'tutor', 
-      text: 'Hello Alex! I am your personal AI Tutor. How can I help you today with the Python Bootcamp?', 
-      timestamp: '14:30', 
-      source: 'Course docs' 
+  
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => {
+    const firstName = user?.name ? user.name.split(' ')[0] : 'learner';
+    let welcomeText = `Hello ${firstName}! I am your personal AI Tutor. How can I help you today with your learning path?`;
+    if (onboardingAnswers) {
+      welcomeText = `Hello ${firstName}! I am your personal AI Tutor. I see you are here for ${onboardingAnswers.reason} with a goal of investing ${onboardingAnswers.timePerWeek} weekly. Let's work together to achieve your goals! How can I help you today?`;
     }
-  ]);
+    return [
+      { 
+        id: 'm1', 
+        sender: 'tutor', 
+        text: welcomeText, 
+        timestamp: '14:30', 
+        source: 'Course docs' 
+      }
+    ];
+  });
   const [isTyping, setIsTyping] = useState(false);
 
   // Loading & Error States (REQ-LOAD-002, REQ-LOAD-004)
