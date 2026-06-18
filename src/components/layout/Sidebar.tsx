@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { 
@@ -34,6 +34,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const progressPercentage = Math.round((currentXpInLevel / xpNeededForNextLevel) * 100);
 
+  // Swipe-left-to-close tracking
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
+    // Swipe left at least 50px, and more horizontal than vertical
+    if (deltaX < -50 && deltaY < Math.abs(deltaX)) {
+      setIsMobileOpen(false);
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
   const handleNavigate = (id: string) => {
     onNavigate(id);
     if (window.innerWidth < 1024) {
@@ -62,6 +83,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div 
           className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[65] transition-opacity duration-300"
           onClick={() => setIsMobileOpen(false)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         />
       )}
 
@@ -72,6 +95,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           fixed lg:relative top-0 left-0
         `}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         {/* Brand Header */}
         <div className="pt-3 pb-6 px-4 flex flex-col items-center justify-center relative">
