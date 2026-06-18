@@ -95,7 +95,7 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
 
       {isError ? (
         /* REQ-LOAD-004: Failed load show error state with retry action */
-        <div className="text-center py-16 bg-panel border border-line rounded-2xl max-w-md mx-auto my-6 space-y-4 shadow-xl animate-[fadeIn_0.3s_ease-out]">
+        <div className="text-center py-16 max-w-md mx-auto my-6 space-y-4 animate-[fadeIn_0.3s_ease-out]">
           <div className="w-12 h-12 rounded-full bg-red/10 border border-red/35 flex items-center justify-center mx-auto text-red animate-pulse">
             <AlertCircle className="w-6 h-6" />
           </div>
