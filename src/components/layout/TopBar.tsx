@@ -2,14 +2,20 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { useTheme } from '../../context/ThemeContext';
-import { Search, Sun, Moon, Bell, User, Sliders, LogOut } from 'lucide-react';
+import { Search, Sun, Moon, Bell, User, Sliders, LogOut, Menu, X } from 'lucide-react';
 import { SearchOverlay } from '../search/SearchOverlay';
 
 interface TopBarProps {
   onNavigate: (page: string) => void;
+  isMobileOpen: boolean;
+  setIsMobileOpen: (open: boolean) => void;
 }
 
-export const TopBar: React.FC<TopBarProps> = ({ onNavigate }) => {
+export const TopBar: React.FC<TopBarProps> = ({ 
+  onNavigate,
+  isMobileOpen,
+  setIsMobileOpen
+}) => {
   const { user, signOut } = useAuth();
   const { streak } = useXP();
   const { theme, toggleTheme } = useTheme();
@@ -94,6 +100,15 @@ export const TopBar: React.FC<TopBarProps> = ({ onNavigate }) => {
   return (
     <div className="bg-panel border-b border-line h-16 px-[26px] shrink-0 relative z-[60]">
       <div className="max-w-[1360px] mx-auto h-full flex items-center justify-between gap-5 w-full">
+        {/* Mobile/Tablet Menu Button Toggle */}
+        <button 
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          className="lg:hidden h-9 w-9 flex items-center justify-center rounded-xl text-muted hover:text-cyan hover:bg-cyan/10 transition-colors cursor-pointer shrink-0"
+          title="Toggle menu"
+        >
+          {isMobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-6 h-6" />}
+        </button>
+
         {/* Global Search Button Trigger (Interactive Command Palette) */}
         <div className="relative flex-1 max-w-xl hidden md:block">
           <button 
