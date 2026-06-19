@@ -49,6 +49,11 @@ export interface Course {
   longDescription?: string;
   level: CourseLevel;
   format: CourseFormat;
+  topic?: string;
+  duration?: string;
+  language?: string;
+  tags?: ('Bestseller' | 'New' | 'Limited cohort')[];
+  priceStatus?: 'paid' | 'included' | 'employer';
   xpReward: number;
   price: string;
   rating?: number;
@@ -59,11 +64,16 @@ export interface Course {
   trainer: Trainer;
   learningOutcomes?: string[];
   modules: Module[];
+  startDate?: string;
 }
 
 export interface CareerTrack {
   id: string;
   title: string;
+  description: string;
+  imageUrl: string;
+  level: CourseLevel;
+  tags?: string[];
   outcomeStatement: string;
   estimatedTime: string;
   coursesCount: number;
