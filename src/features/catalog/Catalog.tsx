@@ -251,15 +251,15 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
         </div>
       ) : isLoading ? (
         /* REQ-LOAD-002: Skeleton loader mimicking layout shape */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map(i => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map(i => (
             <div 
               key={i} 
-              className="bg-panel border border-line rounded-2xl overflow-hidden flex flex-col justify-between h-[380px]"
+              className="bg-panel border border-line rounded-2xl overflow-hidden flex flex-col justify-between h-[420px]"
             >
               <div>
                 {/* Header Image Skeleton */}
-                <div className="h-48 bg-bg border-b border-line animate-pulse relative">
+                <div className="h-46 bg-bg border-b border-line animate-pulse relative">
                   <div className="absolute top-3 left-3 flex gap-2">
                     <div className="h-4 w-14 bg-line rounded animate-pulse" />
                     <div className="h-4 w-16 bg-line rounded animate-pulse" />
@@ -342,83 +342,84 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-[fadeIn_0.3s_ease-out]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeIn_0.3s_ease-out]">
           {discoveryMode === 'courses' ? sortedCourses.map(course => (
             <div 
               key={course.id} 
-              className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-md h-[380px]"
+              className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:translate-y-[-4px] duration-300 h-[420px]"
             >
               <div>
                 {/* Header Image */}
-                <div className="h-48 relative bg-bg overflow-hidden border-b border-line">
-                  <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" />
+                <div className="h-44 relative bg-bg overflow-hidden border-b border-line">
+                  <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover opacity-85 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg/60 via-transparent to-transparent opacity-60" />
                   <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-                    <span className="bg-bg/90 backdrop-blur border border-line text-[9px] px-2 py-0.5 rounded font-bold uppercase text-text whitespace-nowrap">
+                    <span className="bg-bg/40 backdrop-blur-md border border-white/20 text-[10px] px-2.5 py-1 rounded font-bold uppercase text-white shadow-sm">
                       {course.level}
                     </span>
-                    <span className="bg-cyan text-bg text-[9px] px-2 py-0.5 rounded font-bold uppercase whitespace-nowrap">
+                    <span className="bg-cyan/80 backdrop-blur-md text-bg text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm">
                       {course.format}
                     </span>
                     {course.tags?.map(tag => (
-                      <span key={tag} className="bg-amber-500 text-bg text-[9px] px-2 py-0.5 rounded font-bold uppercase whitespace-nowrap">
+                      <span key={tag} className="bg-amber-500/80 backdrop-blur-md text-white text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm whitespace-nowrap">
                         {tag}
                       </span>
                     ))}
                   </div>
                   {course.startDate && (
-                    <div className="absolute bottom-2 right-3 bg-bg/80 backdrop-blur px-2 py-1 rounded text-[10px] font-semibold text-cyan border border-cyan/20">
+                    <div className="absolute bottom-2 right-3 bg-bg/60 backdrop-blur-md px-2.5 py-1 rounded text-[10px] font-bold text-cyan border border-cyan/30 shadow-sm">
                       Starts: {course.startDate}
                     </div>
                   )}
                 </div>
 
                 {/* Content */}
-                <div className="p-4 space-y-2">
-                  <h3 className="text-sm font-bold text-text hover:text-cyan transition-colors line-clamp-1">
+                <div className="p-5 space-y-2.5">
+                  <h3 className="text-base font-bold text-text group-hover:text-cyan transition-colors line-clamp-1">
                     {course.title}
                   </h3>
-                  <p className="text-muted text-[10px] line-clamp-2 leading-relaxed min-h-[28px]">
+                  <p className="text-muted text-[11px] line-clamp-2 leading-relaxed min-h-[32px]">
                     {course.description}
                   </p>
                   
-                  <div className="flex items-center space-x-3 pt-1.5 text-[10px] text-muted">
-                    <div className="flex items-center space-x-1">
-                      <Award className="w-3.5 h-3.5 text-cyan" />
-                      <span>+{course.xpReward} XP</span>
+                  <div className="flex items-center space-x-6 pt-2.5 text-[11px] font-bold">
+                    <div className="flex items-center space-x-1.5 h-4">
+                      <Award className="w-4 h-4 text-cyan flex-shrink-0" />
+                      <span className="text-text inline-flex items-center">+{course.xpReward} XP</span>
                     </div>
-                    <div className="flex items-center space-x-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{course.duration}</span>
+                    <div className="flex items-center space-x-1.5 h-4">
+                      <Clock className="w-4 h-4 text-cyan flex-shrink-0" />
+                      <span className="text-text inline-flex items-center">{course.duration}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Action Bar */}
-              <div className="p-4 pt-3 border-t border-line mt-auto flex items-center justify-between">
+              <div className="p-5 pt-4 border-t border-line mt-auto flex items-center justify-between bg-bg/20">
                 <div>
                   {course.enrolled ? (
-                    <div className="flex items-center space-x-2.5">
-                      {/* Simple SVG Progress Ring */}
-                      <div className="relative w-8 h-8">
-                        <svg className="w-8 h-8 -rotate-90">
-                          <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-bg" />
-                          <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="3" fill="transparent" strokeDasharray={88} strokeDashoffset={88 - (88 * course.progress) / 100} className="text-cyan transition-all duration-1000" />
+                    <div className="flex items-center space-x-3">
+                      {/* Premium Progress Ring */}
+                      <div className="relative w-9 h-9">
+                        <svg className="w-9 h-9 -rotate-90">
+                          <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" className="text-line opacity-20" />
+                          <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" strokeDasharray={100} strokeDashoffset={100 - (100 * course.progress) / 100} className="text-cyan transition-all duration-1000 shadow-[0_0_8px_rgba(45,212,191,0.5)]" />
                         </svg>
-                        <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-text">
+                        <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-text">
                           {course.progress}%
                         </span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[9px] text-muted font-bold leading-none mb-1 uppercase">Active</span>
-                        <span className="text-[11px] font-bold text-cyan">Continue</span>
+                        <span className="text-[10px] text-cyan font-black leading-none mb-1 uppercase tracking-wider">Active</span>
+                        <span className="text-[12px] font-bold text-text opacity-80">Continue Course</span>
                       </div>
                     </div>
                   ) : (
                     <div className="flex flex-col">
-                      <span className="text-[9px] text-muted font-bold uppercase mb-0.5">Price</span>
-                      <span className="text-sm font-bold text-text">
-                        {course.priceStatus === 'included' ? 'Included' : course.priceStatus === 'employer' ? 'Free for you' : course.price}
+                      <span className="text-[10px] text-muted font-bold uppercase mb-0.5 tracking-tight">Booking Info</span>
+                      <span className="text-[15px] font-black text-text tracking-tight">
+                        {course.priceStatus === 'included' ? 'Included' : course.priceStatus === 'employer' ? 'Company Paid' : course.price}
                       </span>
                     </div>
                   )}
@@ -433,82 +434,84 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                       onNavigate('course-detail');
                     }
                   }}
-                  className={`bg-cyan hover:bg-cyan2 text-bg text-[11px] font-bold px-5 py-2 rounded-xl transition-all shadow-sm hover:translate-y-[-2px] cursor-pointer`}
+                  className={`relative overflow-hidden group/btn bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer`}
                 >
-                  {course.enrolled ? 'Resume' : 'Enrol'}
+                  <span className="relative z-10">{course.enrolled ? 'Resume Path' : 'Enrol Now'}</span>
+                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
                 </button>
               </div>
             </div>
           )) : tracksToShow.map(track => (
             <div 
               key={track.id} 
-              className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-md h-[380px]"
+              className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:translate-y-[-4px] duration-300 h-[420px]"
             >
               <div>
                 {/* Header Image */}
-                <div className="h-48 relative bg-bg overflow-hidden border-b border-line">
-                  <img src={track.imageUrl} alt={track.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" />
+                <div className="h-44 relative bg-bg overflow-hidden border-b border-line">
+                  <img src={track.imageUrl} alt={track.title} className="w-full h-full object-cover opacity-85 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg/60 via-transparent to-transparent opacity-60" />
                   <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-                    <span className="bg-bg/90 backdrop-blur border border-line text-[9px] px-2 py-0.5 rounded font-bold uppercase text-text">
+                    <span className="bg-bg/40 backdrop-blur-md border border-white/20 text-[10px] px-2.5 py-1 rounded font-bold uppercase text-white shadow-sm">
                       {track.level}
                     </span>
                     {track.tags?.map(tag => (
-                      <span key={tag} className="bg-cyan text-bg text-[9px] px-2 py-0.5 rounded font-bold uppercase">
+                      <span key={tag} className={`${tag=="Career Track"  ? "bg-cyan/80" : "bg-amber-500/80"}  backdrop-blur-md text-bg text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm whitespace-nowrap`}>
                         {tag}
                       </span>
                     ))}
                   </div>
-                  <div className="absolute bottom-2 right-3 bg-bg/80 backdrop-blur px-2 py-1 rounded text-[10px] font-bold text-cyan border border-cyan/20">
-                    {track.coursesCount} Courses
+                  <div className="absolute bottom-2 right-3 bg-bg/60 backdrop-blur-md px-2.5 py-1 rounded text-[10px] font-black text-cyan border border-cyan/30 shadow-sm uppercase tracking-wider">
+                    {track.coursesCount} Courses in Path
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-4 space-y-2">
-                  <h3 className="text-sm font-bold text-text hover:text-cyan transition-colors line-clamp-1">
+                <div className="p-5 space-y-2.5">
+                  <h3 className="text-base font-bold text-text group-hover:text-cyan transition-colors line-clamp-1">
                     {track.title}
                   </h3>
-                  <p className="text-muted text-[10px] line-clamp-2 leading-relaxed min-h-[28px]">
+                  <p className="text-muted text-[11px] line-clamp-2 leading-relaxed min-h-[32px]">
                     {track.description}
                   </p>
                   
-                  <div className="flex items-center space-x-3 pt-1.5 text-[10px] text-muted">
-                    <div className="flex items-center space-x-1">
-                      <Clock className="w-3.5 h-3.5 text-cyan" />
-                      <span>{track.estimatedTime}</span>
+                  <div className="flex items-center space-x-6 pt-2.5 text-[11px] font-bold">
+                    <div className="flex items-center space-x-1.5 h-4">
+                      <Clock className="w-4 h-4 text-cyan flex-shrink-0" />
+                      <span className="text-text inline-flex items-center">{track.estimatedTime}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Action Bar */}
-              <div className="p-5 pt-4 border-t border-line mt-auto flex items-center justify-between">
+              <div className="p-5 pt-4 border-t border-line mt-auto flex items-center justify-between bg-bg/20">
                 <div>
-                  <div className="flex items-center space-x-2.5">
-                    <div className="relative w-8 h-8">
-                      <svg className="w-8 h-8 -rotate-90">
-                        <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-bg" />
-                        <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="3" fill="transparent" strokeDasharray={88} strokeDashoffset={88 - (88 * track.progress) / 100} className="text-cyan transition-all duration-1000" />
+                  <div className="flex items-center space-x-3">
+                    <div className="relative w-9 h-9">
+                      <svg className="w-9 h-9 -rotate-90">
+                        <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" className="text-line opacity-20" />
+                        <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" strokeDasharray={100} strokeDashoffset={100 - (100 * track.progress) / 100} className="text-cyan transition-all duration-1000 shadow-[0_0_8px_rgba(45,212,191,0.5)]" />
                       </svg>
-                      <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-text">
+                      <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-text">
                         {track.progress}%
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[9px] text-muted font-bold leading-none mb-1 uppercase">Track Progress</span>
-                      <span className="text-[11px] font-bold text-text">Continue Path</span>
+                      <span className="text-[10px] text-muted font-bold leading-none mb-1 uppercase tracking-wider">Track Path</span>
+                      <span className="text-[12px] font-bold text-text">Resume Learning</span>
                     </div>
                   </div>
                 </div>
 
                 <button 
                   onClick={() => {
-                    // Navigate to first course or track detail
                     onNavigate('course-detail');
                   }}
-                  className="bg-cyan hover:bg-cyan2 text-bg text-[11px] font-bold px-5 py-2 rounded-xl transition-all shadow-sm hover:translate-y-[-2px] cursor-pointer"
+                  className="relative overflow-hidden group/btn bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer"
                 >
-                  View Path
+                  <span className="relative z-10">Continue Path</span>
+                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
                 </button>
               </div>
             </div>

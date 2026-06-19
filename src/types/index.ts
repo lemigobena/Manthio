@@ -50,7 +50,7 @@ export interface Course {
   level: CourseLevel;
   format: CourseFormat;
   topic?: string;
-  duration?: string;
+  duration: string;
   language?: string;
   tags?: ('Bestseller' | 'New' | 'Limited cohort')[];
   priceStatus?: 'paid' | 'included' | 'employer';
