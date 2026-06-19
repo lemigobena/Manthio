@@ -3,15 +3,93 @@ import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { COURSES } from '../../services/mockData';
 import { useModal } from '../../context/ModalContext';
-import { Play, Flame, Award, BookOpen, AlertCircle, ArrowRight, Sparkles, RefreshCw, X } from 'lucide-react';
+import { 
+  Play, 
+  Flame, 
+  Award, 
+  BookOpen, 
+  AlertCircle, 
+  ArrowRight, 
+  Sparkles, 
+  RefreshCw, 
+  X, 
+  Code,
+  Layout,
+  Database,
+  Cloud,
+  Cpu,
+  MessageSquare
+} from 'lucide-react';
 
 interface DashboardProps {
   onNavigate: (page: string) => void;
-}
+}// Sub-component for individual Neural Insight Card
+const NeuralInsightCard: React.FC<{ 
+  category: string; 
+  text: string; 
+  color: 'cyan' | 'purple' | 'yellow' | 'orange';
+}> = ({ category, text, color }) => {
+  const accentColor = {
+    cyan: 'border-l-cyan ring-cyan/10',
+    purple: 'border-l-purple ring-purple/10',
+    yellow: 'border-l-yellow ring-yellow/10',
+    orange: 'border-l-orange ring-orange/10',
+  }[color];
+
+  const labelColor = {
+    cyan: 'text-cyan',
+    purple: 'text-purple',
+    yellow: 'text-yellow',
+    orange: 'text-orange',
+  }[color];
+
+  return (
+    <div className={`bg-bg/40 border border-line ${accentColor} border-l-4 rounded-lg p-4 space-y-2 transition-all hover:bg-bg/60`}>
+      <span className={`text-[10px] font-bold uppercase tracking-widest ${labelColor}`}>{category}</span>
+      <p className="text-xs text-text font-medium leading-relaxed italic">
+        "{text}"
+      </p>
+    </div>
+  );
+};
+
+
+/* 
+// Progress Indicator for Hero with smooth SVG animations
+const RingProgress: React.FC<{ progress: number; size?: number; strokeWidth?: number; color?: string }> = ({ 
+  progress, size = 68, strokeWidth = 6, color = 'var(--cyan)' 
+}) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (progress / 100) * circumference;
+
+  return (
+    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="rotate-[-90deg]">
+        <circle
+          cx={size / 2} cy={size / 2} r={radius}
+          fill="none" stroke="currentColor" strokeWidth={strokeWidth}
+          className="text-line"
+        />
+        <circle
+          cx={size / 2} cy={size / 2} r={radius}
+          fill="none" stroke={color} strokeWidth={strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          className="transition-all duration-1000 ease-out"
+        />
+      </svg>
+      <span className="absolute text-[13px] font-bold text-text tabular-nums">{progress}%</span>
+    </div>
+  );
+};
+*/
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const { user, setActiveCourseId } = useAuth();
   const { level, streak, xp, addToast } = useXP();
+  const { openModal } = useModal();
 
   // Progress Sync States (REQ-LOAD-003)
   const [isSyncing, setIsSyncing] = useState(false);
@@ -22,11 +100,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   // Page Mount Loading State (REQ-LOAD-002)
   const [isPageLoading, setIsPageLoading] = useState(true);
 
-  // Clear timers and handle mount load
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPageLoading(false);
-    }, 850);
+    const timer = setTimeout(() => setIsPageLoading(false), 950);
     return () => {
       clearTimeout(timer);
       if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
@@ -37,49 +112,36 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     if (isSyncing) return;
     setIsSyncing(true);
     setSyncProgress(0);
-    setSyncStep('Connecting to sync service...');
-
+    setSyncStep('Initializing sync engine...');
     syncIntervalRef.current = setInterval(() => {
       setSyncProgress(prev => {
-        const next = prev + 2.5;
+        const next = Math.min(prev + 1.25, 100);
         if (next >= 100) {
           if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
           setIsSyncing(false);
-          addToast('success', '✓ Offline sync completed successfully');
+          addToast('success', '✓ Workspace synced successfully');
           return 100;
         }
-
-        // Update step messaging dynamically based on progress percent
-        if (next < 25) {
-          setSyncStep('Downloading modules database structure...');
-        } else if (next < 55) {
-          setSyncStep('Caching video lessons & exercises...');
-        } else if (next < 85) {
-          setSyncStep('Downloading interactive quiz templates...');
-        } else {
-          setSyncStep('Finalizing local cache storage compilation...');
-        }
-
+        if (next < 25) setSyncStep('Updating local module schemas...');
+        else if (next < 55) setSyncStep('Caching lesson assets...');
+        else if (next < 85) setSyncStep('Optimizing offline search index...');
+        else setSyncStep('Finalizing local manifest...');
         return next;
       });
-    }, 100); // 100 ticks of 100ms = 4 seconds total duration (satisfies > 3 seconds requirement)
+    }, 50);
   };
 
   const handleCancelSync = () => {
-    if (syncIntervalRef.current) {
-      clearInterval(syncIntervalRef.current);
-      syncIntervalRef.current = null;
-    }
+    if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
     setIsSyncing(false);
     setSyncProgress(0);
-    setSyncStep('');
-    addToast('info', 'Sync operation cancelled by user');
+    addToast('info', 'Sync cancelled');
   };
-  const { openModal } = useModal();
 
-  // Find enrolled courses
-  const enrolledCourses = COURSES.filter(c => c.enrolled);
-  const activeCourse = COURSES.find(c => c.id === 'python-bootcamp');
+  const enrolledCourses = COURSES.filter(c => c.enrolled).slice(0, 4);
+  const activeCourse = enrolledCourses.find(c => c.progress > 0 && c.progress < 100) || enrolledCourses[0];
+
+
 
   const getGreeting = () => {
     const hours = new Date().getHours();
@@ -242,50 +304,108 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 </div>
               )}
 
-              {/* Enrolled Courses Grid */}
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-bold">Your Courses</h3>
+              {/* Enrolled Courses Grid: Alternating Step Design */}
+              <div className="space-y-8">
+                <div className="flex justify-between items-center px-2">
+                  <h3 className="text-2xl font-bold tracking-tight">Your Courses</h3>
                   <button 
                     onClick={() => onNavigate('catalog')}
-                    className="text-cyan hover:text-cyan2 text-sm font-semibold flex items-center space-x-1"
+                    className="text-cyan hover:text-cyan2 text-sm font-bold flex items-center space-x-1 transition-colors"
                   >
                     <span>Show all</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {enrolledCourses.map(course => (
-                    <div key={course.id} className="bg-panel border border-line rounded-xl p-4 flex flex-col justify-between hover:border-cyan/50 transition-colors">
-                      <div>
-                        <span className="text-[10px] text-muted font-bold tracking-wider uppercase bg-bg px-2 py-0.5 rounded border border-line">
-                          {course.level}
-                        </span>
-                        <h4 className="font-bold text-base mt-2 text-text">{course.title}</h4>
-                        <p className="text-muted text-xs line-clamp-2 mt-1">{course.description}</p>
-                      </div>
-                      
-                      <div className="mt-4 pt-4 border-t border-line flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-8 h-2 bg-bg rounded-full overflow-hidden">
-                            <div className="h-full bg-cyan" style={{ width: `${course.progress}%` }} />
-                          </div>
-                          <span className="text-[10px] font-bold text-muted">{course.progress}%</span>
-                        </div>
-                        
-                        <button 
-                          onClick={() => {
-                            setActiveCourseId(course.id);
-                            onNavigate('learning-path');
-                          }}
-                          className="bg-cyan hover:bg-cyan2 text-bg text-[10px] font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                <div className="space-y-6">
+                  {enrolledCourses.map((course, index) => {
+                    const stepNumber = (index + 1).toString().padStart(2, '0');
+                    const isEven = index % 2 !== 0;
+                    const colors = ['cyan', 'purple', 'yellow', 'green'];
+                    const color = colors[index % colors.length];
+                    
+                    // Helper to get specific icon for each course
+                    const getCourseIcon = (title: string) => {
+                      const lowerTitle = title.toLowerCase();
+                      if (lowerTitle.includes('python') || lowerTitle.includes('code') || lowerTitle.includes('programming')) return <Code className="w-8 h-8 md:w-12 md:h-12 text-bg" />;
+                      if (lowerTitle.includes('react') || lowerTitle.includes('frontend') || lowerTitle.includes('interface')) return <Layout className="w-8 h-8 md:w-12 md:h-12 text-bg" />;
+                      if (lowerTitle.includes('data') || lowerTitle.includes('analytics') || lowerTitle.includes('science')) return <Database className="w-8 h-8 md:w-12 md:h-12 text-bg" />;
+                      if (lowerTitle.includes('git') || lowerTitle.includes('github')) return (
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          className="w-8 h-8 md:w-12 md:h-12 text-bg"
                         >
-                          Continue
-                        </button>
+                          <circle cx="5" cy="6" r="3"/><path d="M12 6h5a2 2 0 0 1 2 2v7"/><path d="m15 9-3-3 3-3"/><circle cx="19" cy="18" r="3"/><path d="M12 18H7a2 2 0 0 1-2-2V9"/><path d="m9 15 3 3-3 3"/>
+                        </svg>
+                      );
+                      if (lowerTitle.includes('cloud') || lowerTitle.includes('infrastructure')) return <Cloud className="w-8 h-8 md:w-12 md:h-12 text-bg" />;
+                      return <BookOpen className="w-8 h-8 md:w-12 md:h-12 text-bg" />;
+                    };
+
+                    return (
+                      <div key={course.id} className={`flex flex-col md:items-stretch gap-0 md:gap-4 ${isEven ? 'md:flex-row-reverse' : 'md:flex-row'}`}>
+                        {/* Course Icon Step / Mobile Badge Header */}
+                        <div className={`relative w-full md:w-32 flex flex-row md:flex-col items-center justify-between md:justify-center px-6 py-4 md:p-4 bg-${color} rounded-t-2xl md:rounded-2xl shadow-xl z-20 flex-shrink-0`}>
+                          <div className="flex items-center md:flex-col md:items-center">
+                            <div className="mr-4 md:mr-0 md:mb-3">
+                              {getCourseIcon(course.title)}
+                            </div>
+                            <span className="text-[11px] md:text-sm font-black text-bg/90 uppercase tracking-[0.25em]">
+                              MODULE
+                            </span>
+                          </div>
+                          
+                          <div className="md:hidden">
+                             <div className="text-[14px] font-black text-bg/90 px-3 py-1 rounded-full bg-bg/20 border border-bg/30">
+                               {stepNumber}
+                             </div>
+                          </div>
+                          
+                          {/* Triangle Pointer: Hidden on mobile, visible on desktop */}
+                          <div className={`hidden md:block absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-${color} rotate-45 ${isEven ? '-left-1' : '-right-1'} -z-10`} />
+                        </div>
+
+                        {/* Content Box */}
+                        <div className="flex-1 bg-panel border border-line rounded-b-2xl md:rounded-2xl p-6 flex flex-col justify-between shadow-lg hover:bg-panel2 transition-all group overflow-hidden">
+                          <div className="space-y-2">
+                            <h4 className="font-bold text-lg text-text group-hover:text-cyan transition-colors">{course.title}</h4>
+                            <p className="text-muted text-sm line-clamp-2 md:line-clamp-3 leading-relaxed">{course.description}</p>
+                          </div>
+                          
+                          <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex-1 w-full max-w-xs space-y-2">
+                              <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-muted">
+                                <span>Progress</span>
+                                <span>{course.progress}%</span>
+                              </div>
+                              <div className="h-1.5 bg-bg rounded-full overflow-hidden border border-line/30">
+                                <div 
+                                  className={`h-full bg-${color} transition-all duration-1000`} 
+                                  style={{ width: `${course.progress}%` }} 
+                                />
+                              </div>
+                            </div>
+                            
+                            <button 
+                              onClick={() => {
+                                setActiveCourseId(course.id);
+                                onNavigate('learning-path');
+                              }}
+                              className={`w-full sm:w-auto bg-${color} hover:brightness-110 text-bg text-xs font-black px-8 py-3 rounded-xl transition-all active:scale-95 shadow-md uppercase tracking-wider`}
+                            >
+                              {course.progress === 100 ? 'Review' : 'Continue'}
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -317,63 +437,40 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 </div>
               </div>
 
-              {/* AI Tutor Recommendations */}
-              <div className="bg-panel border border-line rounded-xl p-5 space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Sparkles className="w-4 h-4 text-purple" />
-                  <h3 className="font-bold text-sm uppercase tracking-wider text-muted">AI Tutor Recommendations</h3>
-                </div>
-                <div className="space-y-3">
-                  <div className="bg-bg border border-line rounded-lg p-3 text-xs space-y-2">
-                    <span className="text-[10px] bg-cyan/15 text-cyan px-2 py-0.5 rounded font-semibold">Current Module</span>
-                    <p className="font-medium text-text">Practice now: OOP Concepts • 10 min</p>
-                    <p className="text-muted">Based on your learning path: "Classes and Objects in Python"</p>
+              {/* Neural Insights Section (High Fidelity Design) */}
+              <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-cyan/10 border border-cyan/20 rounded-xl text-cyan">
+                    <Cpu className="w-5 h-5" />
                   </div>
-                  <div className="bg-bg border border-line rounded-lg p-3 text-xs space-y-2">
-                    <span className="text-[10px] bg-purple/15 text-purple px-2 py-0.5 rounded font-semibold">Weak Points</span>
-                    <p className="font-medium text-text">Review: Recursion Quiz • 8 min</p>
-                    <p className="text-muted">Close your knowledge gap with recursive function calls.</p>
-                  </div>
+                  <h3 className="text-lg font-bold text-text">Neural Insights</h3>
                 </div>
+
+                <div className="space-y-4">
+                  <NeuralInsightCard 
+                    category="Recommendation" 
+                    text="Based on your 92% Focus, I suggest moving to the **Practical Lab: GPU Cluster Optimization**." 
+                    color="cyan" 
+                  />
+                  <NeuralInsightCard 
+                    category="Knowledge Gap" 
+                    text="Your retention in 'Probability' is slightly lower. Try the 5-minute refresher before the next module." 
+                    color="purple" 
+                  />
+                  <NeuralInsightCard 
+                    category="Sync Alert" 
+                    text="Three peers in your cohort are starting 'LLM Fine-tuning' now. Join the collaborative session?" 
+                    color="cyan" 
+                  />
+                </div>
+
                 <button 
                   onClick={() => onNavigate('ai-tutor')}
-                  className="w-full bg-bg hover:bg-line border border-line hover:border-cyan text-text text-xs font-semibold py-2.5 rounded-lg transition-colors cursor-pointer"
+                  className="w-full bg-transparent hover:bg-cyan/5 border border-cyan/30 text-cyan text-xs font-bold py-3 rounded-lg transition-all uppercase tracking-widest flex items-center justify-center space-x-2"
                 >
-                  Talk to AI Tutor
+                  <MessageSquare className="w-4 h-4" />
+                  <span>Chat with Neural Tutor</span>
                 </button>
-              </div>
-
-              {/* My Weaknesses */}
-              <div className="bg-panel border border-line rounded-xl p-5 space-y-4">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center space-x-2">
-                    <AlertCircle className="w-4 h-4 text-yellow" />
-                    <h3 className="font-bold text-sm uppercase tracking-wider text-muted">My Weak Points</h3>
-                  </div>
-                  <span className="bg-yellow/20 text-yellow text-[10px] px-2 py-0.5 rounded font-bold">3 Gaps</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {['OOP Concepts', 'Recursion', 'List Comprehensions'].map((weakness, idx) => (
-                    <span key={idx} className="bg-bg border border-line text-xs px-3 py-1.5 rounded-lg text-text flex items-center space-x-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-red" />
-                      <span>{weakness}</span>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex space-x-2 pt-2">
-                  <button 
-                    onClick={() => onNavigate('analytics')}
-                    className="flex-1 bg-bg hover:bg-line border border-line text-xs font-semibold py-2 rounded-lg text-center"
-                  >
-                    Details
-                  </button>
-                  <button 
-                    onClick={() => onNavigate('ai-tutor')}
-                    className="flex-1 bg-cyan hover:bg-cyan2 text-bg text-xs font-semibold py-2 rounded-lg text-center"
-                  >
-                    Analyze
-                  </button>
-                </div>
               </div>
 
               {/* REQ-LOAD-003: Progress indicators for long operations with Cancel option */}
