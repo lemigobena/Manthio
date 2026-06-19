@@ -271,6 +271,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
     setIsSyncing(false);
     setSyncProgress(0);
+    setSyncStep('');
     addToast('info', 'Sync cancelled');
   };
 
