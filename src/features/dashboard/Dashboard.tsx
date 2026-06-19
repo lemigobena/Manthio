@@ -4,13 +4,12 @@ import { useXP } from '../../context/XPContext';
 import { COURSES } from '../../services/mockData';
 import { useModal } from '../../context/ModalContext';
 import { 
-  Play, 
-  Flame, 
-  Award, 
-  BookOpen, 
+  Play,
+  Award,
+  BookOpen,
+  Sparkles,
   AlertCircle, 
   ArrowRight, 
-  Sparkles, 
   RefreshCw, 
   X, 
   Code,
@@ -53,18 +52,16 @@ const NeuralInsightCard: React.FC<{
   );
 };
 
-
-/* 
-// Progress Indicator for Hero with smooth SVG animations
+// Progress Indicator for mobile with smooth SVG animations
 const RingProgress: React.FC<{ progress: number; size?: number; strokeWidth?: number; color?: string }> = ({ 
-  progress, size = 68, strokeWidth = 6, color = 'var(--cyan)' 
+  progress, size = 64, strokeWidth = 5, color = 'var(--cyan)' 
 }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+    <div className="relative flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="rotate-[-90deg]">
         <circle
           cx={size / 2} cy={size / 2} r={radius}
@@ -80,11 +77,150 @@ const RingProgress: React.FC<{ progress: number; size?: number; strokeWidth?: nu
           className="transition-all duration-1000 ease-out"
         />
       </svg>
-      <span className="absolute text-[13px] font-bold text-text tabular-nums">{progress}%</span>
+      <span className="absolute text-[12px] font-bold text-text tabular-nums">{progress}%</span>
     </div>
   );
 };
-*/
+
+// High-fidelity Pill Progress component for desktop
+const PillProgress: React.FC<{ progress: number }> = ({ progress }) => {
+  const getStatusLabel = (val: number) => {
+    if (val === 0) return "Not started yet";
+    if (val < 25) return "Just getting started...";
+    if (val < 50) return "Gathering momentum...";
+    if (val < 75) return "Past the halfway mark!";
+    if (val < 90) return "Almost there...";
+    if (val < 100) return "Securing the finish...";
+    return "Course complete!";
+  };
+
+  return (
+    <div className="flex flex-col gap-2 w-full max-w-[280px] min-w-[200px] shrink-0">
+      <div className="text-[10px] font-bold text-right text-text uppercase tracking-widest opacity-60 pr-10">
+        {getStatusLabel(progress)}
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 h-6 bg-bg border-2 border-cyan/40 rounded-full overflow-hidden p-0.5 shadow-[0_0_15px_-5px_rgba(0,255,242,0.3)]">
+          <div 
+            className="h-full bg-gradient-to-r from-cyan/20 to-cyan rounded-full relative transition-all duration-1000 ease-out"
+            style={{ width: `${progress}%` }}
+          >
+            {/* Thumb/Knob element */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-cyan rounded-full shadow-[0_0_10px_rgba(0,255,242,0.8)]" />
+          </div>
+        </div>
+        <div className="text-sm font-black text-text font-mono shrink-0">{progress}%</div>
+      </div>
+    </div>
+  );
+};
+
+// High-fidelity Sticky Note Stat component inspired by Skale design
+const StickyNoteStat: React.FC<{ 
+  label: string; 
+  value: string | number; 
+  subtext: string; 
+  color: 'peach' | 'lavender' | 'sky' | 'mint';
+  rotation: string;
+  onClick?: () => void;
+}> = ({ label, value, subtext, color, rotation, onClick }) => {
+  const bgStyles = {
+    peach: 'bg-[#FFF0EB] border-[#FFD9CF] dark:bg-orange/10 dark:border-orange/20',
+    lavender: 'bg-[#F5F0FF] border-[#E0D4FF] dark:bg-purple/10 dark:border-purple/20',
+    sky: 'bg-[#E8F8FF] border-[#BDEBFF] dark:bg-cyan/10 dark:border-cyan/20',
+    mint: 'bg-[#EFFDF5] border-[#D1F7E3] dark:bg-green/10 dark:border-green/20',
+  }[color];
+
+  const pinStyles = {
+    peach: 'bg-orange shadow-[0_0_10px_rgba(255,123,0,0.5)]',
+    lavender: 'bg-purple shadow-[0_0_10px_rgba(163,58,255,0.5)]',
+    sky: 'bg-cyan shadow-[0_0_10px_rgba(0,255,242,0.5)]',
+    mint: 'bg-green shadow-[0_0_10px_rgba(34,197,94,0.5)]',
+  }[color];
+
+  return (
+    <button 
+      onClick={onClick}
+      className={`group relative ${bgStyles} border-b-4 border-r-2 p-5 rounded-2xl text-left transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] shadow-xl ${rotation} ${onClick ? 'cursor-pointer' : 'cursor-default'}`}
+    >
+      {/* 3D Glass Pin Effect */}
+      <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center">
+        <div className={`w-3 h-3 rounded-full ${pinStyles} relative opacity-80`}>
+          <div className="absolute inset-0 bg-white/40 rounded-full blur-[1px]" />
+        </div>
+        <div className="w-0.5 h-3 bg-gray-400/30 -mt-1" />
+      </div>
+
+      <div className="relative z-10 flex flex-col items-center text-center justify-between min-h-[110px] pt-1">
+        <div className="space-y-1">
+          <h3 className="text-[9px] font-black text-text uppercase tracking-[0.2em] opacity-40">{label}</h3>
+          <div className="text-3xl font-black text-text tracking-tight leading-none">{value}</div>
+        </div>
+        <p className="text-[11px] text-muted font-bold leading-relaxed italic mt-3 max-w-[150px]">
+          "{subtext}"
+        </p>
+      </div>
+    </button>
+  );
+};
+
+// Neural Activity Chart - High Fidelity Bar Visualization
+const NeuralActivityChart: React.FC = () => {
+  // Minutes of learning per day (Mon–Sun)
+  const data = [
+    { day: 'M', mins: 42, label: 'Mon' },
+    { day: 'T', mins: 78, label: 'Tue' },
+    { day: 'W', mins: 55, label: 'Wed' },
+    { day: 'T', mins: 110, label: 'Thu' },
+    { day: 'F', mins: 90, label: 'Fri' },
+    { day: 'S', mins: 30, label: 'Sat' },
+    { day: 'S', mins: 95, label: 'Sun' },
+  ];
+  const maxMins = Math.max(...data.map(d => d.mins));
+
+  return (
+    <div className="bg-panel border border-line rounded-2xl p-5 flex flex-col flex-1">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse shadow-[0_0_6px_rgba(0,255,242,0.6)]" />
+          <h3 className="text-[11px] font-semibold text-text/50 uppercase tracking-[0.3em]">Neural Velocity</h3>
+        </div>
+        <span className="text-[10px] font-bold text-cyan/70 tabular-nums">
+          {data.reduce((s, d) => s + d.mins, 0)} <span className="opacity-50">min / wk</span>
+        </span>
+      </div>
+
+      {/* Bars — flex-1 fills all remaining card height */}
+      <div className="flex-1 flex items-end gap-2 min-h-0">
+        {data.map((d, i) => {
+          const ratio = d.mins / maxMins;
+          return (
+            <div key={i} className="flex-1 flex flex-col h-full items-center justify-end gap-1.5 group relative">
+              {/* Tooltip */}
+              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-text text-bg text-[9px] px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity font-black whitespace-nowrap z-20 pointer-events-none shadow-xl">
+                {d.label}: {d.mins} min
+              </div>
+              {/* Spacer pushes bar down proportionally */}
+              <div className="w-full" style={{ flex: 1 - ratio }} />
+              {/* Bar fills its proportional share */}
+              <div
+                className={`w-full rounded-t-md transition-all duration-500 cursor-pointer relative overflow-hidden bg-cyan/20 border-t-2 border-cyan/40 group-hover:bg-cyan/40`}
+                style={{ flex: ratio }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/10" />
+              </div>
+              {/* Day label */}
+              <span className={`text-[9px] font-black uppercase shrink-0 transition-colors text-muted group-hover:text-text`}>
+                {d.day}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const { user, setActiveCourseId } = useAuth();
@@ -187,15 +323,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       ) : (
         <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
           {/* Hero Greeting Section */}
-          <div className="bg-panel border border-line rounded-2xl p-6 relative overflow-hidden">
-            <div className="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-cyan/10 to-transparent pointer-events-none" />
+          <div className="pt-2">
             <div className="relative z-10 space-y-4">
               <div className="flex items-center space-x-2">
                 <h1 className="text-2xl md:text-3xl font-bold text-text">
                   {getGreeting()}, {user?.name.split(' ')[0]} 👋
                 </h1>
               </div>
-              {activeCourse && (
+              {activeCourse ? (
                 <p className="text-muted text-sm md:text-base">
                   You are currently learning <span className="text-cyan font-semibold">{activeCourse.title}</span>. Active module:{' '}
                   <span className="text-text font-semibold">
@@ -203,57 +338,66 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     {activeCourse.modules.find(m => m.status === 'In progress')?.title}
                   </span>.
                 </p>
-              )}
-              
-              {/* Quick Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                <button 
-                  onClick={() => onNavigate('analytics')}
-                  className="bg-bg border border-line p-4 rounded-xl text-left hover:border-cyan transition-colors"
-                >
-                  <div className="flex items-center justify-between text-muted mb-1 text-xs">
-                    <span>LEVEL</span>
-                    <Award className="w-4 h-4 text-cyan" />
+              ) : (
+                <div className="bg-panel border border-line rounded-2xl p-5 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-cyan/5 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-cyan/10 transition-all duration-700" />
+                  <div className="relative z-10 space-y-2 text-center md:text-left">
+                    <h2 className="text-xl md:text-2xl font-black text-text leading-tight">Master Your Next Frontier §11.4</h2>
+                    <p className="text-muted text-sm md:text-base max-w-lg">
+                      You haven't started a technical track yet. Explore our curated laboratory paths and build your engineering legacy today.
+                    </p>
                   </div>
-                  <div className="text-xl font-bold">{level}</div>
-                  <span className="text-xs text-muted">Level 42 Explorer</span>
-                </button>
-                <div className="bg-bg border border-line p-4 rounded-xl text-left">
-                  <div className="flex items-center justify-between text-muted mb-1 text-xs">
-                    <span>STREAK</span>
-                    <Flame className="w-4 h-4 text-yellow" />
-                  </div>
-                  <div className="text-xl font-bold">{streak} Days</div>
-                  <span className="text-xs text-muted">Record: 15 Days</span>
+                  <button 
+                    onClick={() => onNavigate('browse-courses')}
+                    className="relative z-10 w-full md:w-auto bg-cyan hover:bg-cyan2 text-bg text-xs font-black px-10 py-4 rounded-xl transition-all shadow-lg active:scale-95 uppercase tracking-widest"
+                  >
+                    Begin Discovery
+                  </button>
                 </div>
-                <button 
-                  onClick={() => onNavigate('analytics')}
-                  className="bg-bg border border-line p-4 rounded-xl text-left hover:border-cyan transition-colors"
-                >
-                  <div className="flex items-center justify-between text-muted mb-1 text-xs">
-                    <span>TOTAL XP</span>
-                    <Sparkles className="w-4 h-4 text-purple" />
-                  </div>
-                  <div className="text-xl font-bold">{xp.toLocaleString()}</div>
-                  <span className="text-xs text-muted">Next level in {10000 - (xp % 10000)} XP</span>
-                </button>
-                <button 
-                  onClick={() => onNavigate('learning-path')}
-                  className="bg-bg border border-line p-4 rounded-xl text-left hover:border-cyan transition-colors"
-                >
-                  <div className="flex items-center justify-between text-muted mb-1 text-xs">
-                    <span>MODULE</span>
-                    <BookOpen className="w-4 h-4 text-green" />
-                  </div>
-                  <div className="text-xl font-bold">2/10</div>
-                  <span className="text-xs text-muted">Completed</span>
-                </button>
-              </div>
+              )}
+            </div>
+          </div>
+
+          {/* Quick Stats Grid - Sticky Note Style */}
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-12 mt-8 md:mt-12 mb-8 md:mb-10">
+              <StickyNoteStat 
+                label="Learning Level"
+                value={level}
+                subtext="Mastering the core foundations of engineering"
+                color="peach"
+                rotation="md:rotate-1"
+                onClick={() => onNavigate('analytics')}
+              />
+              <StickyNoteStat 
+                label="Current Streak"
+                value={`${streak} Days`}
+                subtext="Consistency is the key to mental muscle memory"
+                color="lavender"
+                rotation="md:-rotate-2"
+                onClick={() => onNavigate('analytics')}
+              />
+              <StickyNoteStat 
+                label="Total XP Pool"
+                value={xp.toLocaleString()}
+                subtext="Points earned through vigorous laboratory work"
+                color="sky"
+                rotation="md:rotate-2"
+                onClick={() => onNavigate('analytics')}
+              />
+              <StickyNoteStat 
+                label="Module Progress"
+                value="2/10"
+                subtext="Keep moving forward, one block at a time"
+                color="mint"
+                rotation="md:-rotate-1"
+                onClick={() => onNavigate('learning-path')}
+              />
             </div>
           </div>
 
           {/* Main Two-Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-stretch">
             
             {/* Left Column (Courses & Activity) */}
             <div className="lg:col-span-2 space-y-6">
@@ -261,29 +405,28 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               {/* Active Course Card (Continue Learning CTA) */}
               {activeCourse && (
                 <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <span className="bg-orange/20 text-orange border border-orange/30 text-xs px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider">
-                        Active Course
-                      </span>
-                      <h2 className="text-xl font-bold mt-2">{activeCourse.title}</h2>
-                      <p className="text-muted text-sm mt-1">{activeCourse.description}</p>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-start gap-6">
+                      <div>
+                        <span className="bg-orange/20 text-orange border border-orange/30 text-xs px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider">
+                          Active Course
+                        </span>
+                        <h2 className="text-xl font-bold mt-2">{activeCourse.title}</h2>
+                      </div>
+                      <div className="shrink-0">
+                        {/* Mobile: Circular Progress */}
+                        <div className="md:hidden">
+                          <RingProgress progress={activeCourse.progress} size={56} strokeWidth={4} />
+                        </div>
+                        {/* Desktop: Pill Progress */}
+                        <div className="hidden md:block">
+                          <PillProgress progress={activeCourse.progress} />
+                        </div>
+                      </div>
                     </div>
-                    <div className="w-16 h-16 rounded-full border-4 border-line flex items-center justify-center relative">
-                      <div className="text-sm font-bold">{activeCourse.progress}%</div>
-                      {/* Simplistic visual circular border representation */}
-                      <svg className="absolute -inset-1 w-18 h-18 rotate-[-90deg]">
-                        <circle 
-                          cx="36" cy="36" r="30" 
-                          fill="none" 
-                          stroke="var(--cyan)" 
-                          strokeWidth="4" 
-                          strokeDasharray={`${2 * Math.PI * 30}`} 
-                          strokeDashoffset={`${2 * Math.PI * 30 * (1 - activeCourse.progress / 100)}`}
-                          className="transition-all duration-500"
-                        />
-                      </svg>
-                    </div>
+                    <p className="text-muted text-sm leading-relaxed">
+                      {activeCourse.description}
+                    </p>
                   </div>
                   
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-line">
@@ -411,7 +554,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             </div>
 
             {/* Right Column (Community Events, Recommendations, and Weak Points) */}
-            <div className="space-y-6">
+            <div className="flex flex-col gap-6">
+              
+              {/* REQ-DASH-007: Activity Chart - Right Column Visualization */}
+              <NeuralActivityChart />
               
               {/* Upcoming Community Event */}
               <div className="bg-panel border border-line rounded-xl p-5 space-y-4">
@@ -525,7 +671,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             </div>
 
           </div>
-
+          
           {/* Toast Notification & Swipe Gesture Dev Sandbox */}
           <div className="bg-panel border border-line rounded-2xl p-5 space-y-4 mt-6">
             <div>
