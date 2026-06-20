@@ -162,8 +162,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             {children}
           </div>
           
-          {/* Footer inside main layout frame */}
-          <Footer onNavigate={onNavigate} />
+          {/* Footer inside main layout frame - hidden on checkout for single-screen focus */}
+          {activePage !== 'checkout' && <Footer onNavigate={onNavigate} />}
         </main>
       </div>
 

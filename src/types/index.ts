@@ -1,10 +1,32 @@
-export type CourseFormat = 'self-paced' | 'cohort' | 'flipped';
+export type CourseFormat = 'self-paced' | 'cohort' | 'flipped' | "Multiple formats";
 export type CourseLevel = 'Foundation' | 'Intermediate' | 'Advanced';
 export type LessonType = 'Video' | 'Article' | 'Quiz' | 'Code' | 'H5P' | 'Assignment' | 'External' | 'Live Event';
 export type LessonStatus = 'completed' | 'in_progress' | 'not_started' | 'locked';
 export type ModuleStatus = 'Completed' | 'In progress' | 'Open' | 'Locked';
 export type ModuleType = 'Self-study' | 'Live online session' | 'In-person session';
 export type BloomLevel = 'Remember' | 'Understand' | 'Apply' | 'Analyse' | 'Evaluate' | 'Create';
+
+export interface FormatOption {
+  format: CourseFormat;
+  price: string;
+  features: {
+    aiTutor: boolean;
+    peerCohort: boolean;
+    inPerson: boolean;
+    certificate: boolean;
+  };
+  bundledSubscription?: {
+    durationMonths: number;
+    valueAmount: string;
+    label: string;
+  };
+  cohortProgress?: {
+    minParticipants: number;
+    currentParticipants: number;
+    maxParticipants: number;
+    confirmationDate: string;
+  };
+}
 
 export interface Trainer {
   id: string;
@@ -52,7 +74,7 @@ export interface Course {
   topic?: string;
   duration: string;
   language?: string;
-  tags?: ('Bestseller' | 'New' | 'Limited cohort')[];
+  tags?: ('Bestseller' | 'New' | 'Limited cohort' | 'Advanced' | "Intensive")[];
   priceStatus?: 'paid' | 'included' | 'employer';
   xpReward: number;
   price: string;
@@ -65,6 +87,25 @@ export interface Course {
   learningOutcomes?: string[];
   modules: Module[];
   startDate?: string;
+  availableFormats?: FormatOption[];
+  reviews?: Review[];
+  bundledSubscription?: {
+    durationMonths: number;
+    valueAmount: string;
+    label: string;
+  };
+  cohortProgress?: {
+    minParticipants: number;
+    currentParticipants: number;
+    maxParticipants: number;
+    confirmationDate: string;
+  };
+  preCourseRequirements?: {
+    hardware?: string[];
+    software?: string[];
+    knowledge?: string[];
+  };
+  cancellationPolicy?: string;
 }
 
 export interface CareerTrack {
@@ -137,4 +178,15 @@ export interface ForumThread {
   hasAcceptedAnswer: boolean;
   timestamp: string;
   isAnonymous?: boolean;
+}
+
+export interface Review {
+  id: string;
+  userName: string;
+  userAvatar?: string;
+  rating: number;
+  comment: string;
+  date: string;
+  isVerified: boolean;
+  helpfulCount: number;
 }

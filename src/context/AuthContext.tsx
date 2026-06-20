@@ -17,6 +17,8 @@ interface AuthContextType {
   updateProfile: (name: string, bio: string) => void;
   activeCourseId: string | null;
   setActiveCourseId: (id: string | null) => void;
+  selectedFormat: string | null;
+  setSelectedFormat: (format: string | null) => void;
   skipAuth: () => void;
 }
 
@@ -36,10 +38,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return localStorage.getItem('activeCourseId') || 'python-bootcamp';
   });
 
+  const [selectedFormat, setSelectedFormatState] = useState<string | null>(() => {
+    return localStorage.getItem('selectedFormat') || null;
+  });
+
   const setActiveCourseId = (id: string | null) => {
     setActiveCourseIdState(id);
     if (id) localStorage.setItem('activeCourseId', id);
     else localStorage.removeItem('activeCourseId');
+  };
+
+  const setSelectedFormat = (format: string | null) => {
+    setSelectedFormatState(format);
+    if (format) localStorage.setItem('selectedFormat', format);
+    else localStorage.removeItem('selectedFormat');
   };
 
   const signIn = async (email: string, password: string): Promise<boolean> => {
@@ -133,6 +145,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updateProfile,
       activeCourseId,
       setActiveCourseId,
+      selectedFormat,
+      setSelectedFormat,
       skipAuth
     }}>
       {children}
