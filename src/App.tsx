@@ -5,11 +5,11 @@ import { XPProvider } from './context/XPContext';
 import { AppLayout } from './components/layout/AppLayout';
 import { ModalProvider, useModal } from './context/ModalContext';
 import ModalManager from './components/modal/ModalManager';
-// import { HelpCenter } from './features/info/HelpCenter';
-// import { PrivacyPolicy } from './features/info/PrivacyPolicy';
-// import { TermsOfUse } from './features/info/TermsOfUse';
-// import { CookieSettings } from './features/info/CookieSettings';
-// import { Imprint } from './features/info/Imprint';
+import { HelpCenter } from './features/info/HelpCenter';
+import { PrivacyPolicy } from './features/info/PrivacyPolicy';
+import { TermsOfUse } from './features/info/TermsOfUse';
+import { CookieSettings } from './features/info/CookieSettings';
+import { Imprint } from './features/info/Imprint';
 
 // Page Views
 import { Dashboard } from './features/dashboard/Dashboard';
@@ -26,6 +26,7 @@ import { Onboarding } from './features/onboarding/Onboarding';
 import { SignIn } from './features/auth/SignIn';
 import { SignUp } from './features/auth/SignUp';
 import { AuthLayout } from './features/auth/AuthLayout';
+import { Checkout } from './features/checkout/Checkout';
 
 const MainApp: React.FC = () => {
   const { isAuthenticated, isOnboardingCompleted } = useAuth();
@@ -34,61 +35,83 @@ const MainApp: React.FC = () => {
     return isOnboardingCompleted ? 'dashboard' : 'onboarding';
   });
 
+  const handleNavigate = (target: string) => {
+    console.log("App Navigation Triggered:", target);
+    setCurrentPage(target);
+  };
+
   const [page, tab] = currentPage.split(':');
 
   const renderPage = () => {
     switch (page) {
       case 'signin':
-        return <SignIn onNavigate={setCurrentPage} />;
+        return <SignIn onNavigate={handleNavigate} />;
       case 'signup':
-        return <SignUp onNavigate={setCurrentPage} />;
+        return <SignUp onNavigate={handleNavigate} />;
       case 'onboarding':
-        return <Onboarding onNavigate={setCurrentPage} />;
+        return <Onboarding onNavigate={handleNavigate} />;
       case 'dashboard':
-        return <Dashboard onNavigate={setCurrentPage} />;
+        return <Dashboard onNavigate={handleNavigate} />;
       case 'catalog':
-        return <Catalog onNavigate={setCurrentPage} />;
+        return <Catalog onNavigate={handleNavigate} />;
       case 'course-detail':
-        return <CourseDetail onNavigate={setCurrentPage} />;
+        return <CourseDetail onNavigate={handleNavigate} />;
       case 'learning-path':
-        return <LearningPath onNavigate={setCurrentPage} />;
+        return <LearningPath onNavigate={handleNavigate} />;
       case 'content-player':
-        return <ContentPlayer onNavigate={setCurrentPage} />;
+        return <ContentPlayer onNavigate={handleNavigate} />;
       case 'ai-tutor':
-        return <AITutorPage onNavigate={setCurrentPage} />;
+        return <AITutorPage onNavigate={handleNavigate} />;
       case 'analytics':
-        return <Analytics onNavigate={setCurrentPage} />;
+        return <Analytics onNavigate={handleNavigate} />;
       case 'resources':
-        return <Resources onNavigate={setCurrentPage} />;
+        return <Resources onNavigate={handleNavigate} />;
       case 'community':
-        return <Community onNavigate={setCurrentPage} />;
+        return <Community onNavigate={handleNavigate} />;
       case 'settings':
         return <Settings initialTab={tab as 'profile' | 'account' | 'billing' | 'preferences'} />;
-      // case 'help-center':
-      //   return <HelpCenter onNavigate={setCurrentPage} />;
-      // case 'privacy':
-      //   return <PrivacyPolicy onNavigate={setCurrentPage} />;
-      // case 'terms':
-      //   return <TermsOfUse onNavigate={setCurrentPage} />;
-      // case 'cookies':
-      //   return <CookieSettings onNavigate={setCurrentPage} />;
-      // case 'imprint':
-      //   return <Imprint onNavigate={setCurrentPage} />;
+      case 'help-center':
+        return <HelpCenter onNavigate={handleNavigate} />;
+      case 'privacy':
+        return <PrivacyPolicy onNavigate={handleNavigate} />;
+      case 'terms':
+        return <TermsOfUse onNavigate={handleNavigate} />;
+      case 'cookies':
+        return <CookieSettings onNavigate={handleNavigate} />;
+      case 'imprint':
+        return <Imprint onNavigate={handleNavigate} />;
+      case 'checkout':
+        return <Checkout onNavigate={handleNavigate} />;
       default:
-        return <Dashboard onNavigate={setCurrentPage} />;
+        return <Dashboard onNavigate={handleNavigate} />;
     }
   };
 
-  if (!isAuthenticated) {
+  const publicPages = ['signin', 'signup', 'onboarding', 'privacy', 'terms', 'cookies', 'imprint', 'help-center', 'checkout'];
+  const isPublicPage = publicPages.includes(page);
+
+  if (!isAuthenticated && !isPublicPage) {
     return (
-      <AuthLayout onNavigate={setCurrentPage}>
-        {page === 'signup' ? <SignUp onNavigate={setCurrentPage} /> : <SignIn onNavigate={setCurrentPage} />}
+      <AuthLayout onNavigate={handleNavigate}>
+        {page === 'signup' ? <SignUp onNavigate={handleNavigate} /> : <SignIn onNavigate={handleNavigate} />}
       </AuthLayout>
     );
   }
 
-  if (page === 'onboarding') {
-    return <Onboarding onNavigate={setCurrentPage} />;
+  // If public page but not signed in, we might still want the layout (except for signin/signup/onboarding)
+  const needsAuthLayout = !isAuthenticated && ['signin', 'signup'].includes(page);
+  const needsNoLayout = page === 'onboarding';
+
+  if (needsAuthLayout) {
+    return (
+      <AuthLayout onNavigate={handleNavigate}>
+        {page === 'signup' ? <SignUp onNavigate={handleNavigate} /> : <SignIn onNavigate={handleNavigate} />}
+      </AuthLayout>
+    );
+  }
+
+  if (needsNoLayout) {
+    return <Onboarding onNavigate={handleNavigate} />;
   }
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -97,7 +120,7 @@ const MainApp: React.FC = () => {
   return (
     <>
       <div className={`transition-all duration-300 ${activeModal ? 'blur-sm pointer-events-none select-none' : ''}`}>
-        <AppLayout activePage={page} onNavigate={setCurrentPage}>
+        <AppLayout activePage={page} onNavigate={handleNavigate}>
           {renderPage()}
         </AppLayout>
       </div>

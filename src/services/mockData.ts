@@ -42,6 +42,23 @@ export const COURSES: Course[] = [
       'Handle errors gracefully and read/write file systems.',
       'Build a command-line interface (CLI) application as a capstone project.'
     ],
+    bundledSubscription: {
+      durationMonths: 2,
+      valueAmount: 'CHF 60.00',
+      label: 'Premium Platform Access'
+    },
+    cohortProgress: {
+      minParticipants: 3,
+      currentParticipants: 2,
+      maxParticipants: 10,
+      confirmationDate: '2026-06-25'
+    },
+    preCourseRequirements: {
+      hardware: ['Laptop with at least 8GB RAM', 'Webcam and Microphone for workshops'],
+      software: ['Python 3.11+', 'Visual Studio Code', 'Git installed'],
+      knowledge: ['Basic computer literacy', 'Understanding of logic (if/then)', 'Commitment to 4h prep time']
+    },
+    cancellationPolicy: 'Full refund up to 7 days before start. 50% refund between 7 days and 48 hours. No refund within 48 hours of session start.',
     modules: [
       {
         id: 'py-mod-1',
@@ -173,6 +190,98 @@ export const COURSES: Course[] = [
           { id: 'py-les-9-2', title: 'Feedback & Platform Certificates', type: 'Live Event', duration: '90min', status: 'locked', required: true, bloomLevel: 'Create' }
         ]
       }
+    ],
+    reviews: [
+      {
+        id: 'rev-1',
+        userName: 'Marc S.',
+        rating: 5,
+        comment: 'The flipped classroom model really works. I could prepare at my own pace and the in-person workshops were incredibly valuable for clearing up my misunderstandings.',
+        date: '2026-05-12',
+        isVerified: true,
+        helpfulCount: 24
+      },
+      {
+        id: 'rev-2',
+        userName: 'Elena R.',
+        rating: 5,
+        comment: 'David is an excellent trainer. The capstone project was challenging but very rewarding. Highly recommended for complete beginners!',
+        date: '2026-04-28',
+        isVerified: true,
+        helpfulCount: 18
+      },
+      {
+        id: 'rev-3',
+        userName: 'Thomas K.',
+        rating: 4,
+        comment: 'Great overview of Python. The modules are structured logically. I would have liked a bit more focus on async programming, but for a Foundation course it is perfect.',
+        date: '2026-04-15',
+        isVerified: true,
+        helpfulCount: 12
+      }
+    ]
+  },
+  {
+    id: 'advanced-python',
+    title: 'Advanced Python Engineering',
+    description: 'Master advanced Python paradigms, async programming, and system design. Ideal for developers moving towards senior roles.',
+    longDescription: 'This intensive flipped bootcamp focuses on enterprise-grade Python. You will dive deep into asynchronous programming, decorators, context managers, and advanced system architecture. Learn to build high-performance, scalable applications with direct coaching from senior IT architects.',
+    level: 'Advanced',
+    format: 'flipped',
+    topic: 'Python',
+    duration: '3 Days',
+    language: 'English',
+    tags: ['Advanced', 'Intensive'],
+    priceStatus: 'paid',
+    xpReward: 1200,
+    price: 'CHF 1\'800.00',
+    rating: 4.9,
+    ratingCount: 56,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['david-pinezich'],
+    learningOutcomes: [
+      'Implement complex asynchronous workflows using asyncio.',
+      'Design high-performance systems with multiprocessing and threading.',
+      'Master advanced design patterns (Factory, Singleton, Repository).',
+      'Optimize memory usage and execution speed for large-scale apps.',
+      'Automate enterprise deployments with advanced CI/CD pipelines.'
+    ],
+    modules: [
+      {
+        id: 'adv-py-mod-1',
+        number: 1,
+        title: 'Asynchronous Paradigms',
+        description: 'Deep dive into event loops, coroutines, and async/await syntax.',
+        duration: '2h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'adv-py-les-1-1', title: 'The Event Loop Explained', type: 'Video', duration: '40min', status: 'not_started', required: true, bloomLevel: 'Understand' },
+          { id: 'adv-py-les-1-2', title: 'Async/Await Patterns', type: 'Code', duration: '50min', status: 'not_started', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'adv-rev-1',
+        userName: 'Sven L.',
+        rating: 5,
+        comment: 'This course is a beast. Asyncio was always a black box for me, but the senior IT architects explains it with such clarity. Well worth the price.',
+        date: '2026-06-05',
+        isVerified: true,
+        helpfulCount: 32
+      },
+      {
+        id: 'adv-rev-2',
+        userName: 'Marta P.',
+        rating: 5,
+        comment: 'The focus on enterprise-grade patterns is what sets this apart. We started implementing the Repository pattern at work the day after the bootcamp.',
+        date: '2026-05-20',
+        isVerified: true,
+        helpfulCount: 15
+      }
     ]
   },
   {
@@ -181,7 +290,7 @@ export const COURSES: Course[] = [
     description: 'Master version control basics, commits, branching, merging, and collaboration with GitHub.',
     longDescription: 'Get up to speed with Git, the industry-standard version control system. In this short course, you will learn how to track file versions, create branches, resolve merge conflicts, and collaborate using GitHub.',
     level: 'Foundation',
-    format: 'self-paced',
+    format: 'Multiple formats',
     topic: 'Git',
     duration: '2 Hours',
     language: 'English',
@@ -191,10 +300,43 @@ export const COURSES: Course[] = [
     price: 'CHF 90.00',
     rating: 4.6,
     ratingCount: 41,
-    enrolled: true,
+    enrolled: false,
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1654277041218-84424c78f0ae?auto=format&fit=crop&w=800&q=80',
     trainer: TRAINERS['david-pinezich'],
+    availableFormats: [
+      {
+        format: 'self-paced',
+        price: 'CHF 250.00',
+        features: { aiTutor: true, peerCohort: false, inPerson: false, certificate: true }
+      },
+      {
+        format: 'cohort',
+        price: 'CHF 650.00',
+        features: { aiTutor: true, peerCohort: true, inPerson: false, certificate: true },
+        bundledSubscription: {
+          durationMonths: 1,
+          valueAmount: 'CHF 30.00',
+          label: 'Premium Access'
+        },
+        cohortProgress: {
+          minParticipants: 3,
+          currentParticipants: 5,
+          maxParticipants: 12,
+          confirmationDate: '2026-07-01'
+        }
+      },
+      {
+        format: 'flipped',
+        price: 'CHF 950.00',
+        features: { aiTutor: true, peerCohort: true, inPerson: true, certificate: true },
+        bundledSubscription: {
+          durationMonths: 2,
+          valueAmount: 'CHF 60.00',
+          label: 'Premium Access'
+        }
+      }
+    ],
     learningOutcomes: [
       'Initialize Git repositories and record changes using commits.',
       'Navigate branch histories and execute branch merges.',
@@ -216,6 +358,26 @@ export const COURSES: Course[] = [
           { id: 'git-les-1-3', title: 'Branching and Merging', type: 'Code', duration: '35min', status: 'not_started', required: true, bloomLevel: 'Apply' },
           { id: 'git-les-1-4', title: 'Quiz: Git Commands', type: 'Quiz', duration: '15min', status: 'not_started', required: true, bloomLevel: 'Remember' }
         ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'git-rev-1',
+        userName: 'Oliver B.',
+        rating: 4,
+        comment: 'Exactly what I needed. I used Git before but never really understood what was happening "under the hood" until now.',
+        date: '2026-06-10',
+        isVerified: true,
+        helpfulCount: 8
+      },
+      {
+        id: 'git-rev-2',
+        userName: 'Sarah J.',
+        rating: 5,
+        comment: 'The merge conflict resolution exercises were the best. Finally I don’t freak out when I see a conflict!',
+        date: '2026-05-30',
+        isVerified: true,
+        helpfulCount: 21
       }
     ]
   },
@@ -281,6 +443,12 @@ export const COURSES: Course[] = [
       'Incorporate hyperlinks, images, and tables.',
       'Adopt clean README layouts for open source projects.'
     ],
+    preCourseRequirements: {
+      hardware: ['Any computer with a modern web browser'],
+      software: ['Web browser (Chrome, Firefox, Safari)', 'A text editor (Notepad, VS Code, or similar)'],
+      knowledge: ['Basic typing skills', 'Comfort with navigating web pages']
+    },
+    cancellationPolicy: 'Self-paced courses are eligible for a full refund within 30 days of purchase if less than 20% of the content has been accessed.',
     modules: [
       {
         id: 'md-mod-1',
@@ -359,6 +527,26 @@ export const COURSES: Course[] = [
           { id: 'sql-les-3-1', title: 'Why queries get slow', type: 'Video', duration: '25min', status: 'locked', required: true, bloomLevel: 'Understand' },
           { id: 'sql-les-3-2', title: 'Creating Indexes', type: 'Code', duration: '40min', status: 'locked', required: true, bloomLevel: 'Apply' }
         ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'sql-rev-1',
+        userName: 'Fabian Z.',
+        rating: 5,
+        comment: 'Very practical. Using PostgreSQL for the exercises made it real. The JOIN logic is explained much better than in any online tutorial I found.',
+        date: '2026-06-01',
+        isVerified: true,
+        helpfulCount: 14
+      },
+      {
+        id: 'sql-rev-2',
+        userName: 'Andrea M.',
+        rating: 4,
+        comment: 'The performance module was a real eye-opener. I never knew how much difference a simple index could make.',
+        date: '2026-05-15',
+        isVerified: true,
+        helpfulCount: 9
       }
     ]
   },
