@@ -17,6 +17,8 @@ interface AuthContextType {
   updateProfile: (name: string, bio: string) => void;
   activeCourseId: string | null;
   setActiveCourseId: (id: string | null) => void;
+  activeTrackId: string | null;
+  setActiveTrackId: (id: string | null) => void;
   selectedFormat: string | null;
   setSelectedFormat: (format: string | null) => void;
   skipAuth: () => void;
@@ -38,6 +40,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return localStorage.getItem('activeCourseId') || 'python-bootcamp';
   });
 
+  const [activeTrackId, setActiveTrackIdState] = useState<string | null>(() => {
+    return localStorage.getItem('activeTrackId') || null;
+  });
+
   const [selectedFormat, setSelectedFormatState] = useState<string | null>(() => {
     return localStorage.getItem('selectedFormat') || null;
   });
@@ -46,6 +52,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setActiveCourseIdState(id);
     if (id) localStorage.setItem('activeCourseId', id);
     else localStorage.removeItem('activeCourseId');
+  };
+
+  const setActiveTrackId = (id: string | null) => {
+    setActiveTrackIdState(id);
+    if (id) localStorage.setItem('activeTrackId', id);
+    else localStorage.removeItem('activeTrackId');
   };
 
   const setSelectedFormat = (format: string | null) => {
@@ -145,6 +157,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updateProfile,
       activeCourseId,
       setActiveCourseId,
+      activeTrackId,
+      setActiveTrackId,
       selectedFormat,
       setSelectedFormat,
       skipAuth

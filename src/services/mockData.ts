@@ -846,8 +846,8 @@ export const COURSES: Course[] = [
     price: 'CHF 1\'800.00',
     rating: 4.9,
     ratingCount: 37,
-    enrolled: false,
-    progress: 0,
+    enrolled: true,
+    progress: 26,
     imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
     trainer: TRAINERS['david-pinezich'],
     learningOutcomes: [
@@ -879,6 +879,7 @@ export const COURSES: Course[] = [
         duration: '6h',
         status: 'Locked',
         type: 'Self-study',
+        availableDate: 'Oct 24, 09:00',
         lessons: [
           { id: 'arch-les-2-1', title: 'Why DB queries are slow', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
           { id: 'arch-les-2-2', title: 'Redis client set and get caching', type: 'Code', duration: '60min', status: 'locked', required: true, bloomLevel: 'Apply' }
@@ -891,7 +892,14 @@ export const COURSES: Course[] = [
         description: 'Primary/replica topologies, read-write splitting, connection pools.',
         duration: '6h',
         status: 'Locked',
-        type: 'Self-study',
+        type: 'In-person session',
+        availableDate: 'Oct 26, 14:00',
+        scheduledTime: 'Oct 26, 14:00 - 18:00',
+        venue: 'Room 302, Engineering Block',
+        prerequisites: [
+          'Complete Module 2 labs',
+          'Draft database topology schema'
+        ],
         lessons: [
           { id: 'arch-les-3-1', title: 'Topologies for High Availability', type: 'Video', duration: '35min', status: 'locked', required: true, bloomLevel: 'Understand' },
           { id: 'arch-les-3-2', title: 'Configuring Read Splitting', type: 'Code', duration: '50min', status: 'locked', required: true, bloomLevel: 'Apply' }
@@ -952,10 +960,125 @@ export const TRACKS: CareerTrack[] = [
     estimatedTime: '36 hours + 2 in-person sessions',
     coursesCount: 3,
     progress: 38,
+    enrolled: true,
+    selfAssessmentOptions: ['I Know Nothing', 'I Know Basics', 'I Have Experience'],
     milestones: [
-      { id: 'mile-1', title: 'Start with Basics', description: 'Complete Python Bootcamp to gain foundational syntax skills.', courseIds: ['python-bootcamp'], status: 'active' },
-      { id: 'mile-2', title: 'Object-Oriented Programming', description: 'Dive into intermediate OOP and design patterns.', courseIds: [], status: 'locked' },
-      { id: 'mile-3', title: 'Production & APIs', description: 'Build REST APIs and deploy with Docker.', courseIds: [], status: 'locked' }
+      { 
+        id: 'mile-1', 
+        title: 'Start with Basics', 
+        description: 'Complete Python Bootcamp to gain foundational syntax skills.', 
+        courses: [
+          { id: 'python-bootcamp' },
+          { id: 'git-essentials', isOptional: true }
+        ], 
+        status: 'active' 
+      },
+      { 
+        id: 'mile-2', 
+        title: 'Object-Oriented Programming', 
+        description: 'Dive into intermediate OOP and design patterns.', 
+        courses: [
+          { id: 'advanced-python' }
+        ], 
+        status: 'locked' 
+      },
+      { 
+        id: 'mile-3', 
+        title: 'Production & APIs', 
+        description: 'Build REST APIs and deploy with Docker.', 
+        courses: [
+          { id: 'docker-containers' },
+          { id: 'api-design-fastapi', isOptional: true }
+        ], 
+        status: 'locked' 
+      }
+    ]
+  },
+  {
+    id: 'cloud-devops-engineer',
+    title: 'Become a Cloud & DevOps Engineer',
+    description: 'Go from zero to production-ready infrastructure. Master containerisation, CI/CD automation, and cloud platform deployments used by modern engineering teams.',
+    imageUrl: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?auto=format&fit=crop&w=800&q=80',
+    level: 'Intermediate',
+    tags: ['Career Track', 'New'],
+    outcomeStatement: 'Design and operate cloud-native infrastructure pipelines using Docker, Kubernetes, Terraform, and GitHub Actions on AWS or Azure.',
+    estimatedTime: '42 hours + 3 in-person sessions',
+    coursesCount: 4,
+    enrolled: false,
+    progress: 0,
+    selfAssessmentOptions: ['Pure Beginner', 'Some IT Background', 'Junior Dev'],
+    milestones: [
+      { 
+        id: 'devops-mile-1', 
+        title: 'Linux & Networking Fundamentals', 
+        description: 'Bash scripting, networking basics, SSH, and process management.', 
+        courses: [
+          { id: 'command-line-basics' }
+        ], 
+        status: 'active' 
+      },
+      { 
+        id: 'devops-mile-2', 
+        title: 'Docker & Container Orchestration', 
+        description: 'Build, ship, and run containers with Docker Compose and Kubernetes.', 
+        courses: [
+          { id: 'docker-containers' }
+        ], 
+        status: 'locked' 
+      },
+      { 
+        id: 'devops-mile-3', 
+        title: 'CI/CD Pipelines', 
+        description: 'Automate build, test, and deploy workflows with GitHub Actions.', 
+        courses: [], 
+        status: 'locked' 
+      },
+      { 
+        id: 'devops-mile-4', 
+        title: 'Cloud Infrastructure with Terraform', 
+        description: 'Provision and manage AWS or Azure resources as code.', 
+        courses: [], 
+        status: 'locked' 
+      }
+    ]
+  },
+  {
+    id: 'data-engineering-python-sql',
+    title: 'Data Engineering with Python & SQL',
+    description: 'Build robust data pipelines, warehouses, and transformation workflows. A hands-on track for engineers who want to work in the data stack.',
+    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+    level: 'Intermediate',
+    tags: ['Career Track', 'Intensive'],
+    outcomeStatement: 'Design ETL pipelines, model relational data warehouses, and deliver analytics-ready datasets using Python, SQL, dbt, and Apache Airflow.',
+    estimatedTime: '38 hours + 2 in-person sessions',
+    coursesCount: 3,
+    progress: 0,
+    enrolled: false,
+    selfAssessmentOptions: ['New to Data', 'SQL User', 'Python Programmer'],
+    milestones: [
+      { 
+        id: 'data-mile-1', 
+        title: 'SQL Mastery', 
+        description: 'Write advanced queries, CTEs, window functions, and optimise query plans.', 
+        courses: [
+          { id: 'sql-databases' }
+        ], 
+        status: 'active' 
+      },
+      { 
+        id: 'data-mile-2', 
+        title: 'Python for Data', 
+        description: 'Work with Pandas, data cleaning, transformation, and file I/O pipelines.', 
+        courses: [], 
+        status: 'locked' 
+      },
+      { 
+        id: 'data-mile-3', 
+        title: 'Data Pipelines & Orchestration', 
+        description: 'Build Airflow DAGs and schedule end-to-end ETL workflows.', 
+        courses: [], 
+        status: 'locked' 
+      }
     ]
   }
 ];

@@ -62,6 +62,8 @@ export interface Module {
   lessons: Lesson[];
   scheduledTime?: string;
   venue?: string;
+  availableDate?: string;
+  prerequisites?: string[];
 }
 
 export interface Course {
@@ -119,13 +121,18 @@ export interface CareerTrack {
   estimatedTime: string;
   coursesCount: number;
   progress: number; // percentage
+  enrolled: boolean;
   milestones: {
     id: string;
     title: string;
     description: string;
-    courseIds: string[];
+    courses: {
+      id: string;
+      isOptional?: boolean;
+    }[];
     status: 'completed' | 'active' | 'locked';
   }[];
+  selfAssessmentOptions?: string[];
 }
 
 export interface UserProfile {

@@ -8,7 +8,7 @@ interface CatalogProps {
 }
 
 export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
-  const { setActiveCourseId } = useAuth();
+  const { setActiveCourseId, setActiveTrackId } = useAuth();
   const [discoveryMode, setDiscoveryMode] = useState<'courses' | 'tracks'>(() => {
     const lastUsed = localStorage.getItem('catalogDiscoveryMode');
     return (lastUsed as 'courses' | 'tracks') || (COURSES.some(c => c.enrolled) ? 'courses' : 'tracks');
@@ -427,6 +427,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
 
                 <button 
                   onClick={() => {
+                    setActiveTrackId(null);
                     setActiveCourseId(course.id);
                     if (course.enrolled) {
                       onNavigate('learning-path');
@@ -487,30 +488,43 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
               {/* Action Bar */}
               <div className="p-5 pt-4 border-t border-line mt-auto flex items-center justify-between bg-bg/20">
                 <div>
-                  <div className="flex items-center space-x-3">
-                    <div className="relative w-9 h-9">
-                      <svg className="w-9 h-9 -rotate-90">
-                        <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" className="text-line opacity-20" />
-                        <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" strokeDasharray={100} strokeDashoffset={100 - (100 * track.progress) / 100} className="text-cyan transition-all duration-1000 shadow-[0_0_8px_rgba(45,212,191,0.5)]" />
-                      </svg>
-                      <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-text">
-                        {track.progress}%
-                      </span>
+                  {track.enrolled ? (
+                    <div className="flex items-center space-x-3">
+                      {/* Premium Progress Ring */}
+                      <div className="relative w-9 h-9">
+                        <svg className="w-9 h-9 -rotate-90">
+                          <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" className="text-line opacity-20" />
+                          <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" strokeDasharray={100} strokeDashoffset={100 - (100 * track.progress) / 100} className="text-cyan transition-all duration-1000 shadow-[0_0_8px_rgba(45,212,191,0.5)]" />
+                        </svg>
+                        <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-text">
+                          {track.progress}%
+                        </span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-cyan font-black leading-none mb-1 uppercase tracking-wider">Active</span>
+                        <span className="text-[12px] font-bold text-text opacity-80">Resume Learning</span>
+                      </div>
                     </div>
+                  ) : (
                     <div className="flex flex-col">
-                      <span className="text-[10px] text-muted font-bold leading-none mb-1 uppercase tracking-wider">Track Path</span>
-                      <span className="text-[12px] font-bold text-text">Resume Learning</span>
+                      <span className="text-[10px] text-muted font-bold uppercase mb-0.5 tracking-tight">Track Path</span>
+                      <span className="text-[15px] font-black text-text tracking-tight uppercase">Multi-Course</span>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 <button 
                   onClick={() => {
-                    onNavigate('course-detail');
+                    setActiveTrackId(track.id);
+                    if (track.enrolled) {
+                      onNavigate('learning-path');
+                    } else {
+                      onNavigate('course-detail');
+                    }
                   }}
                   className="relative overflow-hidden group/btn bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer"
                 >
-                  <span className="relative z-10">Continue Path</span>
+                  <span className="relative z-10">{track.enrolled ? 'Continue Path' : 'Enrol Now'}</span>
                   <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
                 </button>
               </div>

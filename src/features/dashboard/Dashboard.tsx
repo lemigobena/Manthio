@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
-import { COURSES } from '../../services/mockData';
+import { COURSES, TRACKS } from '../../services/mockData';
 import { useModal } from '../../context/ModalContext';
 import { 
   Play,
@@ -223,7 +223,7 @@ const NeuralActivityChart: React.FC = () => {
 };
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
-  const { user, setActiveCourseId } = useAuth();
+  const { user, setActiveCourseId, setActiveTrackId } = useAuth();
   const { level, streak, xp, addToast } = useXP();
   const { openModal } = useModal();
 
@@ -275,8 +275,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     addToast('info', 'Sync cancelled');
   };
 
+  const enrolledTracks = TRACKS.filter(t => t.enrolled);
   const enrolledCourses = COURSES.filter(c => c.enrolled).slice(0, 4);
+  
+  const activeTrack = enrolledTracks.find(t => t.progress > 0 && t.progress < 100) || enrolledTracks[0];
   const activeCourse = enrolledCourses.find(c => c.progress > 0 && c.progress < 100) || enrolledCourses[0];
+
+  const primaryActive: (
+    { type: 'track'; data: typeof TRACKS[0] } | 
+    { type: 'course'; data: typeof COURSES[0] } |
+    { type: 'none'; data: null }
+  ) = (activeTrack && activeTrack.enrolled) 
+    ? { type: 'track', data: activeTrack } 
+    : (activeCourse && activeCourse.enrolled)
+      ? { type: 'course', data: activeCourse }
+      : { type: 'none', data: null };
 
 
 
@@ -331,13 +344,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   {getGreeting()}, {user?.name.split(' ')[0]} 👋
                 </h1>
               </div>
-              {activeCourse ? (
+              {primaryActive.type !== 'none' ? (
                 <p className="text-muted text-sm md:text-base">
-                  You are currently learning <span className="text-cyan font-semibold">{activeCourse.title}</span>. Active module:{' '}
-                  <span className="text-text font-semibold">
-                    Module {activeCourse.modules.find(m => m.status === 'In progress')?.number || 1}:{' '}
-                    {activeCourse.modules.find(m => m.status === 'In progress')?.title}
-                  </span>.
+                  You are currently {primaryActive.type === 'track' ? 'on the track' : 'learning'} <span className="text-cyan font-semibold">{primaryActive.data.title}</span>. 
+                  {primaryActive.type === 'course' && (
+                    <>
+                      {' '}Active module:{' '}
+                      <span className="text-text font-semibold">
+                        {primaryActive.data.modules.find(m => m.status === 'In progress')?.number || 1}:{' '}
+                        {primaryActive.data.modules.find(m => m.status === 'In progress')?.title}
+                      </span>.
+                    </>
+                  )}
+                  {primaryActive.type === 'track' && (
+                    <>
+                      {' '}Current focus:{' '}
+                      <span className="text-text font-semibold">
+                        {primaryActive.data.milestones.find(m => m.status === 'active')?.title}
+                      </span>.
+                    </>
+                  )}
                 </p>
               ) : (
                 <div className="bg-panel border border-line rounded-2xl p-5 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group">
@@ -432,17 +458,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-line">
                     <div className="text-xs text-muted">
-                      Continue with: <span className="text-text font-medium">Variables, Data Types & Operators</span>
+                      {primaryActive.type === 'track' ? 'Current Focus:' : 'Continue with:'} <span className="text-text font-medium">
+                        {primaryActive.type === 'track' 
+                          ? (primaryActive.data.milestones.find(m => m.status === 'active')?.title)
+                          : 'Variables, Data Types & Operators'}
+                      </span>
                     </div>
                     <button 
                       onClick={() => {
-                        setActiveCourseId(activeCourse.id);
-                        onNavigate('content-player');
+                        if (primaryActive.type === 'track') {
+                          setActiveTrackId(primaryActive.data.id);
+                        } else if (primaryActive.type === 'course') {
+                          setActiveCourseId(primaryActive.data.id);
+                        }
+                        onNavigate('learning-path');
                       }}
                       className="bg-cyan hover:bg-cyan2 text-bg font-semibold px-5 py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-colors cursor-pointer"
                     >
                       <Play className="w-4 h-4 fill-current" />
-                      <span>OPEN LEARNING PATH</span>
+                      <span>{primaryActive.type === 'track' ? 'RESUME TRACK PATH' : 'OPEN LEARNING PATH'}</span>
                     </button>
                   </div>
                 </div>
