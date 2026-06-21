@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronDown, ChevronUp, Star, Award, CheckCircle, Clock, Sparkles, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, ThumbsUp, Layers, ArrowRight } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star, Award, CheckCircle, Clock, Sparkles, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, ThumbsUp, Layers } from 'lucide-react';
+import type { Review } from '../../types';
 
 interface CourseDetailProps {
   onNavigate: (page: string) => void;
@@ -16,11 +17,9 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
   const course = track ? null : (COURSES.find(c => c.id === activeCourseId) || COURSES[0]);
   
   const displayTitle = track ? track.title : course!.title;
-  const displayDescription = track ? track.description : (course!.longDescription || course!.description);
   const displayImageUrl = track ? track.imageUrl : course!.imageUrl;
   const displayLevel = track ? track.level : course!.level;
   const displayEnrolled = track ? track.enrolled : course!.enrolled;
-  const displayProgress = track ? track.progress : course!.progress;
 
   const [activeModuleIndex, setActiveModuleIndex] = useState<number | null>(0);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -560,7 +559,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
             </div>
 
             <div className="space-y-6">
-              {(course?.reviews || []).map((review: any) => (
+              {(course?.reviews || []).map((review: Review) => (
                 <div key={review.id} className="space-y-4 pb-6 border-b border-line last:border-0 last:pb-0">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
