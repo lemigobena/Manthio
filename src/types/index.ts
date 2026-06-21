@@ -62,6 +62,8 @@ export interface Module {
   lessons: Lesson[];
   scheduledTime?: string;
   venue?: string;
+  availableDate?: string;
+  prerequisites?: string[];
 }
 
 export interface Course {

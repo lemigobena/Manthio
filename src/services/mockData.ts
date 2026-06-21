@@ -846,8 +846,8 @@ export const COURSES: Course[] = [
     price: 'CHF 1\'800.00',
     rating: 4.9,
     ratingCount: 37,
-    enrolled: false,
-    progress: 0,
+    enrolled: true,
+    progress: 26,
     imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
     trainer: TRAINERS['david-pinezich'],
     learningOutcomes: [
@@ -879,6 +879,7 @@ export const COURSES: Course[] = [
         duration: '6h',
         status: 'Locked',
         type: 'Self-study',
+        availableDate: 'Oct 24, 09:00',
         lessons: [
           { id: 'arch-les-2-1', title: 'Why DB queries are slow', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
           { id: 'arch-les-2-2', title: 'Redis client set and get caching', type: 'Code', duration: '60min', status: 'locked', required: true, bloomLevel: 'Apply' }
@@ -891,7 +892,14 @@ export const COURSES: Course[] = [
         description: 'Primary/replica topologies, read-write splitting, connection pools.',
         duration: '6h',
         status: 'Locked',
-        type: 'Self-study',
+        type: 'In-person session',
+        availableDate: 'Oct 26, 14:00',
+        scheduledTime: 'Oct 26, 14:00 - 18:00',
+        venue: 'Room 302, Engineering Block',
+        prerequisites: [
+          'Complete Module 2 labs',
+          'Draft database topology schema'
+        ],
         lessons: [
           { id: 'arch-les-3-1', title: 'Topologies for High Availability', type: 'Video', duration: '35min', status: 'locked', required: true, bloomLevel: 'Understand' },
           { id: 'arch-les-3-2', title: 'Configuring Read Splitting', type: 'Code', duration: '50min', status: 'locked', required: true, bloomLevel: 'Apply' }

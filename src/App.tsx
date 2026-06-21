@@ -16,6 +16,7 @@ import { Dashboard } from './features/dashboard/Dashboard';
 import { Catalog } from './features/catalog/Catalog';
 import { CourseDetail } from './features/course-detail/CourseDetail';
 import { LearningPath } from './features/learning-path/LearningPath';
+import { ModuleDetail } from './features/learning-path/ModuleDetail';
 import { ContentPlayer } from './features/content-player/ContentPlayer';
 import { AITutorPage } from './features/ai-tutor/AITutorPage';
 import { Analytics } from './features/analytics/Analytics';
@@ -58,6 +59,8 @@ const MainApp: React.FC = () => {
         return <CourseDetail onNavigate={handleNavigate} />;
       case 'learning-path':
         return <LearningPath onNavigate={handleNavigate} />;
+      case 'module-detail':
+        return <ModuleDetail moduleId={tab} onNavigate={handleNavigate} />;
       case 'content-player':
         return <ContentPlayer onNavigate={handleNavigate} />;
       case 'ai-tutor':
