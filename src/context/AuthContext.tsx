@@ -10,11 +10,15 @@ interface AuthContextType {
   user: UserProfile | null;
   isAuthenticated: boolean;
   isOnboardingCompleted: boolean;
+  onboardingAnswers: OnboardingAnswers | null;
+  isOnboardingSkipped: boolean;
   signIn: (email: string, password: string) => Promise<boolean>;
   signUp: (name: string, email: string, password: string) => Promise<boolean>;
   signOut: () => void;
   completeOnboarding: (answers: OnboardingAnswers) => void;
-  updateProfile: (name: string, bio: string) => void;
+  skipOnboarding: () => void;
+  resetOnboarding: () => void;
+  updateProfile: (name: string, bio: string, avatar?: string) => void;
   activeCourseId: string | null;
   setActiveCourseId: (id: string | null) => void;
   activeTrackId: string | null;
@@ -34,6 +38,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(() => {
     return localStorage.getItem('isOnboardingCompleted') === 'true';
+  });
+
+  const [onboardingAnswers, setOnboardingAnswers] = useState<OnboardingAnswers | null>(() => {
+    const saved = localStorage.getItem('onboardingAnswers');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const [isOnboardingSkipped, setIsOnboardingSkipped] = useState(() => {
+    return localStorage.getItem('isOnboardingSkipped') === 'true';
   });
 
   const [activeCourseId, setActiveCourseIdState] = useState<string | null>(() => {
@@ -101,8 +114,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     setUser(mockUser);
     setIsOnboardingCompleted(false);
+    setIsOnboardingSkipped(false);
+    setOnboardingAnswers(null);
     localStorage.setItem('user', JSON.stringify(mockUser));
     localStorage.setItem('isOnboardingCompleted', 'false');
+    localStorage.setItem('isOnboardingSkipped', 'false');
+    localStorage.removeItem('onboardingAnswers');
+    localStorage.removeItem('onboarding_current_step');
+    localStorage.removeItem('onboarding_reason');
+    localStorage.removeItem('onboarding_time_commitment');
+    localStorage.removeItem('onboarding_avatar');
     return true;
   };
 
@@ -132,14 +153,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const completeOnboarding = (answers: OnboardingAnswers) => {
     setIsOnboardingCompleted(true);
+    setIsOnboardingSkipped(false);
+    setOnboardingAnswers(answers);
     localStorage.setItem('isOnboardingCompleted', 'true');
+    localStorage.setItem('isOnboardingSkipped', 'false');
     localStorage.setItem('onboardingAnswers', JSON.stringify(answers));
   };
 
-  const updateProfile = (name: string, bio: string) => {
+  const skipOnboarding = () => {
+    setIsOnboardingCompleted(true);
+    setIsOnboardingSkipped(true);
+    localStorage.setItem('isOnboardingCompleted', 'true');
+    localStorage.setItem('isOnboardingSkipped', 'true');
+  };
+
+  const resetOnboarding = () => {
+    setIsOnboardingCompleted(false);
+    setIsOnboardingSkipped(false);
+    setOnboardingAnswers(null);
+    localStorage.setItem('isOnboardingCompleted', 'false');
+    localStorage.setItem('isOnboardingSkipped', 'false');
+    localStorage.removeItem('onboardingAnswers');
+    localStorage.removeItem('onboarding_current_step');
+    localStorage.removeItem('onboarding_reason');
+    localStorage.removeItem('onboarding_time_commitment');
+    localStorage.removeItem('onboarding_avatar');
+  };
+
+  const updateProfile = (name: string, bio: string, avatar?: string) => {
     setUser(prev => {
       if (!prev) return null;
-      const updated = { ...prev, name, bio };
+      const updated = { ...prev, name, bio, ...(avatar ? { avatar } : {}) };
       localStorage.setItem('user', JSON.stringify(updated));
       return updated;
     });
@@ -150,10 +194,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       user,
       isAuthenticated: !!user,
       isOnboardingCompleted,
+      onboardingAnswers,
+      isOnboardingSkipped,
       signIn,
       signUp,
       signOut,
       completeOnboarding,
+      skipOnboarding,
+      resetOnboarding,
       updateProfile,
       activeCourseId,
       setActiveCourseId,

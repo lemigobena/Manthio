@@ -6,10 +6,11 @@ import { User, Shield, CreditCard, Sliders } from 'lucide-react';
 
 interface SettingsProps {
   initialTab?: 'profile' | 'account' | 'billing' | 'preferences';
+  onNavigate?: (page: string) => void;
 }
 
-export const Settings: React.FC<SettingsProps> = ({ initialTab = 'profile' }) => {
-  const { user, updateProfile } = useAuth();
+export const Settings: React.FC<SettingsProps> = ({ initialTab = 'profile', onNavigate }) => {
+  const { user, updateProfile, resetOnboarding } = useAuth();
   const { addToast } = useXP();
   const { theme, toggleTheme } = useTheme();
   const [activeSubTab, setActiveSubTab] = useState<'profile' | 'account' | 'billing' | 'preferences'>(initialTab);
@@ -116,12 +117,31 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'profile' }) =>
                 </div>
               </div>
 
-              <button 
-                onClick={handleSaveProfile}
-                className="bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-6 py-2.5 rounded-xl transition-colors cursor-pointer"
-              >
-                SAVE CHANGES
-              </button>
+              <div className="flex items-center space-x-3">
+                <button 
+                  onClick={handleSaveProfile}
+                  className="bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-6 py-2.5 rounded-xl transition-colors cursor-pointer"
+                >
+                  SAVE CHANGES
+                </button>
+              </div>
+
+              {/* REQ-ONBOARD-004 Repeat onboarding section */}
+              <div className="pt-6 border-t border-line mt-6 space-y-3">
+                <h3 className="text-sm font-bold text-text">Onboarding Setup</h3>
+                <p className="text-muted text-xs leading-relaxed max-w-md">
+                  Revisit the first-time onboarding flow to update your weekly goals, time commitment, and personalized recommendations.
+                </p>
+                <button
+                  onClick={() => {
+                    resetOnboarding();
+                    if (onNavigate) onNavigate('onboarding');
+                  }}
+                  className="bg-panel border border-line hover:border-cyan hover:bg-cyan/5 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all cursor-pointer text-text"
+                >
+                  REVISIT ONBOARDING
+                </button>
+              </div>
             </div>
           )}
 

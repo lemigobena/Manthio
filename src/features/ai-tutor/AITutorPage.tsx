@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useXP } from '../../context/XPContext';
+import { useAuth } from '../../context/AuthContext';
 import { BookOpen, 
   Mic, ThumbsUp, ThumbsDown, Copy, Plus, Search, MessageSquare,
   Share2, PanelLeftClose, PanelLeft, PanelRightClose, PanelRight, ArrowUp,
@@ -10,6 +11,7 @@ import type { ChatMessage } from '../../types';
 interface AITutorPageProps {
   onNavigate?: (page: string) => void;
 }
+
 
 // --- Sub-components ---
 
@@ -161,11 +163,26 @@ const MOCK_SESSIONS: Record<string, ChatSessionData> = {
 
 export const AITutorPage: React.FC<AITutorPageProps> = () => {
   const { addXp } = useXP();
+  const { user, onboardingAnswers } = useAuth();
   const [aiMode, setAiMode] = useState<'auto' | 'docs' | 'full'>('auto');
   const [chatInput, setChatInput] = useState('');
   const [historySearch, setHistorySearch] = useState('');
   const [activeChatId, setActiveChatId] = useState('chat-1');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(MOCK_SESSIONS['chat-1'].messages);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => {
+    const firstName = user?.name ? user.name.split(' ')[0] : 'learner';
+    let welcomeText = `Hello ${firstName}! I am your personal AI Tutor. How can I help you today with your learning path?`;
+    if (onboardingAnswers) {
+      welcomeText = `Hello ${firstName}! I am your personal AI Tutor. I see you are here for ${onboardingAnswers.reason} with a goal of investing ${onboardingAnswers.timePerWeek} weekly. Let's work together to achieve your goals! How can I help you today?`;
+    }
+    
+    // Copy the messages from chat-1 and update the tutor message
+    const messages = [...MOCK_SESSIONS['chat-1'].messages];
+    const tutorMsgIndex = messages.findIndex(m => m.sender === 'tutor');
+    if (tutorMsgIndex !== -1) {
+      messages[tutorMsgIndex] = { ...messages[tutorMsgIndex], text: welcomeText };
+    }
+    return messages;
+  });
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);

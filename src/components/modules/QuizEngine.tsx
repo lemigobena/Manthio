@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useXP } from '../../context/XPContext';
 import { HelpCircle, CheckCircle, XCircle } from 'lucide-react';
 
@@ -52,7 +52,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete }) => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
       setSelectedAnswer(null);
@@ -63,7 +63,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete }) => {
         onComplete();
       }
     }
-  };
+  }, [currentQuestionIndex, totalQuestions, onComplete]);
 
   const handleCloseModal = () => {
     setShowResultModal(false);
@@ -73,13 +73,13 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete }) => {
     setScore(0);
   };
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
       setSelectedAnswer(null);
       setSubmitted(false);
     }
-  };
+  }, [currentQuestionIndex]);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

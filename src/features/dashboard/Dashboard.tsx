@@ -223,7 +223,7 @@ const NeuralActivityChart: React.FC = () => {
 };
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
-  const { user, setActiveCourseId, setActiveTrackId } = useAuth();
+  const { user, setActiveCourseId, setActiveTrackId, isOnboardingSkipped, resetOnboarding, onboardingAnswers } = useAuth();
   const { level, streak, xp, addToast } = useXP();
   const { openModal } = useModal();
 
@@ -235,6 +235,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
   // Page Mount Loading State (REQ-LOAD-002)
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [showBanner, setShowBanner] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsPageLoading(false), 950);
@@ -336,6 +337,43 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         </div>
       ) : (
         <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
+          {/* REQ-ONBOARD-001 Complete Profile banner for skipped onboarding */}
+          {isOnboardingSkipped && showBanner && (
+            <div className="relative overflow-hidden bg-gradient-to-r from-yellow/15 via-yellow/5 to-panel border border-yellow/20 rounded-2xl p-5 md:p-6 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-[fadeIn_0.3s_ease-out]">
+              <div className="absolute top-0 left-0 w-1 h-full bg-yellow" />
+              <div className="flex items-start space-x-3.5 pl-2 max-w-2xl">
+                <div className="p-2.5 bg-yellow/10 border border-yellow/20 text-yellow rounded-xl shrink-0 mt-0.5">
+                  <Sparkles className="w-5 h-5 fill-current" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-bold text-sm text-text">Complete Your Profile!</h3>
+                  <p className="text-muted text-xs leading-relaxed">
+                    Set up your weekly learning goals, time budget, and initials or custom profile picture to get tailored course recommendations from your AI Tutor and personalized metrics.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3 w-full md:w-auto shrink-0 pl-2 md:pl-0">
+                <button
+                  onClick={() => {
+                    resetOnboarding();
+                    onNavigate('onboarding');
+                  }}
+                  className="bg-yellow hover:opacity-90 text-bg text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer shadow-lg shadow-yellow/10 flex items-center space-x-1.5 hover:scale-105 active:scale-95"
+                >
+                  <span>Complete Profile</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-bg" />
+                </button>
+                <button
+                  onClick={() => setShowBanner(false)}
+                  className="text-muted hover:text-text p-2 hover:bg-bg rounded-lg transition-colors cursor-pointer"
+                  title="Dismiss alert"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Hero Greeting Section */}
           <div className="pt-2">
             <div className="relative z-10 space-y-4">
@@ -380,6 +418,29 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   >
                     Begin Discovery
                   </button>
+                </div>
+              )}
+
+              {onboardingAnswers && (
+                <div className="mt-3 p-3 bg-bg/40 border border-line rounded-xl text-xs text-muted flex items-start space-x-2.5 max-w-2xl">
+                  <span className="text-cyan font-bold select-none shrink-0">💡 AI TUTOR PATH:</span>
+                  <div>
+                    {onboardingAnswers.timePerWeek === '< 2h' && (
+                      <p>Since you have less than 2 hours to invest this week, keep it bite-sized! Study 15 minutes a day to lock in your daily streak.</p>
+                    )}
+                    {onboardingAnswers.timePerWeek === '2–5h' && (
+                      <p>With 2–5 hours per week, try finishing 1 module every 3 days. Your AI Tutor will guide you on the key concepts.</p>
+                    )}
+                    {onboardingAnswers.timePerWeek === '5–10h' && (
+                      <p>Aiming for 5–10 hours! You are on an accelerated path. Review Modules 2 and 4 early to secure your Capstone project timeline.</p>
+                    )}
+                    {onboardingAnswers.timePerWeek === '> 10h' && (
+                      <p>Bootcamp mode active! (&gt;10 hours/week). We recommend completing 2 lessons per day and submitting 1 code critique to your AI Tutor.</p>
+                    )}
+                    <span className="text-[10px] text-cyan/70 mt-1 block font-semibold hover:underline cursor-pointer" onClick={() => onNavigate('ai-tutor')}>
+                      Ask your AI Tutor about customized schedule tips &rarr;
+                    </span>
+                  </div>
                 </div>
               )}
             </div>

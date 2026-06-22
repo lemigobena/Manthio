@@ -122,7 +122,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, onNavigate }) 
       <button 
         onClick={() => {
           skipAuth();
-          onNavigate('dashboard');
+          onNavigate('onboarding');
         }}
         className={`fixed bottom-10 right-10 z-50 px-6 py-3 rounded-full font-bold text-xs uppercase tracking-[0.2em] transition-all active:scale-[0.95] flex items-center gap-2 group shadow-2xl ${
           isDark 
