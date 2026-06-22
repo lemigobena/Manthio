@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
+import { analyticsService } from './services/analyticsService';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { XPProvider } from './context/XPContext';
 import { AppLayout } from './components/layout/AppLayout';
@@ -10,7 +11,7 @@ import { PrivacyPolicy } from './features/info/PrivacyPolicy';
 import { TermsOfUse } from './features/info/TermsOfUse';
 import { CookieSettings } from './features/info/CookieSettings';
 import { Imprint } from './features/info/Imprint';
-
+import { LiveSession } from './features/live-session/LiveSession';
 // Page Views
 import { Dashboard } from './features/dashboard/Dashboard';
 import { Catalog } from './features/catalog/Catalog';
@@ -20,6 +21,7 @@ import { ModuleDetail } from './features/learning-path/ModuleDetail';
 import { ContentPlayer } from './features/content-player/ContentPlayer';
 import { AITutorPage } from './features/ai-tutor/AITutorPage';
 import { Analytics } from './features/analytics/Analytics';
+import { CompetenceProfile } from './features/analytics/CompetenceProfile';
 import { Resources } from './features/resources/Resources';
 import { Community } from './features/community/Community';
 import { Settings } from './features/settings/Settings';
@@ -35,6 +37,14 @@ const MainApp: React.FC = () => {
     if (!isAuthenticated) return 'signin';
     return isOnboardingCompleted ? 'dashboard' : 'onboarding';
   });
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const interval = setInterval(() => {
+      analyticsService.incrementStudyTime(1);
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
 
   const handleNavigate = (target: string) => {
     console.log("App Navigation Triggered:", target);
@@ -64,9 +74,11 @@ const MainApp: React.FC = () => {
       case 'content-player':
         return <ContentPlayer onNavigate={handleNavigate} />;
       case 'ai-tutor':
-        return <AITutorPage onNavigate={handleNavigate} />;
+        return <AITutorPage onNavigate={handleNavigate} initialTab={tab} />;
       case 'analytics':
         return <Analytics onNavigate={handleNavigate} />;
+      case 'competence-profile':
+        return <CompetenceProfile onNavigate={handleNavigate} />;
       case 'resources':
         return <Resources onNavigate={handleNavigate} />;
       case 'community':
@@ -85,6 +97,8 @@ const MainApp: React.FC = () => {
         return <Imprint onNavigate={handleNavigate} />;
       case 'checkout':
         return <Checkout onNavigate={handleNavigate} />;
+      case 'live-session':
+        return <LiveSession onNavigate={handleNavigate} />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }

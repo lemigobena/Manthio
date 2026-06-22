@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useXP } from '../../context/XPContext';
 import { HelpCircle, CheckCircle, XCircle } from 'lucide-react';
+import { analyticsService } from '../../services/analyticsService';
 
 interface QuizEngineProps {
   onComplete?: () => void;
@@ -20,19 +21,29 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete }) => {
       text: 'Which keyword is used to define a function in Python?',
       options: ['function', 'def', 'func', 'define'],
       correctIndex: 1,
-      explanation: 'The def keyword introduces a function definition in Python.'
+      explanation: 'The def keyword introduces a function definition in Python.',
+      topic: 'Python Syntax'
     },
     {
       text: 'What data type is the result of 3 / 2 in Python 3?',
       options: ['int', 'float', 'decimal', 'double'],
       correctIndex: 1,
-      explanation: 'In Python 3, division with / always returns a float.'
+      explanation: 'In Python 3, division with / always returns a float.',
+      topic: 'Python Syntax'
     },
     {
       text: 'Which of these is NOT a core data structure in Python?',
       options: ['List', 'Dictionary', 'Array', 'Tuple'],
       correctIndex: 2,
-      explanation: 'Array is not a built-in core data structure in Python (Lists are used instead). Arrays require importing the array module or using NumPy.'
+      explanation: 'Array is not a built-in core data structure in Python (Lists are used instead). Arrays require importing the array module or using NumPy.',
+      topic: 'OOP Concepts'
+    },
+    {
+      text: 'Which block is executed in Python whether an exception is raised or not?',
+      options: ['finally', 'except', 'catch', 'always'],
+      correctIndex: 0,
+      explanation: 'The finally block is always executed, clean-up code is typically placed there.',
+      topic: 'Error Handling'
     }
   ];
 
@@ -43,7 +54,13 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete }) => {
     if (selectedAnswer === null) return;
     setSubmitted(true);
     
-    if (selectedAnswer === question.correctIndex) {
+    const isCorrect = selectedAnswer === question.correctIndex;
+    const topic = question.topic;
+    
+    // Log performance in analytics service
+    analyticsService.recordQuizAnswer(topic, isCorrect, question.text, question.explanation);
+
+    if (isCorrect) {
       addXp(25, 'Quiz question answered correctly');
       addToast('success', '+25 XP — Correct!');
       setScore(prev => prev + 1);
