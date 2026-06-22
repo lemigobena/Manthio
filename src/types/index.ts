@@ -175,18 +175,41 @@ export interface ResourceFile {
   downloadUrl?: string;
 }
 
-export interface ForumThread {
+export interface ForumReply {
+  id: string;
+  author: string;
+  avatar?: string;
+  body: string;
+  timestamp: string;
+  upvotes: number;
+  isAcceptedAnswer?: boolean;
+  isAiSuggested?: boolean;
+  isAnonymous?: boolean;
+}
+
+export interface ChannelMessage {
   id: string;
   title: string;
   author: string;
+  avatar?: string;
   body: string;
-  category: string;
+  category: string; // The course name
   moduleName?: string;
+  tags?: string[];
   upvotes: number;
-  commentsCount: number;
+  replies: ForumReply[];
   hasAcceptedAnswer: boolean;
   timestamp: string;
   isAnonymous?: boolean;
+}
+
+export interface ForumChannel {
+  id: string;
+  name: string; // e.g. "python-bootcamp"
+  courseId: string;
+  description?: string;
+  isJoined: boolean;
+  messages: ChannelMessage[];
 }
 
 export interface Review {
