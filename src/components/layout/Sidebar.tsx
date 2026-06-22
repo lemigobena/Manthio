@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { 
   LayoutDashboard, BookOpen, Compass, BrainCircuit, PieChart, 
-  Folder, MessagesSquare, Settings, ChevronLeft, X
+  Folder, MessagesSquare, Settings, ChevronLeft, X, Video
 } from 'lucide-react';
 
 interface NavItem {
@@ -70,6 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'analytics', label: 'Analytics', icon: PieChart },
     { id: 'resources', label: 'Files', icon: Folder },
     { id: 'community', label: 'Community', icon: MessagesSquare },
+    { id: 'live-session', label: 'Live Sessions', icon: Video },
   ];
 
   const bottomItems: NavItem[] = [
@@ -182,7 +183,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                               </div>
                             </div>
                           )}
-                          {!['dashboard', 'catalog', 'learning-path', 'ai-tutor', 'analytics', 'settings'].includes(item.id) && (
+                          {item.id === 'live-session' && <Video size={16} fill="currentColor" fillOpacity={0.4} strokeWidth={1.5} />}
+                          {!['dashboard', 'catalog', 'learning-path', 'ai-tutor', 'analytics', 'settings', 'live-session'].includes(item.id) && (
                             <Icon size={16} fill="currentColor" strokeWidth={1.5} />
                           )}
                         </div>
