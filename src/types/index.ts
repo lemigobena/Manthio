@@ -1,6 +1,6 @@
 export type CourseFormat = 'self-paced' | 'cohort' | 'flipped' | "Multiple formats";
 export type CourseLevel = 'Foundation' | 'Intermediate' | 'Advanced';
-export type LessonType = 'Video' | 'Article' | 'Quiz' | 'Code' | 'H5P' | 'Assignment' | 'External' | 'Live Event';
+export type LessonType = 'Video' | 'Article' | 'Quiz' | 'Code' | 'H5P' | 'Assignment' | 'External' | 'Live Event' | 'PDF';
 export type LessonStatus = 'completed' | 'in_progress' | 'not_started' | 'locked';
 export type ModuleStatus = 'Completed' | 'In progress' | 'Open' | 'Locked';
 export type ModuleType = 'Self-study' | 'Live online session' | 'In-person session';
@@ -49,6 +49,8 @@ export interface Lesson {
   required: boolean;
   contentUrl?: string;
   estimatedRemainingTime?: string;
+  microChunkable?: boolean;
+  checkpoints?: number;
 }
 
 export interface Module {

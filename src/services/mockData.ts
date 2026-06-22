@@ -14,6 +14,44 @@ export const TRAINERS: Record<string, Trainer> = {
 
 export const COURSES: Course[] = [
   {
+    id: 'test-course',
+    title: 'Testing Course',
+    description: 'A simple course with 2 lessons to test completion flow.',
+    longDescription: 'This course is built for quickly testing the completion module.',
+    level: 'Foundation',
+    format: 'self-paced',
+    topic: 'Testing',
+    duration: '5 Mins',
+    language: 'English',
+    tags: ['New'],
+    priceStatus: 'included',
+    xpReward: 100,
+    price: 'Free',
+    rating: 5.0,
+    ratingCount: 1,
+    enrolled: true,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['david-pinezich'],
+    learningOutcomes: ['Finish lesson 1', 'Finish lesson 2'],
+    modules: [
+      {
+        id: 'test-mod-1',
+        number: 1,
+        title: 'Testing Module',
+        description: 'Module containing exactly two lessons.',
+        duration: '5min',
+        status: 'In progress',
+        type: 'Self-study',
+        lessons: [
+          { id: 'test-les-1', title: 'Lesson 1', type: 'Article', duration: '2min', status: 'in_progress', required: true, bloomLevel: 'Remember' },
+          { id: 'test-les-2', title: 'Lesson 2', type: 'Quiz', duration: '3min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: []
+  },
+  {
     id: 'python-bootcamp',
     title: 'Python Bootcamp',
     description: 'From zero to confident Python developer. Learn syntax, structures, functions, and complete your first real project with direct access to an experienced instructor.',
@@ -69,10 +107,14 @@ export const COURSES: Course[] = [
         status: 'Completed',
         type: 'Self-study',
         lessons: [
-          { id: 'py-les-1-1', title: 'Install Python & Set up IDE', type: 'Video', duration: '20min', status: 'completed', required: true, bloomLevel: 'Remember' },
-          { id: 'py-les-1-2', title: 'REPL, Scripts & venv', type: 'Video', duration: '25min', status: 'completed', required: true, bloomLevel: 'Remember' },
+          { id: 'py-les-1-1', title: 'Install Python & Set up IDE', type: 'Video', duration: '20min', status: 'completed', required: true, bloomLevel: 'Remember', microChunkable: true, checkpoints: 4 },
+          { id: 'py-les-1-2', title: 'Python Cheatsheet', type: 'PDF', duration: '10min', status: 'completed', required: true, bloomLevel: 'Remember' },
           { id: 'py-les-1-3', title: 'Variables & Data Types', type: 'Article', duration: '25min', status: 'completed', required: true, bloomLevel: 'Understand' },
-          { id: 'py-les-1-4', title: 'Your first script', type: 'Code', duration: '20min', status: 'completed', required: true, bloomLevel: 'Apply' }
+          { id: 'py-les-1-4', title: 'Your first script', type: 'Code', duration: '20min', status: 'completed', required: true, bloomLevel: 'Apply' },
+          { id: 'py-les-1-5', title: 'Interactive Flow Quiz', type: 'H5P', duration: '15min', status: 'completed', required: true, bloomLevel: 'Apply' },
+          { id: 'py-les-1-6', title: 'Setup Verification', type: 'Assignment', duration: '15min', status: 'in_progress', required: true, bloomLevel: 'Apply' },
+          { id: 'py-les-1-7', title: 'Official Docs Link', type: 'External', duration: '5min', status: 'not_started', required: false, bloomLevel: 'Remember' },
+          { id: 'py-les-1-8', title: 'Review Quiz', type: 'Quiz', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' }
         ]
       },
       {
