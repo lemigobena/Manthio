@@ -3,7 +3,7 @@ import {
   Search, X, BookOpen, Clock, FileText, MessageSquare, 
   Trash2, Video, Code, Award, CheckCircle, HelpCircle as QuestionIcon
 } from 'lucide-react';
-import { COURSES, RESOURCES, FORUM_THREADS } from '../../services/mockData';
+import { COURSES, RESOURCES, FORUM_CHANNELS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import type { Lesson } from '../../types';
 
@@ -38,7 +38,9 @@ type FlatResultItem =
   | { type: 'course'; id: string; title: string; courseId: string; enrolled: boolean; data: typeof COURSES[0] }
   | { type: 'lesson'; id: string; title: string; courseId: string; data: FlattenedLesson }
   | { type: 'resource'; id: string; title: string; data: typeof RESOURCES[0] }
-  | { type: 'thread'; id: string; title: string; data: typeof FORUM_THREADS[0] };
+  | { type: 'thread'; id: string; title: string; data: typeof FORUM_CHANNELS[0]['messages'][0] };
+
+const allMessages = FORUM_CHANNELS.flatMap(ch => ch.messages);
 
 export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, onNavigate, coords }) => {
   const { setActiveCourseId } = useAuth();
@@ -131,7 +133,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
       matchesTerms([res.name, res.courseName, res.type])
     ).slice(0, 4);
 
-    const matchedThreads = FORUM_THREADS.filter(thread => 
+    const matchedThreads = allMessages.filter(thread => 
       matchesTerms([thread.title, thread.body, thread.category, thread.moduleName])
     ).slice(0, 4);
 
@@ -522,7 +524,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
                             <div className="min-w-0">
                               <h4 className="text-xs font-bold text-text truncate">{thread.title}</h4>
                               <p className="text-[10px] text-muted truncate mt-0.5">
-                                by {thread.author} in {thread.category} • {thread.commentsCount} replies
+                                by {thread.author} in {thread.category} • {thread.replies.length} replies
                               </p>
                             </div>
                           </div>

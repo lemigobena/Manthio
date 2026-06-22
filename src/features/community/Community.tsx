@@ -1,351 +1,623 @@
-import React, { useState } from 'react';
-import { FORUM_THREADS } from '../../services/mockData';
+import React, { useState, useEffect, useRef } from 'react';
+import { FORUM_CHANNELS, COURSES } from '../../services/mockData';
 import { useXP } from '../../context/XPContext';
 import { useAuth } from '../../context/AuthContext';
-import { MessageSquare, ArrowUp, Check, Sparkles, Send, Plus, Search, AlertCircle } from 'lucide-react';
-import type { ForumThread } from '../../types';
+import { MessageSquare, ArrowUp, Check, Sparkles, Send, Hash, X, MessageCircle, ChevronRight, PanelLeft, Code, Image as ImageIcon, ArrowLeft } from 'lucide-react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import type { ForumChannel, ChannelMessage, ForumReply } from '../../types';
 
 interface CommunityProps {
   onNavigate?: (page: string) => void;
 }
 
+const generateId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return Date.now().toString() + Math.random().toString(36).substring(2);
+};
+
 export const Community: React.FC<CommunityProps> = () => {
   const { addXp, addToast } = useXP();
   const { user } = useAuth();
-  const [threads, setThreads] = useState<ForumThread[]>(FORUM_THREADS);
-  const [activeThread, setActiveThread] = useState<ForumThread | null>(null);
-  const [replyInput, setReplyInput] = useState('');
+  const [channels, setChannels] = useState<ForumChannel[]>(FORUM_CHANNELS);
+  const [activeChannelId, setActiveChannelId] = useState<string>('general');
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   
-  // Search & States (REQ-LOAD-001, REQ-LOAD-002, REQ-LOAD-004)
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const [newThreadTitle, setNewThreadTitle] = useState('');
+  const [newThreadBody, setNewThreadBody] = useState('');
+  const [replyInput, setReplyInput] = useState('');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile sidebar toggle
+  const [showCodeLangMenu, setShowCodeLangMenu] = useState(false);
+  const [showReplyCodeLangMenu, setShowReplyCodeLangMenu] = useState(false);
+  const codeLangs = [
+    'javascript', 'typescript', 'python', 'html', 'css', 'json', 'bash', 'sql',
+    'java', 'c', 'cpp', 'csharp', 'go', 'rust', 'ruby', 'php', 'swift', 'kotlin',
+    'dart', 'scala', 'r', 'markdown', 'yaml', 'xml', 'graphql', 'dockerfile'
+  ];
 
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 850);
-    return () => clearTimeout(timer);
-  }, []);
+  const feedEndRef = useRef<HTMLDivElement>(null);
+  const threadEndRef = useRef<HTMLDivElement>(null);
+  const feedScrollRef = useRef<HTMLDivElement>(null);
+  const threadScrollRef = useRef<HTMLDivElement>(null);
+  const prevChannelIdRef = useRef(activeChannelId);
+  const prevThreadIdRef = useRef(activeThreadId);
 
-  // Modals
-  const [newThreadOpen, setNewThreadOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newBody, setNewBody] = useState('');
-
-  const simulateLoad = () => {
-    setIsLoading(true);
-    setIsError(false);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 600);
-    return timer;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const replyFileInputRef = useRef<HTMLInputElement>(null);
+  
+  const handleLanguageSelect = (lang: string) => {
+    setNewThreadBody(prev => prev + (prev.length > 0 ? '\n' : '') + `\`\`\`${lang}\n// Your ${lang} code here\n\`\`\`\n`);
+    setShowCodeLangMenu(false);
   };
 
-  const handleRetry = () => {
-    setIsError(false);
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
+  const handleReplyLanguageSelect = (lang: string) => {
+    setReplyInput(prev => prev + (prev.length > 0 ? '\n' : '') + `\`\`\`${lang}\n// Your ${lang} code here\n\`\`\`\n`);
+    setShowReplyCodeLangMenu(false);
   };
 
-  const handleVote = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setThreads(prev => prev.map(t => {
-      if (t.id === id) {
-        addToast('success', 'Post rated.');
-        return { ...t, upvotes: t.upvotes + 1 };
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setNewThreadBody(prev => prev + (prev.length > 0 ? '\n' : '') + `![${file.name}](${url})\n`);
+      addToast('success', 'Image attached to your message');
+    }
+  };
+
+  const handleReplyImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setReplyInput(prev => prev + (prev.length > 0 ? '\n' : '') + `![${file.name}](${url})\n`);
+      addToast('success', 'Image attached to your message');
+    }
+  };
+
+  const renderBody = (body: string) => {
+    // Split by code blocks first
+    const codeSegments = body.split(/(```[\s\S]*?```)/g);
+    
+    return codeSegments.map((segment, idx) => {
+      if (segment.startsWith('```') && segment.endsWith('```')) {
+        const match = segment.match(/^```([a-zA-Z0-9_-]*)\n?([\s\S]*?)```$/);
+        const language = match && match[1] ? match[1] : 'javascript';
+        const codeContent = match && match[2] ? match[2].replace(/\n$/, '') : segment.slice(3, -3).replace(/^\n/, '');
+        
+        return (
+          <div key={idx} className="my-3 rounded-xl overflow-hidden border border-line/50 shadow-sm">
+            <div className="bg-[#1E1E1E] px-4 py-1.5 text-[10px] text-muted font-mono uppercase tracking-wider border-b border-line/20 flex items-center justify-between">
+              <span>{language}</span>
+            </div>
+            <SyntaxHighlighter
+              language={language}
+              style={vscDarkPlus}
+              customStyle={{ margin: 0, padding: '1rem', background: '#1E1E1E', fontSize: '13px' }}
+              wrapLines={true}
+              wrapLongLines={true}
+            >
+              {codeContent}
+            </SyntaxHighlighter>
+          </div>
+        );
       }
-      return t;
-    }));
+      
+      // For non-code segments, split by image tags
+      const imgSegments = segment.split(/(!\[.*?\]\(.*?\))/g);
+      return imgSegments.map((imgSeg, i2) => {
+        const imgMatch = imgSeg.match(/!\[(.*?)\]\((.*?)\)/);
+        if (imgMatch) {
+          return (
+            <img 
+              key={`${idx}-${i2}`} 
+              src={imgMatch[2]} 
+              alt={imgMatch[1]} 
+              className="max-w-full sm:max-w-sm max-h-64 object-cover rounded-xl mt-2 mb-2 border border-line" 
+            />
+          );
+        }
+        return <span key={`${idx}-${i2}`}>{imgSeg}</span>;
+      });
+    });
   };
 
-  const handleCreateThread = () => {
-    if (!newTitle.trim() || !newBody.trim()) return;
+  const activeChannel = channels.find(c => c.id === activeChannelId);
+  const activeThread = activeChannel?.messages.find(m => m.id === activeThreadId);
 
-    const newThread: ForumThread = {
-      id: Math.random().toString(),
-      title: newTitle,
+  // Scroll behavior for channels
+  useEffect(() => {
+    if (prevChannelIdRef.current !== activeChannelId) {
+      // Navigated to a new channel -> scroll to top
+      if (feedScrollRef.current) feedScrollRef.current.scrollTop = 0;
+      prevChannelIdRef.current = activeChannelId;
+    } else {
+      // Same channel, messages changed -> scroll to bottom
+      feedEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [activeChannelId, activeChannel?.messages.length]);
+
+  // Scroll behavior for threads
+  useEffect(() => {
+    if (prevThreadIdRef.current !== activeThreadId) {
+      // Navigated to a new thread -> scroll to top
+      if (threadScrollRef.current) threadScrollRef.current.scrollTop = 0;
+      prevThreadIdRef.current = activeThreadId;
+    } else {
+      // Same thread, replies changed -> scroll to bottom
+      threadEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [activeThreadId, activeThread?.replies.length]);
+
+  // Simulate AI Tutor auto-answer (5 seconds)
+  useEffect(() => {
+    if (!activeChannel) return;
+    
+    // Check if the latest message was posted by the user, and has no replies
+    const latestMessage = activeChannel.messages[activeChannel.messages.length - 1];
+    
+    if (latestMessage && latestMessage.author === (user?.name || 'Alex Chen') && latestMessage.replies.length === 0 && !latestMessage.hasAcceptedAnswer) {
+      const timer = setTimeout(() => {
+        setChannels(prev => prev.map(ch => {
+          if (ch.id !== activeChannelId) return ch;
+          return {
+            ...ch,
+            messages: ch.messages.map(msg => {
+              if (msg.id !== latestMessage.id) return msg;
+              return {
+                ...msg,
+                replies: [...msg.replies, {
+                  id: generateId(),
+                  author: 'AI Tutor',
+                  body: `Socratic assistance: Based on your question about "${latestMessage.title}", have you considered reviewing the core documentation for this topic? Often, the solution lies in understanding the base paradigm. What specific part is causing the error?`,
+                  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  upvotes: 0,
+                  isAiSuggested: true
+                }]
+              };
+            })
+          };
+        }));
+        addToast('info', 'AI Tutor has suggested an answer!');
+      }, 5000); // 5s delay for testing
+      
+      return () => clearTimeout(timer);
+    }
+  }, [activeChannelId, channels, activeChannel, user?.name, addToast]);
+
+  const handlePostThread = () => {
+    if (!newThreadTitle.trim() || !newThreadBody.trim()) return;
+    const newMsg: ChannelMessage = {
+      id: generateId(),
+      title: newThreadTitle,
       author: user?.name || 'Alex Chen',
-      body: newBody,
-      category: 'Python Bootcamp',
-      moduleName: 'General',
+      body: newThreadBody,
+      category: activeChannel?.name || 'General',
       upvotes: 1,
-      commentsCount: 0,
+      replies: [],
       hasAcceptedAnswer: false,
-      timestamp: 'Just now'
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    setThreads(prev => [newThread, ...prev]);
-    setNewTitle('');
-    setNewBody('');
-    setNewThreadOpen(false);
+    setChannels(prev => prev.map(ch => {
+      if (ch.id !== activeChannelId) return ch;
+      return { ...ch, messages: [...ch.messages, newMsg] };
+    }));
+    
+    setNewThreadTitle('');
+    setNewThreadBody('');
     addXp(25, 'Community thread created');
     addToast('success', '+25 XP — Community thread created!');
   };
 
-  // Filter threads by search query
-  const filteredThreads = threads.filter(thread => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      thread.title.toLowerCase().includes(q) ||
-      thread.body.toLowerCase().includes(q) ||
-      thread.category.toLowerCase().includes(q) ||
-      thread.author.toLowerCase().includes(q)
-    );
-  });  return (
-    <div className="space-y-6 pb-12">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-text">Community & Forum</h1>
-          <p className="text-muted text-sm mt-1">Ask questions, help classmates, and discuss course content.</p>
-        </div>
+  const handlePostReply = () => {
+    if (!replyInput.trim() || !activeThreadId) return;
+    const newRep: ForumReply = {
+      id: generateId(),
+      author: user?.name || 'Alex Chen',
+      body: replyInput,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      upvotes: 1
+    };
 
-        <div className="flex items-center space-x-3 self-start">
-          {/* Search bar inside forum */}
-          {!activeThread && (
-            <div className="relative w-44 sm:w-56">
-              <input 
-                type="text" 
-                placeholder="Search threads..." 
-                value={searchQuery}
-                onChange={(e) => { setSearchQuery(e.target.value); simulateLoad(); }}
-                className="w-full bg-panel border border-line rounded-xl pl-8 pr-3 py-2 text-xs text-text focus:outline-none focus:border-cyan transition-colors"
-              />
-              <Search className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-muted" />
-            </div>
-          )}
+    setChannels(prev => prev.map(ch => {
+      if (ch.id !== activeChannelId) return ch;
+      return {
+        ...ch,
+        messages: ch.messages.map(msg => {
+          if (msg.id !== activeThreadId) return msg;
+          return { ...msg, replies: [...msg.replies, newRep] };
+        })
+      };
+    }));
+    
+    setReplyInput('');
+    addXp(10, 'Forum reply posted');
+    addToast('success', '+10 XP — Reply posted!');
+  };
 
-          <button 
-            onClick={() => setNewThreadOpen(true)}
-            className="bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-4 py-2.5 rounded-xl flex items-center space-x-1.5 transition-colors cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>ASK A QUESTION</span>
+  const handleUpvoteThread = (threadId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setChannels(prev => prev.map(ch => {
+      if (ch.id !== activeChannelId) return ch;
+      return {
+        ...ch,
+        messages: ch.messages.map(msg => {
+          if (msg.id !== threadId) return msg;
+          return { ...msg, upvotes: msg.upvotes + 1 };
+        })
+      };
+    }));
+  };
+
+  const handleUpvoteReply = (replyId: string) => {
+    setChannels(prev => prev.map(ch => {
+      if (ch.id !== activeChannelId) return ch;
+      return {
+        ...ch,
+        messages: ch.messages.map(msg => {
+          if (msg.id !== activeThreadId) return msg;
+          return {
+            ...msg,
+            replies: msg.replies.map(rep => {
+              if (rep.id !== replyId) return rep;
+              return { ...rep, upvotes: rep.upvotes + 1 };
+            })
+          };
+        })
+      };
+    }));
+  };
+
+  const handleMarkAccepted = (replyId: string) => {
+    setChannels(prev => prev.map(ch => {
+      if (ch.id !== activeChannelId) return ch;
+      return {
+        ...ch,
+        messages: ch.messages.map(msg => {
+          if (msg.id !== activeThreadId) return msg;
+          return {
+            ...msg,
+            hasAcceptedAnswer: true,
+            replies: msg.replies.map(rep => {
+              if (rep.id !== replyId) return { ...rep, isAcceptedAnswer: false };
+              return { ...rep, isAcceptedAnswer: true };
+            })
+          };
+        })
+      };
+    }));
+    addXp(15, 'Accepted answer marked');
+    addToast('success', 'Answer accepted! +15 XP');
+  };
+
+  return (
+    <div className="relative flex h-[calc(100dvh-64px)] -mx-3 md:-mx-[44px] -my-6 border-y border-line overflow-hidden bg-bg">
+      {/* 1. Sidebar (Channels) */}
+      <div className={`
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        md:translate-x-0 absolute md:relative z-20 w-64 h-full bg-panel border-r border-line flex flex-col transition-transform duration-300
+      `}>
+        <div className="p-4 border-b border-line flex items-center justify-between">
+          <h2 className="font-bold text-text">Workspace</h2>
+          <button className="md:hidden text-muted hover:text-text" onClick={() => setIsSidebarOpen(false)}>
+            <X size={20} />
           </button>
+        </div>
+        <div className="flex-1 overflow-y-auto py-4">
+          <div className="px-4 mb-2 text-[10px] font-bold text-muted uppercase tracking-wider">Channels</div>
+          <div className="space-y-0.5 px-2">
+            {channels.map(channel => {
+              const course = COURSES.find(c => c.id === channel.courseId);
+              const imageUrl = course?.imageUrl || 'https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?auto=format&fit=crop&q=80&w=100&h=100';
+              return (
+                <button
+                  key={channel.id}
+                  onClick={() => { setActiveChannelId(channel.id); setActiveThreadId(null); setIsSidebarOpen(false); }}
+                  className={`w-full text-left px-3 py-1.5 rounded-lg flex items-center space-x-3 text-sm transition-colors ${
+                    activeChannelId === channel.id ? 'bg-cyan/10 text-cyan font-bold' : 'text-muted hover:bg-line hover:text-text'
+                  }`}
+                >
+                  <img src={imageUrl} alt={channel.name} className="w-6 h-6 rounded-md object-cover shrink-0" />
+                  <span className="truncate">{channel.name}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {isError ? (
-        /* REQ-LOAD-004: Failed load show error state with retry action */
-        <div className="text-center py-16 max-w-md mx-auto my-6 space-y-4 animate-[fadeIn_0.3s_ease-out]">
-          <div className="w-12 h-12 rounded-full bg-red/10 border border-red/35 flex items-center justify-center mx-auto text-red animate-pulse">
-            <AlertCircle className="w-6 h-6" />
-          </div>
-          <div className="space-y-1 px-4">
-            <h3 className="font-bold text-text text-base">Failed to load forum threads</h3>
-            <p className="text-muted text-xs max-w-xs mx-auto">We couldn't reach the forum database. Please check your connection and try again.</p>
-          </div>
-          <button 
-            onClick={handleRetry}
-            className="bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
-          >
-            Retry Connection
-          </button>
-        </div>
-      ) : activeThread ? (
-        // Thread Detail View
-        <div className="space-y-6 max-w-3xl animate-[fadeIn_0.3s_ease-out]">
-          <button 
-            onClick={() => setActiveThread(null)}
-            className="text-cyan hover:underline text-xs font-semibold cursor-pointer"
-          >
-            &larr; Back to forum
-          </button>
-
-          <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
-            <div>
-              <span className="text-[10px] text-cyan font-bold uppercase tracking-wider bg-bg px-2 py-0.5 rounded border border-line">
-                {activeThread.category} &bull; {activeThread.moduleName}
-              </span>
-              <h2 className="text-xl font-bold text-text mt-3">{activeThread.title}</h2>
-              <span className="text-[10px] text-muted block mt-1">
-                Posted by {activeThread.author} &bull; {activeThread.timestamp}
-              </span>
-            </div>
-
-            <p className="text-sm text-text leading-relaxed bg-bg/20 p-4 rounded-xl border border-line">
-              {activeThread.body}
-            </p>
-
-            <div className="flex items-center space-x-4 pt-2 border-t border-line text-xs text-muted">
-              <span>{activeThread.upvotes} Upvotes</span>
-              <span>{activeThread.commentsCount} Comments</span>
-            </div>
-          </div>
-
-          {/* AI Auto-Answer simulation */}
-          <div className="bg-panel/50 border border-purple/35 rounded-2xl p-5 space-y-3 relative overflow-hidden">
-            <div className="absolute right-0 top-0 w-24 h-full bg-gradient-to-l from-purple/5 to-transparent pointer-events-none" />
-            <div className="flex items-center space-x-2">
-              <Sparkles className="w-4 h-4 text-purple" />
-              <span className="text-[10px] text-purple uppercase font-bold tracking-wider">AI Tutor Auto-Answer</span>
-            </div>
-            <p className="text-xs text-text leading-relaxed italic bg-bg/40 p-3.5 rounded-xl border border-line">
-              Socratic assistance: To fix this PowerShell ExecutionPolicy error, you might need to adjust the policy for your local user. Open PowerShell as an administrator and enter `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`. Do you know why PowerShell blocks scripts by default?
-            </p>
-          </div>
-
-          {/* Add Reply Area */}
-          <div className="bg-panel border border-line rounded-2xl p-4 flex items-center space-x-2">
-            <input 
-              type="text" 
-              placeholder="Write a reply..." 
-              value={replyInput}
-              onChange={(e) => setReplyInput(e.target.value)}
-              className="flex-1 bg-bg border border-line text-xs rounded-xl px-4 py-2.5 text-text focus:outline-none focus:border-cyan"
-            />
-            <button 
-              onClick={() => {
-                if (!replyInput.trim()) return;
-                addXp(10, 'Forum reply posted');
-                addToast('success', 'Reply successfully posted!');
-                setReplyInput('');
-              }}
-              className="bg-cyan hover:bg-cyan2 text-bg p-2.5 rounded-xl transition-colors cursor-pointer"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      ) : isLoading ? (
-        /* REQ-LOAD-002: Skeleton loader mimicking horizontal thread cards */
-        <div className="space-y-4">
-          {[1, 2, 3].map(i => (
-            <div 
-              key={i} 
-              className="bg-panel border border-line rounded-xl p-5 flex items-start gap-4 justify-between animate-pulse"
-            >
-              <div className="space-y-3.5 flex-1">
-                <div className="space-y-2.5">
-                  <div className="h-4 bg-line rounded w-28" />
-                  <div className="h-5 bg-line rounded w-1/2" />
-                </div>
-                <div className="space-y-2">
-                  <div className="h-3 bg-line rounded w-full" />
-                  <div className="h-3 bg-line rounded w-5/6" />
-                </div>
-                <div className="h-3 bg-line rounded w-36" />
-              </div>
-              <div className="w-10 h-12 bg-line rounded-xl shrink-0" />
-            </div>
-          ))}
-        </div>
-      ) : filteredThreads.length === 0 ? (
-        /* REQ-LOAD-001: Every list view has a defined empty state with primary action */
-        <div className="text-center py-16 bg-panel border border-line rounded-2xl animate-[fadeIn_0.3s_ease-out]">
-          <MessageSquare className="w-12 h-12 text-muted mx-auto mb-3" />
-          <h3 className="font-bold text-text text-base">No discussions found</h3>
-          <p className="text-muted text-sm mt-1 max-w-sm mx-auto">No threads matched your search query. Try clearing the query or start a new topic.</p>
-          <div className="flex items-center justify-center gap-3 mt-5">
-            <button 
-              onClick={() => { setSearchQuery(''); simulateLoad(); }}
-              className="bg-bg hover:bg-line border border-line text-text text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors cursor-pointer"
-            >
-              Clear Search
-            </button>
-            <button 
-              onClick={() => setNewThreadOpen(true)}
-              className="bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-4 py-2.5 rounded-xl transition-colors cursor-pointer"
-            >
-              Ask a Question
-            </button>
-          </div>
-        </div>
-      ) : (
-        // Threads List
-        <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
-          {filteredThreads.map(thread => (
-            <div 
-              key={thread.id} 
-              onClick={() => setActiveThread(thread)}
-              className="bg-panel border border-line rounded-xl p-5 flex items-start gap-4 hover:border-cyan/50 transition-colors cursor-pointer justify-between"
-            >
-              <div className="space-y-2 flex-1">
-                <div>
-                  <span className="text-[9px] text-cyan font-bold uppercase tracking-wider bg-bg px-2 py-0.5 rounded border border-line">
-                    {thread.category} &bull; {thread.moduleName}
-                  </span>
-                  <h3 className="font-bold text-base text-text mt-2 hover:text-cyan transition-colors line-clamp-1">
-                    {thread.title}
-                  </h3>
-                </div>
-                <p className="text-muted text-xs line-clamp-2 leading-relaxed">
-                  {thread.body}
-                </p>
-                <span className="flex items-center space-x-4 pt-1 text-[10px] text-muted">
-                  <span>Author: {thread.author}</span>
-                  <span>{thread.timestamp}</span>
-                  <span className="flex items-center space-x-1">
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    <span>{thread.commentsCount}</span>
-                  </span>
-                  {thread.hasAcceptedAnswer && (
-                    <span className="text-green font-semibold flex items-center space-x-0.5">
-                      <Check className="w-3.5 h-3.5 stroke-[3px]" />
-                      <span>Solved</span>
-                    </span>
-                  )}
-                </span>
-              </div>
-
-              {/* Vote block */}
-              <button 
-                onClick={(e) => handleVote(thread.id, e)}
-                className="bg-bg hover:bg-line border border-line px-3 py-2.5 rounded-xl text-center flex flex-col items-center justify-center space-y-1 hover:border-cyan/50 transition-colors cursor-pointer shrink-0"
-              >
-                <ArrowUp className="w-4 h-4 text-muted" />
-                <span className="text-xs font-bold">{thread.upvotes}</span>
-              </button>
-            </div>
-          ))}
-        </div>
+      {/* Mobile overlay */}
+      {isSidebarOpen && (
+        <div className="md:hidden fixed inset-0 z-10 bg-bg/80 backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
       )}
 
-      {/* New Thread Modal */}
-      {newThreadOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg/85 backdrop-blur-sm">
-          <div className="bg-panel border border-line p-6 rounded-2xl max-w-lg w-full space-y-4 shadow-2xl">
-            <h3 className="font-bold text-base text-text border-b border-line pb-3">Create new forum topic</h3>
-            
-            <div className="space-y-3">
-              <div className="space-y-1.5 text-xs">
-                <label className="text-[10px] text-muted font-bold uppercase">Question Title</label>
-                <input 
-                  type="text" 
-                  placeholder="How do I use *args in functions?" 
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-text focus:outline-none focus:border-cyan"
-                />
+      {/* 2. Main Feed (Channel Messages) */}
+      <div className={`flex-1 flex flex-col min-w-0 ${activeThreadId ? 'hidden lg:flex' : 'flex'}`}>
+        {/* Header */}
+        <div className="h-14 border-b border-line flex items-center px-4 justify-between bg-bg/50 backdrop-blur-md shrink-0">
+          <div className="flex items-center space-x-3">
+            <button className="md:hidden text-muted hover:text-text" onClick={() => setIsSidebarOpen(true)}>
+              <PanelLeft size={20} />
+            </button>
+            <div className="font-bold text-text flex items-center space-x-1">
+              <Hash size={18} className="text-muted" />
+              <span>{activeChannel?.name}</span>
+            </div>
+          </div>
+          <div className="text-xs text-muted max-w-[200px] sm:max-w-xs truncate hidden sm:block">
+            {activeChannel?.description}
+          </div>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+          {activeChannel?.messages.map(msg => (
+            <div key={msg.id} className="flex space-x-3 group">
+              <div className="w-10 h-10 rounded-xl bg-purple/20 flex items-center justify-center shrink-0 text-purple font-bold">
+                {msg.author.charAt(0)}
               </div>
-...
-              <div className="space-y-1.5 text-xs">
-                <label className="text-[10px] text-muted font-bold uppercase">Description</label>
-                <textarea 
-                  placeholder="Describe your question in detail. Code snippets can be inserted in Markdown format..."
-                  value={newBody}
-                  onChange={(e) => setNewBody(e.target.value)}
-                  className="w-full h-32 bg-bg border border-line rounded-xl px-3 py-2 text-text focus:outline-none focus:border-cyan resize-none"
-                />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline space-x-2">
+                  <span className="font-bold text-text text-sm">{msg.author}</span>
+                  <span className="text-[10px] text-muted">{msg.timestamp}</span>
+                </div>
+                <div className="mt-1">
+                  <h4 className="font-bold text-text text-base">{msg.title}</h4>
+                  <div className="text-text/90 text-sm mt-1 whitespace-pre-wrap">{renderBody(msg.body)}</div>
+                </div>
+                
+                {msg.tags && msg.tags.length > 0 && (
+                  <div className="flex items-center space-x-2 mt-2">
+                    {msg.tags.map(tag => (
+                      <span key={tag} className="text-[10px] bg-panel border border-line px-2 py-0.5 rounded text-muted">#{tag}</span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex items-center space-x-3 mt-3">
+                  <button 
+                    onClick={(e) => handleUpvoteThread(msg.id, e)}
+                    className="flex items-center space-x-1 text-muted hover:text-cyan text-xs font-semibold px-2 py-1 rounded hover:bg-cyan/10 transition-colors border border-transparent"
+                  >
+                    <ArrowUp size={14} />
+                    <span>{msg.upvotes}</span>
+                  </button>
+                  <button 
+                    onClick={() => setActiveThreadId(msg.id)}
+                    className="flex items-center space-x-1 text-muted hover:text-purple text-xs font-semibold px-2 py-1 rounded hover:bg-purple/10 transition-colors"
+                  >
+                    <MessageSquare size={14} />
+                    <span>{msg.replies.length} replies</span>
+                  </button>
+                  {msg.hasAcceptedAnswer && (
+                    <div className="flex items-center space-x-1 text-green text-[10px] font-bold px-2 py-1 rounded bg-green/10 border border-green/20">
+                      <Check size={12} strokeWidth={3} />
+                      <span>Solved</span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Inline reply preview if it has replies but thread is closed */}
+                {msg.replies.length > 0 && activeThreadId !== msg.id && (
+                  <div 
+                    onClick={() => setActiveThreadId(msg.id)}
+                    className="mt-2 flex items-center space-x-2 text-xs text-cyan cursor-pointer hover:underline"
+                  >
+                    <div className="w-6 h-6 rounded-md bg-cyan/20 flex items-center justify-center text-cyan">
+                      <MessageCircle size={12} />
+                    </div>
+                    <span className="font-semibold">{msg.replies.length} replies</span>
+                    <span className="text-muted">Last reply from {msg.replies[msg.replies.length - 1].author}</span>
+                    <ChevronRight size={14} className="text-muted" />
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+          <div ref={feedEndRef} />
+        </div>
+
+        {/* Input Area */}
+        <div className="p-4 bg-bg border-t border-line shrink-0">
+          <div className="bg-panel border border-line rounded-xl focus-within:border-cyan transition-colors overflow-hidden">
+            <div className="px-3 py-2">
+              <input 
+                type="text"
+                placeholder="Question Title"
+                value={newThreadTitle}
+                onChange={(e) => setNewThreadTitle(e.target.value)}
+                className="w-full bg-transparent text-sm font-bold text-text outline-none placeholder:font-normal"
+              />
+            </div>
+            <div className="px-3 py-2 border-t border-line/50">
+              <textarea 
+                placeholder={`Ask the community in #${activeChannel?.name}...`}
+                value={newThreadBody}
+                onChange={(e) => setNewThreadBody(e.target.value)}
+                rows={2}
+                className="w-full bg-transparent text-sm text-text outline-none resize-none"
+              />
+            </div>
+            <div className="bg-line/20 px-3 py-2 flex items-center justify-between border-t border-line/50">
+              <div className="flex items-center space-x-2 text-muted relative">
+                <button onClick={() => setShowCodeLangMenu(!showCodeLangMenu)} className="p-1.5 hover:bg-line hover:text-cyan rounded-lg transition-colors" title="Insert Code Snippet"><Code size={16} /></button>
+                {showCodeLangMenu && (
+                  <div className="absolute bottom-full left-0 mb-2 w-32 bg-panel border border-line rounded-xl shadow-lg shadow-black/50 overflow-hidden z-50">
+                    <div className="px-3 py-2 border-b border-line text-[10px] font-bold text-muted uppercase tracking-wider">Select Language</div>
+                    <div className="max-h-48 overflow-y-auto">
+                      {codeLangs.map(lang => (
+                        <button
+                          key={lang}
+                          onClick={() => handleLanguageSelect(lang)}
+                          className="w-full text-left px-3 py-2 text-xs hover:bg-line hover:text-cyan transition-colors"
+                        >
+                          {lang}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                <button onClick={() => fileInputRef.current?.click()} className="p-1.5 hover:bg-line hover:text-cyan rounded-lg transition-colors" title="Upload Image"><ImageIcon size={16} /></button>
+                <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleImageUpload} />
+              </div>
+              <button 
+                onClick={handlePostThread}
+                disabled={!newThreadTitle.trim() || !newThreadBody.trim()}
+                className="bg-cyan hover:bg-cyan2 text-bg px-4 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
+              >
+                <Send size={14} />
+                <span>Post</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Thread Pane (Right) */}
+      {activeThread && (
+        <div className="absolute lg:relative inset-0 lg:inset-auto z-30 lg:z-auto w-full lg:w-[400px] xl:w-[450px] bg-panel border-l border-line flex flex-col shrink-0 animate-slide-in-right">
+          <div className="h-14 border-b border-line flex items-center px-4 justify-between bg-bg/50 backdrop-blur-md shrink-0">
+            <div className="flex items-center space-x-2">
+              <button 
+                className="lg:hidden p-1 -ml-1 text-muted hover:text-text rounded-lg hover:bg-line transition-colors mr-1" 
+                onClick={() => setActiveThreadId(null)}
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <span className="font-bold text-text">Thread</span>
+              <span className="text-xs font-normal text-muted bg-line px-2 py-0.5 rounded">#{activeChannel?.name}</span>
+            </div>
+            <button className="hidden lg:block p-2 text-muted hover:text-text rounded-lg hover:bg-line transition-colors" onClick={() => setActiveThreadId(null)}>
+              <X size={20} />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto" ref={threadScrollRef}>
+            {/* Original Post */}
+            <div className="p-5 border-b border-line">
+              <div className="flex space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-purple/20 flex items-center justify-center shrink-0 text-purple font-bold">
+                  {activeThread.author.charAt(0)}
+                </div>
+                <div>
+                  <div className="flex items-baseline space-x-2">
+                    <span className="font-bold text-text text-sm">{activeThread.author}</span>
+                    <span className="text-[10px] text-muted">{activeThread.timestamp}</span>
+                  </div>
+                  <h4 className="font-bold text-text text-base mt-1">{activeThread.title}</h4>
+                  <div className="text-text/90 text-sm mt-2 whitespace-pre-wrap">{renderBody(activeThread.body)}</div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3 mt-4 ml-13">
+                <div className="flex items-center space-x-1 text-muted text-xs font-semibold px-2 py-1 rounded bg-line/50 border border-line">
+                  <ArrowUp size={14} />
+                  <span>{activeThread.upvotes}</span>
+                </div>
               </div>
             </div>
 
-            <div className="flex space-x-3 pt-2">
-              <button 
-                onClick={() => setNewThreadOpen(false)}
-                className="flex-1 bg-bg hover:bg-line border border-line text-xs font-semibold py-2.5 rounded-lg text-center"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleCreateThread}
-                className="flex-1 bg-cyan hover:bg-cyan2 text-bg text-xs font-bold py-2.5 rounded-lg text-center cursor-pointer"
-              >
-                Create (+25 XP)
-              </button>
+            {/* Replies */}
+            <div className="p-5 space-y-6">
+              <div className="flex items-center space-x-4">
+                <div className="h-px bg-line flex-1" />
+                <span className="text-[10px] font-bold text-muted uppercase">{activeThread.replies.length} replies</span>
+                <div className="h-px bg-line flex-1" />
+              </div>
+
+              {activeThread.replies.map(reply => (
+                <div key={reply.id} className="flex space-x-3 relative group">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 font-bold ${reply.isAiSuggested ? 'bg-purple text-bg' : 'bg-cyan/20 text-cyan'}`}>
+                    {reply.isAiSuggested ? <Sparkles size={16} /> : reply.author.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline space-x-2">
+                      <span className="font-bold text-text text-sm">{reply.author}</span>
+                      {reply.isAiSuggested && <span className="text-[9px] bg-purple/20 text-purple px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">AI</span>}
+                      <span className="text-[10px] text-muted">{reply.timestamp}</span>
+                    </div>
+                    
+                    <div className={`mt-1 text-sm p-3 rounded-xl border ${reply.isAcceptedAnswer ? 'bg-green/5 border-green/30 text-green-100' : reply.isAiSuggested ? 'bg-purple/5 border-purple/20 text-text/90' : 'bg-bg/50 border-line text-text/90'} whitespace-pre-wrap leading-relaxed`}>
+                      {renderBody(reply.body)}
+                    </div>
+
+                    <div className="flex items-center space-x-3 mt-2">
+                      <button 
+                        onClick={() => handleUpvoteReply(reply.id)}
+                        className="flex items-center space-x-1 text-muted hover:text-cyan text-xs font-semibold px-2 py-1 rounded hover:bg-cyan/10 transition-colors"
+                      >
+                        <ArrowUp size={12} />
+                        <span>{reply.upvotes}</span>
+                      </button>
+                      
+                      {reply.isAcceptedAnswer ? (
+                        <div className="flex items-center space-x-1 text-green text-xs font-bold px-2 py-1">
+                          <Check size={14} strokeWidth={3} />
+                          <span>Accepted Answer</span>
+                        </div>
+                      ) : (
+                        !activeThread.hasAcceptedAnswer && activeThread.author === user?.name && (
+                          <button 
+                            onClick={() => handleMarkAccepted(reply.id)}
+                            className="opacity-0 group-hover:opacity-100 flex items-center space-x-1 text-muted hover:text-green text-xs font-semibold px-2 py-1 rounded hover:bg-green/10 transition-all"
+                          >
+                            <Check size={12} />
+                            <span>Mark accepted</span>
+                          </button>
+                        )
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <div ref={threadEndRef} />
+            </div>
+          </div>
+
+          {/* Reply Input */}
+          <div className="p-4 bg-bg border-t border-line shrink-0">
+            <div className="bg-panel border border-line rounded-xl focus-within:border-purple transition-colors overflow-hidden">
+              <div className="px-3 py-2 border-line/50">
+                <textarea 
+                  placeholder={`Reply to ${activeThread.author}...`}
+                  value={replyInput}
+                  onChange={(e) => setReplyInput(e.target.value)}
+                  rows={2}
+                  className="w-full bg-transparent text-sm text-text outline-none resize-none max-h-32 overflow-y-auto"
+                />
+              </div>
+              <div className="bg-line/20 px-3 py-2 flex items-center justify-between border-t border-line/50">
+                <div className="flex items-center space-x-2 text-muted relative">
+                  <button onClick={() => setShowReplyCodeLangMenu(!showReplyCodeLangMenu)} className="p-1.5 hover:bg-line hover:text-purple rounded-lg transition-colors" title="Insert Code Snippet"><Code size={16} /></button>
+                  {showReplyCodeLangMenu && (
+                    <div className="absolute bottom-full left-0 mb-2 w-32 bg-panel border border-line rounded-xl shadow-lg shadow-black/50 overflow-hidden z-50">
+                      <div className="px-3 py-2 border-b border-line text-[10px] font-bold text-muted uppercase tracking-wider">Select Language</div>
+                      <div className="max-h-48 overflow-y-auto">
+                        {codeLangs.map(lang => (
+                          <button
+                            key={lang}
+                            onClick={() => handleReplyLanguageSelect(lang)}
+                            className="w-full text-left px-3 py-2 text-xs hover:bg-line hover:text-purple transition-colors"
+                          >
+                            {lang}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <button onClick={() => replyFileInputRef.current?.click()} className="p-1.5 hover:bg-line hover:text-purple rounded-lg transition-colors" title="Upload Image"><ImageIcon size={16} /></button>
+                  <input type="file" accept="image/*" className="hidden" ref={replyFileInputRef} onChange={handleReplyImageUpload} />
+                </div>
+                <button 
+                  onClick={handlePostReply}
+                  disabled={!replyInput.trim()}
+                  className="bg-purple hover:bg-purple/90 text-bg px-4 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1 shrink-0"
+                >
+                  <Send size={14} />
+                  <span>Reply</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
