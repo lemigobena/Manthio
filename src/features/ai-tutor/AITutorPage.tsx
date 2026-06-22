@@ -260,7 +260,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = () => {
   };
 
   return (
-    <div className="h-[750px] max-h-[85vh] flex flex-col md:flex-row bg-bg border border-line rounded-2xl overflow-hidden relative shadow-sm mb-12">
+    <div className="h-[750px] max-h-[85vh] max-md:h-[calc(100dvh-96px)] flex flex-col md:flex-row bg-bg border border-line rounded-2xl max-md:rounded-none max-md:border-x-0 max-md:border-b-0 max-md:-mx-[44px] max-md:-mb-6 overflow-hidden relative shadow-sm md:mb-12 mb-0">
       
       {/* Left Column: Chat Sessions History */}
       <div className={`transition-all duration-300 bg-panel border-r border-line flex flex-col shrink-0 z-40 absolute md:relative top-0 bottom-0 left-0 h-full shadow-2xl md:shadow-none overflow-hidden ${
@@ -406,7 +406,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = () => {
             </div>
           ) : (
             <>
-              <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-8">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 md:p-6 space-y-8">
                 {chatMessages.map((msg, idx) => (
                   <div 
                     key={idx} 
@@ -417,7 +417,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = () => {
                     <div className={`${
                       msg.sender === 'system' 
                         ? 'w-full px-4' 
-                        : 'max-w-[85%] md:max-w-[70%] p-4 rounded-2xl'
+                        : 'max-w-[95%] md:max-w-[70%] p-4 rounded-2xl'
                     } ${
                       msg.sender === 'user' 
                         ? 'bg-cyan text-bg rounded-tr-none' 
