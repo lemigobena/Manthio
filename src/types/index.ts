@@ -173,6 +173,8 @@ export interface ResourceFile {
   accessLevel: 'All Learners' | 'Trainers Only' | 'Cohort Only';
   size: string;
   downloadUrl?: string;
+  realContent?: string;
+  url?: string;
 }
 
 export interface ForumReply {
