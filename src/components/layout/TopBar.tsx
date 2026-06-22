@@ -220,7 +220,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   {/* Profile Link */}
                   <button 
                     onClick={() => {
-                      onNavigate('settings:profile');
+                      onNavigate('profile');
                       setProfileOpen(false);
                     }}
                     className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-muted hover:text-cyan hover:bg-cyan/10 transition-colors text-left cursor-pointer"

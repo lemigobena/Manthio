@@ -30,6 +30,7 @@ import { SignIn } from './features/auth/SignIn';
 import { SignUp } from './features/auth/SignUp';
 import { AuthLayout } from './features/auth/AuthLayout';
 import { Checkout } from './features/checkout/Checkout';
+import { PublicProfile } from './features/profile/PublicProfile';
 
 const MainApp: React.FC = () => {
   const { isAuthenticated, isOnboardingCompleted } = useAuth();
@@ -84,7 +85,9 @@ const MainApp: React.FC = () => {
       case 'community':
         return <Community onNavigate={handleNavigate} />;
       case 'settings':
-        return <Settings initialTab={tab as 'profile' | 'account' | 'billing' | 'preferences'} />;
+        return <Settings initialTab={tab as 'account' | 'billing' | 'preferences' | 'privacy'} onNavigate={handleNavigate} />;
+      case 'profile':
+        return <PublicProfile onNavigate={handleNavigate} />;
       case 'help-center':
         return <HelpCenter onNavigate={handleNavigate} />;
       case 'privacy':
