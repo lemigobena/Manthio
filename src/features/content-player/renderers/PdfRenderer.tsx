@@ -103,7 +103,7 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson }) => {
             <Maximize className="w-4 h-4 hover:text-text cursor-pointer" onClick={toggleFullscreen} />
           </span>
           <span title="Download">
-            <a href="/Manthio_Learner_Frontend_Requirements.pdf" download className="hover:text-text"><Download className="w-4 h-4 cursor-pointer" /></a>
+            <a href={lesson.contentUrl || "/Manthio_Learner_Frontend_Requirements.pdf"} download className="hover:text-text"><Download className="w-4 h-4 cursor-pointer" /></a>
           </span>
         </div>
       </div>
@@ -115,7 +115,7 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson }) => {
         )}
         {!error && (
           <Document 
-            file="/Manthio_Learner_Frontend_Requirements.pdf" 
+            file={lesson.contentUrl || "/Manthio_Learner_Frontend_Requirements.pdf"} 
             onLoadSuccess={onDocumentLoadSuccess}
             onLoadError={(err) => setError(err.message)}
             className="flex flex-col items-center max-w-full w-full"

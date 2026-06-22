@@ -1126,11 +1126,76 @@ export const TRACKS: CareerTrack[] = [
 ];
 
 export const RESOURCES: ResourceFile[] = [
-  { id: 'file-1', name: 'Python Bootcamp - Module 1 Materials', type: 'pdf', courseName: 'Python Bootcamp', uploadDate: 'Jan 15, 2026', accessLevel: 'All Learners', size: '2.4 MB' },
-  { id: 'file-2', name: 'Lecture Script AI Week 03.pdf', type: 'pdf', courseName: 'AI Fundamentals', uploadDate: 'Yesterday, 14:30', accessLevel: 'Cohort Only', size: '1.8 MB' },
-  { id: 'file-3', name: 'React Hooks Crashcourse.mp4', type: 'video', courseName: 'Web Development with React', uploadDate: 'Jan 10, 2026', accessLevel: 'All Learners', size: '45 MB' },
-  { id: 'file-4', name: 'Python_Exercises_Set_2.zip', type: 'archive', courseName: 'Python Bootcamp', uploadDate: 'Jan 08, 2026', accessLevel: 'All Learners', size: '1.2 MB' },
-  { id: 'file-5', name: 'IT Security Cheatsheet.pdf', type: 'pdf', courseName: 'IT Security Basics', uploadDate: 'Jan 05, 2026', accessLevel: 'All Learners', size: '420 KB' }
+  { 
+    id: 'file-1', 
+    name: 'Manthio Requirements.pdf', 
+    type: 'pdf', 
+    courseName: 'Project Management', 
+    uploadDate: 'Jan 15, 2026', 
+    accessLevel: 'All Learners', 
+    size: '1.2 MB', 
+    url: 'public/Manthio_Learner_Frontend_Requirements.pdf' 
+  },
+  { 
+    id: 'file-2', 
+    name: 'Branding Overview.png', 
+    type: 'image', 
+    courseName: 'Design Systems', 
+    uploadDate: 'Feb 01, 2026', 
+    accessLevel: 'All Learners', 
+    size: '850 KB', 
+    url: '/resource/branding-overview.png' 
+  },
+  { 
+    id: 'file-3', 
+    name: 'Python Utility Script.py', 
+    type: 'code', 
+    courseName: 'Python Bootcamp', 
+    uploadDate: 'Feb 10, 2026', 
+    accessLevel: 'All Learners', 
+    size: '4 KB', 
+    url: '/resource/script.py' 
+  },
+  { 
+    id: 'file-4', 
+    name: 'Data Analysis Lab.ipynb', 
+    type: 'notebook', 
+    courseName: 'Python Bootcamp', 
+    uploadDate: 'Feb 12, 2026', 
+    accessLevel: 'Cohort Only', 
+    size: '12 KB', 
+    url: '/resource/analysis.ipynb' 
+  },
+  { 
+    id: 'file-5', 
+    name: 'Brand Foundation.docx', 
+    type: 'office', 
+    courseName: 'Design Systems', 
+    uploadDate: 'Feb 15, 2026', 
+    accessLevel: 'All Learners', 
+    size: '2.5 MB', 
+    url: '/resource/brand-foundation.docx' 
+  },
+  { 
+    id: 'file-6', 
+    name: 'Platform Notes.txt', 
+    type: 'code', 
+    courseName: 'Project Management', 
+    uploadDate: 'Feb 18, 2026', 
+    accessLevel: 'All Learners', 
+    size: '1 KB', 
+    url: '/resource/notes.txt' 
+  },
+  {
+    id: 'file-7',
+    name: 'Introduction to Manthio.mp4',
+    type: 'video',
+    courseName: 'Design Systems',
+    uploadDate: 'Mar 01, 2026',
+    accessLevel: 'All Learners',
+    size: '1 MB',
+    url: '/resource/sample.mp4'
+  }
 ];
 
 export const FORUM_CHANNELS: ForumChannel[] = [
