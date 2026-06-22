@@ -7,9 +7,11 @@ import { BookOpen,
   Globe
 } from 'lucide-react';
 import type { ChatMessage } from '../../types';
+import { analyticsService } from '../../services/analyticsService';
 
 interface AITutorPageProps {
   onNavigate?: (page: string) => void;
+  initialTab?: string;
 }
 
 
@@ -25,6 +27,13 @@ const RichMessage: React.FC<{ text: string; sender: 'user' | 'tutor' | 'system' 
       {text}
     </div>
   );
+};
+
+const generateId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return Date.now().toString() + Math.random().toString(36).substring(2);
 };
 
 const AutoExpandingTextarea: React.FC<{
@@ -161,14 +170,100 @@ const MOCK_SESSIONS: Record<string, ChatSessionData> = {
   }
 };
 
-export const AITutorPage: React.FC<AITutorPageProps> = () => {
+export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab }) => {
   const { addXp } = useXP();
   const { user, onboardingAnswers } = useAuth();
+
+  // Conditionally initialize sessions state with initialTab remediation if present
+  const [sessions, setSessions] = useState<Record<string, ChatSessionData>>(() => {
+    const initialSessions = { ...MOCK_SESSIONS };
+    if (initialTab && initialTab.startsWith('remediation-')) {
+      const weaknessId = initialTab.replace('remediation-', '');
+      const analyticsData = analyticsService.getAnalyticsData();
+      const weakness = analyticsData.weaknesses.find(w => w.id === weaknessId);
+      if (weakness) {
+        const sessionId = `remediation-${weaknessId}`;
+        initialSessions[sessionId] = {
+          id: sessionId,
+          title: `Remediation: ${weakness.topic}`,
+          messages: [
+            { 
+              id: crypto.randomUUID(), 
+              sender: 'system', 
+              text: `Socratic Remediation Mode Active: Focused on ${weakness.topic}`, 
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+            },
+            { 
+              id: crypto.randomUUID(), 
+              sender: 'system', 
+              text: `Learner wrong-answer pattern: "${weakness.wrongPatterns}"`, 
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+            },
+            { 
+              id: crypto.randomUUID(), 
+              sender: 'tutor', 
+              text: `Hello ${user?.name ? user.name.split(' ')[0] : 'learner'}! I've loaded a Socratic remediation session for "${weakness.topic}". I noticed you recently had some incorrect answers matching patterns: "${weakness.wrongPatterns}". Let's work together to close this gap. I will ask you a few questions. To start, ${weakness.remediationPlan[0]}`, 
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              source: 'Course docs'
+            }
+          ],
+          context: {
+            module: 'Remediation Session',
+            lesson: `${weakness.topic} Review`,
+            progress: 0,
+            weakPoints: [{ label: weakness.topic, color: weakness.severity === 'significant' ? 'bg-red' : 'bg-yellow' }],
+            snippets: []
+          }
+        };
+      }
+    }
+    return initialSessions;
+  });
+
   const [aiMode, setAiMode] = useState<'auto' | 'docs' | 'full'>('auto');
   const [chatInput, setChatInput] = useState('');
   const [historySearch, setHistorySearch] = useState('');
-  const [activeChatId, setActiveChatId] = useState('chat-1');
+  
+  // Conditionally initialize active chat ID
+  const [activeChatId, setActiveChatId] = useState(() => {
+    if (initialTab && initialTab.startsWith('remediation-')) {
+      const weaknessId = initialTab.replace('remediation-', '');
+      return `remediation-${weaknessId}`;
+    }
+    return 'chat-1';
+  });
+
+  // Conditionally initialize chat messages
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => {
+    if (initialTab && initialTab.startsWith('remediation-')) {
+      const weaknessId = initialTab.replace('remediation-', '');
+      const analyticsData = analyticsService.getAnalyticsData();
+      const weakness = analyticsData.weaknesses.find(w => w.id === weaknessId);
+      if (weakness) {
+        return [
+          { 
+            id: crypto.randomUUID(), 
+            sender: 'system', 
+            text: `Socratic Remediation Mode Active: Focused on ${weakness.topic}`, 
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+          },
+          { 
+            id: crypto.randomUUID(), 
+            sender: 'system', 
+            text: `Learner wrong-answer pattern: "${weakness.wrongPatterns}"`, 
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+          },
+          { 
+            id: crypto.randomUUID(), 
+            sender: 'tutor', 
+            text: `Hello ${user?.name ? user.name.split(' ')[0] : 'learner'}! I've loaded a Socratic remediation session for "${weakness.topic}". I noticed you recently had some incorrect answers matching patterns: "${weakness.wrongPatterns}". Let's work together to close this gap. I will ask you a few questions. To start, ${weakness.remediationPlan[0]}`, 
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            source: 'Course docs'
+          }
+        ];
+      }
+    }
+
     const firstName = user?.name ? user.name.split(' ')[0] : 'learner';
     let welcomeText = `Hello ${firstName}! I am your personal AI Tutor. How can I help you today with your learning path?`;
     if (onboardingAnswers) {
@@ -203,8 +298,16 @@ export const AITutorPage: React.FC<AITutorPageProps> = () => {
     }
   }, [chatMessages, isTyping]);
 
+  const remediationSessions = Object.values(sessions).filter(s => s.id.startsWith('remediation-'));
+
   const historyGroups = [
-    { label: 'Today', items: [{ id: 'chat-1', title: 'Recursion Base Case', date: '14:30' }] },
+    { 
+      label: 'Today', 
+      items: [
+        ...remediationSessions.map(s => ({ id: s.id, title: s.title, date: 'Now' })),
+        { id: 'chat-1', title: 'Recursion Base Case', date: '14:30' }
+      ] 
+    },
     { label: 'Yesterday', items: [{ id: 'chat-2', title: 'Difference List vs Tuple', date: 'Jun 21' }] },
     { label: 'Last Week', items: [
       { id: 'chat-3', title: 'Error with venv PowerShell', date: 'Jun 12' },
@@ -213,64 +316,104 @@ export const AITutorPage: React.FC<AITutorPageProps> = () => {
   ];
 
   const handleSelectChat = (id: string) => {
-    if (!MOCK_SESSIONS[id]) return;
+    if (!sessions[id]) return;
     setIsSwitching(true);
     setActiveChatId(id);
     setTimeout(() => {
-      setChatMessages(MOCK_SESSIONS[id].messages);
+      setChatMessages(sessions[id].messages);
       setIsSwitching(false);
     }, 400);
   };
 
-  const activeContext = MOCK_SESSIONS[activeChatId]?.context || MOCK_SESSIONS['chat-1'].context;
+  const activeContext = sessions[activeChatId]?.context || sessions['chat-1'].context;
 
-  const suggestedPrompts = [
-    "Explain decorators with an example",
-    "How does recursion work in Python?",
-    "Show me a list comprehension for even numbers"
-  ];
+  const activeSession = sessions[activeChatId] || sessions['chat-1'];
+  
+  const suggestedPrompts = activeSession.id.startsWith('remediation-')
+    ? (analyticsService.getAnalyticsData().weaknesses.find(w => `remediation-${w.id}` === activeSession.id)?.remediationPlan || [])
+    : [
+        "Explain decorators with an example",
+        "How does recursion work in Python?",
+        "Show me a list comprehension for even numbers"
+      ];
+
+  const addMessageToSession = (sessionId: string, msg: ChatMessage) => {
+    setSessions(prev => {
+      const session = prev[sessionId];
+      if (!session) return prev;
+      return {
+        ...prev,
+        [sessionId]: {
+          ...session,
+          messages: [...session.messages, msg]
+        }
+      };
+    });
+  };
 
   const handleSendMessage = (textOverride?: string, forceCloud?: boolean) => {
     const messageText = textOverride || chatInput;
     if (!messageText.trim()) return;
 
     const userMsg: ChatMessage = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       sender: 'user',
       text: messageText,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
     setChatMessages(prev => [...prev, userMsg]);
+    addMessageToSession(activeChatId, userMsg);
     setChatInput('');
     setIsTyping(true);
 
     if (aiMode === 'docs' && messageText.toLowerCase().includes('general') && !forceCloud) {
       setTimeout(() => {
         const fallbackMsg: ChatMessage = {
-          id: crypto.randomUUID(),
+          id: generateId(),
           sender: 'tutor',
           text: 'I can\'t find this in the local course materials. Would you like me to ask the Cloud AI for a general answer?',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           source: 'Course docs'
         };
         setChatMessages(prev => [...prev, fallbackMsg]);
+        addMessageToSession(activeChatId, fallbackMsg);
         setIsTyping(false);
       }, 1000);
       return;
     }
 
     setTimeout(() => {
-      const tutorMsg: ChatMessage = {
-        id: crypto.randomUUID(),
-        sender: 'tutor',
-        text: forceCloud 
+      let responseText: string;
+      if (activeSession.id.startsWith('remediation-')) {
+        // Dynamic Socratic remediation response
+        const weaknessId = activeSession.id.replace('remediation-', '');
+        const weakness = analyticsService.getAnalyticsData().weaknesses.find(w => w.id === weaknessId);
+        const qIndex = weakness?.remediationPlan.indexOf(messageText) ?? -1;
+        if (qIndex !== -1 && weakness && qIndex < weakness.remediationPlan.length - 1) {
+          responseText = `Excellent answer! That shows you are thinking about the principles correctly. Next, let's explore: "${weakness.remediationPlan[qIndex + 1]}"`;
+        } else {
+          responseText = `That's a solid point! Socratic analysis complete. Remember that understanding this is key to solving tasks. You can test your skills with a review quiz on the Analytics page once it is available! Let me know if you want to write a code snippet together.`;
+          // Trigger increment score or progress
+          if (weakness) {
+            analyticsService.submitReviewQuizResult(weakness.id, true);
+          }
+        }
+      } else {
+        responseText = forceCloud 
           ? 'Connecting to Cloud AI... Here is a general answer based on global knowledge: Recursion is a fundamental computer science concept...' 
-          : 'Based on the curriculum, recursion is a key concept where functions call themselves. For this specific query, I recommend checking Module 6.',
+          : 'Based on the curriculum, recursion is a key concept where functions call themselves. For this specific query, I recommend checking Module 6.';
+      }
+
+      const tutorMsg: ChatMessage = {
+        id: generateId(),
+        sender: 'tutor',
+        text: responseText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         source: (forceCloud || aiMode === 'full') ? 'Cloud AI' : 'Course docs'
       };
       setChatMessages(prev => [...prev, tutorMsg]);
+      addMessageToSession(activeChatId, tutorMsg);
       setIsTyping(false);
       addXp(10, 'Asked AI Tutor');
     }, 1500);
@@ -381,7 +524,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = () => {
               <PanelLeft size={18} />
             </button>
             <div className="w-px h-4 bg-line mx-1" />
-            <h2 className="font-bold text-[11px] text-text truncate max-w-[80px]">{MOCK_SESSIONS[activeChatId]?.title}</h2>
+            <h2 className="font-bold text-[11px] text-text truncate max-w-[80px]">{sessions[activeChatId]?.title}</h2>
           </div>
 
           <div className="flex bg-bg/50 p-0.5 rounded-lg border border-line shrink-0">
@@ -404,7 +547,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = () => {
         {/* Desktop Chat Header */}
         <div className="hidden md:flex px-6 py-4 border-b border-line items-center justify-between bg-panel/50 backdrop-blur-md z-10 shrink-0">
           <div className="flex flex-col min-w-0">
-            <h2 className="font-bold text-sm text-text truncate">{MOCK_SESSIONS[activeChatId]?.title}</h2>
+            <h2 className="font-bold text-sm text-text truncate">{sessions[activeChatId]?.title}</h2>
             <div className="flex items-center space-x-2 text-[10px] text-muted"><div className="w-1.5 h-1.5 rounded-full bg-green" /><span className="truncate">Ready</span></div>
           </div>
           

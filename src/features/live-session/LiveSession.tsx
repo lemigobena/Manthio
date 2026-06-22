@@ -687,12 +687,59 @@ const PostSessionView: React.FC<{ data: SessionData, onContactTrainer: () => voi
   );
 };
 
+const generateId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return Date.now().toString() + Math.random().toString(36).substring(2);
+};
+
 const TrainerDirectView: React.FC<{ 
   trainer: SessionData['trainer'], 
   onBack: () => void 
 }> = ({ trainer, onBack }) => {
   const [isAnswerExpanded, setIsAnswerExpanded] = useState(false);
   const [chatInput, setChatInput] = useState('');
+  const [messages, setMessages] = useState([
+    {
+      id: '1', sender: 'trainer', text: "Hi Alex! Thanks for the questions about the Performance module. I've sent you some additional reading materials over email, but let me know if you want to discuss the memoization part here.", time: "Jun 12, 10:15 AM", type: 'text'
+    },
+    {
+      id: '2', sender: 'user', text: "Thanks Dr. Sarah! I'm particularly interested in how useMemo compares to using fixed constants outside the component for purely static lists. Does the check itself have a meaningful overhead?", time: "Jun 12, 11:20 AM", type: 'text', read: true
+    },
+    {
+      id: '3', sender: 'trainer', text: "Exactly! Fixed constants are always better if the data is truly static. The document above shows the micro-benchmarks for the dependency array check. It's negligible but worth understanding!", time: "Jun 12, 11:45 AM", type: 'resource'
+    }
+  ]);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSendMessage = () => {
+    if (!chatInput.trim()) return;
+    const newMsg = {
+      id: generateId(),
+      sender: 'user',
+      text: chatInput,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      type: 'text'
+    };
+    setMessages(prev => [...prev, newMsg]);
+    setChatInput('');
+    
+    // Simulate trainer response
+    setTimeout(() => {
+      setMessages(prev => [...prev, {
+        id: generateId(),
+        sender: 'trainer',
+        text: "That's a great question! Let's explore that further in our next session.",
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        type: 'text'
+      }]);
+    }, 1500);
+  };
 
   // Lock scroll only for this view
   React.useEffect(() => {
@@ -701,7 +748,7 @@ const TrainerDirectView: React.FC<{
   }, []);
 
   return (
-    <div className="h-[700px] flex flex-col bg-bg border border-line rounded-2xl overflow-hidden animate-cel-reveal max-md:fixed max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:z-40 max-md:h-[calc(100dvh-64px)] max-md:rounded-none max-md:border-none">
+    <div className="h-[85vh] min-h-[750px] max-h-[100vh] md:max-h-[90vh] max-md:h-[calc(100dvh-64px)] flex flex-col bg-bg border border-line rounded-2xl max-md:rounded-none max-md:border-none max-md:-mx-3 max-md:-mt-6 max-md:-mb-12 overflow-hidden animate-cel-reveal relative shadow-sm md:mb-12 mb-0">
       {/* Combined Mobile Header (matches AI Tutor style) */}
       <div className="md:hidden flex items-center justify-between px-3 py-2 border-b border-line bg-panel/50 backdrop-blur-md z-20 shrink-0 gap-2">
         <div className="flex items-center space-x-1 shrink-0">
@@ -750,35 +797,28 @@ const TrainerDirectView: React.FC<{
            <span className="px-3 py-1 bg-panel border border-line rounded-full text-[9px] font-bold text-muted uppercase tracking-widest">Conversation Started 2 weeks ago</span>
         </div>
 
-        <div className="flex justify-start">
-           <div className="max-w-[80%] bg-panel border border-line p-4 rounded-2xl rounded-tl-none">
-              <p className="text-xs text-text leading-relaxed">Hi Alex! Thanks for the questions about the Performance module. I've sent you some additional reading materials over email, but let me know if you want to discuss the memoization part here.</p>
-              <div className="mt-2 text-[9px] text-muted">Jun 12, 10:15 AM</div>
-           </div>
-        </div>
-
-        <div className="flex justify-end">
-           <div className="max-w-[80%] bg-cyan text-bg p-4 rounded-2xl rounded-tr-none">
-              <p className="text-xs font-medium leading-relaxed">Thanks Dr. Sarah! I'm particularly interested in how useMemo compares to using fixed constants outside the component for purely static lists. Does the check itself have a meaningful overhead?</p>
-              <div className="mt-2 text-[9px] text-bg/60">Jun 12, 11:20 AM • Read</div>
-           </div>
-        </div>
-
-        <div className="flex justify-start">
-           <div className="max-w-[80%] bg-panel border border-line p-4 rounded-2xl rounded-tl-none">
-              <div className="flex items-center space-x-3 mb-3 bg-bg/50 p-2 rounded-xl">
-                 <div className="w-8 h-8 bg-purple/20 text-purple rounded-lg flex items-center justify-center"><BookOpen size={16} /></div>
-                 <div>
-                    <div className="text-[10px] font-bold text-text">Resource: Overhead Analysis</div>
-                    <div className="text-[9px] text-muted">PDF Document • 4.2 MB</div>
-                 </div>
+        {messages.map((msg) => (
+          <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-[65%] p-4 rounded-2xl ${msg.sender === 'user' ? 'bg-cyan text-bg rounded-tr-none' : 'bg-panel border border-line rounded-tl-none'}`}>
+              {msg.type === 'resource' && (
+                <div className="flex items-center space-x-3 mb-3 bg-bg/50 p-2 rounded-xl">
+                   <div className="w-8 h-8 bg-purple/20 text-purple rounded-lg flex items-center justify-center"><BookOpen size={16} /></div>
+                   <div>
+                      <div className="text-[10px] font-bold text-text">Resource: Overhead Analysis</div>
+                      <div className="text-[9px] text-muted">PDF Document • 4.2 MB</div>
+                   </div>
+                </div>
+              )}
+              <p className={`text-xs leading-relaxed ${msg.sender === 'user' ? 'font-medium text-bg' : 'text-text'}`}>{msg.text}</p>
+              <div className={`mt-2 text-[9px] ${msg.sender === 'user' ? 'text-bg/60' : 'text-muted'}`}>
+                {msg.time} {msg.read && '• Read'}
               </div>
-              <p className="text-xs text-text leading-relaxed">Exactly! Fixed constants are always better if the data is truly static. The document above shows the micro-benchmarks for the dependency array check. It's negligible but worth understanding!</p>
-              <div className="mt-2 text-[9px] text-muted">Jun 12, 11:45 AM</div>
-           </div>
-        </div>
+            </div>
+          </div>
+        ))}
 
-        <div className={`max-w-[90%] md:max-w-[80%] transition-all duration-500 overflow-hidden ${isAnswerExpanded ? 'bg-purple/10 border-purple/40 ring-1 ring-purple/20' : 'bg-purple/5 border-purple/20'} border rounded-2xl p-4 flex flex-col space-y-3 relative`}>
+
+        <div className={`max-w-[80%] md:max-w-[65%] transition-all duration-500 overflow-hidden ${isAnswerExpanded ? 'bg-purple/10 border-purple/40 ring-1 ring-purple/20' : 'bg-purple/5 border-purple/20'} border rounded-2xl p-4 flex flex-col space-y-3 relative`}>
            <div className="flex items-start space-x-3">
              <Bot size={18} className="text-purple shrink-0 mt-1" />
              <div className="flex-1 space-y-2">
@@ -821,13 +861,14 @@ const TrainerDirectView: React.FC<{
                     {isAnswerExpanded ? 'Check other resources' : 'View Cohort Answer'}
                    </button>
                    
-                   <button className="text-[10px] font-bold px-3 py-1 bg-cyan/10 text-cyan border border-cyan/30 rounded-lg hover:bg-cyan hover:text-bg hover:border-cyan transition-all">
+                   <button onClick={handleSendMessage} className="text-[10px] font-bold px-3 py-1 bg-cyan/10 text-cyan border border-cyan/30 rounded-lg hover:bg-cyan hover:text-bg hover:border-cyan transition-all">
                      Send to Trainer anyway
                    </button>
                 </div>
              </div>
            </div>
         </div>
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}
@@ -841,6 +882,12 @@ const TrainerDirectView: React.FC<{
                <textarea 
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
                   placeholder="Ask a question or share progress..."
                   rows={1}
                   className="flex-1 bg-transparent border-none text-xs py-3 text-text !outline-none !ring-0 focus:!outline-none focus:!ring-0 focus-visible:!outline-none focus-visible:!ring-0 resize-none min-h-[44px] max-h-[120px]"
@@ -852,6 +899,7 @@ const TrainerDirectView: React.FC<{
                   </button>
                   
                   <button 
+                    onClick={handleSendMessage}
                     disabled={!chatInput.trim()}
                     className={`w-9 h-9 rounded-full flex items-center justify-center transition-all shrink-0 shadow-lg ${
                       chatInput.trim() 
