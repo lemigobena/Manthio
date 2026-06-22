@@ -277,7 +277,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = () => {
   };
 
   return (
-    <div className="h-[750px] max-h-[85vh] max-md:h-[calc(100dvh-96px)] flex flex-col md:flex-row bg-bg border border-line rounded-2xl max-md:rounded-none max-md:border-x-0 max-md:border-b-0 max-md:-mx-[44px] max-md:-mb-6 overflow-hidden relative shadow-sm md:mb-12 mb-0">
+    <div className="h-[750px] max-h-[100vh] md:max-h-[85vh] max-md:h-[calc(100dvh-64px)] flex flex-col md:flex-row bg-bg border border-line rounded-2xl max-md:rounded-none max-md:border-none max-md:-mx-3 max-md:-mt-6 max-md:-mb-12 overflow-hidden relative shadow-sm md:mb-12 mb-0">
       
       {/* Left Column: Chat Sessions History */}
       <div className={`transition-all duration-300 bg-panel border-r border-line flex flex-col shrink-0 z-40 absolute md:relative top-0 bottom-0 left-0 h-full shadow-2xl md:shadow-none overflow-hidden ${
@@ -374,18 +374,35 @@ export const AITutorPage: React.FC<AITutorPageProps> = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col bg-bg border-r border-line overflow-hidden relative">
-        {/* Mobile Header Buttons */}
-        <div className="md:hidden flex items-center justify-between px-4 py-2 border-b border-line bg-panel/30 z-20 shrink-0">
-          <button onClick={() => setLeftCollapsed(false)} className="p-2 text-muted hover:text-cyan transition-all">
-            <PanelLeft size={20} />
-          </button>
-          <button onClick={() => setRightCollapsed(false)} className="p-2 text-muted hover:text-cyan transition-all">
-            <PanelRight size={20} />
+        {/* Combined Mobile Header: Toggles, Title & Mode */}
+        <div className="md:hidden flex items-center justify-between px-3 py-2 border-b border-line bg-panel/50 backdrop-blur-md z-20 shrink-0 gap-2">
+          <div className="flex items-center space-x-1 shrink-0">
+            <button onClick={() => setLeftCollapsed(false)} className="p-1.5 text-muted hover:text-cyan transition-all">
+              <PanelLeft size={18} />
+            </button>
+            <div className="w-px h-4 bg-line mx-1" />
+            <h2 className="font-bold text-[11px] text-text truncate max-w-[80px]">{MOCK_SESSIONS[activeChatId]?.title}</h2>
+          </div>
+
+          <div className="flex bg-bg/50 p-0.5 rounded-lg border border-line shrink-0">
+            {['auto', 'docs', 'full'].map(mode => (
+              <button 
+                key={mode}
+                onClick={() => setAiMode(mode as 'auto' | 'docs' | 'full')}
+                className={`px-2 py-1 text-[9px] font-bold rounded-md transition-all capitalize ${aiMode === mode ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
+              >
+                {mode === 'docs' ? 'Docs' : mode === 'full' ? 'Full' : 'Auto'}
+              </button>
+            ))}
+          </div>
+
+          <button onClick={() => setRightCollapsed(false)} className="p-1.5 text-muted hover:text-cyan transition-all shrink-0">
+            <PanelRight size={18} />
           </button>
         </div>
 
-        {/* Chat Header */}
-        <div className="px-6 py-4 border-b border-line flex items-center justify-between bg-panel/50 backdrop-blur-md z-10 shrink-0">
+        {/* Desktop Chat Header */}
+        <div className="hidden md:flex px-6 py-4 border-b border-line items-center justify-between bg-panel/50 backdrop-blur-md z-10 shrink-0">
           <div className="flex flex-col min-w-0">
             <h2 className="font-bold text-sm text-text truncate">{MOCK_SESSIONS[activeChatId]?.title}</h2>
             <div className="flex items-center space-x-2 text-[10px] text-muted"><div className="w-1.5 h-1.5 rounded-full bg-green" /><span className="truncate">Ready</span></div>

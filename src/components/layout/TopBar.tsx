@@ -98,8 +98,8 @@ export const TopBar: React.FC<TopBarProps> = ({
   ];
 
   return (
-    <div className="bg-panel border-b border-line h-16 px-[26px] shrink-0 relative z-[60]">
-      <div className="max-w-[1360px] mx-auto h-full flex items-center justify-between gap-5 w-full">
+    <div className="bg-panel border-b border-line h-16 px-3 md:px-6 lg:px-8 shrink-0 relative z-[60]">
+      <div className="max-w-[1400px] mx-auto h-full flex items-center justify-between gap-5 w-full">
         {/* Mobile/Tablet Menu Button Toggle */}
         <button 
           onClick={() => setIsMobileOpen(!isMobileOpen)}
