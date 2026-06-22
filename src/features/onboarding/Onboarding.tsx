@@ -92,12 +92,14 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
     return localStorage.getItem('onboarding_avatar') || user?.avatar || '';
   });
 
-  useEffect(() => {
-    if (avatar && avatar.startsWith('https://ui-avatars.com/api/') && user) {
-      const initialsDataUrl = generateInitialsAvatar(user.name, theme === 'light');
+  const [prevTheme, setPrevTheme] = useState(theme);
+  if (theme !== prevTheme && avatar && avatar.startsWith('https://ui-avatars.com/api/') && user) {
+    setPrevTheme(theme);
+    const initialsDataUrl = generateInitialsAvatar(user.name, theme === 'light');
+    if (avatar !== initialsDataUrl) {
       setAvatar(initialsDataUrl);
     }
-  }, [theme, user]);
+  }
 
   // Step 4 recommended courses selection
   const [selectedCourseId, setSelectedCourseId] = useState<string>('python-bootcamp');
@@ -122,12 +124,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   const handleSwipeEnd = (e: React.MouseEvent | React.TouchEvent) => {
     if (swipeStartX === null) return;
     
-    let endX = 0;
-    if ('changedTouches' in e) {
-      endX = e.changedTouches[0].clientX;
-    } else {
-      endX = (e as React.MouseEvent).clientX;
-    }
+    const endX = 'changedTouches' in e 
+      ? e.changedTouches[0].clientX 
+      : (e as React.MouseEvent).clientX;
 
     const diff = swipeStartX - endX;
     
@@ -218,12 +217,13 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   const recommendedCourses = getRecommendedCourses();
 
   // Set default selection when course recommendations update
-  useEffect(() => {
-    if (recommendedCourses.length > 0) {
-      // Pick first as default
+  const [prevReason, setPrevReason] = useState(reason);
+  if (reason !== prevReason) {
+    setPrevReason(reason);
+    if (recommendedCourses.length > 0 && selectedCourseId !== recommendedCourses[0].id) {
       setSelectedCourseId(recommendedCourses[0].id);
     }
-  }, [reason]);
+  }
 
   const nextStep = () => {
     setStep(prev => Math.min(prev + 1, 5));

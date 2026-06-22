@@ -21,6 +21,11 @@ interface AuthContextType {
   updateProfile: (name: string, bio: string, avatar?: string) => void;
   activeCourseId: string | null;
   setActiveCourseId: (id: string | null) => void;
+  activeTrackId: string | null;
+  setActiveTrackId: (id: string | null) => void;
+  selectedFormat: string | null;
+  setSelectedFormat: (format: string | null) => void;
+  skipAuth: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,20 +33,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
     const saved = localStorage.getItem('user');
-    if (saved) return JSON.parse(saved);
-    // Return a default mock user (Alex Chen, Level 42) for testing out of the box
-    return {
-      name: 'Alex Chen',
-      email: 'alex.chen@manthio.io',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150',
-      bio: 'Software Developer & Python Enthusiast. Enrolled in Python Bootcamp by Apigenio.',
-      level: 42,
-      xp: 42500,
-      currentXpInLevel: 2500,
-      xpNeededForNextLevel: 10000,
-      streak: 12,
-      streakFreezeAvailable: true
-    };
+    return saved ? JSON.parse(saved) : null;
   });
 
   const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(() => {
@@ -61,15 +53,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return localStorage.getItem('activeCourseId') || 'python-bootcamp';
   });
 
+  const [activeTrackId, setActiveTrackIdState] = useState<string | null>(() => {
+    return localStorage.getItem('activeTrackId') || null;
+  });
+
+  const [selectedFormat, setSelectedFormatState] = useState<string | null>(() => {
+    return localStorage.getItem('selectedFormat') || null;
+  });
+
   const setActiveCourseId = (id: string | null) => {
     setActiveCourseIdState(id);
     if (id) localStorage.setItem('activeCourseId', id);
     else localStorage.removeItem('activeCourseId');
   };
 
+  const setActiveTrackId = (id: string | null) => {
+    setActiveTrackIdState(id);
+    if (id) localStorage.setItem('activeTrackId', id);
+    else localStorage.removeItem('activeTrackId');
+  };
+
+  const setSelectedFormat = (format: string | null) => {
+    setSelectedFormatState(format);
+    if (format) localStorage.setItem('selectedFormat', format);
+    else localStorage.removeItem('selectedFormat');
+  };
+
   const signIn = async (email: string, password: string): Promise<boolean> => {
     void password;
-    // Basic mock authentication
     const mockUser: UserProfile = {
       name: 'Alex Chen',
       email: email,
@@ -119,6 +130,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = () => {
     setUser(null);
     localStorage.removeItem('user');
+  };
+
+  const skipAuth = () => {
+    const guestUser: UserProfile = {
+      name: 'Guest Developer',
+      email: 'guest@example.com',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150',
+      bio: 'Exploring the platform as a guest.',
+      level: 1,
+      xp: 0,
+      currentXpInLevel: 0,
+      xpNeededForNextLevel: 10000,
+      streak: 0,
+      streakFreezeAvailable: true
+    };
+    setUser(guestUser);
+    setIsOnboardingCompleted(true);
+    localStorage.setItem('user', JSON.stringify(guestUser));
+    localStorage.setItem('isOnboardingCompleted', 'true');
   };
 
   const completeOnboarding = (answers: OnboardingAnswers) => {
@@ -174,7 +204,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       resetOnboarding,
       updateProfile,
       activeCourseId,
-      setActiveCourseId
+      setActiveCourseId,
+      activeTrackId,
+      setActiveTrackId,
+      selectedFormat,
+      setSelectedFormat,
+      skipAuth
     }}>
       {children}
     </AuthContext.Provider>

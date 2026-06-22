@@ -162,8 +162,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             {children}
           </div>
           
-          {/* Footer inside main layout frame */}
-          <Footer onNavigate={onNavigate} />
+          {activePage !== 'checkout' && (
+            <div className={activePage === 'ai-tutor' ? 'hidden md:block' : ''}>
+              <Footer onNavigate={onNavigate} />
+            </div>
+          )}
         </main>
       </div>
 

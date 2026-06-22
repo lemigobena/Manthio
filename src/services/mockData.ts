@@ -14,12 +14,55 @@ export const TRAINERS: Record<string, Trainer> = {
 
 export const COURSES: Course[] = [
   {
+    id: 'test-course',
+    title: 'Testing Course',
+    description: 'A simple course with 2 lessons to test completion flow.',
+    longDescription: 'This course is built for quickly testing the completion module.',
+    level: 'Foundation',
+    format: 'self-paced',
+    topic: 'Testing',
+    duration: '5 Mins',
+    language: 'English',
+    tags: ['New'],
+    priceStatus: 'included',
+    xpReward: 100,
+    price: 'Free',
+    rating: 5.0,
+    ratingCount: 1,
+    enrolled: true,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['david-pinezich'],
+    learningOutcomes: ['Finish lesson 1', 'Finish lesson 2'],
+    modules: [
+      {
+        id: 'test-mod-1',
+        number: 1,
+        title: 'Testing Module',
+        description: 'Module containing exactly two lessons.',
+        duration: '5min',
+        status: 'In progress',
+        type: 'Self-study',
+        lessons: [
+          { id: 'test-les-1', title: 'Lesson 1', type: 'Article', duration: '2min', status: 'in_progress', required: true, bloomLevel: 'Remember' },
+          { id: 'test-les-2', title: 'Lesson 2', type: 'Quiz', duration: '3min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: []
+  },
+  {
     id: 'python-bootcamp',
     title: 'Python Bootcamp',
     description: 'From zero to confident Python developer. Learn syntax, structures, functions, and complete your first real project with direct access to an experienced instructor.',
     longDescription: 'Our two-day Python Bootcamp takes you from zero to confident Python developer. You\'ll learn alongside other students with direct access to an experienced instructor. From basic syntax through data structures and functions to your first real project — all with live feedback and hands-on exercises.',
     level: 'Foundation',
     format: 'flipped',
+    topic: 'Python',
+    duration: '2 Days',
+    language: 'English',
+    tags: ['Bestseller'],
+    priceStatus: 'paid',
     xpReward: 600,
     price: 'CHF 1\'000.00',
     rating: 4.8,
@@ -37,6 +80,23 @@ export const COURSES: Course[] = [
       'Handle errors gracefully and read/write file systems.',
       'Build a command-line interface (CLI) application as a capstone project.'
     ],
+    bundledSubscription: {
+      durationMonths: 2,
+      valueAmount: 'CHF 60.00',
+      label: 'Premium Platform Access'
+    },
+    cohortProgress: {
+      minParticipants: 3,
+      currentParticipants: 2,
+      maxParticipants: 10,
+      confirmationDate: '2026-06-25'
+    },
+    preCourseRequirements: {
+      hardware: ['Laptop with at least 8GB RAM', 'Webcam and Microphone for workshops'],
+      software: ['Python 3.11+', 'Visual Studio Code', 'Git installed'],
+      knowledge: ['Basic computer literacy', 'Understanding of logic (if/then)', 'Commitment to 4h prep time']
+    },
+    cancellationPolicy: 'Full refund up to 7 days before start. 50% refund between 7 days and 48 hours. No refund within 48 hours of session start.',
     modules: [
       {
         id: 'py-mod-1',
@@ -47,10 +107,14 @@ export const COURSES: Course[] = [
         status: 'Completed',
         type: 'Self-study',
         lessons: [
-          { id: 'py-les-1-1', title: 'Install Python & Set up IDE', type: 'Video', duration: '20min', status: 'completed', required: true, bloomLevel: 'Remember' },
-          { id: 'py-les-1-2', title: 'REPL, Scripts & venv', type: 'Video', duration: '25min', status: 'completed', required: true, bloomLevel: 'Remember' },
+          { id: 'py-les-1-1', title: 'Install Python & Set up IDE', type: 'Video', duration: '20min', status: 'completed', required: true, bloomLevel: 'Remember', microChunkable: true, checkpoints: 4 },
+          { id: 'py-les-1-2', title: 'Python Cheatsheet', type: 'PDF', duration: '10min', status: 'completed', required: true, bloomLevel: 'Remember' },
           { id: 'py-les-1-3', title: 'Variables & Data Types', type: 'Article', duration: '25min', status: 'completed', required: true, bloomLevel: 'Understand' },
-          { id: 'py-les-1-4', title: 'Your first script', type: 'Code', duration: '20min', status: 'completed', required: true, bloomLevel: 'Apply' }
+          { id: 'py-les-1-4', title: 'Your first script', type: 'Code', duration: '20min', status: 'completed', required: true, bloomLevel: 'Apply' },
+          { id: 'py-les-1-5', title: 'Interactive Flow Quiz', type: 'H5P', duration: '15min', status: 'completed', required: true, bloomLevel: 'Apply' },
+          { id: 'py-les-1-6', title: 'Setup Verification', type: 'Assignment', duration: '15min', status: 'in_progress', required: true, bloomLevel: 'Apply' },
+          { id: 'py-les-1-7', title: 'Official Docs Link', type: 'External', duration: '5min', status: 'not_started', required: false, bloomLevel: 'Remember' },
+          { id: 'py-les-1-8', title: 'Review Quiz', type: 'Quiz', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' }
         ]
       },
       {
@@ -168,6 +232,98 @@ export const COURSES: Course[] = [
           { id: 'py-les-9-2', title: 'Feedback & Platform Certificates', type: 'Live Event', duration: '90min', status: 'locked', required: true, bloomLevel: 'Create' }
         ]
       }
+    ],
+    reviews: [
+      {
+        id: 'rev-1',
+        userName: 'Marc S.',
+        rating: 5,
+        comment: 'The flipped classroom model really works. I could prepare at my own pace and the in-person workshops were incredibly valuable for clearing up my misunderstandings.',
+        date: '2026-05-12',
+        isVerified: true,
+        helpfulCount: 24
+      },
+      {
+        id: 'rev-2',
+        userName: 'Elena R.',
+        rating: 5,
+        comment: 'David is an excellent trainer. The capstone project was challenging but very rewarding. Highly recommended for complete beginners!',
+        date: '2026-04-28',
+        isVerified: true,
+        helpfulCount: 18
+      },
+      {
+        id: 'rev-3',
+        userName: 'Thomas K.',
+        rating: 4,
+        comment: 'Great overview of Python. The modules are structured logically. I would have liked a bit more focus on async programming, but for a Foundation course it is perfect.',
+        date: '2026-04-15',
+        isVerified: true,
+        helpfulCount: 12
+      }
+    ]
+  },
+  {
+    id: 'advanced-python',
+    title: 'Advanced Python Engineering',
+    description: 'Master advanced Python paradigms, async programming, and system design. Ideal for developers moving towards senior roles.',
+    longDescription: 'This intensive flipped bootcamp focuses on enterprise-grade Python. You will dive deep into asynchronous programming, decorators, context managers, and advanced system architecture. Learn to build high-performance, scalable applications with direct coaching from senior IT architects.',
+    level: 'Advanced',
+    format: 'flipped',
+    topic: 'Python',
+    duration: '3 Days',
+    language: 'English',
+    tags: ['Advanced', 'Intensive'],
+    priceStatus: 'paid',
+    xpReward: 1200,
+    price: 'CHF 1\'800.00',
+    rating: 4.9,
+    ratingCount: 56,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['david-pinezich'],
+    learningOutcomes: [
+      'Implement complex asynchronous workflows using asyncio.',
+      'Design high-performance systems with multiprocessing and threading.',
+      'Master advanced design patterns (Factory, Singleton, Repository).',
+      'Optimize memory usage and execution speed for large-scale apps.',
+      'Automate enterprise deployments with advanced CI/CD pipelines.'
+    ],
+    modules: [
+      {
+        id: 'adv-py-mod-1',
+        number: 1,
+        title: 'Asynchronous Paradigms',
+        description: 'Deep dive into event loops, coroutines, and async/await syntax.',
+        duration: '2h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'adv-py-les-1-1', title: 'The Event Loop Explained', type: 'Video', duration: '40min', status: 'not_started', required: true, bloomLevel: 'Understand' },
+          { id: 'adv-py-les-1-2', title: 'Async/Await Patterns', type: 'Code', duration: '50min', status: 'not_started', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'adv-rev-1',
+        userName: 'Sven L.',
+        rating: 5,
+        comment: 'This course is a beast. Asyncio was always a black box for me, but the senior IT architects explains it with such clarity. Well worth the price.',
+        date: '2026-06-05',
+        isVerified: true,
+        helpfulCount: 32
+      },
+      {
+        id: 'adv-rev-2',
+        userName: 'Marta P.',
+        rating: 5,
+        comment: 'The focus on enterprise-grade patterns is what sets this apart. We started implementing the Repository pattern at work the day after the bootcamp.',
+        date: '2026-05-20',
+        isVerified: true,
+        helpfulCount: 15
+      }
     ]
   },
   {
@@ -176,15 +332,53 @@ export const COURSES: Course[] = [
     description: 'Master version control basics, commits, branching, merging, and collaboration with GitHub.',
     longDescription: 'Get up to speed with Git, the industry-standard version control system. In this short course, you will learn how to track file versions, create branches, resolve merge conflicts, and collaborate using GitHub.',
     level: 'Foundation',
-    format: 'self-paced',
+    format: 'Multiple formats',
+    topic: 'Git',
+    duration: '2 Hours',
+    language: 'English',
+    tags: ['New'],
+    priceStatus: 'included',
     xpReward: 150,
     price: 'CHF 90.00',
     rating: 4.6,
     ratingCount: 41,
-    enrolled: true,
+    enrolled: false,
     progress: 0,
-    imageUrl: 'https://images.unsplash.com/photo-1618401471353-b98aedd07871?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1654277041218-84424c78f0ae?auto=format&fit=crop&w=800&q=80',
     trainer: TRAINERS['david-pinezich'],
+    availableFormats: [
+      {
+        format: 'self-paced',
+        price: 'CHF 250.00',
+        features: { aiTutor: true, peerCohort: false, inPerson: false, certificate: true }
+      },
+      {
+        format: 'cohort',
+        price: 'CHF 650.00',
+        features: { aiTutor: true, peerCohort: true, inPerson: false, certificate: true },
+        bundledSubscription: {
+          durationMonths: 1,
+          valueAmount: 'CHF 30.00',
+          label: 'Premium Access'
+        },
+        cohortProgress: {
+          minParticipants: 3,
+          currentParticipants: 5,
+          maxParticipants: 12,
+          confirmationDate: '2026-07-01'
+        }
+      },
+      {
+        format: 'flipped',
+        price: 'CHF 950.00',
+        features: { aiTutor: true, peerCohort: true, inPerson: true, certificate: true },
+        bundledSubscription: {
+          durationMonths: 2,
+          valueAmount: 'CHF 60.00',
+          label: 'Premium Access'
+        }
+      }
+    ],
     learningOutcomes: [
       'Initialize Git repositories and record changes using commits.',
       'Navigate branch histories and execute branch merges.',
@@ -207,6 +401,26 @@ export const COURSES: Course[] = [
           { id: 'git-les-1-4', title: 'Quiz: Git Commands', type: 'Quiz', duration: '15min', status: 'not_started', required: true, bloomLevel: 'Remember' }
         ]
       }
+    ],
+    reviews: [
+      {
+        id: 'git-rev-1',
+        userName: 'Oliver B.',
+        rating: 4,
+        comment: 'Exactly what I needed. I used Git before but never really understood what was happening "under the hood" until now.',
+        date: '2026-06-10',
+        isVerified: true,
+        helpfulCount: 8
+      },
+      {
+        id: 'git-rev-2',
+        userName: 'Sarah J.',
+        rating: 5,
+        comment: 'The merge conflict resolution exercises were the best. Finally I don’t freak out when I see a conflict!',
+        date: '2026-05-30',
+        isVerified: true,
+        helpfulCount: 21
+      }
     ]
   },
   {
@@ -216,6 +430,10 @@ export const COURSES: Course[] = [
     longDescription: 'The command line is a developer\'s best friend. This course covers everything from simple shell commands, file path patterns, piping outputs, to basic environment settings.',
     level: 'Foundation',
     format: 'self-paced',
+    topic: 'Terminal',
+    duration: '1.5 Hours',
+    language: 'English',
+    priceStatus: 'included',
     xpReward: 120,
     price: 'CHF 75.00',
     rating: 4.5,
@@ -252,6 +470,7 @@ export const COURSES: Course[] = [
     description: 'Write beautiful readmes, documentation, and formatted notes using Markdown syntax.',
     longDescription: 'Learn Markdown, the standard markup language used for writing web-formatted text. Great for document formatting on GitHub, blogs, and corporate wikis.',
     level: 'Foundation',
+    duration: '48 hours',
     format: 'self-paced',
     xpReward: 80,
     price: 'CHF 40.00',
@@ -266,6 +485,12 @@ export const COURSES: Course[] = [
       'Incorporate hyperlinks, images, and tables.',
       'Adopt clean README layouts for open source projects.'
     ],
+    preCourseRequirements: {
+      hardware: ['Any computer with a modern web browser'],
+      software: ['Web browser (Chrome, Firefox, Safari)', 'A text editor (Notepad, VS Code, or similar)'],
+      knowledge: ['Basic typing skills', 'Comfort with navigating web pages']
+    },
+    cancellationPolicy: 'Self-paced courses are eligible for a full refund within 30 days of purchase if less than 20% of the content has been accessed.',
     modules: [
       {
         id: 'md-mod-1',
@@ -289,6 +514,7 @@ export const COURSES: Course[] = [
     longDescription: 'Data is the core of every system. Learn the design principles of relational schemas, tables, indices, foreign keys, and write optimal SELECT, JOIN, and aggregation queries in PostgreSQL and SQLite.',
     level: 'Intermediate',
     format: 'self-paced',
+    duration: '4 Days',
     xpReward: 350,
     price: 'CHF 320.00',
     rating: 4.7,
@@ -344,6 +570,26 @@ export const COURSES: Course[] = [
           { id: 'sql-les-3-2', title: 'Creating Indexes', type: 'Code', duration: '40min', status: 'locked', required: true, bloomLevel: 'Apply' }
         ]
       }
+    ],
+    reviews: [
+      {
+        id: 'sql-rev-1',
+        userName: 'Fabian Z.',
+        rating: 5,
+        comment: 'Very practical. Using PostgreSQL for the exercises made it real. The JOIN logic is explained much better than in any online tutorial I found.',
+        date: '2026-06-01',
+        isVerified: true,
+        helpfulCount: 14
+      },
+      {
+        id: 'sql-rev-2',
+        userName: 'Andrea M.',
+        rating: 4,
+        comment: 'The performance module was a real eye-opener. I never knew how much difference a simple index could make.',
+        date: '2026-05-15',
+        isVerified: true,
+        helpfulCount: 9
+      }
     ]
   },
   {
@@ -353,13 +599,14 @@ export const COURSES: Course[] = [
     longDescription: 'Explore artificial intelligence from a practical engineering view. Learn about feed-forward layers, weights, vectors, cosine similarity, embeddings, and prompt structures for LLMs.',
     level: 'Intermediate',
     format: 'self-paced',
+    duration: '1 Week',
     xpReward: 400,
     price: 'CHF 490.00',
     rating: 4.9,
     ratingCount: 82,
     enrolled: false,
     progress: 0,
-    imageUrl: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1697577418970-95d99b5a55cf?auto=format&fit=crop&w=800&q=80',
     trainer: TRAINERS['david-pinezich'],
     learningOutcomes: [
       'Articulate basic neural network architectures.',
@@ -420,6 +667,7 @@ export const COURSES: Course[] = [
     xpReward: 450,
     price: 'CHF 390.00',
     rating: 4.7,
+    duration: '1 Month',
     ratingCount: 65,
     enrolled: true,
     progress: 45,
@@ -494,6 +742,7 @@ export const COURSES: Course[] = [
     longDescription: 'Work environment synchronization can be painful. This course introduces Docker containerization, Dockerfiles, volume bindings, ports exposure, and orchestrating multiple services using Docker Compose.',
     level: 'Intermediate',
     format: 'cohort',
+    duration: '10 Days',
     xpReward: 380,
     price: 'CHF 550.00',
     rating: 4.8,
@@ -557,6 +806,7 @@ export const COURSES: Course[] = [
     longDescription: 'Python APIs must be fast and easy to document. Explore FastAPI, utilize Pydantic models for request validation, configure background workers, and write clean dependency injection schemas.',
     level: 'Advanced',
     format: 'cohort',
+    duration: '50 Hours',
     xpReward: 500,
     price: 'CHF 890.00',
     rating: 4.9,
@@ -633,12 +883,13 @@ export const COURSES: Course[] = [
     longDescription: 'Take applications to enterprise scale. This comprehensive course covers horizontal scaling, SSL configurations, proxying with Nginx, database replication, caching with Redis, and writing secure CI/CD build scripts.',
     level: 'Advanced',
     format: 'cohort',
+    duration: '2 Days',
     xpReward: 800,
     price: 'CHF 1\'800.00',
     rating: 4.9,
     ratingCount: 37,
-    enrolled: false,
-    progress: 0,
+    enrolled: true,
+    progress: 26,
     imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
     trainer: TRAINERS['david-pinezich'],
     learningOutcomes: [
@@ -670,6 +921,7 @@ export const COURSES: Course[] = [
         duration: '6h',
         status: 'Locked',
         type: 'Self-study',
+        availableDate: 'Oct 24, 09:00',
         lessons: [
           { id: 'arch-les-2-1', title: 'Why DB queries are slow', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
           { id: 'arch-les-2-2', title: 'Redis client set and get caching', type: 'Code', duration: '60min', status: 'locked', required: true, bloomLevel: 'Apply' }
@@ -682,7 +934,14 @@ export const COURSES: Course[] = [
         description: 'Primary/replica topologies, read-write splitting, connection pools.',
         duration: '6h',
         status: 'Locked',
-        type: 'Self-study',
+        type: 'In-person session',
+        availableDate: 'Oct 26, 14:00',
+        scheduledTime: 'Oct 26, 14:00 - 18:00',
+        venue: 'Room 302, Engineering Block',
+        prerequisites: [
+          'Complete Module 2 labs',
+          'Draft database topology schema'
+        ],
         lessons: [
           { id: 'arch-les-3-1', title: 'Topologies for High Availability', type: 'Video', duration: '35min', status: 'locked', required: true, bloomLevel: 'Understand' },
           { id: 'arch-les-3-2', title: 'Configuring Read Splitting', type: 'Code', duration: '50min', status: 'locked', required: true, bloomLevel: 'Apply' }
@@ -735,14 +994,133 @@ export const TRACKS: CareerTrack[] = [
   {
     id: 'python-production-engineer',
     title: 'Become a Python Production Engineer',
+    description: 'Master the complete Python ecosystem for production environments.',
+    imageUrl: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=800&q=80',
+    level: 'Advanced',
+    tags: ['Career Track', 'Top Rated'],
     outcomeStatement: 'Master Python from base syntax to production-grade services, testing structures, database integrations, and automated pipelines.',
     estimatedTime: '36 hours + 2 in-person sessions',
     coursesCount: 3,
     progress: 38,
+    enrolled: true,
+    selfAssessmentOptions: ['I Know Nothing', 'I Know Basics', 'I Have Experience'],
     milestones: [
-      { id: 'mile-1', title: 'Start with Basics', description: 'Complete Python Bootcamp to gain foundational syntax skills.', courseIds: ['python-bootcamp'], status: 'active' },
-      { id: 'mile-2', title: 'Object-Oriented Programming', description: 'Dive into intermediate OOP and design patterns.', courseIds: [], status: 'locked' },
-      { id: 'mile-3', title: 'Production & APIs', description: 'Build REST APIs and deploy with Docker.', courseIds: [], status: 'locked' }
+      { 
+        id: 'mile-1', 
+        title: 'Start with Basics', 
+        description: 'Complete Python Bootcamp to gain foundational syntax skills.', 
+        courses: [
+          { id: 'python-bootcamp' },
+          { id: 'git-essentials', isOptional: true }
+        ], 
+        status: 'active' 
+      },
+      { 
+        id: 'mile-2', 
+        title: 'Object-Oriented Programming', 
+        description: 'Dive into intermediate OOP and design patterns.', 
+        courses: [
+          { id: 'advanced-python' }
+        ], 
+        status: 'locked' 
+      },
+      { 
+        id: 'mile-3', 
+        title: 'Production & APIs', 
+        description: 'Build REST APIs and deploy with Docker.', 
+        courses: [
+          { id: 'docker-containers' },
+          { id: 'api-design-fastapi', isOptional: true }
+        ], 
+        status: 'locked' 
+      }
+    ]
+  },
+  {
+    id: 'cloud-devops-engineer',
+    title: 'Become a Cloud & DevOps Engineer',
+    description: 'Go from zero to production-ready infrastructure. Master containerisation, CI/CD automation, and cloud platform deployments used by modern engineering teams.',
+    imageUrl: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?auto=format&fit=crop&w=800&q=80',
+    level: 'Intermediate',
+    tags: ['Career Track', 'New'],
+    outcomeStatement: 'Design and operate cloud-native infrastructure pipelines using Docker, Kubernetes, Terraform, and GitHub Actions on AWS or Azure.',
+    estimatedTime: '42 hours + 3 in-person sessions',
+    coursesCount: 4,
+    enrolled: false,
+    progress: 0,
+    selfAssessmentOptions: ['Pure Beginner', 'Some IT Background', 'Junior Dev'],
+    milestones: [
+      { 
+        id: 'devops-mile-1', 
+        title: 'Linux & Networking Fundamentals', 
+        description: 'Bash scripting, networking basics, SSH, and process management.', 
+        courses: [
+          { id: 'command-line-basics' }
+        ], 
+        status: 'active' 
+      },
+      { 
+        id: 'devops-mile-2', 
+        title: 'Docker & Container Orchestration', 
+        description: 'Build, ship, and run containers with Docker Compose and Kubernetes.', 
+        courses: [
+          { id: 'docker-containers' }
+        ], 
+        status: 'locked' 
+      },
+      { 
+        id: 'devops-mile-3', 
+        title: 'CI/CD Pipelines', 
+        description: 'Automate build, test, and deploy workflows with GitHub Actions.', 
+        courses: [], 
+        status: 'locked' 
+      },
+      { 
+        id: 'devops-mile-4', 
+        title: 'Cloud Infrastructure with Terraform', 
+        description: 'Provision and manage AWS or Azure resources as code.', 
+        courses: [], 
+        status: 'locked' 
+      }
+    ]
+  },
+  {
+    id: 'data-engineering-python-sql',
+    title: 'Data Engineering with Python & SQL',
+    description: 'Build robust data pipelines, warehouses, and transformation workflows. A hands-on track for engineers who want to work in the data stack.',
+    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+    level: 'Intermediate',
+    tags: ['Career Track', 'Intensive'],
+    outcomeStatement: 'Design ETL pipelines, model relational data warehouses, and deliver analytics-ready datasets using Python, SQL, dbt, and Apache Airflow.',
+    estimatedTime: '38 hours + 2 in-person sessions',
+    coursesCount: 3,
+    progress: 0,
+    enrolled: false,
+    selfAssessmentOptions: ['New to Data', 'SQL User', 'Python Programmer'],
+    milestones: [
+      { 
+        id: 'data-mile-1', 
+        title: 'SQL Mastery', 
+        description: 'Write advanced queries, CTEs, window functions, and optimise query plans.', 
+        courses: [
+          { id: 'sql-databases' }
+        ], 
+        status: 'active' 
+      },
+      { 
+        id: 'data-mile-2', 
+        title: 'Python for Data', 
+        description: 'Work with Pandas, data cleaning, transformation, and file I/O pipelines.', 
+        courses: [], 
+        status: 'locked' 
+      },
+      { 
+        id: 'data-mile-3', 
+        title: 'Data Pipelines & Orchestration', 
+        description: 'Build Airflow DAGs and schedule end-to-end ETL workflows.', 
+        courses: [], 
+        status: 'locked' 
+      }
     ]
   }
 ];
