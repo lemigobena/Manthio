@@ -202,3 +202,11 @@ code, pre {
 .toast-item-exit {
   animation: slideOut 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+/* Utility to hide scrollbar but allow scrolling */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
