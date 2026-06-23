@@ -116,7 +116,7 @@ export interface H5PCoursePresentationData {
     elements: {
       id: string;
       type: 'text' | 'image' | 'video' | 'question';
-      content: any; // Simplified payload for slide element
+      content: string; // Simplified payload for slide element
       x: number;
       y: number;
       width: number;

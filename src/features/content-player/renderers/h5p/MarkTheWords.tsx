@@ -53,7 +53,7 @@ export const MarkTheWords: React.FC<MarkTheWordsProps> = ({ data, onComplete }) 
           const isSelected = selectedIndices.has(index);
           const isCorrectAnswer = data.correctWordIndices.includes(index);
           
-          let stateClasses = "hover:bg-line/50 cursor-pointer";
+          let stateClasses: string;
           
           if (isChecked) {
             if (isSelected && isCorrectAnswer) {
@@ -66,9 +66,9 @@ export const MarkTheWords: React.FC<MarkTheWordsProps> = ({ data, onComplete }) 
               stateClasses = "opacity-50 cursor-default border-transparent"; // Neither selected nor correct
             }
           } else if (isSelected) {
-            stateClasses = "bg-cyan text-bg font-bold border-cyan";
+            stateClasses = "bg-cyan text-bg font-bold border-cyan cursor-pointer";
           } else {
-            stateClasses = "border-transparent";
+            stateClasses = "border-transparent hover:bg-line/50 cursor-pointer";
           }
 
           return (

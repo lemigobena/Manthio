@@ -25,8 +25,10 @@ export const Timeline: React.FC<TimelineProps> = ({ data, onComplete }) => {
   // If there are no events, auto-complete
   useEffect(() => {
     if (data.events.length === 0 && !completed) {
-      setCompleted(true);
-      onComplete(100);
+      setTimeout(() => {
+        setCompleted(true);
+        onComplete(100);
+      }, 0);
     }
   }, [data.events.length, completed, onComplete]);
 
