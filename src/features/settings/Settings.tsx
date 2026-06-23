@@ -120,7 +120,7 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account' }) =>
                 </button>
 
                 {/* Content Pane */}
-                <div className={`bg-panel border border-line rounded-2xl p-4 sm:p-6 lg:p-8 ${isActive ? 'block' : 'hidden'}`}>
+                <div className={`lg:bg-panel lg:border lg:border-line lg:rounded-2xl pt-2 lg:p-8 mt-2.5 lg:mt-0 ${isActive ? 'block' : 'hidden'}`}>
                   {isActive && tab.id === 'account' && (
                     <AccountTab 
                       user={user!} 

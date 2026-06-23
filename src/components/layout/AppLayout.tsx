@@ -219,10 +219,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             {children}
           </div>
           
-          {activePage !== 'checkout' && (
-            <div className={activePage === 'ai-tutor' ? 'hidden md:block' : ''}>
-              <Footer onNavigate={onNavigate} />
-            </div>
+          {activePage !== 'checkout' && activePage !== 'community' && activePage !== 'ai-tutor' && (
+            <Footer onNavigate={onNavigate} />
           )}
         </main>
       </div>
