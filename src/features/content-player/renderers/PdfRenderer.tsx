@@ -151,7 +151,7 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson }) => {
         </div>
 
         <div className="flex items-center space-x-2 sm:space-x-4">
-          <div className="hidden md:flex items-center bg-bg/50 border border-line rounded-xl px-3 h-9 group focus-within:border-cyan/50 transition-all w-48 lg:w-64">
+          <div className="hidden md:flex items-center bg-bg/50 border border-line rounded-full px-3 h-9 group focus-within:border-cyan/50 transition-all w-48 lg:w-64">
             <Search className="w-3.5 h-3.5 text-muted group-focus-within:text-cyan" />
             <input 
               type="text" 
@@ -159,7 +159,7 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson }) => {
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               onKeyDown={handleSearchKeyDown}
-              className="bg-transparent border-none text-[11px] focus:ring-0 w-full placeholder:text-muted/50 ml-2" 
+              className="bg-transparent !border-none text-[11px] !focus:ring-0 !outline-none !ring-0 !shadow-none w-full placeholder:text-muted/50 ml-2 rounded-full" 
             />
           </div>
 
