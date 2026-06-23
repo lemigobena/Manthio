@@ -51,7 +51,8 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({ moduleId, onNavigate
   const isLocked = module.status === 'Locked';
 
   return (
-    <div className="pb-20 space-y-6">
+    <div className="relative h-[calc(100dvh-64px)] -mx-3 md:-mx-[44px] -my-6 overflow-y-auto bg-bg border-y border-line px-3 md:px-[44px] py-6">
+      <div className="pb-20 space-y-6 max-w-[1600px] mx-auto">
       {/* Header & Back Navigation */}
       <div className="flex items-center justify-between">
         <button 
@@ -194,6 +195,7 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({ moduleId, onNavigate
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 };

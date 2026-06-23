@@ -420,7 +420,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab }) => {
   };
 
   return (
-    <div className="h-[750px] max-h-[100vh] md:max-h-[85vh] max-md:h-[calc(100dvh-64px)] flex flex-col md:flex-row bg-bg border border-line rounded-2xl max-md:rounded-none max-md:border-none max-md:-mx-3 max-md:-mt-6 max-md:-mb-12 overflow-hidden relative shadow-sm md:mb-12 mb-0">
+    <div className="relative flex flex-col md:flex-row h-[calc(100dvh-64px)] -mx-3 md:-mx-[44px] -my-6 border-y border-line overflow-hidden bg-bg">
       
       {/* Left Column: Chat Sessions History */}
       <div className={`transition-all duration-300 bg-panel border-r border-line flex flex-col shrink-0 z-40 absolute md:relative top-0 bottom-0 left-0 h-full shadow-2xl md:shadow-none overflow-hidden ${

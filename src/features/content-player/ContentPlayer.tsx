@@ -170,7 +170,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
   };
 
   return (
-    <div className="h-[calc(100vh-120px)] flex flex-col -m-6 bg-bg overflow-hidden relative">
+    <div className="h-[calc(100dvh-64px)] flex flex-col -mx-3 md:-mx-[44px] -my-6 bg-bg overflow-hidden relative border-y border-line">
       <PlayerTopBar 
         course={course}
         currentLesson={currentLesson}

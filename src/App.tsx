@@ -35,6 +35,7 @@ import { SignUp } from './features/auth/SignUp';
 import { AuthLayout } from './features/auth/AuthLayout';
 import { Checkout } from './features/checkout/Checkout';
 import { PublicProfile } from './features/profile/PublicProfile';
+import { DemoCenter } from './features/demo/DemoCenter';
 
 const MainApp: React.FC = () => {
   const { isAuthenticated, isOnboardingCompleted } = useAuth();
@@ -96,6 +97,8 @@ const MainApp: React.FC = () => {
         return <EmailTemplate />;
       case 'notification-test':
         return <NotificationTestPage onNavigate={handleNavigate} />;
+      case 'demo-center':
+        return <DemoCenter onNavigate={handleNavigate} />;
       case 'profile':
         return <PublicProfile onNavigate={handleNavigate} />;
       case 'help-center':

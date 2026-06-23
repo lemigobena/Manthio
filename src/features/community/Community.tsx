@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FORUM_CHANNELS, COURSES } from '../../services/mockData';
 import { useXP } from '../../context/XPContext';
 import { useAuth } from '../../context/AuthContext';
-import { MessageSquare, ArrowUp, Check, Sparkles, Send, Hash, X, MessageCircle, ChevronRight, PanelLeft, Code, Image as ImageIcon, ArrowLeft } from 'lucide-react';
+import { MessageSquare, ArrowUp, Check, Sparkles, Send, Hash, X, MessageCircle, ChevronRight, PanelLeft, Code, Image as ImageIcon, ArrowLeft, Bell, BellOff } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { ForumChannel, ChannelMessage, ForumReply } from '../../types';
@@ -22,6 +22,7 @@ export const Community: React.FC<CommunityProps> = () => {
   const [channels, setChannels] = useState<ForumChannel[]>(FORUM_CHANNELS);
   const [activeChannelId, setActiveChannelId] = useState<string>('general');
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
+  const [mutedChannels, setMutedChannels] = useState<Set<string>>(new Set());
   
   const [newThreadTitle, setNewThreadTitle] = useState('');
   const [newThreadBody, setNewThreadBody] = useState('');
@@ -39,8 +40,8 @@ export const Community: React.FC<CommunityProps> = () => {
   const threadEndRef = useRef<HTMLDivElement>(null);
   const feedScrollRef = useRef<HTMLDivElement>(null);
   const threadScrollRef = useRef<HTMLDivElement>(null);
-  const prevChannelIdRef = useRef(activeChannelId);
-  const prevThreadIdRef = useRef(activeThreadId);
+  const prevChannelIdRef = useRef<string | null>(null);
+  const prevThreadIdRef = useRef<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const replyFileInputRef = useRef<HTMLInputElement>(null);
@@ -289,6 +290,17 @@ export const Community: React.FC<CommunityProps> = () => {
     addToast('success', 'Answer accepted! +15 XP');
   };
 
+  const toggleMuteChannel = (channelId: string) => {
+    setMutedChannels(prev => {
+      const next = new Set(prev);
+      if (next.has(channelId)) next.delete(channelId);
+      else next.add(channelId);
+      return next;
+    });
+    const isMuted = !mutedChannels.has(channelId);
+    addToast('info', isMuted ? `Muted notifications for #${activeChannel?.name}` : `Unmuted notifications for #${activeChannel?.name}`);
+  };
+
   return (
     <div className="relative flex h-[calc(100dvh-64px)] -mx-3 md:-mx-[44px] -my-6 border-y border-line overflow-hidden bg-bg">
       {/* 1. Sidebar (Channels) */}
@@ -343,13 +355,29 @@ export const Community: React.FC<CommunityProps> = () => {
               <span>{activeChannel?.name}</span>
             </div>
           </div>
-          <div className="text-xs text-muted max-w-[200px] sm:max-w-xs truncate hidden sm:block">
-            {activeChannel?.description}
+          <div className="flex items-center space-x-4">
+            <div className="text-xs text-muted max-w-[200px] sm:max-w-xs truncate hidden sm:block">
+              {activeChannel?.description}
+            </div>
+            {activeChannel && (
+              <button
+                onClick={() => toggleMuteChannel(activeChannel.id)}
+                className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors border ${
+                  mutedChannels.has(activeChannel.id)
+                    ? 'bg-red/10 text-red border-red/20 hover:bg-red/20'
+                    : 'bg-bg text-muted border-line hover:border-cyan/40 hover:text-cyan'
+                }`}
+                title={mutedChannels.has(activeChannel.id) ? "Unmute channel" : "Mute channel notifications"}
+              >
+                {mutedChannels.has(activeChannel.id) ? <BellOff size={14} /> : <Bell size={14} />}
+                <span className="hidden sm:inline">{mutedChannels.has(activeChannel.id) ? 'Muted' : 'Mute'}</span>
+              </button>
+            )}
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 space-y-6" ref={feedScrollRef}>
           {activeChannel?.messages.map(msg => (
             <div key={msg.id} className="flex space-x-3 group">
               <div className="w-10 h-10 rounded-xl bg-purple/20 flex items-center justify-center shrink-0 text-purple font-bold">
