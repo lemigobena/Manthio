@@ -165,7 +165,7 @@ export const InteractiveVideo: React.FC<InteractiveVideoProps> = ({ data, onComp
   return (
     <div 
       ref={containerRef}
-      className="relative w-full h-full sm:h-[400px] md:h-[500px] flex flex-col bg-black rounded-xl overflow-hidden shadow-2xl group"
+      className="relative w-full min-h-[350px] sm:h-[400px] md:h-[500px] flex flex-col bg-black rounded-xl overflow-hidden shadow-2xl group"
       onMouseMove={handleInteract}
       onMouseLeave={() => isPlaying && setShowControls(false)}
     >
@@ -191,7 +191,7 @@ export const InteractiveVideo: React.FC<InteractiveVideoProps> = ({ data, onComp
         {/* Interaction Overlay */}
         {showInteraction !== null && (
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-30 animate-fade-in">
-            <div className="bg-bg border border-line rounded-xl p-6 max-w-md w-full shadow-2xl pointer-events-auto">
+            <div className="bg-bg border border-line rounded-xl p-4 sm:p-6 max-w-md w-full shadow-2xl pointer-events-auto max-h-full overflow-y-auto">
               <h3 className="text-lg font-bold mb-4">{data.interactions[showInteraction].question}</h3>
               
               <div className="space-y-3">
