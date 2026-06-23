@@ -145,10 +145,137 @@ export const COURSES: Course[] = [
               ]
             }
           },
-          { id: 'py-les-1-5', title: 'Interactive Flow Quiz', type: 'H5P', duration: '15min', status: 'completed', required: true, bloomLevel: 'Apply' },
+          { 
+            id: 'py-les-1-5', 
+            title: 'Interactive Flow Quiz', 
+            type: 'H5P', 
+            duration: '15min', 
+            status: 'completed', 
+            required: true, 
+            bloomLevel: 'Apply',
+            h5pData: {
+              type: 'Composite',
+              composite: {
+                items: [
+                  {
+                    type: 'InteractiveVideo',
+                    interactiveVideo: {
+                      videoUrl: 'https://media.w3.org/2010/05/sintel/trailer.mp4',
+                      interactions: [
+                        { time: 15, type: 'multiple-choice', question: 'What is the girl looking for?', options: ['A dragon', 'A sword', 'A boy'], correctAnswerIndex: 0, pauseVideo: true },
+                        { time: 30, type: 'multiple-choice', question: 'Who is the girl speaking to?', options: ['A shaman', 'A guard', 'A merchant'], correctAnswerIndex: 0, pauseVideo: true },
+                        { time: 45, type: 'multiple-choice', question: 'What weapon is the girl holding?', options: ['A bow', 'A spear', 'A staff'], correctAnswerIndex: 1, pauseVideo: true }
+                      ]
+                    }
+                  },
+                  {
+                    type: 'BranchingScenario',
+                    branchingScenario: {
+                      startNodeId: 'node1',
+                      nodes: [
+                        { id: 'node1', title: 'Debugging KeyError', content: 'You see a KeyError when accessing a dict. What do you do?', choices: [{ text: 'Use dict.get()', nextId: 'node2' }, { text: 'Ignore it', nextId: 'node3' }] },
+                        { id: 'node2', title: 'Safe Access', content: 'You used dict.get(), but it returned None. Now what?', choices: [{ text: 'Provide a default value', nextId: 'node4' }, { text: 'Raise another error', nextId: 'node3' }] },
+                        { id: 'node3', title: 'Fail', content: 'The program crashes.', choices: [] },
+                        { id: 'node4', title: 'Success', content: 'Your code is robust!', choices: [] }
+                      ]
+                    }
+                  },
+                  {
+                    type: 'DragAndDrop',
+                    dragAndDrop: {
+                      backgroundImageUrl: 'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?w=800&auto=format&fit=crop&q=60',
+                      dropZones: [{ id: 'z1', label: 'List', acceptsIds: ['d1'] }, { id: 'z2', label: 'Tuple', acceptsIds: ['d2'] }, { id: 'z3', label: 'Set', acceptsIds: ['d3'] }],
+                      draggableItems: [{ id: 'd1', label: 'List', type: 'text', content: '[1, 2, 3]' }, { id: 'd2', label: 'Tuple', type: 'text', content: '(1, 2, 3)' }, { id: 'd3', label: 'Set', type: 'text', content: '{1, 2, 3}' }]
+                    }
+                  },
+                  {
+                    type: 'FillInTheBlanks',
+                    fillInTheBlanks: {
+                      text: 'To define a function, use __BLANK__. To return a value, use __BLANK__. To yield a value in a generator, use __BLANK__.',
+                      blanks: [{ correctAnswers: ['def'], hint: 'Short for define' }, { correctAnswers: ['return'], hint: 'Output keyword' }, { correctAnswers: ['yield'], hint: 'Generator keyword' }]
+                    }
+                  },
+                  {
+                    type: 'MarkTheWords',
+                    markTheWords: {
+                      text: 'Lists and dictionaries are mutable, while tuples and strings are immutable.',
+                      correctWordIndices: [0, 2, 6, 8]
+                    }
+                  },
+                  {
+                    type: 'CoursePresentation',
+                    coursePresentation: {
+                      slides: [
+                        { id: 's1', elements: [
+                          { id: 'e1', type: 'text', content: '<h2>Python OOP: Classes</h2><p>Classes encapsulate data and behavior.</p>', x: 10, y: 5, width: 80, height: 20 },
+                          { id: 'img1', type: 'image', content: '/images/oop_classes_diagram_1782205252964.png', x: 10, y: 25, width: 80, height: 70 }
+                        ] },
+                        { id: 's2', elements: [
+                          { id: 'e2', type: 'text', content: '<h2>The __init__ method</h2><p>Initializes a new instance of a class.</p>', x: 10, y: 5, width: 80, height: 20 },
+                          { id: 'img2', type: 'image', content: '/images/init_method_diagram_1782205265997.png', x: 10, y: 25, width: 80, height: 70 }
+                        ] },
+                        { id: 's3', elements: [
+                          { id: 'e3', type: 'text', content: '<h2>Inheritance</h2><p>Child classes inherit from parent classes.</p>', x: 10, y: 5, width: 80, height: 20 },
+                          { id: 'img3', type: 'image', content: '/images/inheritance_diagram_1782205277306.png', x: 10, y: 25, width: 80, height: 70 }
+                        ] }
+                      ]
+                    }
+                  },
+                  {
+                    type: 'Quiz',
+                    quiz: {
+                      questions: [
+                        { id: 'q1', question: 'What does the len() function do?', options: ['Returns memory size', 'Returns the number of items', 'Converts to string'], correctAnswerIndex: 1 },
+                        { id: 'q2', question: 'How do you insert an item at a specific index in a list?', options: ['list.add()', 'list.append()', 'list.insert()'], correctAnswerIndex: 2 },
+                        { id: 'q3', question: 'Which operator is used for exponentiation?', options: ['^', '**', '//'], correctAnswerIndex: 1 }
+                      ]
+                    }
+                  },
+                  {
+                    type: 'Flashcards',
+                    flashcards: {
+                      cards: [
+                        { id: 'f1', front: '__str__', back: 'Returns a human-readable string representation.' },
+                        { id: 'f2', front: '__len__', back: 'Called by the len() built-in function.' },
+                        { id: 'f3', front: '__iter__', back: 'Returns an iterator object.' }
+                      ]
+                    }
+                  },
+                  {
+                    type: 'Timeline',
+                    timeline: {
+                      events: [
+                        { id: 't1', year: '2000', title: 'Python 2.0', description: 'Introduced list comprehensions and garbage collection system.' },
+                        { id: 't2', year: '2008', title: 'Python 3.0', description: 'Major revision focusing on fixing core design flaws (strings are Unicode by default).' },
+                        { id: 't3', year: '2021', title: 'Python 3.10', description: 'Introduced structural pattern matching (match/case statements).' }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          },
           { id: 'py-les-1-6', title: 'Setup Verification', type: 'Assignment', duration: '15min', status: 'in_progress', required: true, bloomLevel: 'Apply' },
           { id: 'py-les-1-7', title: 'Official Docs Link', type: 'External', duration: '5min', status: 'not_started', required: false, bloomLevel: 'Remember' },
-          { id: 'py-les-1-8', title: 'Review Quiz', type: 'Quiz', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' }
+          { 
+            id: 'py-les-1-8', 
+            title: 'Review Quiz', 
+            type: 'H5P', 
+            duration: '10min', 
+            status: 'not_started', 
+            required: true, 
+            bloomLevel: 'Remember',
+            h5pData: {
+              type: 'FillInTheBlanks',
+              fillInTheBlanks: {
+                text: 'To print something to the console in Python, you use the __BLANK__ function. A sequence of characters is called a __BLANK__.',
+                blanks: [
+                  { correctAnswers: ['print', 'print()'], hint: 'Output function' },
+                  { correctAnswers: ['string', 'str'], hint: 'Data type for text' }
+                ]
+              }
+            }
+          }
         ]
       },
       {
@@ -535,8 +662,77 @@ export const COURSES: Course[] = [
         status: 'Open',
         type: 'Self-study',
         lessons: [
-          { id: 'md-les-1-1', title: 'Formatting Text & Lists', type: 'Article', duration: '25min', status: 'not_started', required: true, bloomLevel: 'Remember' },
-          { id: 'md-les-1-2', title: 'Embedding Code and Media', type: 'Article', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Understand' }
+          { 
+            id: 'md-les-1-1', 
+            title: 'Identify Markdown Syntax', 
+            type: 'H5P', 
+            duration: '15min', 
+            status: 'not_started', 
+            required: true, 
+            bloomLevel: 'Remember',
+            h5pData: {
+              type: 'MarkTheWords',
+              markTheWords: {
+                text: 'To create a heading you use the # symbol. For bold text you use ** double asterisks **. For italics you use _ underscores _.',
+                correctWordIndices: [7, 18, 19, 20, 27, 28, 29]
+              }
+            }
+          },
+          { 
+            id: 'md-les-1-2', 
+            title: 'Complete the Markdown', 
+            type: 'H5P', 
+            duration: '20min', 
+            status: 'not_started', 
+            required: true, 
+            bloomLevel: 'Understand',
+            h5pData: {
+              type: 'FillInTheBlanks',
+              fillInTheBlanks: {
+                text: 'To create a hyperlink in Markdown, you wrap the link text in __BLANK__ and the URL in __BLANK__.',
+                blanks: [
+                  { correctAnswers: ['[ ]', 'brackets', 'square brackets'], hint: 'Symbol for text' },
+                  { correctAnswers: ['( )', 'parentheses', 'round brackets'], hint: 'Symbol for URL' }
+                ]
+              }
+            }
+          },
+          {
+            id: 'md-les-1-3',
+            title: 'Markdown Presentation',
+            type: 'H5P',
+            duration: '25min',
+            status: 'not_started',
+            required: true,
+            bloomLevel: 'Understand',
+            h5pData: {
+              type: 'CoursePresentation',
+              coursePresentation: {
+                slides: [
+                  {
+                    id: 'slide-1',
+                    elements: [
+                      { id: 'el-1', type: 'text', content: '<h1 style="font-size:2rem; font-weight:bold; color:#2dd4bf;">Welcome to Markdown</h1>', x: 10, y: 30, width: 80, height: 20 },
+                      { id: 'el-2', type: 'text', content: '<p style="font-size:1.25rem;">Learn how to format text quickly and efficiently.</p>', x: 10, y: 50, width: 80, height: 20 }
+                    ]
+                  },
+                  {
+                    id: 'slide-2',
+                    elements: [
+                      { id: 'el-3', type: 'text', content: '<h2>Images</h2><p>Use ![alt text](url) to embed images.</p>', x: 10, y: 20, width: 80, height: 30 },
+                      { id: 'el-4', type: 'image', content: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=400&q=80', x: 20, y: 50, width: 60, height: 40 }
+                    ]
+                  },
+                  {
+                    id: 'slide-3',
+                    elements: [
+                      { id: 'el-5', type: 'question', content: 'What symbol is used for an unordered list?', x: 20, y: 30, width: 60, height: 40 }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
         ]
       }
     ]
@@ -574,7 +770,32 @@ export const COURSES: Course[] = [
         lessons: [
           { id: 'sql-les-1-1', title: 'Database Fundamentals', type: 'Video', duration: '30min', status: 'completed', required: true, bloomLevel: 'Remember' },
           { id: 'sql-les-1-2', title: 'Defining Schemas & Tables', type: 'Code', duration: '40min', status: 'not_started', required: true, bloomLevel: 'Apply' },
-          { id: 'sql-les-1-3', title: 'Inserting and Selecting Data', type: 'Code', duration: '35min', status: 'not_started', required: true, bloomLevel: 'Apply' }
+          { id: 'sql-les-1-3', title: 'Inserting and Selecting Data', type: 'Code', duration: '35min', status: 'not_started', required: true, bloomLevel: 'Apply' },
+          { 
+            id: 'sql-les-1-4', 
+            title: 'Match Database Terminology', 
+            type: 'H5P', 
+            duration: '10min', 
+            status: 'not_started', 
+            required: true, 
+            bloomLevel: 'Understand',
+            h5pData: {
+              type: 'DragAndDrop',
+              dragAndDrop: {
+                dropZones: [
+                  { id: 'zone-1', label: 'Primary Key', acceptsIds: ['item-1', 'item-4'] },
+                  { id: 'zone-2', label: 'Foreign Key', acceptsIds: ['item-2'] },
+                  { id: 'zone-3', label: 'Index', acceptsIds: ['item-3'] }
+                ],
+                draggableItems: [
+                  { id: 'item-1', label: 'Item 1', type: 'text', content: 'Unique identifier for a row' },
+                  { id: 'item-2', label: 'Item 2', type: 'text', content: 'References a column in another table' },
+                  { id: 'item-3', label: 'Item 3', type: 'text', content: 'Improves query speed' },
+                  { id: 'item-4', label: 'Item 4', type: 'text', content: 'Cannot be NULL' }
+                ]
+              }
+            }
+          }
         ]
       },
       {
@@ -686,7 +907,65 @@ export const COURSES: Course[] = [
         type: 'Self-study',
         lessons: [
           { id: 'ai-les-3-1', title: 'Structuring System Commands', type: 'Article', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
-          { id: 'ai-les-3-2', title: 'Zero vs Few-shot Prompting', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' }
+          { id: 'ai-les-3-2', title: 'Zero vs Few-shot Prompting', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { 
+            id: 'ai-les-3-3', 
+            title: 'AI Ethics Decision Tree', 
+            type: 'H5P', 
+            duration: '20min', 
+            status: 'locked', 
+            required: true, 
+            bloomLevel: 'Apply',
+            h5pData: {
+              type: 'BranchingScenario',
+              branchingScenario: {
+                startNodeId: 'node-1',
+                nodes: [
+                  {
+                    id: 'node-1',
+                    title: 'The Hiring Algorithm',
+                    content: 'Your company wants to deploy an AI model to pre-screen job applicants based on historical hiring data. What is your primary concern?',
+                    mediaUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80',
+                    choices: [
+                      { text: 'Historical bias being replicated by the model', nextId: 'node-2' },
+                      { text: 'The compute cost of running the model', nextId: 'node-3' }
+                    ]
+                  },
+                  {
+                    id: 'node-2',
+                    title: 'Addressing Bias',
+                    content: 'Excellent point. Historical data often contains unconscious human biases. How do you mitigate this?',
+                    choices: [
+                      { text: 'Remove explicit protected attributes (e.g., gender, race)', nextId: 'node-4' },
+                      { text: 'Audit the data for proxy variables and ensure balanced representation', nextId: 'node-5' }
+                    ]
+                  },
+                  {
+                    id: 'node-3',
+                    title: 'Wrong Priority',
+                    content: 'While cost is important, deploying a biased model can lead to severe reputational damage and legal consequences. You need to focus on fairness first.',
+                    choices: [
+                      { text: 'Re-evaluate priorities', nextId: 'node-1' }
+                    ]
+                  },
+                  {
+                    id: 'node-4',
+                    title: 'Proxy Variables Remain',
+                    content: 'Simply removing explicit attributes isn\'t enough. The model might pick up on "proxy" variables like zip code or alma mater that correlate heavily with protected attributes.',
+                    choices: [
+                      { text: 'Audit the data instead', nextId: 'node-5' }
+                    ]
+                  },
+                  {
+                    id: 'node-5',
+                    title: 'Correct Approach',
+                    content: 'You successfully audited the dataset and established fairness constraints during training. The model is now much safer to deploy.',
+                    choices: []
+                  }
+                ]
+              }
+            }
+          }
         ]
       }
     ]

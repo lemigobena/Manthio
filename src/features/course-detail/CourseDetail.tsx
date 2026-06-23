@@ -62,7 +62,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-8 pt-5 pb-12">
       {/* Course Hero Header */}
       <div className="bg-panel border border-line rounded-2xl p-6 relative overflow-hidden flex flex-col md:flex-row gap-6 items-center">
         <div className="w-full md:w-1/3 h-48 bg-bg rounded-xl overflow-hidden border border-line">

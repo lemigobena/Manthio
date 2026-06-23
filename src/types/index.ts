@@ -57,6 +57,121 @@ export interface SandboxData {
   tests: SandboxTest[];
 }
 
+export type H5PType = 'InteractiveVideo' | 'BranchingScenario' | 'DragAndDrop' | 'FillInTheBlanks' | 'MarkTheWords' | 'CoursePresentation' | 'Quiz' | 'Flashcards' | 'Timeline' | 'Composite';
+
+export interface H5PInteractiveVideoData {
+  videoUrl: string;
+  interactions: {
+    time: number;
+    type: 'multiple-choice' | 'true-false';
+    question: string;
+    options: string[];
+    correctAnswerIndex: number;
+    pauseVideo: boolean;
+  }[];
+}
+
+export interface H5PBranchingScenarioNode {
+  id: string;
+  title: string;
+  content: string;
+  mediaUrl?: string;
+  choices: {
+    text: string;
+    nextId: string | null;
+  }[];
+}
+
+export interface H5PDragAndDropData {
+  backgroundImageUrl?: string;
+  dropZones: {
+    id: string;
+    label: string;
+    acceptsIds: string[];
+  }[];
+  draggableItems: {
+    id: string;
+    label: string;
+    type: 'text' | 'image';
+    content: string;
+  }[];
+}
+
+export interface H5PFillInTheBlanksData {
+  text: string; // use __BLANK__ for the blank spaces
+  blanks: {
+    correctAnswers: string[];
+    hint?: string;
+  }[];
+}
+
+export interface H5PMarkTheWordsData {
+  text: string; // The full text
+  correctWordIndices: number[]; // Indices of the words that should be marked
+}
+
+export interface H5PCoursePresentationData {
+  slides: {
+    id: string;
+    elements: {
+      id: string;
+      type: 'text' | 'image' | 'video' | 'question';
+      content: string; // Simplified payload for slide element
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }[];
+  }[];
+}
+
+export interface H5PQuizData {
+  questions: {
+    id: string;
+    question: string;
+    options: string[];
+    correctAnswerIndex: number;
+  }[];
+}
+
+export interface H5PFlashcardsData {
+  cards: {
+    id: string;
+    front: string;
+    back: string;
+  }[];
+}
+
+export interface H5PTimelineData {
+  events: {
+    id: string;
+    year: string;
+    title: string;
+    description: string;
+  }[];
+}
+
+export interface H5PCompositeData {
+  items: H5PData[];
+}
+
+export interface H5PData {
+  type: H5PType;
+  interactiveVideo?: H5PInteractiveVideoData;
+  branchingScenario?: {
+    startNodeId: string;
+    nodes: H5PBranchingScenarioNode[];
+  };
+  dragAndDrop?: H5PDragAndDropData;
+  fillInTheBlanks?: H5PFillInTheBlanksData;
+  markTheWords?: H5PMarkTheWordsData;
+  coursePresentation?: H5PCoursePresentationData;
+  quiz?: H5PQuizData;
+  flashcards?: H5PFlashcardsData;
+  timeline?: H5PTimelineData;
+  composite?: H5PCompositeData;
+}
+
 export interface Lesson {
   id: string;
   title: string;
@@ -71,6 +186,7 @@ export interface Lesson {
   microChunkable?: boolean;
   checkpoints?: number;
   sandboxData?: SandboxData;
+  h5pData?: H5PData;
 }
 
 export interface Module {

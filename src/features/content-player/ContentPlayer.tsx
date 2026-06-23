@@ -65,10 +65,11 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
     }
   }, [hasNext, currentIndex, allLessons]);
 
-  const markLessonComplete = useCallback(() => {
+  const markLessonComplete = useCallback((xpAmount: number = 50) => {
     if (currentLesson.status !== 'completed') {
-      addXp(50, `Lesson "${currentLesson.title}" completed`);
-      addToast('success', '+50 XP — Lesson completed!');
+      // Award specified XP (default 50) per lesson completion
+      addXp(xpAmount, `Lesson "${currentLesson.title}" completed`);
+      addToast('success', `+${xpAmount} XP — Lesson completed!`);
       
       // Update local state to show it's completed (mocking backend)
       setCourse(prev => {
@@ -158,7 +159,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
       case 'Code':
         return <SandboxRenderer lesson={currentLesson} onComplete={markLessonComplete} />;
       case 'H5P':
-        return <H5PRenderer lesson={currentLesson} />;
+        return <H5PRenderer lesson={currentLesson} onComplete={markLessonComplete} />;
       case 'Assignment':
         return <AssignmentRenderer lesson={currentLesson} onComplete={markLessonComplete} />;
       case 'External':
