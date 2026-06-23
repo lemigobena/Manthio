@@ -1,6 +1,10 @@
-import React from 'react';
-import type { Lesson } from '../../../types';
+import React, { useState, useEffect, useRef } from 'react';
+import type { Lesson, SandboxFile } from '../../../types';
 import { useXP } from '../../../context/XPContext';
+import { useModal } from '../../../context/ModalContext';
+import { MonacoEditor } from './components/MonacoEditor';
+import { ExecutionPanel } from './components/ExecutionPanel';
+import { FileCode, TerminalSquare } from 'lucide-react';
 
 interface SandboxRendererProps {
   lesson: Lesson;
@@ -9,27 +13,178 @@ interface SandboxRendererProps {
 
 export const SandboxRenderer: React.FC<SandboxRendererProps> = ({ lesson, onComplete }) => {
   const { addXp } = useXP();
-  const [submitted, setSubmitted] = React.useState(lesson.status === 'completed');
-  const [code, setCode] = React.useState(
-`# Write a function that returns the square of all even numbers
-def get_even_squares(numbers):
-    # TODO: Complete list comprehension
-    return [n**2 for n in numbers if n % 2 == 0]
+  const { openModal } = useModal();
+  const sandboxData = lesson.sandboxData;
+  
+  // States
+  const [submitted, setSubmitted] = useState(lesson.status === 'completed');
+  
+  const [files, setFiles] = useState<SandboxFile[]>(() => {
+    if (!sandboxData) return [];
+    const saved = localStorage.getItem(`sandbox_${lesson.id}`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && Array.isArray(parsed) && parsed.length === sandboxData.files.length) {
+          return parsed;
+        }
+      } catch (e) {
+        console.error("Failed to parse saved sandbox code", e);
+      }
+    }
+    return sandboxData.files;
+  });
+  
+  const [activeFileIndex, setActiveFileIndex] = useState(0);
+  
+  // Execution States
+  const [output, setOutput] = useState<string | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const [activeTab, setActiveTab] = useState<'output' | 'tests'>('output');
+  const [testResults, setTestResults] = useState<{id: string, name: string, passed: boolean, error?: string}[]>([]);
 
-# Test your function
-print(get_even_squares([1, 2, 3, 4, 5, 6]))
-`);
-  const [output, setOutput] = React.useState<string | null>(null);
-  const [isRunning, setIsRunning] = React.useState(false);
+  // Resizing States
+  const [panelSize, setPanelSize] = useState(300);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const startResize = () => {
+    // e.preventDefault() is often problematic on touchstart if not passive, but fine here
+    setIsDragging(true);
+
+    const isColumn = window.innerWidth < 768;
+
+    const handleMove = (clientX: number, clientY: number) => {
+      if (containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        
+        if (isColumn) {
+          const newHeight = containerRect.bottom - clientY;
+          if (newHeight > 150 && newHeight < containerRect.height - 150) {
+            setPanelSize(newHeight);
+          }
+        } else {
+          const newWidth = containerRect.right - clientX;
+          if (newWidth > 250 && newWidth < containerRect.width - 250) {
+            setPanelSize(newWidth);
+          }
+        }
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      e.preventDefault();
+      handleMove(e.clientX, e.clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      // Prevent scrolling while dragging
+      if (e.cancelable) e.preventDefault(); 
+      handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    
+    const handleEnd = () => {
+      setIsDragging(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleEnd);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove, { passive: false });
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleEnd);
+  };
+
+  // Load from LocalStorage if lesson changes
+  useEffect(() => {
+    if (!sandboxData) return;
+    const saved = localStorage.getItem(`sandbox_${lesson.id}`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && Array.isArray(parsed) && parsed.length === sandboxData.files.length) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setFiles(parsed);
+          return;
+        }
+      } catch (e) {
+        console.error("Failed to parse saved sandbox code", e);
+      }
+    }
+    setFiles(sandboxData.files);
+  }, [lesson.id, sandboxData]);
+
+  // Save to LocalStorage
+  const handleCodeChange = (newCode: string | undefined) => {
+    if (newCode === undefined) return;
+    
+    setFiles(prev => {
+      const newFiles = [...prev];
+      newFiles[activeFileIndex] = { ...newFiles[activeFileIndex], code: newCode };
+      localStorage.setItem(`sandbox_${lesson.id}`, JSON.stringify(newFiles));
+      return newFiles;
+    });
+  };
+
+  const handleReset = () => {
+    openModal('confirmation', {
+      title: 'Reset Sandbox',
+      description: 'Are you sure you want to reset all files to their original state? This will erase your code.',
+      props: {
+        confirmText: 'Reset Code',
+        variant: 'danger',
+        onConfirm: () => {
+          if (sandboxData) {
+            setFiles(sandboxData.files);
+            localStorage.removeItem(`sandbox_${lesson.id}`);
+            setOutput(null);
+            setTestResults([]);
+          }
+        }
+      }
+    });
+  };
 
   const handleRun = () => {
-    setIsRunning(true);
-    setOutput("Running tests...");
+    if (!sandboxData) return;
     
+    setIsRunning(true);
+    setActiveTab('output');
+    setOutput("Executing code...\n");
+    setTestResults([]);
+
+    // Simulated execution latency
     setTimeout(() => {
+      // Mock execution results based on whether they modified the default code
+      const currentCode = files[0].code;
+      const hasCorrectImplementation = currentCode.includes('return "Hello, World!"') || currentCode.includes("return 'Hello, World!'");
+      
+      let outText = "Running Python 3.12 (Pyodide)\n";
+      const results = sandboxData.tests.map((test, index) => {
+        const passed = hasCorrectImplementation;
+        let error = undefined;
+        
+        if (index === 0) {
+          if (!passed) error = `AssertionError: assert greet() == "Hello, World!"\nFound: None`;
+        } else {
+          // Test 2 relies on utils.helper which we assume works if the first test does for the sake of simulation
+          if (!passed) error = `ImportError: cannot import name 'custom_greeting' from 'utils.helper'`;
+        }
+        
+        return { id: test.id, name: test.name, passed, error };
+      });
+
+      if (hasCorrectImplementation) {
+        outText += "\n> Hello, World!\n";
+      }
+
+      setTestResults(results);
+      setOutput(outText);
+      setActiveTab('tests');
       setIsRunning(false);
-      setOutput("Running Python 3.12...\n\nOutput:\n[4, 16, 36]\n\n✅ 3/3 test cases passed!");
-    }, 1200);
+    }, 1500);
   };
 
   const handleSubmit = () => {
@@ -40,62 +195,120 @@ print(get_even_squares([1, 2, 3, 4, 5, 6]))
     }
   };
 
+  const activeFile = files[activeFileIndex];
+  const allTestsPassed = testResults.length > 0 && testResults.every(t => t.passed);
+
+  if (!sandboxData || files.length === 0) {
+    return (
+      <div className="w-full h-64 flex items-center justify-center text-muted">
+        No sandbox data available for this lesson.
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col h-[600px] w-full overflow-hidden border border-line rounded-xl">
-      <div className="bg-bg border-b border-line px-4 py-3 flex items-center justify-between text-xs text-muted shrink-0">
-        <span className="font-bold text-text">Python Editor • exercise.py</span>
-        <span className="bg-cyan/15 text-cyan px-2 py-0.5 rounded font-bold uppercase tracking-wider">Sandbox</span>
-      </div>
-
-      {/* Mobile Notice */}
-      <div className="md:hidden bg-orange/10 border-b border-orange/30 px-4 py-2 text-[10px] text-orange flex items-center shrink-0">
-        <span className="font-bold mr-2">Note:</span>
-        We recommend using a tablet or desktop for serious coding exercises.
-      </div>
-      
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Editor */}
-        <textarea 
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          spellCheck={false}
-          className="flex-1 font-mono p-4 text-xs lg:text-sm text-cyan bg-[#0a0d10] outline-none resize-none"
-          style={{ lineHeight: '1.5' }}
-        />
-        
-        {/* Output Console */}
-        <div className="h-48 bg-black border-t border-line flex flex-col shrink-0">
-          <div className="px-4 py-2 border-b border-line/50 bg-[#111] text-[10px] font-bold text-muted uppercase tracking-wider">
-            Console Output
-          </div>
-          <div className="p-4 font-mono text-xs text-green overflow-y-auto whitespace-pre-wrap flex-1">
-            {output || <span className="text-muted/50 italic">Click 'Run Tests' to see output...</span>}
-          </div>
+    <div className="flex flex-col h-[700px] w-full overflow-hidden border border-line rounded-xl bg-bg shadow-xl">
+      {/* Top Header */}
+      <div className="bg-panel border-b border-line px-4 py-3 flex items-center justify-between shrink-0">
+        <div className="flex items-center space-x-2 text-text">
+          <TerminalSquare className="w-5 h-5 text-cyan" />
+          <span className="font-bold tracking-wide">Interactive Sandbox</span>
+          <span className="bg-cyan/10 text-cyan px-2 py-0.5 rounded text-[10px] font-bold uppercase ml-2">
+            {sandboxData.language}
+          </span>
         </div>
-      </div>
-
-      <div className="bg-bg border-t border-line px-4 py-3 flex items-center justify-between shrink-0">
-        <span className={`text-xs font-bold ${output?.includes('passed') ? 'text-green' : 'text-muted'}`}>
-          {output?.includes('passed') ? 'Test passed: 3/3 test cases' : 'Waiting to run...'}
-        </span>
-        <div className="flex space-x-2">
-          <button 
-            onClick={handleRun}
-            disabled={isRunning}
-            className={`bg-panel border border-line text-xs font-semibold px-4 py-2 rounded-xl transition-colors cursor-pointer ${isRunning ? 'opacity-50 cursor-wait' : 'hover:bg-line'}`}
-          >
-            {isRunning ? 'Running...' : 'Run Tests'}
-          </button>
+        <div className="flex items-center space-x-3">
           <button 
             onClick={handleSubmit}
-            disabled={submitted}
-            className={`text-xs font-bold px-4 py-2 rounded-xl transition-colors ${
-              submitted ? 'bg-green/20 text-green border border-green cursor-default' : 'bg-cyan hover:bg-cyan2 text-bg cursor-pointer'
+            disabled={submitted || (!allTestsPassed && !submitted)}
+            className={`text-xs font-bold px-4 py-2 rounded-xl transition-all ${
+              submitted 
+                ? 'bg-green/20 text-green border border-green cursor-default' 
+                : allTestsPassed
+                  ? 'bg-cyan hover:bg-cyan2 text-bg cursor-pointer shadow-lg shadow-cyan/20'
+                  : 'bg-line text-muted cursor-not-allowed opacity-50'
             }`}
           >
-            {submitted ? 'Submitted!' : 'Submit Code (+75 XP)'}
+            {submitted ? 'Submitted!' : 'Submit to AI Tutor (+75 XP)'}
           </button>
         </div>
+      </div>
+
+      {/* Main Split Content */}
+      <div 
+        ref={containerRef}
+        className={`flex-1 flex flex-col md:flex-row overflow-hidden relative ${isDragging ? 'select-none pointer-events-none' : ''}`}
+      >
+        
+        {/* Editor Area */}
+        <div className="flex-1 flex flex-col overflow-hidden min-h-[300px] pointer-events-auto">
+          {/* File Explorer Tabs */}
+          <div className="flex overflow-x-auto border-b border-line bg-bg shrink-0 scrollbar-hide">
+            {files.map((file, index) => (
+              <button
+                key={file.path}
+                onClick={() => setActiveFileIndex(index)}
+                className={`flex items-center space-x-2 px-4 py-2 text-xs font-mono border-r border-line transition-colors ${
+                  activeFileIndex === index 
+                    ? 'bg-panel text-cyan border-b-2 border-b-cyan' 
+                    : 'text-muted hover:text-text hover:bg-panel/50'
+                }`}
+              >
+                <FileCode className="w-3.5 h-3.5" />
+                <span>{file.path}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Monaco Editor */}
+          <div className="flex-1 relative">
+            {activeFile && (
+              <MonacoEditor
+                code={activeFile.code}
+                language={sandboxData.language}
+                onChange={handleCodeChange}
+                path={activeFile.path}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Resizer Handle */}
+        <div 
+          onMouseDown={startResize}
+          onTouchStart={startResize}
+          className="flex md:hidden h-1.5 hover:h-2 w-full bg-line hover:bg-cyan/50 cursor-row-resize z-10 transition-colors shrink-0 pointer-events-auto"
+          title="Drag to resize"
+        />
+        <div 
+          onMouseDown={startResize}
+          onTouchStart={startResize}
+          className="hidden md:flex w-1 hover:w-1.5 h-full bg-line hover:bg-cyan/50 cursor-col-resize z-10 transition-colors shrink-0 pointer-events-auto"
+          title="Drag to resize"
+        />
+
+        {/* Execution & Output Panel */}
+        <div 
+          className="shrink-0 border-t md:border-t-0 md:border-l border-line pointer-events-auto min-h-[150px] md:min-h-0 md:min-w-[300px]"
+          style={{ 
+            '--panel-size': `${panelSize}px`,
+            height: window.innerWidth < 768 ? 'var(--panel-size)' : '100%',
+            width: window.innerWidth < 768 ? '100%' : 'var(--panel-size)'
+          } as React.CSSProperties}
+        >
+          <div className="h-full w-full">
+            <ExecutionPanel
+              output={output}
+              tests={testResults}
+              isRunning={isRunning}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              onRun={handleRun}
+              onReset={handleReset}
+            />
+          </div>
+        </div>
+
       </div>
     </div>
   );

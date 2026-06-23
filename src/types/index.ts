@@ -38,6 +38,25 @@ export interface Trainer {
   website?: string;
 }
 
+export interface SandboxFile {
+  path: string;
+  code: string;
+  hidden?: boolean;
+}
+
+export interface SandboxTest {
+  id: string;
+  name: string;
+  code: string;
+  hidden?: boolean;
+}
+
+export interface SandboxData {
+  language: 'python' | 'javascript' | 'sql';
+  files: SandboxFile[];
+  tests: SandboxTest[];
+}
+
 export interface Lesson {
   id: string;
   title: string;
@@ -51,6 +70,7 @@ export interface Lesson {
   estimatedRemainingTime?: string;
   microChunkable?: boolean;
   checkpoints?: number;
+  sandboxData?: SandboxData;
 }
 
 export interface Module {

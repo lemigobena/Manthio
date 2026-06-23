@@ -45,7 +45,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
   const isTablet = window.innerWidth >= 768 && window.innerWidth < 1200;
   
   const [curriculumOpen, setCurriculumOpen] = useState(!isMobile && !isTablet);
-  const [toolsOpen, setToolsOpen] = useState(!isMobile);
+  const [toolsOpen, setToolsOpen] = useState(false);
 
   // Flatten lessons to find previous/next easily
   const allLessons = course.modules.flatMap(m => m.lessons);
