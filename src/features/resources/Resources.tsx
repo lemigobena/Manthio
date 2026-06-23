@@ -479,87 +479,62 @@ export const Resources: React.FC<ResourcesProps> = () => {
       {/* File Preview Drawer Overlay */}
       {previewFile && (
         <div 
-          className="fixed inset-0 z-[999] flex items-center justify-center bg-bg/90 backdrop-blur-xl p-3 sm:p-6"
+          className="fixed inset-0 z-[999] flex items-center justify-center bg-bg/95 backdrop-blur-2xl p-0 sm:p-4"
           onClick={() => setPreviewFile(null)}
         >
           <div 
-            className={`bg-panel border border-line rounded-2xl w-[95%] sm:w-[90%] md:w-[85%] max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] ${
-              ['video', 'image'].includes(previewFile.type) ? '' : 'min-h-[70vh] md:min-h-[80vh]'
+            className={`bg-panel border border-line rounded-none sm:rounded-2xl w-full sm:w-[95%] md:w-[90%] max-w-6xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] flex flex-col h-full sm:h-[90vh] ${
+              ['video', 'image'].includes(previewFile.type) ? '' : 'min-h-[70vh] md:min-h-[85vh]'
             }`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-bg/30 border-b border-line px-4 sm:px-6 py-4 gap-4 sm:gap-0">
-              <div className="flex items-center space-x-3 min-w-0 w-full">
-                <div className="p-2 bg-panel rounded-xl border border-line">
-                  {getFileIcon(previewFile.type)}
+            {/* Header: Simplified for PDF, Standard for others */}
+            {previewFile.type !== 'pdf' ? (
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-bg/30 border-b border-line px-4 sm:px-6 py-4 gap-4 sm:gap-0">
+                <div className="flex items-center space-x-3 min-w-0 w-full">
+                  <div className="p-2 bg-panel rounded-xl border border-line">
+                    {getFileIcon(previewFile.type)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-bold text-sm text-text leading-tight truncate">{previewFile.name}</h3>
+                    <p className="text-[10px] text-muted uppercase tracking-wider font-bold truncate">
+                      {previewFile.courseName} &middot; {previewFile.size}
+                    </p>
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-bold text-sm text-text leading-tight truncate">{previewFile.name}</h3>
-                  <p className="text-[10px] text-muted uppercase tracking-wider font-bold truncate">
-                    {previewFile.courseName} &middot; {previewFile.size}
-                  </p>
+                <div className="flex items-center space-x-2 shrink-0 self-end sm:self-auto">
+                  <button className="p-2 rounded-xl hover:bg-line/20 text-muted transition-colors"><Bookmark className="w-4 h-4" /></button>
+                  <button className="p-2 rounded-xl hover:bg-line/20 text-muted transition-colors"><Share2 className="w-4 h-4" /></button>
+                  <div className="w-px h-6 bg-line mx-2" />
+                  <button onClick={() => setPreviewFile(null)} className="p-1.5 rounded-xl hover:bg-red/10 text-muted hover:text-red transition-all group"><X className="w-5 h-5 group-hover:scale-110 transition-transform" /></button>
                 </div>
               </div>
-              <div className="flex items-center space-x-2 shrink-0 self-end sm:self-auto">
-                <button 
-                  className="p-2 rounded-xl hover:bg-line/20 text-muted transition-colors"
-                  title="Save to notes"
+            ) : (
+              <div className="absolute top-4 right-4 z-[60] flex items-center space-x-2">
+                 <button 
+                  onClick={() => setPreviewFile(null)} 
+                  className="p-2 bg-black/50 backdrop-blur rounded-xl text-white hover:bg-red/80 transition-all shadow-xl"
+                  title="Exit Preview"
                 >
-                  <Bookmark className="w-4 h-4" />
-                </button>
-                <button 
-                  className="p-2 rounded-xl hover:bg-line/20 text-muted transition-colors"
-                  title="Share"
-                >
-                  <Share2 className="w-4 h-4" />
-                </button>
-                <div className="w-px h-6 bg-line mx-2" />
-                <button 
-                  onClick={() => setPreviewFile(null)}
-                  className="p-1.5 rounded-xl hover:bg-red/10 text-muted hover:text-red transition-all group"
-                  title="Close Preview"
-                >
-                  <X className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-            </div>
+            )}
             
-            <div className="flex-1 bg-bg/50 p-2 sm:p-4 md:p-6 overflow-hidden flex flex-col">
-              <div className="w-full flex-1 flex flex-col overflow-hidden rounded-xl border border-line shadow-inner">
+            <div className={`flex-1 overflow-hidden flex flex-col ${previewFile.type === 'pdf' ? 'p-0' : 'bg-bg/50 p-2 sm:p-4 md:p-6'}`}>
+              <div className={`w-full flex-1 flex flex-col overflow-hidden rounded-none ${previewFile.type === 'pdf' ? '' : 'rounded-xl border border-line shadow-inner'}`}>
                 {previewFile.type === 'video' && previewFile.url ? (
                   <div className="flex-1 w-full flex items-center justify-center bg-black/5 rounded-xl overflow-hidden min-h-0">
-                    <video 
-                      src={previewFile.url} 
-                      controls 
-                      className="w-full h-auto max-h-full object-contain outline-none rounded-xl"
-                    />
-                  </div>
-                ) : previewFile.type === 'video' ? (
-                  <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4 bg-panel">
-                    <div className="w-20 h-20 rounded-full bg-cyan/10 flex items-center justify-center text-cyan group-hover:scale-110 transition-transform cursor-pointer">
-                      <Video className="w-10 h-10 ml-1" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="font-bold text-text">Internal Video Player</p>
-                      <p className="text-xs text-muted">No video source available.</p>
-                    </div>
+                    <video src={previewFile.url} controls className="w-full h-auto max-h-full object-contain outline-none rounded-xl" />
                   </div>
                 ) : previewFile.type === 'pdf' ? (
-                  <div className="w-full flex-1 flex flex-col overflow-y-auto items-center min-h-0 overflow-hidden">
+                  <div className="w-full h-full flex flex-col items-center min-h-0 overflow-hidden">
                     <PdfRenderer lesson={{ title: previewFile.name, type: 'PDF', id: previewFile.id, contentUrl: previewFile.url } as Lesson} />
                   </div>
                 ) : previewFile.type === 'office' ? (
                   <DocxRenderer lesson={{ title: previewFile.name, contentUrl: previewFile.url || '' }} />
                 ) : (previewFile.type === 'code' || previewFile.type === 'notebook') && (fetchedContent || previewFile.realContent) ? (
-                  <CodeRenderer 
-                    fileName={previewFile.name} 
-                    content={fetchedContent || previewFile.realContent || ''} 
-                  />
-                ) : fetchedContent || previewFile.realContent ? (
-                  <CodeRenderer 
-                    fileName={previewFile.name} 
-                    content={fetchedContent || previewFile.realContent || ''} 
-                  />
+                  <CodeRenderer fileName={previewFile.name} content={fetchedContent || previewFile.realContent || ''} />
                 ) : previewFile.type === 'image' && previewFile.url ? (
                   <div className="flex-1 w-full flex items-center justify-center p-4 bg-panel min-h-0">
                     <img src={previewFile.url} alt={previewFile.name} className="max-w-full max-h-full object-contain rounded-lg shadow-lg" />
@@ -568,7 +543,7 @@ export const Resources: React.FC<ResourcesProps> = () => {
                   <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4 bg-panel">
                     <FolderOpen className="w-20 h-20 text-muted/40" />
                     <div className="space-y-1">
-                      <p className="font-bold text-text">Generic Preview Handler</p>
+                      <p className="font-bold text-text">Preview Unvailable</p>
                       <p className="text-xs text-muted">Optimizing display for {previewFile.type} format...</p>
                     </div>
                   </div>
@@ -576,27 +551,22 @@ export const Resources: React.FC<ResourcesProps> = () => {
               </div>
             </div>
 
-            <div className="bg-bg/30 border-t border-line p-4 md:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0">
-              <div className="flex items-center space-x-2 text-muted text-[10px] font-medium">
-                <AlertCircle className="w-3.5 h-3.5" />
-                <span>Confidential Material &middot; Strictly Controlled Access</span>
+            {/* Footer: Hidden for PDF, Standard for others */}
+            {previewFile.type !== 'pdf' && (
+              <div className="bg-bg/30 border-t border-line p-4 md:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0">
+                <div className="flex items-center space-x-2 text-muted text-[10px] font-medium">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  <span>Confidential Material &middot; Strictly Controlled Access</span>
+                </div>
+                <div className="flex space-x-3">
+                  <button onClick={() => setPreviewFile(null)} className="bg-panel hover:bg-line border border-line text-xs font-bold px-6 py-2.5 rounded-xl text-text transition-colors">Cancel</button>
+                  <button onClick={() => setPreviewFile(null)} className="bg-cyan hover:bg-cyan2 text-bg text-xs font-extrabold px-8 py-2.5 rounded-xl transition-all shadow-lg shadow-cyan/10 cursor-pointer flex items-center space-x-2">
+                    <ArrowDownToLine className="w-4 h-4" />
+                    <span>Download File</span>
+                  </button>
+                </div>
               </div>
-              <div className="flex space-x-3">
-                <button 
-                  onClick={() => setPreviewFile(null)}
-                  className="bg-panel hover:bg-line border border-line text-xs font-bold px-6 py-2.5 rounded-xl text-text transition-colors"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={() => setPreviewFile(null)}
-                  className="bg-cyan hover:bg-cyan2 text-bg text-xs font-extrabold px-8 py-2.5 rounded-xl transition-all shadow-lg shadow-cyan/10 cursor-pointer flex items-center space-x-2"
-                >
-                  <ArrowDownToLine className="w-4 h-4" />
-                  <span>Download File</span>
-                </button>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       )}
