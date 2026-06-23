@@ -197,7 +197,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
     if (step === 0) {
       const timer = setTimeout(() => {
         setIsSlammed(true);
-      }, 4500);
+      }, 2200);
       return () => clearTimeout(timer);
     }
   }, [step]);
@@ -385,10 +385,10 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
       )}
 
       {/* Main Form Container with Glassmorphism / Shadow Panel */}
-      <div className={`relative overflow-hidden ${step === 1 ? 'py-2' : 'bg-panel border border-line rounded-3xl p-5 md:p-6 shadow-2xl'}`}>
+      <div className={`relative overflow-hidden ${step === 0 ? '' : step === 1 ? 'py-2' : 'bg-panel border border-line rounded-3xl p-5 md:p-6 shadow-2xl'}`}>
         
         {step === 0 && (
-          <div className="relative min-h-[50vh] md:min-h-[500px] flex flex-col items-center justify-center py-4 space-y-4 overflow-hidden">
+          <div className="relative h-[calc(100vh-2rem)] flex flex-col items-center justify-between py-4 overflow-hidden">
             {/* Floating Theme Toggle in Top Right of Step 0 Splash Screen */}
             <div className="absolute top-4 right-4 z-50">
               <button 
@@ -410,11 +410,11 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                 onMouseLeave={handleMouseLeave}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleMouseLeave}
-                className="relative w-full max-w-2xl flex-1 flex items-center justify-center cursor-grab active:cursor-grabbing preserve-3d py-4 select-none"
+                className="relative w-full max-w-5xl flex-1 flex items-center justify-center cursor-grab active:cursor-grabbing preserve-3d py-8 select-none"
                 style={{ perspective: '1200px' }}
               >
                 <div 
-                  className={`relative w-[380px] md:w-[480px] h-[260px] md:h-[320px] preserve-3d ${isSlammed && !isHovered ? 'animate-3d-idle' : ''}`}
+                  className={`relative w-[480px] md:w-[640px] lg:w-[800px] h-[320px] md:h-[420px] lg:h-[540px] preserve-3d ${isSlammed && !isHovered ? 'animate-3d-idle' : ''}`}
                   style={isHovered ? { transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) rotateZ(0deg)`, transition: 'transform 0.1s ease-out' } : {}}
                 >
                   <style>{`
@@ -439,29 +439,27 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                     }
                     @keyframes logoSlam {
                       0% {
-                        transform: translateZ(700px) rotateX(-540deg) rotateY(45deg) scale(0.15);
+                        transform: translateZ(1200px) rotateX(-720deg) rotateY(90deg) scale(0.1);
                         opacity: 0;
+                        filter: blur(10px);
                       }
-                      40% {
-                        transform: translateZ(180px) rotateX(20deg) rotateY(-15deg) scale(1.3);
+                      50% {
+                        transform: translateZ(250px) rotateX(25deg) rotateY(-20deg) scale(1.35);
                         opacity: 1;
+                        filter: blur(0px);
                       }
-                      65% {
-                        transform: translateZ(-150px) rotateX(-10deg) rotateY(10deg) scale(0.9);
-                        opacity: 1;
-                      }
-                      85% {
-                        transform: translateZ(40px) rotateX(5deg) rotateY(-5deg) scale(1.05);
+                      75% {
+                        transform: translateZ(-80px) rotateX(-12deg) rotateY(15deg) scale(0.95);
                         opacity: 1;
                       }
                       100% {
-                        transform: translateZ(0px) rotateX(0deg) rotateY(0deg) scale(1);
+                        transform: translateZ(0px) rotateX(8deg) rotateY(-18deg) scale(1);
                         opacity: 1;
                       }
                     }
-                    .anim-logo-slam { animation: logoSlam 4.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
-                    .anim-button-entrance { animation: buttonEntrance 1s ease-out 4.5s both; }
-                    .anim-skip-entrance { animation: buttonEntrance 1s ease-out 4.8s both; }
+                    .anim-logo-slam { animation: logoSlam 2.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+                    .anim-button-entrance { animation: buttonEntrance 0.8s cubic-bezier(0.25, 1, 0.5, 1) 1.8s both; }
+                    .anim-skip-entrance { animation: buttonEntrance 0.8s cubic-bezier(0.25, 1, 0.5, 1) 2.1s both; }
                     .animate-3d-idle { animation: floatRotate3D 8s ease-in-out infinite; }
                     .preserve-3d { transform-style: preserve-3d; }
                     .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
@@ -472,7 +470,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
                 {/* Floor Shadow */}
                 <div 
-                  className="absolute -bottom-16 left-1/2 -translate-x-1/2 w-72 md:w-96 h-10 bg-black/20 dark:bg-black/50 rounded-full blur-xl pointer-events-none"
+                  className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-96 md:w-[500px] h-12 bg-black/20 dark:bg-black/50 rounded-full blur-2xl pointer-events-none"
                   style={{
                     transform: 'rotateX(90deg) translateZ(-200px)',
                     transformStyle: 'preserve-3d'
@@ -529,7 +527,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
             </div>
 
             {/* Subtitle and Controls Group */}
-            <div className="w-full flex flex-col items-center space-y-4 relative z-20">
+            <div className="w-full flex flex-col items-center space-y-6 relative z-20 pb-8">
               <p className="text-muted text-sm md:text-base lg:text-lg font-bold tracking-[0.25em] uppercase max-w-lg anim-button-entrance text-center">
                 Interactive Peer-to-Peer Study Hub
               </p>
