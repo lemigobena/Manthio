@@ -6,6 +6,7 @@ import { useModal } from '../../context/ModalContext';
 import { 
   Play,
   Award,
+  Bell,
   BookOpen,
   Sparkles,
   AlertCircle, 
@@ -812,9 +813,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-      {/* Modal System Showcase */}
-      <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
-        <div className="flex items-center space-x-2">
+          {/* Notification Test Lab Link */}
+          <button
+            onClick={() => onNavigate('notification-test')}
+            className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-bg hover:bg-panel border border-line hover:border-cyan/40 rounded-xl transition-all cursor-pointer group"
+          >
+            <div className="flex items-center gap-3">
+              <Bell className="w-4 h-4 text-cyan" />
+              <div className="text-left">
+                <span className="text-sm font-bold text-text group-hover:text-cyan transition-colors">Notification Test Lab</span>
+                <span className="block text-[11px] text-muted">Fire, inspect and customize all notification types in real-time</span>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-muted group-hover:text-cyan group-hover:translate-x-0.5 transition-all shrink-0" />
+          </button>
+
+          {/* Modal System Showcase */}
+          <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
+            <div className="flex items-center space-x-2">
           <Sparkles className="w-5 h-5 text-cyan" />
           <h2 className="text-xl font-bold font-display">Modal System Showcase</h2>
         </div>
