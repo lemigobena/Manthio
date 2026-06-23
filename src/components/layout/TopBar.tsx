@@ -10,12 +10,15 @@ interface TopBarProps {
   onNavigate: (page: string) => void;
   isMobileOpen: boolean;
   setIsMobileOpen: (open: boolean) => void;
+  activePage?: string;
+  isPublicView?: boolean;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({ 
   onNavigate,
   isMobileOpen,
-  setIsMobileOpen
+  setIsMobileOpen,
+  isPublicView
 }) => {
   const { user, signOut } = useAuth();
   const { streak } = useXP();
@@ -94,6 +97,29 @@ export const TopBar: React.FC<TopBarProps> = ({
   };
 
   const recentNotifications = notifications.slice(0, 20);
+
+  if (isPublicView) {
+    return (
+      <div className="bg-panel border-b border-line h-16 px-3 md:px-6 lg:px-8 shrink-0 relative z-[60]">
+        <div className="max-w-[1400px] mx-auto h-full flex items-center justify-between w-full">
+          <img 
+            src="/Branding/primary/logo_7_prio_1_variation.png" 
+            alt="Manthio Logo" 
+            className={`h-30 -ml-[45px] cursor-pointer object-left object-contain ${theme === 'dark' ? 'brightness-0 invert' : ''}`}
+            onClick={() => onNavigate('explore')}
+          />
+          <div className="flex items-center gap-3">
+            <button onClick={toggleTheme} className="p-2 rounded-xl text-muted hover:text-text hover:bg-bg/50 transition-colors">
+              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <button onClick={() => { signOut(); onNavigate('signin'); }} className="bg-cyan hover:bg-cyan2 text-bg text-sm font-bold px-4 py-2 rounded-xl transition-colors">
+              Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-panel border-b border-line h-16 px-3 md:px-6 lg:px-8 shrink-0 relative z-[60]">

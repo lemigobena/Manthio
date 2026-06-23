@@ -6,9 +6,10 @@ import type { Review } from '../../types';
 
 interface CourseDetailProps {
   onNavigate: (page: string) => void;
+  isPublic?: boolean;
 }
 
-export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
+export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic }) => {
   const { activeCourseId, activeTrackId, selectedFormat, setSelectedFormat, setActiveCourseId, setActiveTrackId } = useAuth();
   
   // Decide what to show: Track or Course
@@ -48,6 +49,10 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
 
   const handleEnroll = () => {
     console.log("Navigating to checkout for:", track ? track.id : course!.id);
+    if (isPublic) {
+      onNavigate('signin');
+      return;
+    }
     if (!enrolled) {
       onNavigate('checkout');
     }
@@ -133,7 +138,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
                 }}
                 className="bg-cyan hover:bg-cyan/90 text-bg font-black px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(45,212,191,0.2)] hover:translate-y-[-2px] cursor-pointer w-full sm:w-auto text-center uppercase tracking-wider text-xs"
               >
-                {track ? 'Resume Path' : 'Continue Learning'}
+                {track ? 'Resume Path' : 'Enroll Now'}
               </button>
             ) : (
               <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
@@ -746,7 +751,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate }) => {
                     onClick={handleEnroll}
                     className="w-full bg-cyan hover:bg-cyan/90 text-bg font-black py-4 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] uppercase tracking-widest text-[10px] cursor-pointer"
                   >
-                    {activeCohort && activeCohort.currentParticipants < activeCohort.minParticipants ? 'Reserve Your Seat' : 'Confirm Booking'}
+                    {isPublic ? 'Login to get the course' : (activeCohort && activeCohort.currentParticipants < activeCohort.minParticipants ? 'Reserve Your Seat' : 'Confirm Booking')}
                   </button>
                   <button className="w-full text-[9px] font-black text-cyan hover:text-cyan/80 transition-colors uppercase tracking-widest pt-1 opacity-70">
                     Team / Corporate Purchase?

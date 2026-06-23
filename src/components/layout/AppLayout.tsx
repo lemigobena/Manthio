@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { Footer } from './Footer';
+import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { useNotifications } from '../../context/NotificationContext';
 import type { LiveNotificationToast } from '../../context/NotificationContext';
@@ -191,18 +192,23 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { toasts, removeToast, celebrationActive, dismissCelebration, levelUpTo } = useXP();
   const { liveToasts, dismissLiveToast, markAsRead } = useNotifications();
+  const { isAuthenticated } = useAuth();
+  
+  const isPublicView = activePage === 'explore' || (!isAuthenticated && activePage === 'course-detail');
   
   return (
     <div className="flex h-[100dvh] overflow-hidden bg-bg text-text">
       {/* Sidebar Navigation */}
-      <Sidebar 
-        activePage={activePage} 
-        onNavigate={onNavigate} 
-        collapsed={sidebarCollapsed} 
-        setCollapsed={setSidebarCollapsed} 
-        isMobileOpen={isMobileOpen}
-        setIsMobileOpen={setIsMobileOpen}
-      />
+      {!isPublicView && (
+        <Sidebar 
+          activePage={activePage} 
+          onNavigate={onNavigate} 
+          collapsed={sidebarCollapsed} 
+          setCollapsed={setSidebarCollapsed} 
+          isMobileOpen={isMobileOpen}
+          setIsMobileOpen={setIsMobileOpen}
+        />
+      )}
 
       {/* Main View Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -211,6 +217,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           onNavigate={onNavigate} 
           isMobileOpen={isMobileOpen}
           setIsMobileOpen={setIsMobileOpen}
+          activePage={activePage}
+          isPublicView={isPublicView}
         />
 
         {/* Content View Body */}

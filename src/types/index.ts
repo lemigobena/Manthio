@@ -277,6 +277,7 @@ export interface UserProfile {
   name: string;
   email: string;
   avatar: string;
+  backgroundImage?: string;
   bio: string;
   level: number;
   xp: number;
