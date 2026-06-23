@@ -360,3 +360,19 @@ export interface Review {
   isVerified: boolean;
   helpfulCount: number;
 }
+
+export interface Note {
+  id: string;
+  userId: string;
+  title: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface TutorConversation {
+  id: string;
+  userId: string;
+  title: string;
+  preview: string;
+  createdAt: string;
+}

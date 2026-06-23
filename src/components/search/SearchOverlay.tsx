@@ -3,9 +3,10 @@ import {
   Search, X, BookOpen, Clock, FileText, MessageSquare, 
   Trash2, Video, Code, Award, CheckCircle, HelpCircle as QuestionIcon
 } from 'lucide-react';
-import { COURSES, RESOURCES, FORUM_CHANNELS } from '../../services/mockData';
+import { COURSES, RESOURCES, FORUM_CHANNELS, MOCK_NOTES, MOCK_TUTOR_CONVERSATIONS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import type { Lesson } from '../../types';
+import Fuse from 'fuse.js';
 
 interface SearchOverlayProps {
   isOpen: boolean;
@@ -38,13 +39,16 @@ type FlatResultItem =
   | { type: 'course'; id: string; title: string; courseId: string; enrolled: boolean; data: typeof COURSES[0] }
   | { type: 'lesson'; id: string; title: string; courseId: string; data: FlattenedLesson }
   | { type: 'resource'; id: string; title: string; data: typeof RESOURCES[0] }
-  | { type: 'thread'; id: string; title: string; data: typeof FORUM_CHANNELS[0]['messages'][0] };
+  | { type: 'thread'; id: string; title: string; data: typeof FORUM_CHANNELS[0]['messages'][0] }
+  | { type: 'note'; id: string; title: string; data: typeof MOCK_NOTES[0] }
+  | { type: 'tutor'; id: string; title: string; data: typeof MOCK_TUTOR_CONVERSATIONS[0] };
 
 const allMessages = FORUM_CHANNELS.flatMap(ch => ch.messages);
 
 export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, onNavigate, coords }) => {
-  const { setActiveCourseId } = useAuth();
+  const { setActiveCourseId, user } = useAuth();
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsContainerRef = useRef<HTMLDivElement>(null);
@@ -62,6 +66,14 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
     }
     return ["Python basics", "React hooks", "Docker compose", "SQL joins"];
   });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query);
+      setSelectedIndex(0);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   const popularTopics = ["Python", "React", "Docker", "SQL", "Git", "FastAPI"];
 
@@ -111,39 +123,41 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
 
   // Search logic: token-based matching across categories
   const getFilteredResults = () => {
-    if (!query.trim()) return null;
+    if (!debouncedQuery.trim()) return null;
 
-    const terms = query.toLowerCase().trim().split(/\s+/);
-
-    const matchesTerms = (fields: (string | undefined)[]) => {
-      return terms.every(term => 
-        fields.some(field => field?.toLowerCase().includes(term))
-      );
+    const fuseOptions = {
+      includeScore: true,
+      threshold: 0.4, // Allows some typos
+      ignoreLocation: true
     };
 
-    const matchedCourses = COURSES.filter(course => 
-      matchesTerms([course.title, course.description, course.level, course.format, ... (course.learningOutcomes || [])])
-    ).slice(0, 4);
+    const courseFuse = new Fuse(COURSES, { ...fuseOptions, keys: ['title', 'description', 'level', 'format', 'learningOutcomes'] });
+    const lessonFuse = new Fuse(allLessons, { ...fuseOptions, keys: ['title', 'courseTitle', 'moduleTitle'] });
+    const resourceFuse = new Fuse(RESOURCES, { ...fuseOptions, keys: ['name', 'courseName', 'type'] });
+    const threadFuse = new Fuse(allMessages, { ...fuseOptions, keys: ['title', 'body', 'category', 'moduleName'] });
 
-    const matchedLessons = allLessons.filter(lesson => 
-      matchesTerms([lesson.title, lesson.courseTitle, lesson.moduleTitle])
-    ).slice(0, 4);
+    // Personal entities
+    const userNotes = MOCK_NOTES.filter(n => user && n.userId === 'u1');
+    const userTutor = MOCK_TUTOR_CONVERSATIONS.filter(t => user && t.userId === 'u1');
+    const noteFuse = new Fuse(userNotes, { ...fuseOptions, keys: ['title', 'content'] });
+    const tutorFuse = new Fuse(userTutor, { ...fuseOptions, keys: ['title', 'preview'] });
 
-    const matchedResources = RESOURCES.filter(res => 
-      matchesTerms([res.name, res.courseName, res.type])
-    ).slice(0, 4);
+    const matchedCourses = courseFuse.search(debouncedQuery).map(res => res.item).slice(0, 4);
+    const matchedLessons = lessonFuse.search(debouncedQuery).map(res => res.item).slice(0, 4);
+    const matchedResources = resourceFuse.search(debouncedQuery).map(res => res.item).slice(0, 4);
+    const matchedThreads = threadFuse.search(debouncedQuery).map(res => res.item).slice(0, 4);
+    const matchedNotes = noteFuse.search(debouncedQuery).map(res => res.item).slice(0, 4);
+    const matchedTutor = tutorFuse.search(debouncedQuery).map(res => res.item).slice(0, 4);
 
-    const matchedThreads = allMessages.filter(thread => 
-      matchesTerms([thread.title, thread.body, thread.category, thread.moduleName])
-    ).slice(0, 4);
-
-    const totalCount = matchedCourses.length + matchedLessons.length + matchedResources.length + matchedThreads.length;
+    const totalCount = matchedCourses.length + matchedLessons.length + matchedResources.length + matchedThreads.length + matchedNotes.length + matchedTutor.length;
 
     return {
       courses: matchedCourses,
       lessons: matchedLessons,
       resources: matchedResources,
       threads: matchedThreads,
+      notes: matchedNotes,
+      tutor: matchedTutor,
       totalCount
     };
   };
@@ -156,6 +170,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
     results.lessons.forEach(l => flatResults.push({ type: 'lesson', id: `l-${l.id}`, title: l.title, courseId: l.courseId, data: l }));
     results.resources.forEach(r => flatResults.push({ type: 'resource', id: `r-${r.id}`, title: r.name, data: r }));
     results.threads.forEach(t => flatResults.push({ type: 'thread', id: `t-${t.id}`, title: t.title, data: t }));
+    results.notes.forEach(n => flatResults.push({ type: 'note', id: `n-${n.id}`, title: n.title, data: n }));
+    results.tutor.forEach(t => flatResults.push({ type: 'tutor', id: `tu-${t.id}`, title: t.title, data: t }));
   }
 
   // Scroll active item into view
@@ -203,6 +219,12 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
         break;
       case 'thread':
         onNavigate('community');
+        break;
+      case 'note':
+        onNavigate('profile');
+        break;
+      case 'tutor':
+        onNavigate('ai-tutor');
         break;
     }
     handleClose();
@@ -534,6 +556,78 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
                               Solved
                             </span>
                           )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Notes Category */}
+              {results && results.notes.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-[11px] font-bold text-muted uppercase tracking-wider px-1">Personal Notes</span>
+                  <div className="space-y-1.5">
+                    {results.notes.map((note) => {
+                      const flatIndex = flatResults.findIndex(item => item.id === `n-${note.id}`);
+                      const isSelected = flatIndex === selectedIndex;
+                      return (
+                        <div
+                          key={note.id}
+                          data-index={flatIndex}
+                          onMouseEnter={() => setSelectedIndex(flatIndex)}
+                          onClick={() => handleSelectResult(flatResults[flatIndex])}
+                          className={`flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer ${
+                            isSelected 
+                              ? 'bg-line/40 border-cyan shadow-sm shadow-cyan/5' 
+                              : 'bg-bg/20 border-line hover:border-line/80'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="p-2 bg-panel border border-line rounded-lg text-yellow">
+                              <FileText className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="text-xs font-bold text-text truncate">{note.title}</h4>
+                              <p className="text-[10px] text-muted truncate mt-0.5">{note.content}</p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* AI Tutor Category */}
+              {results && results.tutor.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-[11px] font-bold text-muted uppercase tracking-wider px-1">AI Tutor Conversations</span>
+                  <div className="space-y-1.5">
+                    {results.tutor.map((chat) => {
+                      const flatIndex = flatResults.findIndex(item => item.id === `tu-${chat.id}`);
+                      const isSelected = flatIndex === selectedIndex;
+                      return (
+                        <div
+                          key={chat.id}
+                          data-index={flatIndex}
+                          onMouseEnter={() => setSelectedIndex(flatIndex)}
+                          onClick={() => handleSelectResult(flatResults[flatIndex])}
+                          className={`flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer ${
+                            isSelected 
+                              ? 'bg-line/40 border-cyan shadow-sm shadow-cyan/5' 
+                              : 'bg-bg/20 border-line hover:border-line/80'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="p-2 bg-panel border border-line rounded-lg text-green">
+                              <MessageSquare className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="text-xs font-bold text-text truncate">{chat.title}</h4>
+                              <p className="text-[10px] text-muted truncate mt-0.5">{chat.preview}</p>
+                            </div>
+                          </div>
                         </div>
                       );
                     })}
