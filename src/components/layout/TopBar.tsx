@@ -103,7 +103,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         {/* Mobile/Tablet Menu Button Toggle */}
         <button 
           onClick={() => setIsMobileOpen(!isMobileOpen)}
-          className="lg:hidden h-9 w-9 flex items-center justify-center rounded-xl text-muted hover:text-cyan hover:bg-cyan/10 transition-colors cursor-pointer shrink-0"
+          className="lg:hidden h-9 w-9 flex items-center justify-center rounded-xl text-muted hover:text-cyan transition-colors cursor-pointer shrink-0"
           title="Toggle menu"
         >
           {isMobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-6 h-6" />}
