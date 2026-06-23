@@ -524,7 +524,7 @@ export const Resources: React.FC<ResourcesProps> = () => {
           onClick={() => setPreviewFile(null)}
         >
           <div 
-            className={`bg-panel border border-line rounded-none sm:rounded-2xl w-full sm:w-[95%] md:w-[90%] max-w-6xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] flex flex-col h-full sm:h-[90vh] ${
+            className={`bg-panel border border-line rounded-none sm:rounded-2xl w-full sm:w-[95%] md:w-[90%] max-w-6xl overflow-hidden shadow-[0_0_100px_rgba(0,245,228,0.15)] flex flex-col h-full sm:h-[90vh] ${
               ['video', 'image'].includes(previewFile.type) ? '' : 'min-h-[70vh] md:min-h-[85vh]'
             }`}
             onClick={(e) => e.stopPropagation()}
@@ -550,17 +550,7 @@ export const Resources: React.FC<ResourcesProps> = () => {
                   <button onClick={() => setPreviewFile(null)} className="p-1.5 rounded-xl hover:bg-red/10 text-muted hover:text-red transition-all group"><X className="w-5 h-5 group-hover:scale-110 transition-transform" /></button>
                 </div>
               </div>
-            ) : (
-              <div className="absolute top-4 right-4 z-[60] flex items-center space-x-2">
-                 <button 
-                  onClick={() => setPreviewFile(null)} 
-                  className="p-2 bg-black/50 backdrop-blur rounded-xl text-white hover:bg-red/80 transition-all shadow-xl"
-                  title="Exit Preview"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            )}
+            ) : null}
             
             <div className={`flex-1 overflow-hidden flex flex-col ${previewFile.type === 'pdf' ? 'p-0' : 'bg-bg/50 p-2 sm:p-4 md:p-6'}`}>
               <div className={`w-full flex-1 flex flex-col overflow-hidden rounded-none ${previewFile.type === 'pdf' ? '' : 'rounded-xl border border-line shadow-inner'}`}>
@@ -569,8 +559,11 @@ export const Resources: React.FC<ResourcesProps> = () => {
                     <video src={previewFile.url} controls className="w-full h-auto max-h-full object-contain outline-none rounded-xl" />
                   </div>
                 ) : previewFile.type === 'pdf' ? (
-                  <div className="w-full h-full flex flex-col items-center min-h-0 overflow-hidden">
-                    <PdfRenderer lesson={{ title: previewFile.name, type: 'PDF', id: previewFile.id, contentUrl: previewFile.url } as Lesson} />
+                  <div className="w-full h-full flex flex-col items-center min-h-0 overflow-hidden shadow-[0_0_100px_rgba(0,245,228,0.1)]">
+                    <PdfRenderer 
+                      lesson={{ title: previewFile.name, type: 'PDF', id: previewFile.id, contentUrl: previewFile.url } as Lesson} 
+                      onClose={() => setPreviewFile(null)}
+                    />
                   </div>
                 ) : previewFile.type === 'office' ? (
                   <DocxRenderer lesson={{ title: previewFile.name, contentUrl: previewFile.url || '' }} />
