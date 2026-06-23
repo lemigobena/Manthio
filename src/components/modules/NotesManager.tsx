@@ -3,7 +3,7 @@ import {
   MessageSquare, Bookmark, Plus, Search, 
   Trash2, ChevronRight, Clock, 
   Download, ExternalLink, Save, 
-  FileText, Tag, X
+  FileText, Tag
 } from 'lucide-react';
 import { useXP } from '../../context/XPContext';
 
@@ -420,7 +420,7 @@ export const NotesManager: React.FC<NotesManagerProps> = ({
   );
 };
 
-function Eye(props: any) {
+function Eye(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
