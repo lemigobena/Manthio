@@ -36,11 +36,12 @@ import { AuthLayout } from './features/auth/AuthLayout';
 import { Checkout } from './features/checkout/Checkout';
 import { PublicProfile } from './features/profile/PublicProfile';
 import { DemoCenter } from './features/demo/DemoCenter';
+import { Explore } from './features/catalog/Explore';
 
 const MainApp: React.FC = () => {
   const { isAuthenticated, isOnboardingCompleted } = useAuth();
   const [currentPage, setCurrentPage] = useState<string>(() => {
-    if (!isAuthenticated) return 'signin';
+    if (!isAuthenticated) return 'explore';
     return isOnboardingCompleted ? 'dashboard' : 'onboarding';
   });
 
@@ -71,6 +72,8 @@ const MainApp: React.FC = () => {
         return <Dashboard onNavigate={handleNavigate} />;
       case 'catalog':
         return <Catalog onNavigate={handleNavigate} />;
+      case 'explore':
+        return <Explore onNavigate={handleNavigate} />;
       case 'course-detail':
         return <CourseDetail onNavigate={handleNavigate} />;
       case 'learning-path':
@@ -120,7 +123,7 @@ const MainApp: React.FC = () => {
     }
   };
 
-  const publicPages = ['signin', 'signup', 'onboarding', 'privacy', 'terms', 'cookies', 'imprint', 'help-center', 'checkout'];
+  const publicPages = ['explore', 'course-detail', 'signin', 'signup', 'onboarding', 'privacy', 'terms', 'cookies', 'imprint', 'help-center', 'checkout'];
   const isPublicPage = publicPages.includes(page);
 
   if (!isAuthenticated && !isPublicPage) {

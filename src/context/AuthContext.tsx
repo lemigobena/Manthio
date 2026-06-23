@@ -18,7 +18,7 @@ interface AuthContextType {
   completeOnboarding: (answers: OnboardingAnswers) => void;
   skipOnboarding: () => void;
   resetOnboarding: () => void;
-  updateProfile: (name: string, bio: string, avatar?: string) => void;
+  updateProfile: (name: string, bio: string, avatar?: string, backgroundImage?: string) => void;
   activeCourseId: string | null;
   setActiveCourseId: (id: string | null) => void;
   activeTrackId: string | null;
@@ -180,10 +180,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('onboarding_avatar');
   };
 
-  const updateProfile = (name: string, bio: string, avatar?: string) => {
+  const updateProfile = (name: string, bio: string, avatar?: string, backgroundImage?: string) => {
     setUser(prev => {
       if (!prev) return null;
-      const updated = { ...prev, name, bio, ...(avatar ? { avatar } : {}) };
+      const updated = { ...prev, name, bio, ...(avatar ? { avatar } : {}), ...(backgroundImage ? { backgroundImage } : {}) };
       localStorage.setItem('user', JSON.stringify(updated));
       return updated;
     });

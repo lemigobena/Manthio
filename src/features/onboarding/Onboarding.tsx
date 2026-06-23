@@ -9,7 +9,6 @@ import {
   Camera,
   Check,
   ChevronRight,
-  User,
   Sun,
   Moon,
   Brain,
@@ -19,17 +18,13 @@ import {
   Code2,
   Globe
 } from 'lucide-react';
+import defaultAvatar from '../../assets/Avatar.png';
 
 interface OnboardingProps {
   onNavigate: (page: string) => void;
 }
 
-// Generate an Initials Avatar URL using the well-known ui-avatars.com service
-const generateInitialsAvatar = (name: string, isLight: boolean): string => {
-  const bg = isLight ? 'FAF6EE' : '0D1117';
-  const color = isLight ? '0D7D6E' : '00F5D4';
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=${bg}&color=${color}&size=128&bold=true`;
-};
+// Removed generateInitialsAvatar
 
 export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   const { 
@@ -56,20 +51,29 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   const [timeCommitment, setTimeCommitment] = useState<string>(() => {
     return localStorage.getItem('onboarding_time_commitment') || '';
   });
+  const [experienceLevel, setExperienceLevel] = useState<string>(() => {
+    return localStorage.getItem('onboarding_experience_level') || '';
+  });
+  const [learningPreference, setLearningPreference] = useState<string>(() => {
+    return localStorage.getItem('onboarding_learning_preference') || '';
+  });
+  const [interestedSubject, setInterestedSubject] = useState<string>(() => {
+    return localStorage.getItem('onboarding_interested_subject') || '';
+  });
 
   // Step 3 inputs
   const [avatar, setAvatar] = useState<string>(() => {
-    return localStorage.getItem('onboarding_avatar') || user?.avatar || '';
+    const saved = localStorage.getItem('onboarding_avatar');
+    // Ignore old cached placeholder URLs
+    if (saved && (saved.includes('unsplash.com') || saved.includes('ui-avatars.com'))) {
+      return '';
+    }
+    return saved || '';
   });
 
-  const [prevTheme, setPrevTheme] = useState(theme);
-  if (theme !== prevTheme && avatar && avatar.startsWith('https://ui-avatars.com/api/') && user) {
-    setPrevTheme(theme);
-    const initialsDataUrl = generateInitialsAvatar(user.name, theme === 'light');
-    if (avatar !== initialsDataUrl) {
-      setAvatar(initialsDataUrl);
-    }
-  }
+  const [backgroundImage, setBackgroundImage] = useState<string>(() => {
+    return localStorage.getItem('onboarding_bg_image') || '';
+  });
 
   // Step 4 recommended courses selection
   const [selectedCourseId, setSelectedCourseId] = useState<string>('python-bootcamp');
@@ -158,10 +162,24 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   }, [timeCommitment]);
 
   useEffect(() => {
+    localStorage.setItem('onboarding_experience_level', experienceLevel);
+  }, [experienceLevel]);
+
+  useEffect(() => {
+    localStorage.setItem('onboarding_learning_preference', learningPreference);
+  }, [learningPreference]);
+
+  useEffect(() => {
+    localStorage.setItem('onboarding_interested_subject', interestedSubject);
+  }, [interestedSubject]);
+
+  useEffect(() => {
     localStorage.setItem('onboarding_avatar', avatar);
   }, [avatar]);
 
-
+  useEffect(() => {
+    localStorage.setItem('onboarding_bg_image', backgroundImage);
+  }, [backgroundImage]);
 
   // Recommendations mapping based on step 2 choices
   const getRecommendedCourses = () => {
@@ -203,7 +221,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
     }
     if (step === 4) {
       // Leave avatar as default
-      setAvatar(user?.avatar || '');
+      setAvatar(defaultAvatar);
     }
     nextStep();
   };
@@ -220,8 +238,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
       courseToStart.enrolled = true;
       setActiveCourseId(courseToStart.id);
     }
-    if (user && avatar && avatar !== user.avatar) {
-      updateProfile(user.name, user.bio, avatar);
+    const finalAvatar = avatar || defaultAvatar;
+    if (user && (finalAvatar !== user.avatar || backgroundImage !== user.backgroundImage)) {
+      updateProfile(user.name, user.bio, finalAvatar, backgroundImage);
     }
     completeOnboarding({ reason: reason || 'Curiosity', timePerWeek: timeCommitment || '2-5 Hrs' });
     addXp(150, 'Completed first-time onboarding (+150 XP)');
@@ -230,8 +249,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   };
 
   const handleBrowseCatalog = () => {
-    if (user && avatar && avatar !== user.avatar) {
-      updateProfile(user.name, user.bio, avatar);
+    const finalAvatar = avatar || defaultAvatar;
+    if (user && (finalAvatar !== user.avatar || backgroundImage !== user.backgroundImage)) {
+      updateProfile(user.name, user.bio, finalAvatar, backgroundImage);
     }
     completeOnboarding({ reason: reason || 'Curiosity', timePerWeek: timeCommitment || '2-5 Hrs' });
     onNavigate('catalog');
@@ -251,10 +271,16 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
     }
   };
 
-  const handleGenerateInitials = () => {
-    if (user) {
-      const initialsDataUrl = generateInitialsAvatar(user.name, theme === 'light');
-      setAvatar(initialsDataUrl);
+  const handleBgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setBackgroundImage(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -698,6 +724,31 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                   })}
                 </div>
               </div>
+              {/* Experience Level Question */}
+              <div className="space-y-2 pt-2">
+                <label className="text-xs text-muted font-bold uppercase tracking-wider block px-1">What best describes your current experience level?</label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { id: 'Beginner', label: 'Beginner' },
+                    { id: 'Intermediate', label: 'Intermediate' },
+                    { id: 'Advanced', label: 'Advanced' },
+                    { id: 'Expert', label: 'Expert' }
+                  ].map(opt => {
+                    const isSelected = experienceLevel === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        onClick={() => setExperienceLevel(opt.id)}
+                        className={`text-center p-4 min-h-[60px] md:min-h-[70px] rounded-2xl border transition-all cursor-pointer flex items-center justify-center space-x-2 ${
+                          isSelected ? 'border-cyan bg-cyan/10 text-cyan' : 'border-line hover:border-cyan/40 bg-bg/20 hover:bg-bg/40'
+                        }`}
+                      >
+                        <span className="font-bold text-sm md:text-base text-text">{opt.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
             {/* Step Controls */}
@@ -719,9 +770,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                 </button>
                 <button
                   onClick={nextStep}
-                  disabled={!reason}
+                  disabled={!reason || !experienceLevel}
                   className={`font-bold px-6 py-3 rounded-xl transition-all cursor-pointer flex items-center space-x-2 text-sm md:text-base hover:scale-105 active:scale-95 shadow-lg ${
-                    (!reason) 
+                    (!reason || !experienceLevel) 
                       ? 'bg-line text-muted cursor-not-allowed opacity-50 shadow-none' 
                       : 'bg-cyan hover:bg-cyan2 text-bg shadow-cyan/15'
                   }`}
@@ -760,9 +811,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
             <div className="relative z-10 space-y-4">
               <div className="text-left space-y-1 border-b border-line pb-3">
-                <h2 className="text-2xl md:text-3xl font-black text-text font-display uppercase">STEP 3 — TIME COMMITMENT</h2>
+                <h2 className="text-2xl md:text-3xl font-black text-text font-display uppercase">STEP 3 — PREFERENCES</h2>
                 <p className="text-muted text-sm md:text-base">
-                  We'll adapt your learning path based on how much time you have.
+                  We'll adapt your learning path based on your preferences.
                 </p>
               </div>
 
@@ -793,6 +844,60 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                   })}
                 </div>
               </div>
+
+              {/* Learning Preference Question */}
+              <div className="space-y-2 pt-2">
+                <label className="text-xs text-muted font-bold uppercase tracking-wider block px-1">How do you prefer to learn?</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { id: 'Self-paced', label: 'Self-paced courses' },
+                    { id: 'Live cohort', label: 'Live cohort sessions' },
+                    { id: 'Hybrid', label: 'Hybrid (self-study + workshops)' },
+                    { id: 'No preference', label: 'No preference' }
+                  ].map(opt => {
+                    const isSelected = learningPreference === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        onClick={() => setLearningPreference(opt.id)}
+                        className={`text-center p-3 min-h-[60px] rounded-2xl border transition-all cursor-pointer flex items-center justify-center space-x-2 ${
+                          isSelected ? 'border-cyan bg-cyan/10 text-cyan' : 'border-line hover:border-cyan/40 bg-bg/20 hover:bg-bg/40'
+                        }`}
+                      >
+                        <span className="font-bold text-xs md:text-sm text-text">{opt.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Interested Subjects Question */}
+              <div className="space-y-2 pt-2">
+                <label className="text-xs text-muted font-bold uppercase tracking-wider block px-1">What subjects are you most interested in right now?</label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {[
+                    { id: 'AI', label: 'Artificial Intelligence' },
+                    { id: 'Software Dev', label: 'Programming & Software Dev' },
+                    { id: 'Cloud', label: 'Cloud & DevOps' },
+                    { id: 'Cybersecurity', label: 'Cybersecurity' },
+                    { id: 'Data', label: 'Data & Analytics' },
+                    { id: 'Other', label: 'Other' }
+                  ].map(opt => {
+                    const isSelected = interestedSubject === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        onClick={() => setInterestedSubject(opt.id)}
+                        className={`text-center p-3 min-h-[60px] rounded-2xl border transition-all cursor-pointer flex items-center justify-center space-x-2 ${
+                          isSelected ? 'border-cyan bg-cyan/10 text-cyan' : 'border-line hover:border-cyan/40 bg-bg/20 hover:bg-bg/40'
+                        }`}
+                      >
+                        <span className="font-bold text-xs md:text-sm text-text">{opt.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
             {/* Step Controls */}
@@ -814,9 +919,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                 </button>
                 <button
                   onClick={nextStep}
-                  disabled={!timeCommitment}
+                  disabled={!timeCommitment || !learningPreference || !interestedSubject}
                   className={`font-bold px-6 py-3 rounded-xl transition-all cursor-pointer flex items-center space-x-2 text-sm md:text-base hover:scale-105 active:scale-95 shadow-lg ${
-                    (!timeCommitment) 
+                    (!timeCommitment || !learningPreference || !interestedSubject) 
                       ? 'bg-line text-muted cursor-not-allowed opacity-50 shadow-none' 
                       : 'bg-cyan hover:bg-cyan2 text-bg shadow-cyan/15'
                   }`}
@@ -862,39 +967,23 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                 </p>
               </div>
 
-            <div className="flex flex-col md:flex-row items-center justify-center gap-8 py-4">
+            <div className="flex flex-col items-center justify-center gap-6 py-4">
               
               {/* Large Avatar preview */}
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-tr from-cyan via-purple to-yellow rounded-full blur opacity-25 group-hover:opacity-40 transition-opacity" />
                 <div className="relative w-32 h-32 rounded-full border-4 border-cyan bg-bg overflow-hidden flex items-center justify-center">
-                  {avatar ? (
-                    <img 
-                      src={avatar} 
-                      alt="Avatar preview" 
-                      className="w-full h-full object-cover" 
-                    />
-                  ) : (
-                    <User className="w-16 h-16 text-muted" />
-                  )}
+                  <img 
+                    src={avatar || defaultAvatar} 
+                    alt="Avatar preview" 
+                    className="w-full h-full object-cover" 
+                  />
                 </div>
               </div>
 
               {/* Select Options */}
-              <div className="space-y-3 max-w-sm w-full">
+              <div className="space-y-4 max-w-sm w-full">
                 <div className="space-y-1">
-                  <label className="text-xs text-muted font-black uppercase tracking-wider block px-1">Initials Generator</label>
-                  <button
-                    onClick={handleGenerateInitials}
-                    className="w-full bg-cyan/10 border border-cyan/30 hover:border-cyan text-cyan text-sm font-bold p-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-center space-x-2"
-                  >
-                    <User className="w-4 h-4 text-cyan" />
-                    <span>Generate Initials Badge</span>
-                  </button>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-muted font-black uppercase tracking-wider block px-1">Upload File</label>
                   <label className="w-full bg-panel border border-line hover:border-cyan text-text text-sm font-bold p-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-center space-x-2 text-center select-none border-dashed bg-bg/20">
                     <Camera className="w-4 h-4 text-muted" />
                     <span>Choose Picture File</span>
@@ -905,6 +994,26 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                       className="hidden"
                     />
                   </label>
+                </div>
+                
+                <div className="space-y-1 pt-2">
+                  <label className="text-xs text-muted font-black uppercase tracking-wider block px-1">Background Image</label>
+                  <label className="w-full bg-panel border border-line hover:border-cyan text-text text-sm font-bold p-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-center space-x-2 text-center select-none border-dashed bg-bg/20">
+                    <Camera className="w-4 h-4 text-muted" />
+                    <span>Choose Background File</span>
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleBgUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  {backgroundImage && (
+                    <div className="mt-2 text-xs text-cyan text-center font-bold flex items-center justify-center space-x-1">
+                      <Check className="w-3 h-3" />
+                      <span>Background uploaded</span>
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -764,6 +764,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
           </div>
           
+          {/* Explore Catalog Link */}
+          <button
+            onClick={() => onNavigate('explore')}
+            className="w-full flex items-center justify-between gap-3 px-6 py-5 bg-gradient-to-r from-cyan/10 to-blue-500/10 border border-cyan/30 hover:border-blue-500/50 rounded-2xl transition-all cursor-pointer group shadow-lg shadow-cyan/5 mt-6"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-panel rounded-xl shadow-inner border border-line">
+                <BookOpen className="w-6 h-6 text-cyan group-hover:text-blue-500 transition-colors" />
+              </div>
+              <div className="text-left">
+                <span className="text-lg font-black text-text group-hover:text-cyan transition-colors tracking-tight">Explore All Courses</span>
+                <span className="block text-sm text-muted mt-1">Browse the full catalog without personalized filters or enrolled statuses.</span>
+              </div>
+            </div>
+            <ArrowRight className="w-6 h-6 text-muted group-hover:text-cyan group-hover:translate-x-1 transition-all shrink-0" />
+          </button>
+
           {/* Demo Center Link */}
           <button
             onClick={() => onNavigate('demo-center')}

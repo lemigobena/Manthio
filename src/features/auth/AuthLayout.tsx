@@ -74,7 +74,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, onNavigate }) 
 
             <div className="flex justify-end items-start w-full">
               <button 
-                onClick={() => onNavigate('dashboard')}
+                onClick={() => onNavigate('explore')}
                 className="px-5 py-2 bg-white/20 border border-white/20 rounded-full text-white text-[11px] font-bold flex items-center gap-2 hover:bg-white/30 transition-all uppercase tracking-wider"
               >
                 Back to website
