@@ -524,7 +524,7 @@ export const Resources: React.FC<ResourcesProps> = () => {
           onClick={() => setPreviewFile(null)}
         >
           <div 
-            className={`bg-panel border border-line rounded-none sm:rounded-2xl w-full sm:w-[95%] md:w-[90%] max-w-6xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] flex flex-col h-full sm:h-[90vh] ${
+            className={`bg-panel border border-line rounded-none sm:rounded-2xl w-full sm:w-[95%] md:w-[90%] max-w-6xl overflow-hidden shadow-[0_0_100px_rgba(0,245,228,0.15)] flex flex-col h-full sm:h-[90vh] ${
               ['video', 'image'].includes(previewFile.type) ? '' : 'min-h-[70vh] md:min-h-[85vh]'
             }`}
             onClick={(e) => e.stopPropagation()}
@@ -559,7 +559,7 @@ export const Resources: React.FC<ResourcesProps> = () => {
                     <video src={previewFile.url} controls className="w-full h-auto max-h-full object-contain outline-none rounded-xl" />
                   </div>
                 ) : previewFile.type === 'pdf' ? (
-                  <div className="w-full h-full flex flex-col items-center min-h-0 overflow-hidden">
+                  <div className="w-full h-full flex flex-col items-center min-h-0 overflow-hidden shadow-[0_0_100px_rgba(0,245,228,0.1)]">
                     <PdfRenderer 
                       lesson={{ title: previewFile.name, type: 'PDF', id: previewFile.id, contentUrl: previewFile.url } as Lesson} 
                       onClose={() => setPreviewFile(null)}

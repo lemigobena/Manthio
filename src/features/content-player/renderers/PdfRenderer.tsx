@@ -220,7 +220,7 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson, onClose }) => 
                   key={`page_${index + 1}`} 
                   ref={el => { pageRefs.current[index + 1] = el; }}
                   data-page-number={index + 1}
-                  className="mb-6 sm:mb-10 shadow-2xl relative group bg-white overflow-hidden transition-all duration-300 mx-auto"
+                  className="mb-6 sm:mb-10 shadow-[0_0_50px_rgba(0,245,228,0.1)] relative group bg-white overflow-hidden transition-all duration-300 mx-auto"
                   style={{ width: pdfWidth }}
                 >
                    <Page 
@@ -250,7 +250,7 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson, onClose }) => 
 
         {/* Integrated High-Fidelity Notes & Bookmarks Manager */}
         {isNotesOpen && (
-          <div className="absolute top-0 right-0 bottom-0 w-full sm:w-80 bg-panel/95 backdrop-blur-2xl border-l border-line z-40 flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.5)]">
+          <div className="absolute top-0 right-0 bottom-0 w-full sm:w-80 bg-panel/95 backdrop-blur-2xl border-l border-line z-40 flex flex-col shadow-[-10px_0_50px_rgba(0,245,228,0.2)]">
             <div className="absolute top-4 right-4 z-[50]">
               <button 
                 onClick={() => setIsNotesOpen(false)}
