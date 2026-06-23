@@ -90,7 +90,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete, timeLimit = 
 
   // Timer Effect
   useEffect(() => {
-    let interval: NodeJS.Timeout | undefined;
+    let interval: ReturnType<typeof setInterval> | undefined;
     if (timerActive && timeLeft > 0 && phase === 'quiz') {
       interval = setInterval(() => {
         setTimeLeft(prev => {
