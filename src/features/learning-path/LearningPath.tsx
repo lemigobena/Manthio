@@ -88,7 +88,8 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                            course.modules.find(m => m.status === 'Open');
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="relative h-[calc(100dvh-64px)] -mx-3 md:-mx-[44px] -my-6 overflow-y-auto bg-bg border-y border-line px-3 md:px-[44px] py-6">
+      <div className="space-y-6 pb-12 max-w-[1600px] mx-auto">
       {/* 14.2 Header Card & Stats */}
       <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -556,6 +557,7 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

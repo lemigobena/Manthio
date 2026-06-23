@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNotifications } from '../../context/NotificationContext';
+import { useXP } from '../../context/XPContext';
 import type { NotificationCategory, AppNotification } from '../../types';
 import {
   Bell, BookOpen, MessageSquare, AlertCircle, Award, Target,
@@ -160,6 +161,127 @@ const PRESETS: {
       critical: false,
       link: 'settings:billing'
     }
+  },
+  // ── Additional types ──────────────────────────────────────────────────────
+  {
+    label: 'Mention in Forum',
+    color: 'purple',
+    icon: <MessageSquare className="w-5 h-5" />,
+    payload: {
+      category: 'social',
+      title: '@you were mentioned',
+      message: 'Jordan mentioned you in "Best practices for async/await in Python".',
+      critical: false,
+      link: 'community'
+    }
+  },
+  {
+    label: 'XP Milestone Reached',
+    color: 'yellow',
+    icon: <Zap className="w-5 h-5" />,
+    payload: {
+      category: 'gamification',
+      title: '⚡ XP Milestone: 1,000 XP!',
+      message: 'You crossed the 1,000 XP threshold. Keep going — next milestone at 2,500 XP.',
+      critical: false,
+      link: 'analytics'
+    }
+  },
+  {
+    label: 'Level Up',
+    color: 'green',
+    icon: <Award className="w-5 h-5" />,
+    payload: {
+      category: 'gamification',
+      title: '🆙 You reached Level 5!',
+      message: 'Congratulations! Your dedication has leveled you up to Level 5: Code Apprentice.',
+      critical: false,
+      link: 'analytics'
+    }
+  },
+  {
+    label: 'Password Changed',
+    color: 'red',
+    icon: <Shield className="w-5 h-5" />,
+    payload: {
+      category: 'system',
+      title: '🔑 Password changed',
+      message: 'Your account password was changed successfully. If this was not you, contact support immediately.',
+      critical: true,
+      link: 'settings:account'
+    }
+  },
+  {
+    label: 'Quiz Results Ready',
+    color: 'cyan',
+    icon: <CheckCheck className="w-5 h-5" />,
+    payload: {
+      category: 'course',
+      title: '📊 Quiz graded: 90%',
+      message: 'Your Module 3 quiz has been graded. You scored 90% — excellent work!',
+      critical: false,
+      link: 'learning-path'
+    }
+  },
+  {
+    label: 'Leaderboard Rank Change',
+    color: 'orange',
+    icon: <Award className="w-5 h-5" />,
+    payload: {
+      category: 'gamification',
+      title: '📈 You moved up to #3 on the leaderboard!',
+      message: 'Your recent activity pushed you from #5 to #3. Keep up the pace!',
+      critical: false,
+      link: 'analytics'
+    }
+  },
+  {
+    label: 'Peer Joined Your Course',
+    color: 'purple',
+    icon: <MessageSquare className="w-5 h-5" />,
+    payload: {
+      category: 'social',
+      title: '👋 A friend joined your course',
+      message: 'Sam just enrolled in Python Bootcamp. You can study together now!',
+      critical: false,
+      link: 'community'
+    }
+  },
+  {
+    label: 'Course Recommendation',
+    color: 'muted',
+    icon: <BookOpen className="w-5 h-5" />,
+    payload: {
+      category: 'marketing',
+      title: '💡 Recommended for you',
+      message: 'Based on your progress, "Advanced Django REST APIs" is a great next step.',
+      critical: false,
+      link: 'browse-courses'
+    }
+  },
+  {
+    label: 'Upcoming Live Event',
+    color: 'yellow',
+    icon: <Zap className="w-5 h-5" />,
+    payload: {
+      category: 'course',
+      title: '📅 Live workshop tomorrow',
+      message: 'Don\'t forget: "Advanced Python Patterns" live session is tomorrow at 18:00 UTC.',
+      critical: false,
+      link: 'live-session'
+    }
+  },
+  {
+    label: 'Assignment Graded',
+    color: 'green',
+    icon: <CheckCheck className="w-5 h-5" />,
+    payload: {
+      category: 'course',
+      title: '✅ Assignment graded: A',
+      message: 'Your capstone project submission received an A grade. View the instructor feedback.',
+      critical: false,
+      link: 'learning-path'
+    }
   }
 ];
 
@@ -173,6 +295,7 @@ const CATEGORY_GROUPS: { key: NotificationCategory; label: string; icon: React.R
 
 export const NotificationTestPage: React.FC<NotificationTestPageProps> = ({ onNavigate }) => {
   const { addNotification, dismissAll, markAllAsRead, notifications, unreadCount } = useNotifications();
+  const { addToast } = useXP();
   const [fired, setFired] = useState<string[]>([]);
 
   const fire = (preset: typeof PRESETS[number]) => {
@@ -305,24 +428,101 @@ export const NotificationTestPage: React.FC<NotificationTestPageProps> = ({ onNa
         </button>
       </div>
 
-      {/* Individual Presets */}
+      {/* Fire by Category */}
       <div>
-        <h2 className="text-sm font-black uppercase tracking-widest text-muted mb-4">Individual Presets</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {PRESETS.map((preset) => (
-            <button
-              key={preset.label}
-              onClick={() => fire(preset)}
-              className={`flex items-center gap-3 p-4 border rounded-xl text-left transition-all cursor-pointer ${colorClass[preset.color] ?? colorClass['muted']}`}
-            >
-              <div className="shrink-0">{preset.icon}</div>
-              <div className="flex-1 min-w-0">
-                <div className="font-bold text-sm leading-tight">{preset.label}</div>
-                <div className="text-[11px] opacity-70 truncate capitalize">{preset.payload.category} • {preset.payload.critical ? 'Critical' : 'Normal'}</div>
-              </div>
-              <ChevronRight className="w-4 h-4 opacity-50 shrink-0" />
-            </button>
-          ))}
+        <h2 className="text-sm font-black uppercase tracking-widest text-muted mb-4">Fire by Category</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          {CATEGORY_GROUPS.map(g => {
+            const presets = PRESETS.filter(p => p.payload.category === g.key);
+            return (
+              <button
+                key={g.key}
+                onClick={() => {
+                  presets.forEach((p, i) => setTimeout(() => { addNotification(p.payload); }, i * 100));
+                  setFired(prev => [`All ${g.label}`, ...prev.slice(0, 4)]);
+                }}
+                className="flex flex-col items-center gap-2 p-4 bg-panel border border-line rounded-2xl hover:border-cyan/50 hover:bg-bg transition-all cursor-pointer group"
+              >
+                <span className={`${g.color} group-hover:scale-110 transition-transform`}>{g.icon}</span>
+                <span className="text-xs font-bold text-text">{g.label}</span>
+                <span className="text-[10px] text-muted">{presets.length} types</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Individual Presets grouped by category */}
+      {CATEGORY_GROUPS.map(g => {
+        const presets = PRESETS.filter(p => p.payload.category === g.key);
+        return (
+          <div key={g.key}>
+            <div className={`flex items-center gap-2 mb-3`}>
+              <span className={g.color}>{g.icon}</span>
+              <h2 className="text-sm font-black uppercase tracking-widest text-muted">{g.label} Notifications</h2>
+              <span className="text-[10px] text-muted bg-bg border border-line px-2 py-0.5 rounded-full font-bold">{presets.length}</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {presets.map((preset) => (
+                <button
+                  key={preset.label}
+                  onClick={() => fire(preset)}
+                  className={`flex items-center gap-3 p-4 border rounded-xl text-left transition-all cursor-pointer ${colorClass[preset.color] ?? colorClass['muted']}`}
+                >
+                  <div className="shrink-0">{preset.icon}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-sm leading-tight">{preset.label}</div>
+                    <div className="text-[11px] opacity-70 truncate capitalize">{preset.payload.critical ? '🔴 Critical' : '⚪ Normal'}</div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 opacity-50 shrink-0" />
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Toast Notification & Swipe Gesture Dev Sandbox */}
+      <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
+        <div>
+          <h2 className="text-sm font-black text-text flex items-center space-x-2 uppercase tracking-widest mb-1">
+            <span>🛠️ Developer Toast & Gesture Sandbox</span>
+          </h2>
+          <p className="text-xs text-muted">
+            Test gamified toast notifications, stacking bounds, and mobile gestures.
+            On desktop, toasts slide in bottom-right. On mobile, they slide in top-center.
+            Swipe left or right on a phone screen to dismiss them dynamically.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => {
+              addToast('xp', '+25 XP — Quiz answered correctly');
+              setTimeout(() => addToast('success', '✓ File uploaded'), 300);
+              setTimeout(() => addToast('info', 'Your session will expire in 10 minutes'), 600);
+            }}
+            className="bg-cyan hover:bg-cyan2 text-bg font-bold text-xs px-5 py-3 rounded-xl transition-colors cursor-pointer"
+          >
+            Fire Staggered Toasts (Max 3)
+          </button>
+          <button
+            onClick={() => {
+              addToast('error', 'Something went wrong, please try again', () => {
+                addToast('success', '✓ Retry successful!');
+              });
+            }}
+            className="bg-red/15 hover:bg-red/25 text-red font-bold text-xs px-5 py-3 rounded-xl border border-red/30 transition-colors cursor-pointer"
+          >
+            Fire Error with Retry
+          </button>
+          <button
+            onClick={() => {
+              addToast('xp', '+10 XP — Fast read completion');
+            }}
+            className="bg-bg hover:bg-line border border-line text-text font-bold text-xs px-5 py-3 rounded-xl transition-colors cursor-pointer"
+          >
+            Fire Single XP
+          </button>
         </div>
       </div>
 
