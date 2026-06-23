@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   ZoomIn, ZoomOut, Download, Search, 
-  MessageSquare, Plus, Trash2, ChevronLeft, 
-  ChevronRight, X, FileText, Clock, Settings2
+  MessageSquare, Plus, ChevronLeft, 
+  ChevronRight, X, FileText
 } from 'lucide-react';
+import { NotesManager } from '../../../components/modules/NotesManager';
 import type { Lesson } from '../../../types';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
@@ -12,31 +13,22 @@ import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 
-interface Note {
-  id: string;
-  pageNumber: number;
-  text: string;
-  timestamp: string;
-}
-
 interface WindowFind {
   find: (str: string, caseSensitive: boolean, backwards: boolean, wrapAround: boolean, wholeWord: boolean, searchInFrames: boolean, showDialog: boolean) => boolean;
 }
 
 interface PdfRendererProps {
   lesson: Lesson;
+  onClose?: () => void;
 }
 
-export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson }) => {
+export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson, onClose }) => {
   const [numPages, setNumPages] = useState<number>();
   const [scale, setScale] = useState(1.0);
   const [error, setError] = useState<string>('');
   const [searchText, setSearchText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isNotesOpen, setIsNotesOpen] = useState(false);
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [newNoteText, setNewNoteText] = useState('');
-  const [showNoteInput, setShowNoteInput] = useState(false);
   const [containerWidth, setContainerWidth] = useState<number>(800);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -116,23 +108,6 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson }) => {
     }
   };
 
-  const addNote = () => {
-    if (!newNoteText.trim()) return;
-    const note: Note = {
-      id: Math.random().toString(36).substr(2, 9),
-      pageNumber: currentPage,
-      text: newNoteText,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-    setNotes([note, ...notes]);
-    setNewNoteText('');
-    setShowNoteInput(false);
-  };
-
-  const deleteNote = (id: string) => {
-    setNotes(notes.filter(n => n.id !== id));
-  };
-
   // Dynamic PDF width based on container and zoom
   const pdfWidth = Math.min(containerWidth, 900) * scale;
 
@@ -144,9 +119,9 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson }) => {
           <div className="hidden sm:flex p-2 bg-cyan/10 rounded-lg shrink-0">
             <FileText className="w-4 h-4 text-cyan" />
           </div>
-          <div className="flex flex-col min-w-0">
+          <div className="flex flex-col min-w-0 flex-1">
             <span className="text-[9px] text-muted uppercase font-bold tracking-widest truncate hidden sm:block">Reader</span>
-            <h1 className="text-xs sm:text-sm font-bold truncate leading-tight">{lesson.title}</h1>
+            <h1 className="text-xs sm:text-sm font-bold truncate leading-tight whitespace-nowrap">{lesson.title}</h1>
           </div>
         </div>
 
@@ -169,11 +144,6 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson }) => {
               className={`p-2 rounded-xl transition-all relative ${isNotesOpen ? 'bg-cyan text-bg shadow-lg shadow-cyan/20' : 'bg-panel border border-line text-muted hover:text-text'}`}
             >
               <MessageSquare className="w-4 h-4" />
-              {notes.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red text-white text-[8px] flex items-center justify-center rounded-full border-2 border-bg">
-                  {notes.length}
-                </span>
-              )}
             </button>
             <div className="h-6 w-px bg-line hidden sm:block" />
             <div className="hidden sm:flex items-center bg-panel border border-line rounded-xl p-0.5">
@@ -182,23 +152,44 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson }) => {
               <button onClick={zoomIn} className="p-1.5 hover:bg-bg rounded-lg text-muted hover:text-text transition-colors"><ZoomIn className="w-4 h-4" /></button>
             </div>
             <div className="h-6 w-px bg-line" />
-            <a 
-              href={lesson.contentUrl || "/Manthio_Learner_Frontend_Requirements.pdf"} 
-              download 
-              className="p-2 bg-text text-bg rounded-xl hover:scale-105 transition-all shadow-md"
-            >
-              <Download className="w-4 h-4" />
-            </a>
+            <div className="flex items-center space-x-1 sm:space-x-2">
+              <a 
+                href={lesson.contentUrl || "/Manthio_Learner_Frontend_Requirements.pdf"} 
+                download 
+                className="p-2 bg-text text-bg rounded-xl hover:scale-105 transition-all shadow-md"
+              >
+                <Download className="w-4 h-4" />
+              </a>
+              {onClose && (
+                <button 
+                  onClick={onClose}
+                  className="p-2 bg-red/10 border border-red/20 text-red rounded-xl hover:bg-red hover:text-white transition-all shadow-md ml-1 sm:ml-2"
+                  title="Close Viewer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div ref={viewportRef} className="flex-1 flex overflow-hidden relative">
+      <div 
+        ref={viewportRef} 
+        className="flex-1 flex overflow-hidden relative"
+        onClick={() => { if (isNotesOpen) setIsNotesOpen(false); }}
+      >
         {/* PDF Viewport */}
         <div 
           ref={scrollContainerRef} 
-          className="flex-1 overflow-y-auto scrollbar-hide bg-[#1a1d21] pt-6 sm:pt-10 pb-32 flex flex-col items-center"
+          onClick={(e) => {
+            // Only close if clicking the viewport background, not the document itself
+            if (e.target === e.currentTarget && isNotesOpen) {
+              setIsNotesOpen(false);
+            }
+          }}
+          className="flex-1 overflow-y-auto scrollbar-hide bg-bg/60 backdrop-blur-sm pt-6 sm:pt-10 pb-32 flex flex-col items-center"
         >
           {error && (
             <div className="flex-1 flex items-center justify-center px-6">
@@ -246,7 +237,6 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson }) => {
                       onClick={() => {
                         jumpToPage(index + 1);
                         setIsNotesOpen(true);
-                        setShowNoteInput(true);
                       }}
                       className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 bg-black/80 backdrop-blur text-white p-3 rounded-2xl shadow-xl opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95 z-20"
                    >
@@ -258,92 +248,27 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson }) => {
           )}
         </div>
 
-        {/* Improved Notes Panel (Floating Sidebar Style) */}
+        {/* Integrated High-Fidelity Notes & Bookmarks Manager */}
         {isNotesOpen && (
-          <div className="absolute top-0 right-0 bottom-0 w-full sm:w-80 bg-panel/95 backdrop-blur-2xl border-l border-line z-40 flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.5)] animate-in slide-in-from-right duration-300">
-            <div className="p-4 sm:p-6 border-b border-line flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <MessageSquare className="w-4 h-4 text-cyan" />
-                <h3 className="font-bold text-sm tracking-tight text-text">Notes</h3>
-              </div>
+          <div className="absolute top-0 right-0 bottom-0 w-full sm:w-80 bg-panel/95 backdrop-blur-2xl border-l border-line z-40 flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.5)]">
+            <div className="absolute top-4 right-4 z-[50]">
               <button 
                 onClick={() => setIsNotesOpen(false)}
                 className="p-2 hover:bg-bg rounded-lg text-muted transition-colors"
+                title="Collapse Vault"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
-              {showNoteInput ? (
-                <div className="bg-bg border border-cyan/30 rounded-2xl p-4 space-y-4 animate-in zoom-in-95 duration-200">
-                  <div className="flex justify-between items-center text-[10px] font-bold text-cyan uppercase tracking-widest">
-                    <span>Annotating Page {currentPage}</span>
-                  </div>
-                  <textarea 
-                    autoFocus
-                    placeholder="Capture your thoughts..."
-                    value={newNoteText}
-                    onChange={(e) => setNewNoteText(e.target.value)}
-                    className="w-full bg-transparent border-none text-[11px] text-text focus:ring-0 min-h-[120px] resize-none"
-                  />
-                  <div className="flex space-x-2">
-                    <button 
-                      onClick={() => setShowNoteInput(false)}
-                      className="flex-1 py-2.5 bg-panel border border-line rounded-xl text-[10px] font-bold uppercase hover:bg-bg transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      onClick={addNote}
-                      className="flex-2 py-2.5 bg-cyan text-bg rounded-xl text-[10px] font-bold uppercase hover:bg-cyan2 shadow-lg shadow-cyan/20 transition-all"
-                    >
-                      Save Progress
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button 
-                  onClick={() => setShowNoteInput(true)}
-                  className="w-full py-4 border-2 border-dashed border-line rounded-2xl flex flex-col items-center justify-center space-y-2 text-muted hover:border-cyan/50 hover:text-cyan transition-all group"
-                >
-                  <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform" />
-                  <span className="text-[10px] font-bold uppercase">New Insight</span>
-                </button>
-              )}
-
-              <div className="space-y-3">
-                {notes.map(note => (
-                  <div key={note.id} className="group p-4 bg-bg border border-line rounded-2xl hover:border-cyan/30 transition-all relative overflow-hidden">
-                    <div className="flex items-center justify-between mb-3">
-                      <button 
-                        onClick={() => jumpToPage(note.pageNumber)}
-                        className="text-[10px] font-bold text-cyan px-2 py-0.5 bg-cyan/10 rounded flex items-center hover:bg-cyan/20"
-                      >
-                        P{note.pageNumber}
-                      </button>
-                      <div className="flex items-center space-x-3">
-                        <span className="text-[9px] text-muted flex items-center">
-                          <Clock className="w-3 h-3 mr-1" />
-                          {note.timestamp}
-                        </span>
-                        <button onClick={() => deleteNote(note.id)} className="text-red/40 hover:text-red transition-colors">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                    <p className="text-[11px] text-text/80 leading-relaxed break-words">{note.text}</p>
-                  </div>
-                ))}
-                
-                {notes.length === 0 && !showNoteInput && (
-                  <div className="py-20 text-center opacity-40">
-                    <Settings2 className="w-10 h-10 mx-auto mb-4" />
-                    <p className="text-[11px] uppercase tracking-widest font-bold">No insights yet</p>
-                  </div>
-                )}
-              </div>
-            </div>
+            <NotesManager 
+              courseId={lesson.id} 
+              currentAnchor={{ type: 'page', value: currentPage }} 
+              onJumpToAnchor={(anchor) => {
+                if (anchor.type === 'page' && typeof anchor.value === 'number') {
+                  jumpToPage(anchor.value);
+                }
+              }}
+            />
           </div>
         )}
       </div>
