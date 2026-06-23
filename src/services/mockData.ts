@@ -110,7 +110,41 @@ export const COURSES: Course[] = [
           { id: 'py-les-1-1', title: 'Install Python & Set up IDE', type: 'Video', duration: '20min', status: 'completed', required: true, bloomLevel: 'Remember', microChunkable: true, checkpoints: 4 },
           { id: 'py-les-1-2', title: 'Python Cheatsheet', type: 'PDF', duration: '10min', status: 'completed', required: true, bloomLevel: 'Remember' },
           { id: 'py-les-1-3', title: 'Variables & Data Types', type: 'Article', duration: '25min', status: 'completed', required: true, bloomLevel: 'Understand' },
-          { id: 'py-les-1-4', title: 'Your first script', type: 'Code', duration: '20min', status: 'completed', required: true, bloomLevel: 'Apply' },
+          { 
+            id: 'py-les-1-4', 
+            title: 'Your first script', 
+            type: 'Code', 
+            duration: '20min', 
+            status: 'completed', 
+            required: true, 
+            bloomLevel: 'Apply',
+            sandboxData: {
+              language: 'python',
+              files: [
+                {
+                  path: 'src/main.py',
+                  code: '# Write a function that returns "Hello, World!"\n\ndef greet():\n    pass\n\nprint(greet())\n'
+                },
+                {
+                  path: 'utils/helper.py',
+                  code: '# Helper functions can go here\ndef custom_greeting(name):\n    return f"Hello, {name}!"\n'
+                }
+              ],
+              tests: [
+                {
+                  id: 'test-1',
+                  name: 'Should return "Hello, World!"',
+                  code: 'assert greet() == "Hello, World!"'
+                },
+                {
+                  id: 'test-2',
+                  name: 'Should handle custom names (Hidden Test)',
+                  code: 'from utils.helper import custom_greeting\nassert custom_greeting("Alice") == "Hello, Alice!"',
+                  hidden: true
+                }
+              ]
+            }
+          },
           { id: 'py-les-1-5', title: 'Interactive Flow Quiz', type: 'H5P', duration: '15min', status: 'completed', required: true, bloomLevel: 'Apply' },
           { id: 'py-les-1-6', title: 'Setup Verification', type: 'Assignment', duration: '15min', status: 'in_progress', required: true, bloomLevel: 'Apply' },
           { id: 'py-les-1-7', title: 'Official Docs Link', type: 'External', duration: '5min', status: 'not_started', required: false, bloomLevel: 'Remember' },
