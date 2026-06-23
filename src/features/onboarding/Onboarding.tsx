@@ -41,43 +41,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
     return saved ? parseInt(saved, 10) : 0;
   });
 
-  // 3D Logo Splash interaction state
-  const [tilt, setTilt] = useState({ x: 8, y: -18 });
-  const [isHovered, setIsHovered] = useState(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
-    setIsHovered(true);
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    
-    // Scale rotations to maximum 20 deg for X and 25 deg for Y
-    const tiltX = -(y / (rect.height / 2)) * 20;
-    const tiltY = (x / (rect.width / 2)) * 25;
-    
-    setTilt({ x: tiltX, y: tiltY });
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    setTilt({ x: 8, y: -18 });
-  };
-
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!containerRef.current || e.touches.length === 0) return;
-    setIsHovered(true);
-    const rect = containerRef.current.getBoundingClientRect();
-    const touch = e.touches[0];
-    const x = touch.clientX - rect.left - rect.width / 2;
-    const y = touch.clientY - rect.top - rect.height / 2;
-    
-    const tiltX = -(y / (rect.height / 2)) * 20;
-    const tiltY = (x / (rect.width / 2)) * 25;
-    
-    setTilt({ x: tiltX, y: tiltY });
-  };
 
   // Step 2 inputs
   const [reason, setReason] = useState<string>(() => {
@@ -107,8 +71,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   // Carousel active index (Step 1)
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
-  // Logo slam completion state (Step 0)
-  const [isSlammed, setIsSlammed] = useState<boolean>(false);
+
 
   // Swipe state for Video Slider
   const [swipeStartX, setSwipeStartX] = useState<number | null>(null);
@@ -192,15 +155,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
     localStorage.setItem('onboarding_avatar', avatar);
   }, [avatar]);
 
-  // Trigger isSlammed after logo slam animation completes
-  useEffect(() => {
-    if (step === 0) {
-      const timer = setTimeout(() => {
-        setIsSlammed(true);
-      }, 2200);
-      return () => clearTimeout(timer);
-    }
-  }, [step]);
+
 
   // Recommendations mapping based on step 2 choices
   const getRecommendedCourses = () => {
@@ -403,114 +358,39 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
             {/* Background glowing gradient */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--cyan)_0%,transparent_60%)] opacity-[0.08] dark:opacity-[0.04] pointer-events-none" />
             
-            {/* 3D Logo viewport - taking up most of the page height */}
-              <div 
-                ref={containerRef}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleMouseLeave}
-                className="relative w-full max-w-5xl flex-1 flex items-center justify-center cursor-grab active:cursor-grabbing preserve-3d py-8 select-none"
-                style={{ perspective: '1200px' }}
-              >
-                <div 
-                  className={`relative w-[480px] md:w-[640px] lg:w-[800px] h-[320px] md:h-[420px] lg:h-[540px] preserve-3d ${isSlammed && !isHovered ? 'animate-3d-idle' : ''}`}
-                  style={isHovered ? { transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) rotateZ(0deg)`, transition: 'transform 0.1s ease-out' } : {}}
-                >
-                  <style>{`
-                    @keyframes buttonEntrance {
-                      0% { transform: translateY(20px); opacity: 0; }
-                      100% { transform: translateY(0); opacity: 1; }
-                    }
-                    @keyframes floatRotate3D {
-                      0% {
-                        transform: rotateX(8deg) rotateY(-18deg) translateY(0px);
-                      }
-                      50% {
-                        transform: rotateX(15deg) rotateY(18deg) translateY(-15px);
-                      }
-                      100% {
-                        transform: rotateX(8deg) rotateY(-18deg) translateY(0px);
-                      }
-                    }
-                    @keyframes shine {
-                      0% { background-position: -200% -200%; }
-                      100% { background-position: 200% 200%; }
-                    }
-                    @keyframes logoSlam {
-                      0% {
-                        transform: translateZ(1200px) rotateX(-720deg) rotateY(90deg) scale(0.1);
-                        opacity: 0;
-                        filter: blur(10px);
-                      }
-                      50% {
-                        transform: translateZ(250px) rotateX(25deg) rotateY(-20deg) scale(1.35);
-                        opacity: 1;
-                        filter: blur(0px);
-                      }
-                      75% {
-                        transform: translateZ(-80px) rotateX(-12deg) rotateY(15deg) scale(0.95);
-                        opacity: 1;
-                      }
-                      100% {
-                        transform: translateZ(0px) rotateX(8deg) rotateY(-18deg) scale(1);
-                        opacity: 1;
-                      }
-                    }
-                    .anim-logo-slam { animation: logoSlam 2.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-                    .anim-button-entrance { animation: buttonEntrance 0.8s cubic-bezier(0.25, 1, 0.5, 1) 1.8s both; }
-                    .anim-skip-entrance { animation: buttonEntrance 0.8s cubic-bezier(0.25, 1, 0.5, 1) 2.1s both; }
-                    .animate-3d-idle { animation: floatRotate3D 8s ease-in-out infinite; }
-                    .preserve-3d { transform-style: preserve-3d; }
-                    .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-                  `}</style>
-
-                {/* Wrapper for the slam animation so we don't break the float or 3D extrusions */}
-                <div className="absolute inset-0 preserve-3d anim-logo-slam">
-
-                {/* Floor Shadow */}
-                <div 
-                  className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-96 md:w-[500px] h-12 bg-black/20 dark:bg-black/50 rounded-full blur-2xl pointer-events-none"
-                  style={{
-                    transform: 'rotateX(90deg) translateZ(-200px)',
-                    transformStyle: 'preserve-3d'
-                  }}
+            {/* Logo viewport */}
+            <div className="relative w-full max-w-5xl flex-1 flex items-center justify-center py-8 select-none">
+              <style>{`
+                @keyframes buttonEntrance {
+                  0% { transform: translateY(20px); opacity: 0; }
+                  100% { transform: translateY(0); opacity: 1; }
+                }
+                @keyframes logoPulseRipple {
+                  0% { opacity: 0.1; filter: drop-shadow(0 0 0 rgba(0, 255, 255, 0)); transform: scale(0.98); }
+                  50% { opacity: 1; filter: drop-shadow(0 0 40px rgba(0, 255, 255, 0.5)); transform: scale(1.02); }
+                  100% { opacity: 0.1; filter: drop-shadow(0 0 0 rgba(0, 255, 255, 0)); transform: scale(0.98); }
+                }
+                @keyframes shine {
+                  0% { background-position: -200% -200%; }
+                  100% { background-position: 200% 200%; }
+                }
+                .anim-logo-pulse { animation: logoPulseRipple 4s ease-in-out infinite; }
+                .anim-shine { animation: shine 4s infinite linear, logoPulseRipple 4s ease-in-out infinite; }
+                .anim-button-entrance { animation: buttonEntrance 0.8s cubic-bezier(0.25, 1, 0.5, 1) 0.5s both; }
+                .anim-skip-entrance { animation: buttonEntrance 0.8s cubic-bezier(0.25, 1, 0.5, 1) 0.8s both; }
+              `}</style>
+              <div className="relative w-[540px] md:w-[720px] lg:w-[960px] h-auto flex items-center justify-center">
+                <img
+                  src="/Branding/primary/logo_7_prio_1_variation.png"
+                  alt="Manthio Logo"
+                  className="w-full h-auto object-contain anim-logo-pulse pointer-events-none select-none"
                 />
-
-                {/* Extruded 3D Layers */}
-                {Array.from({ length: 24 }, (_, i) => i - 12).map((z) => {
-                  const isFront = z === 12;
-                  let filter = 'none';
-                  
-                  // Darken middle layers to form extrusion edges with realistic shading
-                  if (!isFront) {
-                    const factor = (z + 12) / 24; // 0 to 1
-                    filter = `brightness(${0.15 + factor * 0.45}) contrast(1.15) saturate(0.9)`;
-                  }
-
-                  return (
-                    <img
-                      key={z}
-                      src="/Branding/primary/logo_7_prio_1_variation.png"
-                      alt="Manthio Logo Extruded"
-                      className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none preserve-3d backface-hidden"
-                      style={{
-                        transform: `translateZ(${z * 1.6}px)`,
-                        filter,
-                        opacity: isFront ? 1 : 0.85,
-                      }}
-                    />
-                  );
-                })}
-
-                {/* Specular Shine highlight layer on the very front surface */}
+                {/* Inclined Swiper Shine Effect */}
                 <div 
-                  className="absolute inset-0 w-full h-full pointer-events-none preserve-3d backface-hidden"
+                  className="absolute inset-0 w-full h-full pointer-events-none anim-shine"
                   style={{
-                    transform: 'translateZ(20px)',
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.22) 50%, rgba(255,255,255,0) 70%)',
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 70%)',
                     backgroundSize: '300% 300%',
-                    animation: 'shine 7s infinite linear',
                     mixBlendMode: 'overlay',
                     maskImage: 'url(/Branding/primary/logo_7_prio_1_variation.png)',
                     WebkitMaskImage: 'url(/Branding/primary/logo_7_prio_1_variation.png)',
@@ -522,7 +402,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                     WebkitMaskRepeat: 'no-repeat'
                   }}
                 />
-                </div>
               </div>
             </div>
 

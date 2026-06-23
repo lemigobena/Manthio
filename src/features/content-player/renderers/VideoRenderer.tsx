@@ -145,6 +145,7 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, duration]);
 
   useEffect(() => {
