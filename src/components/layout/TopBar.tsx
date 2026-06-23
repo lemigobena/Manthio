@@ -2,8 +2,9 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { useTheme } from '../../context/ThemeContext';
-import { Search, Sun, Moon, Bell, User, Sliders, LogOut, Menu, X } from 'lucide-react';
+import { Search, Sun, Moon, Bell, User, Sliders, LogOut, Menu, X, BookOpen, MessageSquare, AlertCircle, Award, Target } from 'lucide-react';
 import { SearchOverlay } from '../search/SearchOverlay';
+import { useNotifications } from '../../context/NotificationContext';
 
 interface TopBarProps {
   onNavigate: (page: string) => void;
@@ -19,6 +20,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   const { user, signOut } = useAuth();
   const { streak } = useXP();
   const { theme, toggleTheme } = useTheme();
+  const { notifications, unreadCount, markAllAsRead, markAsRead } = useNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -91,11 +93,7 @@ export const TopBar: React.FC<TopBarProps> = ({
     setNotificationsOpen(false);
   };
 
-  const notifications = [
-    { id: 1, text: 'Live session starts in 5 minutes!', time: '2 min ago', critical: true },
-    { id: 2, text: 'Congratulations! You have completed Module 2.', time: '1 hr ago', critical: false },
-    { id: 3, text: 'AI Tutor has rated your code task.', time: '3 hrs ago', critical: false }
-  ];
+  const recentNotifications = notifications.slice(0, 20);
 
   return (
     <div className="bg-panel border-b border-line h-16 px-3 md:px-6 lg:px-8 shrink-0 relative z-[60]">
@@ -166,31 +164,90 @@ export const TopBar: React.FC<TopBarProps> = ({
               className="h-9 w-9 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer relative"
             >
               <Bell className="w-4 h-4" />
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-4 h-4 rounded-full bg-red text-white text-[9px] font-bold flex items-center justify-center px-1">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
             </button>
 
             {/* Notifications Panel */}
             {notificationsOpen && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-panel border border-line rounded-2xl shadow-xl p-4 space-y-3 z-50">
-                <div className="flex justify-between items-center border-b border-line pb-2">
+              <div className="absolute right-0 top-full mt-2 w-[340px] bg-panel border border-line rounded-2xl shadow-xl p-0 z-50 overflow-hidden flex flex-col max-h-[80vh]">
+                <div className="flex justify-between items-center border-b border-line p-3 shrink-0 bg-panel">
                   <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Notifications</h4>
-                  <button 
-                    onClick={() => setNotificationsOpen(false)}
-                    className="text-[10px] text-cyan hover:underline"
-                  >
-                    Mark all as read
-                  </button>
-                </div>
-                <div className="space-y-2">
-                  {notifications.map(n => (
-                    <div 
-                      key={n.id} 
-                      className={`p-2.5 rounded-xl border text-xs space-y-1 ${n.critical ? 'bg-red/10 border-red/30' : 'bg-bg/40 border-line'}`}
+                  {unreadCount > 0 && (
+                    <button 
+                      onClick={markAllAsRead}
+                      className="text-[10px] text-cyan hover:underline font-semibold"
                     >
-                      <p className="font-medium text-text">{n.text}</p>
-                      <span className="text-[10px] text-muted block">{n.time}</span>
-                    </div>
-                  ))}
+                      Mark all as read
+                    </button>
+                  )}
+                </div>
+                <div className="overflow-y-auto p-2 space-y-1">
+                  {recentNotifications.length === 0 ? (
+                    <div className="p-4 text-center text-muted text-xs">No notifications yet.</div>
+                  ) : (
+                    recentNotifications.map(n => {
+                        const accentMap: Record<string, string> = {
+                          course: 'border-l-cyan bg-cyan/5',
+                          social: 'border-l-purple bg-purple/5',
+                          system: 'border-l-yellow bg-yellow/5',
+                          gamification: 'border-l-green bg-green/5',
+                          marketing: 'border-l-orange bg-orange/5',
+                        };
+                        const iconMap: Record<string, React.ReactNode> = {
+                          course: <BookOpen className="w-3.5 h-3.5 text-cyan" />,
+                          social: <MessageSquare className="w-3.5 h-3.5 text-purple" />,
+                          system: <AlertCircle className="w-3.5 h-3.5 text-yellow" />,
+                          gamification: <Award className="w-3.5 h-3.5 text-green" />,
+                          marketing: <Target className="w-3.5 h-3.5 text-orange" />,
+                        };
+                        const criticalOverride = n.critical ? 'border-l-red bg-red/5' : '';
+                        return (
+                          <div 
+                            key={n.id} 
+                            onClick={() => {
+                              if (!n.read) markAsRead(n.id);
+                              if (n.link) {
+                                onNavigate(n.link);
+                                setNotificationsOpen(false);
+                              }
+                            }}
+                            className={`flex items-start gap-2.5 p-3 rounded-xl border-l-[3px] border border-line/40 text-xs cursor-pointer transition-all shadow-sm ${
+                              !n.read
+                                ? (criticalOverride || accentMap[n.category] || 'bg-bg border-l-cyan bg-cyan/5')
+                                : 'bg-bg/30 border-l-line opacity-60 hover:opacity-80'
+                            }`}
+                          >
+                            <div className="shrink-0 mt-0.5 p-1.5 rounded-lg bg-bg/80 border border-line/30">
+                              {n.critical
+                                ? <AlertCircle className="w-3.5 h-3.5 text-red" />
+                                : (iconMap[n.category] ?? <Bell className="w-3.5 h-3.5 text-muted" />)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between items-start gap-1">
+                                <p className={`font-bold leading-tight truncate ${n.critical ? 'text-red' : 'text-text'}`}>{n.title}</p>
+                                <span className="text-[9px] text-muted whitespace-nowrap shrink-0 pt-0.5">{n.time}</span>
+                              </div>
+                              <p className="text-muted line-clamp-2 leading-relaxed mt-0.5">{n.message}</p>
+                            </div>
+                          </div>
+                        );
+                      })
+                  )}
+                </div>
+                <div className="p-2 border-t border-line shrink-0 bg-panel">
+                  <button
+                    onClick={() => {
+                      onNavigate('notifications');
+                      setNotificationsOpen(false);
+                    }}
+                    className="w-full text-center text-xs font-bold text-cyan hover:text-cyan2 p-2"
+                  >
+                    View all notifications
+                  </button>
                 </div>
               </div>
             )}

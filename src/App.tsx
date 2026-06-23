@@ -4,6 +4,7 @@ import { analyticsService } from './services/analyticsService';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { XPProvider } from './context/XPContext';
 import { AppLayout } from './components/layout/AppLayout';
+import { NotificationProvider } from './context/NotificationContext';
 import { ModalProvider, useModal } from './context/ModalContext';
 import ModalManager from './components/modal/ModalManager';
 import { HelpCenter } from './features/info/HelpCenter';
@@ -25,6 +26,9 @@ import { CompetenceProfile } from './features/analytics/CompetenceProfile';
 import { Resources } from './features/resources/Resources';
 import { Community } from './features/community/Community';
 import { Settings } from './features/settings/Settings';
+import { Notifications } from './features/notifications/Notifications';
+import { EmailTemplate } from './features/notifications/EmailTemplate';
+import { NotificationTestPage } from './features/notifications/NotificationTestPage';
 import { Onboarding } from './features/onboarding/Onboarding';
 import { SignIn } from './features/auth/SignIn';
 import { SignUp } from './features/auth/SignUp';
@@ -86,6 +90,12 @@ const MainApp: React.FC = () => {
         return <Community onNavigate={handleNavigate} />;
       case 'settings':
         return <Settings initialTab={tab as 'account' | 'billing' | 'preferences' | 'privacy'} onNavigate={handleNavigate} />;
+      case 'notifications':
+        return <Notifications onNavigate={handleNavigate} />;
+      case 'email-preview':
+        return <EmailTemplate />;
+      case 'notification-test':
+        return <NotificationTestPage onNavigate={handleNavigate} />;
       case 'profile':
         return <PublicProfile onNavigate={handleNavigate} />;
       case 'help-center':
@@ -154,9 +164,11 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <XPProvider>
-          <ModalProvider>
-            <MainApp />
-          </ModalProvider>
+          <NotificationProvider>
+            <ModalProvider>
+              <MainApp />
+            </ModalProvider>
+          </NotificationProvider>
         </XPProvider>
       </AuthProvider>
     </ThemeProvider>

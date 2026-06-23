@@ -3,8 +3,10 @@ import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { Footer } from './Footer';
 import { useXP } from '../../context/XPContext';
+import { useNotifications } from '../../context/NotificationContext';
+import type { LiveNotificationToast } from '../../context/NotificationContext';
 import type { ToastMessage } from '../../context/XPContext';
-import { AlertCircle, CheckCircle, Sparkles, Info, X } from 'lucide-react';
+import { AlertCircle, CheckCircle, Sparkles, Info, X, Bell, BookOpen, MessageSquare, Award, Target } from 'lucide-react';
 
 interface ToastItemProps {
   toast: ToastMessage;
@@ -120,6 +122,60 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, removeToast }) => {
   );
 };
 
+// ── Live Notification Toast (banner style) ────────────────────────────────────
+interface NotifToastItemProps {
+  toast: LiveNotificationToast;
+  onDismiss: (toastId: string) => void;
+  onMarkRead: (id: string) => void;
+}
+
+const NOTIF_ACCENT: Record<string, { bar: string; bg: string; border: string; icon: React.ReactNode }> = {
+  course:       { bar: 'border-l-cyan',   bg: 'bg-cyan/10',   border: 'border-cyan/30',   icon: <BookOpen     className="w-4 h-4 text-cyan"   /> },
+  social:       { bar: 'border-l-purple', bg: 'bg-purple/10', border: 'border-purple/30', icon: <MessageSquare className="w-4 h-4 text-purple" /> },
+  system:       { bar: 'border-l-yellow', bg: 'bg-yellow/10', border: 'border-yellow/30', icon: <AlertCircle  className="w-4 h-4 text-yellow"  /> },
+  gamification: { bar: 'border-l-green',  bg: 'bg-green/10',  border: 'border-green/30',  icon: <Award        className="w-4 h-4 text-green"   /> },
+  marketing:    { bar: 'border-l-orange', bg: 'bg-orange/10', border: 'border-orange/30', icon: <Target       className="w-4 h-4 text-orange"  /> },
+};
+
+const NotifToastItem: React.FC<NotifToastItemProps> = ({ toast, onDismiss, onMarkRead }) => {
+  const accent = toast.critical
+    ? { bar: 'border-l-red', bg: 'bg-red/10', border: 'border-red/30', icon: <AlertCircle className="w-4 h-4 text-red" /> }
+    : (NOTIF_ACCENT[toast.category] ?? { bar: 'border-l-muted', bg: 'bg-panel', border: 'border-line', icon: <Bell className="w-4 h-4 text-muted" /> });
+
+  return (
+    <div
+      className={`pointer-events-auto flex items-start gap-3 p-3.5 rounded-xl
+        border border-l-[4px] shadow-xl backdrop-blur-md
+        ${accent.bar} ${accent.bg} ${accent.border}
+        animate-[slideIn_0.35s_cubic-bezier(0.22,1,0.36,1)]
+      `}
+    >
+      {/* Icon */}
+      <div className="shrink-0 p-1.5 rounded-lg bg-bg/60 border border-line/30">
+        {accent.icon}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <p className={`font-bold text-xs leading-snug ${toast.critical ? 'text-red' : 'text-text'}`}>
+          {toast.title}
+        </p>
+        <p className="text-[11px] text-muted leading-relaxed mt-0.5 line-clamp-2">
+          {toast.message}
+        </p>
+      </div>
+
+      {/* Dismiss */}
+      <button
+        onClick={() => { onMarkRead(toast.id); onDismiss(toast.toastId); }}
+        className="shrink-0 p-1 text-muted hover:text-text transition-colors rounded-md hover:bg-bg/40"
+      >
+        <X className="w-3.5 h-3.5" />
+      </button>
+    </div>
+  );
+};
+
 interface AppLayoutProps {
   children: React.ReactNode;
   activePage: string;
@@ -134,6 +190,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { toasts, removeToast, celebrationActive, dismissCelebration, levelUpTo } = useXP();
+  const { liveToasts, dismissLiveToast, markAsRead } = useNotifications();
   
   return (
     <div className="flex h-[100dvh] overflow-hidden bg-bg text-text">
@@ -178,6 +235,16 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       `}>
         {toasts.map(toast => (
           <ToastItem key={toast.id} toast={toast} removeToast={removeToast} />
+        ))}
+      </div>
+
+      {/* Live Notification Toast Overlay — bottom-right desktop / top-center mobile */}
+      <div className={`fixed z-[79] flex flex-col-reverse max-w-sm w-full pointer-events-none gap-2.5
+        bottom-6 right-6
+        max-lg:flex-col max-lg:top-[72px] max-lg:bottom-auto max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:right-auto max-lg:px-4
+      `}>
+        {liveToasts.map(toast => (
+          <NotifToastItem key={toast.toastId} toast={toast} onDismiss={dismissLiveToast} onMarkRead={markAsRead} />
         ))}
       </div>
 

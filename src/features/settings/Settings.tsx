@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { useTheme } from '../../context/ThemeContext';
-
+import { useNotifications } from '../../context/NotificationContext';
 import { Shield, CreditCard, Sliders, Lock, ChevronDown, ChevronUp, Download, Trash2, Mail, Key, ShieldCheck, Link as LinkIcon, AlertCircle, User, Phone, MapPin } from 'lucide-react';
+import type { NotificationPreferences, NotificationCategory } from '../../types';
 
 type TabType = 'account' | 'billing' | 'preferences' | 'privacy';
 
@@ -32,11 +33,8 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account' }) =>
   const [confirmModalTarget, setConfirmModalTarget] = useState<'delete' | 'cancel_sub' | null>(null);
 
   // Preferences state
+  const { preferences, updatePreferences } = useNotifications();
   const [language, setLanguage] = useState('EN');
-  const [emailCourse, setEmailCourse] = useState(true);
-  const [emailMarketing, setEmailMarketing] = useState(false);
-  const [pushDirect, setPushDirect] = useState(true);
-  const [pushAlerts, setPushAlerts] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [videoSpeed, setVideoSpeed] = useState('1');
@@ -139,10 +137,7 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account' }) =>
                     <PreferencesTab 
                       themeMode={theme} setThemeMode={(v) => setTheme(v as 'light' | 'dark' | 'system')}
                       language={language} setLanguage={(v) => handleSelect(setLanguage, v)}
-                      emailCourse={emailCourse} setEmailCourse={(v) => handleToggle(setEmailCourse, v)}
-                      emailMarketing={emailMarketing} setEmailMarketing={(v) => handleToggle(setEmailMarketing, v)}
-                      pushDirect={pushDirect} setPushDirect={(v) => handleToggle(setPushDirect, v)}
-                      pushAlerts={pushAlerts} setPushAlerts={(v) => handleToggle(setPushAlerts, v)}
+                      preferences={preferences} updatePreferences={updatePreferences}
                       reducedMotion={reducedMotion} setReducedMotion={(v) => handleToggle(setReducedMotion, v)}
                       soundEnabled={soundEnabled} setSoundEnabled={(v) => handleToggle(setSoundEnabled, v)}
                       videoSpeed={videoSpeed} setVideoSpeed={(v) => handleSelect(setVideoSpeed, v)}
@@ -466,14 +461,8 @@ interface PreferencesTabProps {
   setThemeMode: (v: string) => void;
   language: string;
   setLanguage: (v: string) => void;
-  emailCourse: boolean;
-  setEmailCourse: (v: boolean) => void;
-  emailMarketing: boolean;
-  setEmailMarketing: (v: boolean) => void;
-  pushDirect: boolean;
-  setPushDirect: (v: boolean) => void;
-  pushAlerts: boolean;
-  setPushAlerts: (v: boolean) => void;
+  preferences: NotificationPreferences;
+  updatePreferences: (prefs: Partial<NotificationPreferences>) => void;
   reducedMotion: boolean;
   setReducedMotion: (v: boolean) => void;
   soundEnabled: boolean;
@@ -484,7 +473,7 @@ interface PreferencesTabProps {
   setAiMode: (v: string) => void;
 }
 
-const PreferencesTab: React.FC<PreferencesTabProps> = ({ themeMode, setThemeMode, language, setLanguage, emailCourse, setEmailCourse, emailMarketing, setEmailMarketing, pushDirect, setPushDirect, pushAlerts, setPushAlerts, reducedMotion, setReducedMotion, soundEnabled, setSoundEnabled, videoSpeed, setVideoSpeed, aiMode, setAiMode }) => (
+const PreferencesTab: React.FC<PreferencesTabProps> = ({ themeMode, setThemeMode, language, setLanguage, preferences, updatePreferences, reducedMotion, setReducedMotion, soundEnabled, setSoundEnabled, videoSpeed, setVideoSpeed, aiMode, setAiMode }) => (
   <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
     <div>
       <h2 className="text-xl font-bold text-text">Preferences</h2>
@@ -528,15 +517,78 @@ const PreferencesTab: React.FC<PreferencesTabProps> = ({ themeMode, setThemeMode
 
       {/* Notifications */}
       <div className="space-y-4">
-        <h3 className="font-bold text-text text-sm uppercase tracking-wider text-muted">Email notifications (granular toggles)</h3>
-        <div className="space-y-2">
-          <ToggleRow label="Course Updates" description="New lessons and curriculum changes." checked={emailCourse} onChange={setEmailCourse} />
-          <ToggleRow label="Marketing Communications" description="Special offers and platform news." checked={emailMarketing} onChange={setEmailMarketing} />
+        <h3 className="font-bold text-text text-sm uppercase tracking-wider text-muted">Notification Preferences</h3>
+        
+        <div className="p-4 bg-bg border border-line rounded-xl overflow-x-auto">
+          <table className="w-full text-left text-sm whitespace-nowrap">
+            <thead>
+              <tr className="text-muted border-b border-line">
+                <th className="pb-3 font-semibold">Notification Type</th>
+                <th className="pb-3 font-semibold text-center">In-App</th>
+                <th className="pb-3 font-semibold text-center">Email</th>
+                <th className="pb-3 font-semibold text-center">Push</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {[
+                { key: 'course', label: 'Course Updates', desc: 'Lessons, modules, assignments' },
+                { key: 'social', label: 'Social & Community', desc: 'Forum replies, mentions' },
+                { key: 'system', label: 'System Alerts', desc: 'Security, billing, account' },
+                { key: 'gamification', label: 'Gamification', desc: 'Streaks, badges, milestones' },
+                { key: 'marketing', label: 'Marketing', desc: 'Offers and news' }
+              ].map((type) => {
+                const k = type.key as NotificationCategory;
+                return (
+                  <tr key={k}>
+                    <td className="py-3">
+                      <div className="font-bold text-text">{type.label}</div>
+                      <div className="text-[10px] text-muted">{type.desc}</div>
+                    </td>
+                    <td className="py-3 text-center">
+                      <input 
+                        type="checkbox" 
+                        checked={preferences[k].inApp} 
+                        onChange={(e) => updatePreferences({ [k]: { ...preferences[k], inApp: e.target.checked } })}
+                        className="w-4 h-4 rounded bg-bg border border-line text-cyan focus:ring-cyan cursor-pointer"
+                      />
+                    </td>
+                    <td className="py-3 text-center">
+                      <input 
+                        type="checkbox" 
+                        checked={preferences[k].email} 
+                        onChange={(e) => updatePreferences({ [k]: { ...preferences[k], email: e.target.checked } })}
+                        className="w-4 h-4 rounded bg-bg border border-line text-cyan focus:ring-cyan cursor-pointer"
+                      />
+                    </td>
+                    <td className="py-3 text-center">
+                      <input 
+                        type="checkbox" 
+                        checked={preferences[k].push} 
+                        onChange={(e) => updatePreferences({ [k]: { ...preferences[k], push: e.target.checked } })}
+                        className="w-4 h-4 rounded bg-bg border border-line text-cyan focus:ring-cyan cursor-pointer"
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-        <h3 className="font-bold text-text text-sm uppercase tracking-wider text-muted mt-4">Push notifications (granular toggles)</h3>
-        <div className="space-y-2">
-          <ToggleRow label="Direct Messages" description="When a tutor or peer messages you." checked={pushDirect} onChange={setPushDirect} />
-          <ToggleRow label="Live Alerts" description="Reminders for live sessions." checked={pushAlerts} onChange={setPushAlerts} />
+
+        <div className="flex items-center justify-between p-4 bg-bg border border-line rounded-xl mt-2">
+          <div>
+            <div className="font-bold text-sm text-text">Notification Digest</div>
+            <div className="text-xs text-muted mt-0.5">How often to receive low-priority alerts via email.</div>
+          </div>
+          <CustomDropdown 
+            value={preferences.digest} 
+            onChange={(val) => updatePreferences({ digest: val as 'instant' | 'daily' | 'weekly' })} 
+            options={[
+              { label: 'Instant', value: 'instant' },
+              { label: 'Daily Digest', value: 'daily' },
+              { label: 'Weekly Digest', value: 'weekly' }
+            ]} 
+          />
         </div>
       </div>
 

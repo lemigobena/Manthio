@@ -376,3 +376,25 @@ export interface TutorConversation {
   preview: string;
   createdAt: string;
 }
+
+export type NotificationCategory = 'course' | 'social' | 'system' | 'gamification' | 'marketing';
+
+export interface AppNotification {
+  id: string;
+  category: NotificationCategory;
+  title: string;
+  message: string;
+  time: string;
+  read: boolean;
+  critical: boolean;
+  link?: string;
+}
+
+export interface NotificationPreferences {
+  course: { email: boolean; push: boolean; inApp: boolean };
+  social: { email: boolean; push: boolean; inApp: boolean };
+  system: { email: boolean; push: boolean; inApp: boolean };
+  gamification: { email: boolean; push: boolean; inApp: boolean };
+  marketing: { email: boolean; push: boolean; inApp: boolean };
+  digest: 'instant' | 'daily' | 'weekly';
+}
