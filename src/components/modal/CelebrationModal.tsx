@@ -11,13 +11,14 @@ interface CelebrationModalProps {
   points?: number;
 }
 
-const CelebrationModal: React.FC<CelebrationModalProps> = ({
+const CelebrationModal: React.FC<CelebrationModalProps & { centerOnMobile?: boolean }> = ({
   isOpen,
   onClose,
   title,
   subtitle,
   achievementName,
-  points
+  points,
+  centerOnMobile,
 }) => {
   // Restore the original falling confetti style
   const particles = useMemo(() =>
@@ -54,7 +55,7 @@ const CelebrationModal: React.FC<CelebrationModalProps> = ({
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="sm">
+    <Modal isOpen={isOpen} onClose={onClose} size="sm" centerOnMobile={centerOnMobile}>
       <div className="relative flex flex-col items-center text-center py-4 space-y-6 overflow-hidden">
 
         {/* ── Original Falling Confetti ── */}

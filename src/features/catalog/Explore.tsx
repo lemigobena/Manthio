@@ -400,7 +400,8 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                   <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-cyan"/><span className="text-text font-medium">Create multiple profiles for versatility.</span></li>
                 </ul>
                 <div className="pt-4">
-                  <button className="flex items-center space-x-2 text-cyan font-bold hover:text-cyan2 transition-colors">
+                  {/* Desktop button only; mobile variant placed after the card */}
+                  <button className="hidden md:flex items-center space-x-2 text-cyan font-bold hover:text-cyan2 transition-colors">
                     <span>See Doc</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
@@ -413,6 +414,13 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                        <BarChart className="w-16 h-16 text-muted opacity-50" />
                     </div>
                  </div>
+              </div>
+              {/* Mobile-only button placed after the card so it appears below the card on phones */}
+              <div className="w-full md:hidden flex justify-center">
+                <button className="flex items-center space-x-2 text-cyan font-bold hover:text-cyan2 transition-colors py-3">
+                  <span>See Doc</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
@@ -429,7 +437,8 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                   <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-purple"/><span className="text-text font-medium">Shareable workspace links.</span></li>
                 </ul>
                 <div className="pt-4">
-                  <button className="flex items-center space-x-2 text-purple font-bold hover:text-purple/80 transition-colors">
+                  {/* Desktop-only button; mobile copy below the card */}
+                  <button className="hidden md:flex items-center space-x-2 text-purple font-bold hover:text-purple/80 transition-colors">
                     <span>Learn More</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
@@ -442,6 +451,13 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                        <Users className="w-16 h-16 text-muted opacity-50" />
                     </div>
                  </div>
+              </div>
+              {/* Mobile-only button placed after the card so it appears below the card on phones */}
+              <div className="w-full md:hidden flex justify-center">
+                <button className="flex items-center space-x-2 text-purple font-bold hover:text-purple/80 transition-colors py-3">
+                  <span>Learn More</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
