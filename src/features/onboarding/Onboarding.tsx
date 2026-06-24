@@ -18,7 +18,6 @@ import {
   Code2,
   Globe,
   Upload,
-  Trash2,
 } from 'lucide-react';
 // Import custom avatars
 import boy from '../../assets/avatars/boy.png';
@@ -240,21 +239,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
     setStep(prev => Math.max(prev - 1, 1));
   };
 
-  const handleSkipStep = () => {
-    if (step === 2) {
-      setReason('Curiosity');
-      setTimeCommitment('2-5 Hrs');
-      setExperienceLevel('Beginner');
-      setLearningPreference('Interactive Coding');
-      setInterestedSubject('Web Development');
-    }
-    if (step === 3) {
-      // Leave avatar as default
-      setAvatar(defaultAvatar);
-    }
-    nextStep();
-  };
-
   const handleSkipOnboarding = () => {
     skipOnboarding();
     addToast('info', 'Onboarding skipped. You can complete your profile later from settings.');
@@ -294,19 +278,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
       reader.onloadend = () => {
         if (typeof reader.result === 'string') {
           setAvatar(reader.result);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleBgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          setBackgroundImage(reader.result);
         }
       };
       reader.readAsDataURL(file);
@@ -814,7 +785,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
           disabled={!reason || !experienceLevel || !timeCommitment || !interestedSubject}
           className={`h-8 md:h-9 px-3 md:px-4 flex items-center text-[8px] md:text-[10px] font-black uppercase tracking-widest transition-all rounded-md group ${(!reason || !experienceLevel || !timeCommitment || !interestedSubject)
             ? 'bg-line text-muted cursor-not-allowed opacity-50 shadow-none'
-            : 'bg-cyan text-bg cursor-pointer hover:opacity-90 hover:scale-105 active:scale-95 shadow-md'}`}
+            : 'bg-cyan text-bg cursor-pointer hover:opacity-90 active:bg-cyan/80 transition-all shadow-md'}`}
         >
           <span>Continue</span>
           <ChevronRight className="w-3.5 h-3.5 ml-1 transition-transform group-hover:translate-x-0.5" />
@@ -943,7 +914,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                   <div className="pt-4 md:hidden">
                     <button
                       onClick={nextStep}
-                      className="w-full h-10 flex items-center justify-center text-[10px] font-black uppercase tracking-widest rounded-md transition-all bg-cyan text-bg cursor-pointer hover:opacity-90 active:scale-95 shadow-md"
+                      className="w-full h-10 flex items-center justify-center text-[10px] font-black uppercase tracking-widest rounded-md transition-all bg-cyan text-bg cursor-pointer hover:opacity-90 active:bg-cyan/80 shadow-md"
                     >
                       <span>Complete Setup</span>
                       <ChevronRight className="w-4 h-4 ml-1" />
@@ -956,7 +927,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
               <div className="hidden md:flex shrink-0 px-4 md:px-10 py-6 bg-panel border-t border-line justify-end">
                 <button
                   onClick={nextStep}
-                  className="h-9 px-6 flex items-center text-[10px] font-black uppercase tracking-widest transition-all rounded-md group bg-cyan text-bg cursor-pointer hover:opacity-90 hover:scale-105 active:scale-95 shadow-md"
+                  className="h-9 px-6 flex items-center text-[10px] font-black uppercase tracking-widest transition-all rounded-md group bg-cyan text-bg cursor-pointer hover:opacity-90 active:bg-cyan/80 shadow-md"
                 >
                   <span>Complete Setup</span>
                   <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
@@ -969,124 +940,140 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
         {/* Step 4 — Recommendations */}
         {step === 4 && (
-          <div className="max-w-5xl mx-auto mt-8 md:mt-12 bg-panel border border-line rounded-3xl p-6 md:p-10 shadow-2xl animate-[fadeIn_0.5s_ease-out]">
-            {/* Background SVG Watermark */}
-            <div className="absolute -right-6 -bottom-6 w-80 h-80 pointer-events-none opacity-[0.08] dark:opacity-[0.04] z-0 select-none">
-              <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                <style>{`
-                  @keyframes book-float {
-                    0%, 100% { transform: translateY(0px) rotate(0deg); }
-                    50% { transform: translateY(-6px) rotate(1.5deg); }
-                  }
-                  @keyframes sparkle-drift {
-                    0% { transform: translate(0, 0) scale(0); opacity: 0; }
-                    50% { opacity: 1; }
-                    100% { transform: translate(var(--dx), var(--dy)) scale(1.2); opacity: 0; }
-                  }
-                  .anim-book { animation: book-float 4s ease-in-out infinite; transform-origin: 100px 100px; }
-                  .sparkle-1 { animation: sparkle-drift 3s ease-out infinite; --dx: -20px; --dy: -35px; }
-                  .sparkle-2 { animation: sparkle-drift 3.5s ease-out infinite; animation-delay: 1s; --dx: 20px; --dy: -30px; }
-                `}</style>
-                <g className="anim-book">
-                  <path d="M40,130 C70,125 100,135 100,135 C100,135 130,125 160,130 L160,80 C130,75 100,85 100,85 C100,85 70,75 40,80 Z" fill="var(--panel)" stroke="var(--line)" stroke-width="2" />
-                  <line x1="100" y1="85" x2="100" y2="135" stroke="var(--line)" stroke-width="2" />
-                  <line x1="52" y1="94" x2="88" y2="92" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" />
-                  <line x1="52" y1="104" x2="84" y2="102" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" />
-                  <line x1="112" y1="92" x2="148" y2="94" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" />
-                  <line x1="112" y1="102" x2="144" y2="104" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" />
-                </g>
-                <g transform="translate(100, 80)">
-                  <g className="sparkle-1">
-                    <path d="M0,-5 L2,-2 L5,0 L2,2 L0,5 L-2,2 L-5,0 L-2,-2 Z" fill="var(--cyan)" />
-                  </g>
-                  <g className="sparkle-2">
-                    <path d="M0,-4 L1.5,-1.5 L4,0 L1.5,1.5 L0,4 L-1.5,1.5 L-4,0 L-1.5,-1.5 Z" fill="var(--yellow)" />
-                  </g>
-                </g>
-              </svg>
-            </div>
+          <div className="
+            w-full bg-bg animate-[fadeIn_0.5s_ease-out]
+            flex flex-col
+            md:flex-row md:h-full md:overflow-hidden
+          ">
 
-            <div className="relative z-10 space-y-4">
-              <div className="text-left space-y-1 border-b border-line pb-3">
-                <h2 className="text-2xl md:text-3xl font-black text-text font-display uppercase">STEP 4 — YOUR RECOMMENDED STARTERS</h2>
-                <p className="text-muted text-sm md:text-base">
-                  Based on your goals ({reason || 'Curiosity'} / {timeCommitment || '2-5h'}), we recommend starting with one of these courses:
-                </p>
-              </div>
-
-              {/* Recommendation Course Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {recommendedCourses.map(course => {
-                  const isSelected = selectedCourseId === course.id;
-                  return (
-                    <button
-                      key={course.id}
-                      onClick={() => setSelectedCourseId(course.id)}
-                      className={`text-left rounded-2xl border overflow-hidden transition-all cursor-pointer flex flex-col min-h-[380px] bg-bg/25 group ${isSelected ? 'border-cyan ring-1 ring-cyan bg-cyan/5' : 'border-line hover:border-cyan/40 hover:bg-bg/40'
-                        }`}
-                    >
-                      {/* Image thumb */}
-                      <div className="h-36 w-full relative overflow-hidden bg-panel shrink-0">
-                        <img
-                          src={course.imageUrl}
-                          alt={course.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-80" />
-                        <span className="absolute bottom-2 left-2 text-[9px] bg-panel/90 border border-line text-text px-2 py-0.5 rounded font-black tracking-wider uppercase font-mono">
-                          {course.format.toUpperCase()}
-                        </span>
-                      </div>
-
-                      {/* Meta info */}
-                      <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
-                        <div className="space-y-1">
-                          <div className="flex justify-between items-center text-xs text-muted">
-                            <span>{course.level}</span>
-                            <span className="text-yellow font-bold font-semibold">★ {course.rating}</span>
-                          </div>
-                          <h4 className="font-bold text-sm md:text-base text-text line-clamp-1 group-hover:text-cyan transition-colors">{course.title}</h4>
-                          <p className="text-xs text-muted leading-relaxed line-clamp-3">
-                            {course.description}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center justify-between pt-2 border-t border-line text-xs text-muted">
-                          <span>Reward</span>
-                          <span className="text-cyan font-bold">+{course.xpReward} XP</span>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Call to action tools */}
-              <div className="flex items-center justify-between pt-4 border-t border-line mt-4 flex-wrap gap-4">
-                <button
-                  onClick={prevStep}
-                  className="text-sm font-bold text-muted hover:text-text px-4 py-2.5 rounded-xl border border-line hover:border-muted flex items-center space-x-1.5 transition-all cursor-pointer"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>Back</span>
-                </button>
-
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={handleBrowseCatalog}
-                    className="text-sm font-semibold text-muted hover:text-cyan border border-line hover:border-cyan px-4 py-2.5 rounded-xl transition-all cursor-pointer bg-bg/50"
-                  >
-                    Browse All Courses
-                  </button>
-                  <button
-                    onClick={handleStartSelectedCourse}
-                    className="bg-cyan hover:bg-cyan2 text-bg font-bold px-6 py-3 rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 text-sm md:text-base hover:scale-105 active:scale-95 shadow-lg shadow-cyan/15"
-                  >
-                    <span>Start Course (+150 XP)</span>
-                    <ChevronRight className="w-4 h-4 text-bg" />
-                  </button>
+            {/* LEFT PANEL */}
+            <div className="
+              w-full md:w-[38%] lg:w-[35%]
+              bg-gradient-to-br from-panel2 via-panel to-bg
+              flex flex-col justify-center
+              p-8 md:p-12 lg:p-16
+              border-b md:border-b-0 md:border-r border-line
+              relative overflow-hidden shrink-0
+            ">
+              <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-cyan/20 blur-[100px] rounded-full pointer-events-none" />
+              <div className="absolute bottom-[-10%] left-[-10%] w-80 h-80 bg-purple/10 blur-[120px] rounded-full pointer-events-none" />
+              <div className="relative z-10 space-y-5">
+                <div className="w-12 h-12 border border-cyan rounded-xl flex items-center justify-center text-cyan shadow-sm">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <div className="space-y-3">
+                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-text font-sans tracking-tight leading-tight">
+                    Your Tailored <br />Path Awaits
+                  </h2>
+                  <p className="text-muted text-sm md:text-base leading-relaxed max-w-sm">
+                    Based on your interest in <span className="text-cyan font-bold">{interestedSubject || 'Tech'}</span> and your <span className="text-cyan font-bold">{timeCommitment || 'flexible'}</span> schedule, these starters are perfectly tuned for your success.
+                  </p>
                 </div>
               </div>
+            </div>
+
+            {/* RIGHT PANEL */}
+            <div className="flex-1 bg-panel md:min-h-0 md:flex md:flex-col">
+              <div className="
+                flex-1 md:min-h-0 md:overflow-y-auto scrollbar-hide
+                flex flex-col md:justify-center
+                pt-16 md:pt-24
+              ">
+                <div className="max-w-4xl mx-auto w-full px-6 md:px-8 py-8 md:py-12 space-y-8">
+                  
+                  <div className="space-y-2 text-center md:text-left">
+                    <div className="text-xs font-bold text-muted uppercase tracking-wider">Recommended Starters</div>
+                    <h3 className="text-xl md:text-2xl font-black text-text font-display">Pick a course to start your journey</h3>
+                  </div>
+
+                  {/* Recommendation Course Cards Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {recommendedCourses.map(course => {
+                      const isSelected = selectedCourseId === course.id;
+                      return (
+                        <button
+                          key={course.id}
+                          onClick={() => setSelectedCourseId(course.id)}
+                          className={`text-left rounded-2xl border overflow-hidden transition-all cursor-pointer flex flex-col min-h-[340px] bg-bg/25 group relative ${isSelected ? 'border-cyan ring-1 ring-cyan bg-cyan/5' : 'border-line hover:border-cyan/40 hover:bg-bg/40'}`}
+                        >
+                          {/* Image thumb */}
+                          <div className="h-32 w-full relative overflow-hidden bg-panel shrink-0">
+                            <img
+                              src={course.imageUrl}
+                              alt={course.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-80" />
+                            <span className="absolute bottom-2 left-2 text-[9px] bg-panel/90 border border-line text-text px-2 py-0.5 rounded font-black tracking-wider uppercase">
+                              {course.format}
+                            </span>
+                          </div>
+
+                          {/* Meta info */}
+                          <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                            <div className="space-y-1">
+                              <div className="flex justify-between items-center text-[10px] text-muted font-bold uppercase tracking-wider">
+                                <span>{course.level}</span>
+                                <span className="text-yellow text-xs">★ {course.rating}</span>
+                              </div>
+                              <h4 className="font-bold text-sm text-text line-clamp-1 group-hover:text-cyan transition-colors">{course.title}</h4>
+                              <p className="text-[11px] text-muted leading-relaxed line-clamp-2">
+                                {course.description}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2 border-t border-line text-[10px] font-bold text-muted uppercase">
+                              <span>Reward</span>
+                              <span className="text-cyan">+{course.xpReward} XP</span>
+                            </div>
+                          </div>
+
+                          {isSelected && (
+                            <div className="absolute top-2 right-2 w-5 h-5 bg-cyan text-bg rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                              <Check className="w-3 h-3 stroke-[4px]" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Navigation — MOBILE ONLY */}
+                  <div className="pt-6 flex flex-col space-y-3 md:hidden">
+                    <button
+                      onClick={handleStartSelectedCourse}
+                      className="w-full h-10 flex items-center justify-center text-[10px] font-black uppercase tracking-widest rounded-md transition-all bg-cyan text-bg shadow-md"
+                    >
+                      <span>Start {recommendedCourses.find(c => c.id === selectedCourseId)?.title || 'Course'}</span>
+                      <ArrowRight className="w-3 h-3 ml-1" />
+                    </button>
+                    <button
+                      onClick={handleBrowseCatalog}
+                      className="h-9 flex items-center justify-center text-[10px] font-bold uppercase tracking-widest text-cyan border-2 border-cyan/30 rounded-md hover:border-cyan transition-all"
+                    >
+                      <span>Browse All Courses</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Navigation — DESKTOP ONLY */}
+              <div className="hidden md:flex shrink-0 px-4 md:px-10 py-6 bg-panel border-t border-line items-center justify-end space-x-4">
+                <button
+                  onClick={handleBrowseCatalog}
+                  className="h-9 px-6 flex items-center text-[10px] font-black uppercase tracking-widest text-cyan border-2 border-cyan/30 rounded-md hover:border-cyan transition-colors"
+                >
+                  Browse Catalog
+                </button>
+                <button
+                  onClick={handleStartSelectedCourse}
+                  className="h-9 px-6 flex items-center text-[10px] font-black uppercase tracking-widest rounded-md transition-all bg-cyan text-bg hover:opacity-90 active:bg-cyan/80 shadow-md group"
+                >
+                  <span>Start Selected Course</span>
+                  <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                </button>
+              </div>
+
             </div>
           </div>
         )}
