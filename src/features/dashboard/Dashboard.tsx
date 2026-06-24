@@ -590,7 +590,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                       return <BookOpen className="w-8 h-8 md:w-12 md:h-12 text-bg" />;
                     };
 
-                    let rightSection = null;
+                    let rightSection: React.ReactNode | null;
                     if (course.title === 'Testing Course') {
                       rightSection = (
                         <div className="flex flex-col items-center justify-center space-y-4">
