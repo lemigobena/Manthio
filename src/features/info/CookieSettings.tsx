@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { useXP } from '../../context/XPContext';
-import { ArrowLeft } from 'lucide-react';
 
 interface CookieSettingsProps {
   onNavigate: (page: string) => void;
 }
 
-export const CookieSettings: React.FC<CookieSettingsProps> = ({ onNavigate }) => {
+export const CookieSettings: React.FC<CookieSettingsProps> = () => {
   const { addToast, addXp } = useXP();
 
   // Cookie Settings State
@@ -26,76 +25,67 @@ export const CookieSettings: React.FC<CookieSettingsProps> = ({ onNavigate }) =>
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Back navigation */}
-      <button 
-        onClick={() => onNavigate('dashboard')}
-        className="flex items-center space-x-1.5 text-xs text-muted hover:text-cyan transition-colors cursor-pointer group"
-      >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-        <span>Back to Dashboard</span>
-      </button>
+    <div className="max-w-3xl mx-auto px-4 flex flex-col items-center justify-center h-full py-4">
+      {/* Header */}
+      <div className="text-center mb-12 space-y-4">
+        <h1 className="text-4xl md:text-5xl font-black text-text font-display">
+          Cookie <span className="text-cyan">Settings</span>
+        </h1>
+        <p className="text-sm text-muted uppercase tracking-widest">Manage your preferences</p>
+      </div>
 
-      {/* Main Container Card */}
-      <div className="bg-panel border border-line rounded-2xl p-6 lg:p-8 space-y-6">
-        <div>
-          <h2 className="text-2xl font-black tracking-tight text-text">Cookie Settings</h2>
-          <p className="text-xs text-muted mt-1">Configure your privacy preferences. Changing settings takes effect immediately.</p>
+      <div className="w-full space-y-4">
+        {/* Option 1: Necessary */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border border-line rounded-xl bg-bg/25 hover:bg-bg/40 transition-colors gap-4">
+          <div className="space-y-1.5 pr-6">
+            <h4 className="text-sm font-bold text-text">Necessary Cookies</h4>
+            <p className="text-xs text-muted leading-relaxed">Required for key system functionalities: keeping you signed in, loading course progress, and persisting dark/light design choices.</p>
+          </div>
+          <div className="flex items-center bg-cyan/15 border border-cyan/20 px-3 py-1.5 rounded text-[10px] font-bold text-cyan uppercase select-none shrink-0 self-start sm:self-auto">
+            Always Active
+          </div>
         </div>
 
-        <div className="space-y-4 max-w-xl border-t border-line/30 pt-6">
-          {/* Option 1: Necessary */}
-          <div className="flex items-center justify-between p-4 border border-line rounded-xl bg-bg/25">
-            <div className="space-y-1 pr-4">
-              <h4 className="text-xs font-bold text-text">Necessary Cookies</h4>
-              <p className="text-[10px] text-muted">Required for key system functionalities: keeping you signed in, loading course progress, and persisting dark/light design choices.</p>
-            </div>
-            <div className="flex items-center bg-cyan/15 border border-cyan/20 px-2 py-1 rounded text-[10px] font-bold text-cyan uppercase select-none">
-              Always Active
-            </div>
+        {/* Option 2: Analytics */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border border-line rounded-xl bg-bg/25 hover:bg-bg/40 transition-colors gap-4">
+          <div className="space-y-1.5 pr-6">
+            <h4 className="text-sm font-bold text-text">Performance & Analytics</h4>
+            <p className="text-xs text-muted leading-relaxed">Helps us collect anonymous usage data to evaluate lesson completion times, search performance bottlenecks, and refine syllabus content.</p>
           </div>
+          <button 
+            onClick={() => setAnalyticsCookies(!analyticsCookies)}
+            className={`w-12 h-6 rounded-full p-1 transition-all duration-300 cursor-pointer shrink-0 self-start sm:self-auto ${analyticsCookies ? 'bg-cyan' : 'bg-line'}`}
+          >
+            <div className={`w-4 h-4 rounded-full bg-panel shadow transition-all duration-300 transform ${analyticsCookies ? 'translate-x-6' : 'translate-x-0'}`} />
+          </button>
+        </div>
 
-          {/* Option 2: Analytics */}
-          <div className="flex items-center justify-between p-4 border border-line rounded-xl bg-bg/25">
-            <div className="space-y-1 pr-4">
-              <h4 className="text-xs font-bold text-text">Performance & Analytics</h4>
-              <p className="text-[10px] text-muted">Helps us collect anonymous usage data to evaluate lesson completion times, search performance bottlenecks, and refine syllabus content.</p>
-            </div>
-            <button 
-              onClick={() => setAnalyticsCookies(!analyticsCookies)}
-              className={`w-12 h-6 rounded-full p-1 transition-all duration-300 cursor-pointer shrink-0 ${analyticsCookies ? 'bg-cyan' : 'bg-line'}`}
-            >
-              <div className={`w-4 h-4 rounded-full bg-panel shadow transition-all duration-300 transform ${analyticsCookies ? 'translate-x-6' : 'translate-x-0'}`} />
-            </button>
+        {/* Option 3: Marketing */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border border-line rounded-xl bg-bg/25 hover:bg-bg/40 transition-colors gap-4">
+          <div className="space-y-1.5 pr-6">
+            <h4 className="text-sm font-bold text-text">Personalization & Promotions</h4>
+            <p className="text-xs text-muted leading-relaxed">Used to deliver promotional discount updates on upcoming advanced bootcamps and customized learning pathway offers based on completed courses.</p>
           </div>
+          <button 
+            onClick={() => setMarketingCookies(!marketingCookies)}
+            className={`w-12 h-6 rounded-full p-1 transition-all duration-300 cursor-pointer shrink-0 self-start sm:self-auto ${marketingCookies ? 'bg-cyan' : 'bg-line'}`}
+          >
+            <div className={`w-4 h-4 rounded-full bg-panel shadow transition-all duration-300 transform ${marketingCookies ? 'translate-x-6' : 'translate-x-0'}`} />
+          </button>
+        </div>
 
-          {/* Option 3: Marketing */}
-          <div className="flex items-center justify-between p-4 border border-line rounded-xl bg-bg/25">
-            <div className="space-y-1 pr-4">
-              <h4 className="text-xs font-bold text-text">Personalization & Promotions</h4>
-              <p className="text-[10px] text-muted">Used to deliver promotional discount updates on upcoming advanced bootcamps and customized learning pathway offers based on completed courses.</p>
-            </div>
-            <button 
-              onClick={() => setMarketingCookies(!marketingCookies)}
-              className={`w-12 h-6 rounded-full p-1 transition-all duration-300 cursor-pointer shrink-0 ${marketingCookies ? 'bg-cyan' : 'bg-line'}`}
-            >
-              <div className={`w-4 h-4 rounded-full bg-panel shadow transition-all duration-300 transform ${marketingCookies ? 'translate-x-6' : 'translate-x-0'}`} />
-            </button>
-          </div>
-
-          <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
-            <button
-              onClick={handleSaveCookies}
-              className="bg-cyan hover:bg-cyan2 text-bg font-bold text-xs px-5 py-2.5 rounded-xl transition-colors cursor-pointer w-full sm:w-auto text-center"
-            >
-              Save Preferences
-            </button>
-            {!cookieXpClaimed && (
-              <span className="text-[10px] font-bold text-yellow animate-pulse">
-                ✨ Setting preferences awards +50 XP!
-              </span>
-            )}
-          </div>
+        <div className="pt-8 flex flex-col items-center gap-4">
+          <button
+            onClick={handleSaveCookies}
+            className="bg-cyan hover:bg-cyan2 text-bg font-bold text-sm px-8 py-3 rounded-xl transition-colors cursor-pointer text-center w-full sm:w-auto"
+          >
+            Save Preferences
+          </button>
+          {!cookieXpClaimed && (
+            <span className="text-xs font-bold text-yellow animate-pulse">
+              ✨ Setting preferences awards +50 XP!
+            </span>
+          )}
         </div>
       </div>
     </div>

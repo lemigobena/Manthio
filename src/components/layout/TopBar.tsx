@@ -105,7 +105,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <img 
             src="/Branding/primary/logo_7_prio_1_variation.png" 
             alt="Manthio Logo" 
-            className={`h-30 -ml-[45px] cursor-pointer object-left object-contain ${theme === 'dark' ? 'brightness-0 invert' : ''}`}
+            className="h-30 -ml-[45px] cursor-pointer object-left object-contain transition-transform hover:scale-105"
             onClick={() => onNavigate('explore')}
           />
           <div className="flex items-center gap-3">

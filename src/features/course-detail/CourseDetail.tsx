@@ -146,7 +146,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                   onClick={handleEnroll}
                   className="bg-cyan hover:bg-cyan/90 text-bg font-black px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(45,212,191,0.2)] hover:translate-y-[-2px] cursor-pointer w-full sm:w-auto text-center uppercase tracking-wider text-xs"
                 >
-                  Enrol now for {track ? (track.level === 'Advanced' ? 'CHF 2\'500.00' : 'CHF 1\'800.00') : (course!.availableFormats?.find(f => f.format === selectedFormat)?.price || course!.price)}
+                  Enrol now for {course!.availableFormats?.find(f => f.format === selectedFormat)?.price || course!.price}
                 </button>
                 <div className="flex items-center space-x-2 bg-bg/50 border border-line px-4 py-3.5 rounded-xl">
                   <Sparkles className="w-4 h-4 text-orange" />

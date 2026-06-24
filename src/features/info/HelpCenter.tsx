@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { 
-  ArrowLeft, Search, Send, ChevronDown, ChevronUp 
+  Search, Send, ChevronDown, ChevronUp 
 } from 'lucide-react';
 
 interface HelpCenterProps {
-  onNavigate: (page: string) => void;
+  onNavigate?: (page: string) => void;
 }
 
 const FAQS = [
@@ -32,7 +32,7 @@ const FAQS = [
   }
 ];
 
-export const HelpCenter: React.FC<HelpCenterProps> = ({ onNavigate }) => {
+export const HelpCenter: React.FC<HelpCenterProps> = () => {
   const { user } = useAuth();
   const { addToast } = useXP();
 
@@ -67,16 +67,7 @@ export const HelpCenter: React.FC<HelpCenterProps> = ({ onNavigate }) => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Back navigation */}
-      <button 
-        onClick={() => onNavigate('dashboard')}
-        className="flex items-center space-x-1.5 text-xs text-muted hover:text-cyan transition-colors cursor-pointer group"
-      >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-        <span>Back to Dashboard</span>
-      </button>
-
+    <div className="max-w-6xl mx-auto px-4 pb-24 pt-8 md:pt-16 space-y-16">
       {/* Main Container Card */}
       <div className="bg-panel border border-line rounded-2xl p-6 lg:p-8 space-y-8">
         <div>

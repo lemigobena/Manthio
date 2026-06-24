@@ -194,10 +194,16 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const { liveToasts, dismissLiveToast, markAsRead } = useNotifications();
   const { isAuthenticated } = useAuth();
   
-  const isPublicView = activePage === 'explore' || (!isAuthenticated && activePage === 'course-detail');
+  React.useEffect(() => {
+    // No-op
+  }, []);
+  
+  const footerPages = ['help-center', 'privacy', 'terms', 'cookies', 'imprint'];
+  const isPublicView = activePage === 'explore' || (!isAuthenticated && (activePage === 'course-detail' || footerPages.includes(activePage)));
   
   return (
-    <div className="flex h-[100dvh] overflow-hidden bg-bg text-text">
+    <div className="flex h-[100dvh] overflow-hidden bg-bg text-text relative">
+      {/* Global Mouse Spotlight Effect removed */}
       {/* Sidebar Navigation */}
       {!isPublicView && (
         <Sidebar 
@@ -222,13 +228,15 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         />
 
         {/* Content View Body */}
-        <main className="flex-1 overflow-y-auto px-3 md:px-[44px] py-6">
-          <div className="max-w-7xl mx-auto min-h-[calc(100vh-180px)]">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden px-3 md:px-[44px] py-6 flex flex-col">
+          <div className="max-w-7xl mx-auto w-full flex-1">
             {children}
           </div>
           
           {activePage !== 'checkout' && activePage !== 'community' && activePage !== 'ai-tutor' && (
-            <Footer onNavigate={onNavigate} />
+            <div className="mt-auto pt-6">
+              <Footer onNavigate={onNavigate} />
+            </div>
           )}
         </main>
       </div>
