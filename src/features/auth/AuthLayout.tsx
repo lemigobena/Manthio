@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { Sun, Moon } from 'lucide-react';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -24,8 +24,7 @@ const CAROUSEL_DATA = [
 
 export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, onNavigate }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { skipAuth } = useAuth();
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
 
   useEffect(() => {
@@ -112,29 +111,30 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, onNavigate }) 
       </section>
 
       {/* Right Side: Form Panel Area */}
-      <section className="flex-1 h-full overflow-y-auto flex flex-col justify-center px-8 sm:px-16 lg:px-20 xl:px-28 bg-bg transition-colors duration-500">
+      <section className="flex-1 h-full overflow-y-auto flex flex-col justify-center px-8 sm:px-16 lg:px-20 xl:px-28 bg-bg transition-colors duration-500 relative">
+        {/* Theme Toggle (Mobile & Desktop) */}
+        <div className="absolute top-8 right-8 z-50">
+          <button 
+            onClick={toggleTheme}
+            className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 shadow-lg ${
+              isDark 
+                ? 'bg-panel border border-line text-cyan hover:bg-line group' 
+                : 'bg-white border border-black/5 text-cyan hover:shadow-cyan/10'
+            }`}
+            aria-label="Toggle theme"
+          >
+            {isDark ? (
+              <Sun className="w-5 h-5 transition-transform group-hover:rotate-45" />
+            ) : (
+              <Moon className="w-5 h-5 transition-transform hover:-rotate-12" />
+            )}
+          </button>
+        </div>
+
         <div className="w-full max-w-[460px] mx-auto py-12">
           {children}
         </div>
       </section>
-
-      {/* Floating Skip Button */}
-      <button 
-        onClick={() => {
-          skipAuth();
-          onNavigate('onboarding');
-        }}
-        className={`fixed bottom-10 right-10 z-50 px-6 py-3 rounded-full font-bold text-xs uppercase tracking-[0.2em] transition-all active:scale-[0.95] flex items-center gap-2 group shadow-2xl ${
-          isDark 
-            ? 'bg-panel border border-line text-text hover:bg-cyan hover:text-bg' 
-            : 'bg-panel border border-line text-muted hover:border-cyan hover:text-cyan'
-        }`}
-      >
-        Skip
-        <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-        </svg>
-      </button>
 
     </div>
   );

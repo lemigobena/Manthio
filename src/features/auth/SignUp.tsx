@@ -23,17 +23,11 @@ export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!agree) return;
     setIsLoading(true);
-    try {
-      const fullName = `${firstName} ${lastName}`.trim();
-      const success = await signUp(fullName, email, password);
-      if (success) onNavigate('onboarding');
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
+    // Explicitly navigate without constraints
+    const fullName = `${firstName || 'Alex'} ${lastName || 'Chen'}`.trim();
+    await signUp(fullName, email || 'newuser@example.com', password || 'password');
+    onNavigate('onboarding');
   };
 
   return (
@@ -52,38 +46,34 @@ export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
           <input 
             type="text" 
             placeholder="First name"
-            className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 outline-hidden focus:border-cyan transition-all text-sm"
+            className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 !outline-none focus:border-cyan transition-all text-sm"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            required
           />
           <input 
             type="text" 
             placeholder="Last name"
-            className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 outline-hidden focus:border-cyan transition-all text-sm"
+            className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 !outline-none focus:border-cyan transition-all text-sm"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            required
           />
         </div>
 
         <input 
           type="email" 
           placeholder="Email"
-          className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 outline-hidden focus:border-cyan transition-all text-sm"
+          className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 !outline-none focus:border-cyan transition-all text-sm"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
         />
 
         <div className="relative">
           <input 
             type={showPassword ? "text" : "password"} 
             placeholder="Enter your password"
-            className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 outline-hidden focus:border-cyan transition-all text-sm pr-12"
+            className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 !outline-none focus:border-cyan transition-all text-sm pr-12"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
           />
           <button 
             type="button" 

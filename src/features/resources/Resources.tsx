@@ -199,7 +199,7 @@ export const Resources: React.FC<ResourcesProps> = () => {
                 placeholder="Search filename or content..." 
                 value={searchQuery}
                 onChange={(e) => { setSearchQuery(e.target.value); simulateLoad(); }}
-                className="bg-bg border border-line text-xs rounded-xl pl-9 pr-4 py-2.5 text-text !focus:outline-none !outline-none !ring-0 focus:border-cyan w-full md:w-64 transition-all"
+                className="bg-bg border border-line text-xs rounded-xl pl-9 pr-4 py-2.5 text-text !outline-none focus:border-cyan w-full md:w-64 transition-all"
               />
               <Search className="absolute left-3 top-3 w-4 h-4 text-muted" />
             </div>

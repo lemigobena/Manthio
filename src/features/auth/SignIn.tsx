@@ -20,14 +20,9 @@ export const SignIn: React.FC<SignInProps> = ({ onNavigate }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    try {
-      const success = await signIn(email, password);
-      if (success) onNavigate('dashboard');
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
+    // Explicitly navigate without constraints
+    await signIn(email || 'demo@example.com', password || 'password');
+    onNavigate('dashboard');
   };
 
   return (
@@ -45,20 +40,18 @@ export const SignIn: React.FC<SignInProps> = ({ onNavigate }) => {
         <input 
           type="email" 
           placeholder="Email"
-          className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 outline-hidden focus:border-cyan transition-all text-sm"
+          className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 !outline-none focus:border-cyan transition-all text-sm"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required 
         />
 
         <div className="relative">
           <input 
             type={showPassword ? "text" : "password"} 
             placeholder="Password"
-            className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 outline-hidden focus:border-cyan transition-all text-sm pr-12"
+            className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 !outline-none focus:border-cyan transition-all text-sm pr-12"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required 
           />
           <button 
             type="button" 
