@@ -612,8 +612,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
           <BookOpen className="w-6 h-6" />
         </div>
         <div className="space-y-3">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-text font-sans tracking-tight leading-tight">
-            Customize <br />Your Profile
+          <h2 className="text-[clamp(20px,5vw,40px)] md:text-[clamp(22px,4vw,48px)] font-black text-text font-sans tracking-tight leading-tight">
+            Define <br />Your Journey
           </h2>
           <p className="text-muted text-sm md:text-base leading-relaxed max-w-sm">
             Answer a few questions to help us tailor your curriculum, AI responses, and course recommendations for maximum growth.
@@ -637,7 +637,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
         flex-1 md:min-h-0 scrollbar-hide
         flex flex-col md:justify-center md:mt-10 overflow-hidden
       ">
-        <div className="max-w-3xl mx-auto w-full px-6 md:px-8 py-6 md:py-8 space-y-5 md:space-y-6">
+        <div className="max-w-3xl mx-auto w-full px-6 md:px-8 py-6 md:py-8 flex flex-col gap-[50px]">
 
           {/* Primary Goal */}
           <div className="space-y-2">
