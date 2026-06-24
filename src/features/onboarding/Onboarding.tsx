@@ -634,8 +634,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
       {/* Scrollable area — on desktop this is the bounded region between top bar and button */}
       <div className="
-        flex-1 md:min-h-0 md:overflow-y-auto scrollbar-hide
-        flex flex-col md:justify-center
+        flex-1 md:min-h-0 scrollbar-hide
+        flex flex-col md:justify-center md:mt-10 overflow-hidden
       ">
         <div className="max-w-3xl mx-auto w-full px-6 md:px-8 py-6 md:py-8 space-y-5 md:space-y-6">
 
