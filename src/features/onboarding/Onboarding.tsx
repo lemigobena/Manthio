@@ -5,7 +5,6 @@ import { useTheme } from '../../context/ThemeContext';
 import { COURSES } from '../../services/mockData';
 import {
   ArrowRight,
-  ArrowLeft,
   Camera,
   Check,
   ChevronRight,
@@ -233,10 +232,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
   const nextStep = () => {
     setStep(prev => Math.min(prev + 1, 4));
-  };
-
-  const prevStep = () => {
-    setStep(prev => Math.max(prev - 1, 1));
   };
 
   const handleSkipOnboarding = () => {
@@ -597,7 +592,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                     nextStep();
                   }
                 }}
-                className="h-[36px] md:h-[40px] px-5 md:px-6 rounded-lg bg-cyan text-bg text-[11px] md:text-[12px] font-black hover:opacity-90 hover:scale-105 active:scale-95 transition-all shadow-md flex items-center space-x-2 cursor-pointer group"
+                className="h-[36px] md:h-[40px] px-5 md:px-6 rounded-lg bg-cyan text-bg text-[11px] md:text-[12px] font-black hover:opacity-90 active:bg-cyan/80 transition-all shadow-md flex items-center space-x-2 cursor-pointer group"
               >
                 <span>{activeIndex === 5 ? 'Start' : 'Next'}</span>
                 <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
