@@ -16,7 +16,7 @@ import {
   Sparkles,
   BookOpen,
   Code2,
-  Globe
+  Globe,
 } from 'lucide-react';
 import defaultAvatar from '../../assets/Avatar.png';
 
@@ -183,10 +183,10 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
   // Recommendations mapping based on step 2 choices
   const getRecommendedCourses = () => {
-    if (reason === 'Career Change / Professional Development' || reason === 'Assigned by my employer') {
+    if (reason === 'Career growth' || reason === 'Employer assigned') {
       return COURSES.filter(c => ['python-bootcamp', 'sql-databases', 'git-essentials'].includes(c.id));
     }
-    if (reason === 'Building a specific skill') {
+    if (reason === 'Specific skill') {
       return COURSES.filter(c => ['react-web-development', 'api-design-fastapi', 'sql-databases'].includes(c.id));
     }
     // Default or curiosity
@@ -205,7 +205,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   }
 
   const nextStep = () => {
-    setStep(prev => Math.min(prev + 1, 5));
+    setStep(prev => Math.min(prev + 1, 4));
   };
 
   const prevStep = () => {
@@ -215,11 +215,12 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   const handleSkipStep = () => {
     if (step === 2) {
       setReason('Curiosity');
+      setTimeCommitment('2-5 Hrs');
+      setExperienceLevel('Beginner');
+      setLearningPreference('Interactive Coding');
+      setInterestedSubject('Web Development');
     }
     if (step === 3) {
-      setTimeCommitment('2-5 Hrs');
-    }
-    if (step === 4) {
       // Leave avatar as default
       setAvatar(defaultAvatar);
     }
@@ -288,58 +289,36 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
 
   return (
-    <div className={`${(step === 0 || step === 1) ? 'w-full h-[100dvh] overflow-hidden bg-bg' : 'max-w-6xl mx-auto px-4 py-4 space-y-4'}`}>
+    <div className="w-full h-[100dvh] overflow-hidden bg-bg flex flex-col">
 
-      {/* Header bar with global skip - Hidden for Step 0 & 1 */}
-      {step > 1 && (
-        <div className="flex items-center justify-between border-b border-line pb-4 animate-[fadeIn_0.3s_ease-out]">
-          <div className="space-y-1">
-            <span className="text-cyan font-black text-sm uppercase tracking-widest font-display">MANTHIO</span>
-            <div className="flex items-center space-x-1">
-              {[1, 2, 3, 4, 5].map(s => (
-                <div
-                  key={s}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${s === step ? 'w-8 bg-cyan' : s < step ? 'w-4 bg-cyan/50' : 'w-4 bg-line'
-                    }`}
-                />
-              ))}
-            </div>
+      {/* TOP RIGHT UTILITIES (Global) */}
+      {step > 0 && (
+        <div className="md:absolute md:top-8 md:right-8 z-50 flex items-center space-x-2 p-4 md:p-0 w-full md:w-auto justify-between md:justify-end bg-bg/80 md:bg-transparent backdrop-blur-md md:backdrop-blur-none border-b border-line md:border-none">
+          <div className="md:hidden flex items-center">
+            <span className="text-cyan font-bold text-[10px] uppercase tracking-widest">Manthio</span>
           </div>
-
-          {/* REQ-ONBOARD-001 / REQ-ONBOARD-002: Global Onboarding Skip Button & Theme Toggle */}
           <div className="flex items-center space-x-2">
             <button
               onClick={handleSkipOnboarding}
-              className="text-xs font-semibold text-muted hover:text-cyan border border-line hover:border-cyan px-3 py-1.5 rounded-xl transition-all cursor-pointer bg-bg/50"
+              className="h-8 md:h-9 flex items-center text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-bg px-3 md:px-4 bg-cyan hover:opacity-90 rounded-md transition-all cursor-pointer shadow-md"
             >
               Skip Onboarding
             </button>
             <button
               onClick={toggleTheme}
-              className="h-9 w-9 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text hover:border-cyan transition-colors cursor-pointer"
-              title={theme === 'dark' ? 'Switch to light design' : 'Switch to dark design'}
+              className="h-8 md:h-9 w-8 md:w-9 flex items-center justify-center rounded-md bg-cyan text-bg hover:opacity-90 transition-all cursor-pointer shadow-md"
             >
-              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {theme === 'dark' ? <Sun className="w-3.5 md:w-4 h-3.5 md:h-4" /> : <Moon className="w-3.5 md:w-4 h-3.5 md:h-4" />}
             </button>
           </div>
         </div>
       )}
 
-      {/* Main Form Container - Full Screen for Step 0 & 1 */}
-      <div className={`relative overflow-hidden w-full h-full ${(step === 0 || step === 1) ? '' : 'bg-panel border border-line rounded-3xl p-5 md:p-6 shadow-2xl'}`}>
+      {/* Main Form Container */}
+      <div className={`flex-1 relative w-full h-full ${(step === 2 || step > 2) ? 'overflow-y-auto md:overflow-hidden bg-bg' : 'overflow-hidden'}`}>
 
         {step === 0 && (
           <div className="relative h-full w-full flex flex-col items-center justify-center bg-bg overflow-hidden pt-12">
-            {/* Theme Toggle - Positioned like the image's top-right utility group */}
-            <div className="absolute top-8 right-8 z-50 flex items-center space-x-4">
-              <button
-                onClick={toggleTheme}
-                className="h-9 px-4 flex items-center justify-center rounded-lg bg-text text-bg text-sm font-bold hover:scale-105 transition-all cursor-pointer shadow-sm"
-              >
-                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-              </button>
-            </div>
-
             {/* --- MAIN CONTENT AREA WITH ORBITS --- */}
             <div className="relative flex items-center justify-center w-full h-[80%] flex-1">
 
@@ -596,22 +575,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
               })}
             </div>
 
-            {/* TOP RIGHT UTILITIES */}
-            <div className="absolute top-4 md:top-8 right-4 md:right-8 z-50 flex items-center space-x-2">
-              <button
-                onClick={handleSkipOnboarding}
-                className="h-8 md:h-9 flex items-center text-[8px] md:text-[10px] font-black uppercase tracking-widest text-bg px-3 md:px-4 bg-cyan hover:opacity-90 rounded-md transition-all cursor-pointer shadow-md"
-              >
-                Skip Onboarding
-              </button>
-              <button
-                onClick={toggleTheme}
-                className="h-8 md:h-9 w-8 md:w-9 flex items-center justify-center rounded-md bg-cyan text-bg hover:opacity-90 transition-all cursor-pointer shadow-md"
-              >
-                {theme === 'dark' ? <Sun className="w-3.5 md:w-4 h-3.5 md:h-4" /> : <Moon className="w-3.5 md:w-4 h-3.5 md:h-4" />}
-              </button>
-            </div>
-
             {/* BOTTOM RIGHT CONTROLS */}
             <div className="absolute bottom-6 md:bottom-12 right-4 md:right-10 z-30 flex flex-col items-end space-y-4 md:space-y-6">
               {/* Micro Pagination Tracker */}
@@ -645,289 +608,200 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
           </div>
         )}
 
-        {/* Step 2 — Goals */}
-        {step === 2 && (
-          <>
-            {/* Background SVG Watermark */}
-            <div className="absolute -right-6 -bottom-6 w-80 h-80 pointer-events-none opacity-[0.08] dark:opacity-[0.04] z-0 select-none">
-              <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                <style>{`
-                  @keyframes target-pulse {
-                    0%, 100% { transform: scale(0.97); }
-                    50% { transform: scale(1.03); }
-                  }
-                  @keyframes draw-line {
-                    from { stroke-dashoffset: 200; }
-                    to { stroke-dashoffset: 0; }
-                  }
-                  .anim-target { animation: target-pulse 3s ease-in-out infinite; transform-origin: 100px 100px; }
-                  .anim-path { stroke-dasharray: 200; stroke-dashoffset: 200; animation: draw-line 2.5s ease-out forwards; }
-                `}</style>
-                <circle cx="100" cy="100" r="60" fill="var(--cyan)" opacity="0.03" />
-                <g className="anim-target">
-                  <circle cx="100" cy="100" r="45" fill="none" stroke="var(--line)" stroke-width="3" />
-                  <circle cx="100" cy="100" r="30" fill="none" stroke="var(--line)" stroke-width="2" />
-                  <circle cx="100" cy="100" r="15" fill="var(--cyan)" opacity="0.15" stroke="var(--cyan)" stroke-width="1.5" />
-                  <circle cx="100" cy="100" r="6" fill="var(--cyan)" />
-                </g>
-                <g transform="translate(130, 60) rotate(-45)">
-                  <line x1="0" y1="0" x2="60" y2="0" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" />
-                  <polygon points="0,0 -8,-4 -5,0 -8,4" fill="var(--text)" />
-                  <path d="M50,-5 L60,-5 L56,0 L60,5 L50,5 Z" fill="var(--muted)" />
-                </g>
-                <path d="M30,160 Q70,140 100,100 T170,40" fill="none" stroke="var(--cyan)" stroke-width="3" stroke-linecap="round" className="anim-path" />
-                <circle cx="170" cy="40" r="5" fill="var(--cyan)" />
-              </svg>
-            </div>
+        {/* Step 2 — Unified Questionnaire */}
+        {/* Step 2 — Unified Questionnaire */}
+{/* Step 2 — Unified Questionnaire */}
+{step === 2 && (
+  <div className="
+    w-full bg-bg animate-[fadeIn_0.5s_ease-out]
+    flex flex-col
+    md:flex-row md:h-full md:overflow-hidden
+  ">
 
-            <div className="relative z-10 space-y-6">
-              <div className="text-left space-y-1 border-b border-line pb-3">
-                <h2 className="text-2xl md:text-3xl font-black text-text font-display uppercase">STEP 2 — WHAT ARE YOUR GOALS?</h2>
-                <p className="text-muted text-sm md:text-base">
-                  Your selections will customize your dashboard prompts and optimize your AI Tutor's responses.
-                </p>
-              </div>
+    {/* LEFT PANEL */}
+    <div className="
+      w-full md:w-[38%] lg:w-[35%]
+      bg-gradient-to-br from-panel2 via-panel to-bg
+      flex flex-col justify-center
+      p-8 md:p-12 lg:p-16
+      border-b md:border-b-0 md:border-r border-line
+      relative overflow-hidden shrink-0
+    ">
+      <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-cyan/20 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-80 h-80 bg-purple/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="relative z-10 space-y-5">
+        <div className="w-12 h-12 border border-cyan rounded-xl flex items-center justify-center text-cyan shadow-sm">
+          <BookOpen className="w-6 h-6" />
+        </div>
+        <div className="space-y-3">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-text font-sans tracking-tight leading-tight">
+            Customize <br />Your Profile
+          </h2>
+          <p className="text-muted text-sm md:text-base leading-relaxed max-w-sm">
+            Answer a few questions to help us tailor your curriculum, AI responses, and course recommendations for maximum growth.
+          </p>
+        </div>
+      </div>
+    </div>
 
-              <div className="space-y-4">
-                {/* Motivation Question */}
-                <div className="space-y-2">
-                  <label className="text-xs text-muted font-bold uppercase tracking-wider block px-1">What brings you to Manthio?</label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[
-                      { id: 'Career growth', label: 'Career Growth', desc: 'Transitioning roles or professional development.' },
-                      { id: 'Specific skill', label: 'Specific Skill', desc: 'Focusing on mastering one programming stack.' },
-                      { id: 'Curiosity', label: 'Curiosity', desc: 'Exploring and coding for personal interest.' },
-                      { id: 'Employer assigned', label: 'Employer Assigned', desc: 'Required as part of corporate training.' }
-                    ].map(opt => {
-                      const isSelected = reason === opt.id;
-                      return (
-                        <button
-                          key={opt.id}
-                          onClick={() => setReason(opt.id)}
-                          className={`text-left p-6 min-h-[110px] md:min-h-[120px] rounded-2xl border transition-all cursor-pointer flex items-start space-x-3 ${isSelected ? 'border-cyan bg-cyan/10 text-cyan' : 'border-line hover:border-cyan/40 bg-bg/20 hover:bg-bg/40'
-                            }`}
-                        >
-                          <div className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${isSelected ? 'border-cyan bg-cyan' : 'border-muted'
-                            }`}>
-                            {isSelected && <Check className="w-2.5 h-2.5 text-bg stroke-[3px]" />}
-                          </div>
-                          <div className="space-y-1">
-                            <h4 className="font-bold text-sm md:text-base text-text">{opt.label}</h4>
-                            <p className="text-xs md:text-sm text-muted leading-relaxed">{opt.desc}</p>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                {/* Experience Level Question */}
-                <div className="space-y-2 pt-2">
-                  <label className="text-xs text-muted font-bold uppercase tracking-wider block px-1">What best describes your current experience level?</label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {[
-                      { id: 'Beginner', label: 'Beginner' },
-                      { id: 'Intermediate', label: 'Intermediate' },
-                      { id: 'Advanced', label: 'Advanced' },
-                      { id: 'Expert', label: 'Expert' }
-                    ].map(opt => {
-                      const isSelected = experienceLevel === opt.id;
-                      return (
-                        <button
-                          key={opt.id}
-                          onClick={() => setExperienceLevel(opt.id)}
-                          className={`text-center p-4 min-h-[60px] md:min-h-[70px] rounded-2xl border transition-all cursor-pointer flex items-center justify-center space-x-2 ${isSelected ? 'border-cyan bg-cyan/10 text-cyan' : 'border-line hover:border-cyan/40 bg-bg/20 hover:bg-bg/40'
-                            }`}
-                        >
-                          <span className="font-bold text-sm md:text-base text-text">{opt.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
+    {/* RIGHT PANEL */}
+    {/*
+      Desktop: fixed-height flex column.
+        - Top area (flex-1, overflow-y-auto): scrolls internally if needed
+        - Content inside is flex + items-center so it's vertically centered
+        - Bottom bar (shrink-0): sticky Continue button, never overlaps
+      Mobile: just flows naturally, no fixed heights
+    */}
+    <div className="flex-1 bg-panel md:min-h-0 md:flex md:flex-col">
 
-              {/* Step Controls */}
-              <div className="flex items-center justify-between pt-4 border-t border-line mt-4">
-                <button
-                  onClick={prevStep}
-                  className="text-sm font-bold text-muted hover:text-text px-4 py-2.5 rounded-xl border border-line hover:border-muted flex items-center space-x-1.5 transition-all cursor-pointer"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>Back</span>
-                </button>
+      {/* Scrollable area — on desktop this is the bounded region between top bar and button */}
+      <div className="
+        flex-1 md:min-h-0 md:overflow-y-auto scrollbar-hide
+        flex flex-col md:justify-center
+      ">
+        <div className="max-w-3xl mx-auto w-full px-6 md:px-8 py-6 md:py-8 space-y-5 md:space-y-6">
 
-                <div className="flex items-center space-x-3">
+          {/* Primary Goal */}
+          <div className="space-y-2">
+            <div className="text-xs font-bold text-muted uppercase tracking-wider">Primary Goal</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { id: 'Career growth', label: 'Career Growth' },
+                { id: 'Specific skill', label: 'Specific Skill' },
+                { id: 'Curiosity', label: 'Curiosity' },
+                { id: 'Employer assigned', label: 'Employer Assigned' }
+              ].map(opt => {
+                const isSelected = reason === opt.id;
+                return (
                   <button
-                    onClick={handleSkipStep}
-                    className="text-sm font-semibold text-muted hover:text-cyan border border-transparent hover:border-line px-4 py-2.5 rounded-xl transition-all cursor-pointer"
+                    key={opt.id}
+                    onClick={() => setReason(opt.id)}
+                    className={`text-left p-3.5 min-h-[60px] rounded-xl border-2 transition-all cursor-pointer flex items-center space-x-3 ${isSelected ? 'border-cyan bg-cyan/10 shadow-sm' : 'border-line hover:border-cyan/40 bg-bg/20 hover:bg-bg/40'}`}
                   >
-                    Skip Step
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${isSelected ? 'border-cyan bg-cyan' : 'border-muted'}`}>
+                      {isSelected && <Check className="w-2.5 h-2.5 text-bg stroke-[3px]" />}
+                    </div>
+                    <h4 className="font-bold text-sm text-text">{opt.label}</h4>
                   </button>
-                  <button
-                    onClick={nextStep}
-                    disabled={!reason || !experienceLevel}
-                    className={`font-bold px-6 py-3 rounded-xl transition-all cursor-pointer flex items-center space-x-2 text-sm md:text-base hover:scale-105 active:scale-95 shadow-lg ${(!reason || !experienceLevel)
-                      ? 'bg-line text-muted cursor-not-allowed opacity-50 shadow-none'
-                      : 'bg-cyan hover:bg-cyan2 text-bg shadow-cyan/15'
-                      }`}
-                  >
-                    <span>Next Step</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+                );
+              })}
             </div>
-          </>
-        )}
+          </div>
 
-        {/* Step 3 — Time Commitment */}
+          {/* Experience Level */}
+          <div className="space-y-2">
+            <div className="text-xs font-bold text-muted uppercase tracking-wider">Experience Level</div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { id: 'Beginner', label: 'Beginner' },
+                { id: 'Intermediate', label: 'Intermediate' },
+                { id: 'Advanced', label: 'Advanced' },
+                { id: 'Expert', label: 'Expert' }
+              ].map(opt => {
+                const isSelected = experienceLevel === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    onClick={() => setExperienceLevel(opt.id)}
+                    className={`text-center p-3 min-h-[60px] rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center ${isSelected ? 'border-cyan bg-cyan/10 shadow-sm' : 'border-line hover:border-cyan/40 bg-bg/20 hover:bg-bg/40'}`}
+                  >
+                    <span className="font-bold text-sm text-text">{opt.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Time Commitment */}
+          <div className="space-y-2">
+            <div className="text-xs font-bold text-muted uppercase tracking-wider">Time Commitment</div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { id: '< 2h', label: '< 2 hours' },
+                { id: '2–5h', label: '2–5 hours' },
+                { id: '5–10h', label: '5–10 hours' },
+                { id: '> 10h', label: '> 10 hours' }
+              ].map(opt => {
+                const isSelected = timeCommitment === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    onClick={() => setTimeCommitment(opt.id)}
+                    className={`text-center p-3 min-h-[60px] rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center ${isSelected ? 'border-cyan bg-cyan/10 shadow-sm' : 'border-line hover:border-cyan/40 bg-bg/20 hover:bg-bg/40'}`}
+                  >
+                    <span className="font-bold text-sm text-text">{opt.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Subject Interest */}
+          <div className="space-y-2">
+            <div className="text-xs font-bold text-muted uppercase tracking-wider">Choose your Subjects</div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {[
+                { id: 'AI', label: 'AI / Machine Learning' },
+                { id: 'Software Dev', label: 'Software Dev' },
+                { id: 'Cloud', label: 'Cloud & DevOps' },
+                { id: 'Cybersecurity', label: 'Cybersecurity' },
+                { id: 'Data', label: 'Data & Analytics' },
+                { id: 'Other', label: 'Other Topics' }
+              ].map(opt => {
+                const isSelected = interestedSubject === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    onClick={() => setInterestedSubject(opt.id)}
+                    className={`text-left p-3 min-h-[60px] rounded-xl border-2 transition-all cursor-pointer flex items-center space-x-3 ${isSelected ? 'border-cyan ring-1 ring-cyan bg-cyan/5' : 'border-line hover:border-cyan/40 hover:bg-bg/40 bg-bg/20'}`}
+                  >
+                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 ${isSelected ? 'bg-cyan border-cyan' : 'border-line bg-panel'}`}>
+                      {isSelected && <Check className="w-3 h-3 text-bg stroke-[3px]" />}
+                    </div>
+                    <h4 className="font-bold text-sm text-text truncate">{opt.label}</h4>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Continue button — MOBILE ONLY (inline, at bottom of content flow) */}
+          <div className="pt-2 md:hidden">
+            <button
+              onClick={nextStep}
+              disabled={!reason || !experienceLevel || !timeCommitment || !interestedSubject}
+              className={`w-full h-8 flex items-center justify-center text-[8px] font-black uppercase tracking-widest rounded-md transition-all group ${(!reason || !experienceLevel || !timeCommitment || !interestedSubject)
+                ? 'bg-line text-muted cursor-not-allowed opacity-50'
+                : 'bg-cyan text-bg cursor-pointer hover:opacity-90 active:scale-95 shadow-md'}`}
+            >
+              <span>Continue</span>
+              <ChevronRight className="w-3 h-3 ml-1 transition-transform group-hover:translate-x-0.5" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Continue button — DESKTOP ONLY (pinned to bottom of right panel, never overlaps content) */}
+      <div className="hidden md:flex shrink-0 px-4 md:px-10 py-4 bg-panel border-t border-line justify-end">
+        <button
+          onClick={nextStep}
+          disabled={!reason || !experienceLevel || !timeCommitment || !interestedSubject}
+          className={`h-8 md:h-9 px-3 md:px-4 flex items-center text-[8px] md:text-[10px] font-black uppercase tracking-widest transition-all rounded-md group ${(!reason || !experienceLevel || !timeCommitment || !interestedSubject)
+            ? 'bg-line text-muted cursor-not-allowed opacity-50 shadow-none'
+            : 'bg-cyan text-bg cursor-pointer hover:opacity-90 hover:scale-105 active:scale-95 shadow-md'}`}
+        >
+          <span>Continue</span>
+          <ChevronRight className="w-3.5 h-3.5 ml-1 transition-transform group-hover:translate-x-0.5" />
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
+        {/* Step 3 — Profile Picture */}
         {step === 3 && (
-          <>
-            {/* Background SVG Watermark */}
-            <div className="absolute -right-6 -bottom-6 w-80 h-80 pointer-events-none opacity-[0.08] dark:opacity-[0.04] z-0 select-none">
-              <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                <style>{`
-                  @keyframes target-pulse {
-                    0%, 100% { transform: scale(0.97); }
-                    50% { transform: scale(1.03); }
-                  }
-                  .anim-target { animation: target-pulse 3s ease-in-out infinite; transform-origin: 100px 100px; }
-                `}</style>
-                <circle cx="100" cy="100" r="60" fill="var(--cyan)" opacity="0.03" />
-                <g className="anim-target">
-                  <circle cx="100" cy="100" r="45" fill="none" stroke="var(--line)" stroke-width="3" />
-                  <circle cx="100" cy="100" r="30" fill="none" stroke="var(--line)" stroke-width="2" />
-                  <circle cx="100" cy="100" r="15" fill="var(--cyan)" opacity="0.15" stroke="var(--cyan)" stroke-width="1.5" />
-                  <circle cx="100" cy="100" r="6" fill="var(--cyan)" />
-                </g>
-              </svg>
-            </div>
-
-            <div className="relative z-10 space-y-4">
-              <div className="text-left space-y-1 border-b border-line pb-3">
-                <h2 className="text-2xl md:text-3xl font-black text-text font-display uppercase">STEP 3 — PREFERENCES</h2>
-                <p className="text-muted text-sm md:text-base">
-                  We'll adapt your learning path based on your preferences.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                {/* Time commitment Question */}
-                <div className="space-y-2">
-                  <label className="text-xs text-muted font-bold uppercase tracking-wider block px-1">Time per week you can invest?</label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {[
-                      { id: '< 2h', label: '< 2 hours', desc: 'Casual study' },
-                      { id: '2–5h', label: '2–5 hours', desc: 'Balanced pace' },
-                      { id: '5–10h', label: '5–10 hours', desc: 'Accelerated' },
-                      { id: '> 10h', label: '> 10 hours', desc: 'Bootcamp mode' }
-                    ].map(opt => {
-                      const isSelected = timeCommitment === opt.id;
-                      return (
-                        <button
-                          key={opt.id}
-                          onClick={() => setTimeCommitment(opt.id)}
-                          className={`text-center p-5 min-h-[100px] md:min-h-[110px] rounded-2xl border transition-all cursor-pointer flex flex-col items-center justify-center space-y-1.5 ${isSelected ? 'border-cyan bg-cyan/10 text-cyan' : 'border-line hover:border-cyan/40 bg-bg/20 hover:bg-bg/40'
-                            }`}
-                        >
-                          <span className="font-bold text-sm md:text-base text-text">{opt.label}</span>
-                          <span className="text-xs text-muted font-medium">{opt.desc}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Learning Preference Question */}
-                <div className="space-y-2 pt-2">
-                  <label className="text-xs text-muted font-bold uppercase tracking-wider block px-1">How do you prefer to learn?</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { id: 'Self-paced', label: 'Self-paced courses' },
-                      { id: 'Live cohort', label: 'Live cohort sessions' },
-                      { id: 'Hybrid', label: 'Hybrid (self-study + workshops)' },
-                      { id: 'No preference', label: 'No preference' }
-                    ].map(opt => {
-                      const isSelected = learningPreference === opt.id;
-                      return (
-                        <button
-                          key={opt.id}
-                          onClick={() => setLearningPreference(opt.id)}
-                          className={`text-center p-3 min-h-[60px] rounded-2xl border transition-all cursor-pointer flex items-center justify-center space-x-2 ${isSelected ? 'border-cyan bg-cyan/10 text-cyan' : 'border-line hover:border-cyan/40 bg-bg/20 hover:bg-bg/40'
-                            }`}
-                        >
-                          <span className="font-bold text-xs md:text-sm text-text">{opt.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Interested Subjects Question */}
-                <div className="space-y-2 pt-2">
-                  <label className="text-xs text-muted font-bold uppercase tracking-wider block px-1">What subjects are you most interested in right now?</label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {[
-                      { id: 'AI', label: 'Artificial Intelligence' },
-                      { id: 'Software Dev', label: 'Programming & Software Dev' },
-                      { id: 'Cloud', label: 'Cloud & DevOps' },
-                      { id: 'Cybersecurity', label: 'Cybersecurity' },
-                      { id: 'Data', label: 'Data & Analytics' },
-                      { id: 'Other', label: 'Other' }
-                    ].map(opt => {
-                      const isSelected = interestedSubject === opt.id;
-                      return (
-                        <button
-                          key={opt.id}
-                          onClick={() => setInterestedSubject(opt.id)}
-                          className={`text-center p-3 min-h-[60px] rounded-2xl border transition-all cursor-pointer flex items-center justify-center space-x-2 ${isSelected ? 'border-cyan bg-cyan/10 text-cyan' : 'border-line hover:border-cyan/40 bg-bg/20 hover:bg-bg/40'
-                            }`}
-                        >
-                          <span className="font-bold text-xs md:text-sm text-text">{opt.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              {/* Step Controls */}
-              <div className="flex items-center justify-between pt-4 border-t border-line mt-4">
-                <button
-                  onClick={prevStep}
-                  className="text-sm font-bold text-muted hover:text-text px-4 py-2.5 rounded-xl border border-line hover:border-muted flex items-center space-x-1.5 transition-all cursor-pointer"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>Back</span>
-                </button>
-
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={handleSkipStep}
-                    className="text-sm font-semibold text-muted hover:text-cyan border border-transparent hover:border-line px-4 py-2.5 rounded-xl transition-all cursor-pointer"
-                  >
-                    Skip Step
-                  </button>
-                  <button
-                    onClick={nextStep}
-                    disabled={!timeCommitment || !learningPreference || !interestedSubject}
-                    className={`font-bold px-6 py-3 rounded-xl transition-all cursor-pointer flex items-center space-x-2 text-sm md:text-base hover:scale-105 active:scale-95 shadow-lg ${(!timeCommitment || !learningPreference || !interestedSubject)
-                      ? 'bg-line text-muted cursor-not-allowed opacity-50 shadow-none'
-                      : 'bg-cyan hover:bg-cyan2 text-bg shadow-cyan/15'
-                      }`}
-                  >
-                    <span>Next Step</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Step 4 — Profile Picture */}
-        {step === 4 && (
-          <>
+          <div className="max-w-3xl mx-auto mt-8 md:mt-16 bg-panel border border-line rounded-3xl p-6 md:p-10 shadow-2xl animate-[fadeIn_0.5s_ease-out]">
             {/* Background SVG Watermark */}
             <div className="absolute -right-6 -bottom-6 w-80 h-80 pointer-events-none opacity-[0.08] dark:opacity-[0.04] z-0 select-none">
               <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -951,7 +825,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
             <div className="relative z-10 space-y-4">
               <div className="text-left space-y-1 border-b border-line pb-3">
-                <h2 className="text-2xl md:text-3xl font-black text-text font-display uppercase">STEP 4 — SETUP PROFILE PICTURE</h2>
+                <h2 className="text-2xl md:text-3xl font-black text-text font-display uppercase">STEP 3 — SETUP PROFILE PICTURE</h2>
                 <p className="text-muted text-sm md:text-base">
                   Customize your visual presence. Upload an avatar image file or generate initials-based badge.
                 </p>
@@ -1037,12 +911,12 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                 </div>
               </div>
             </div>
-          </>
+          </div>
         )}
 
-        {/* Step 5 — Recommendations */}
-        {step === 5 && (
-          <>
+        {/* Step 4 — Recommendations */}
+        {step === 4 && (
+          <div className="max-w-5xl mx-auto mt-8 md:mt-12 bg-panel border border-line rounded-3xl p-6 md:p-10 shadow-2xl animate-[fadeIn_0.5s_ease-out]">
             {/* Background SVG Watermark */}
             <div className="absolute -right-6 -bottom-6 w-80 h-80 pointer-events-none opacity-[0.08] dark:opacity-[0.04] z-0 select-none">
               <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -1081,7 +955,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
             <div className="relative z-10 space-y-4">
               <div className="text-left space-y-1 border-b border-line pb-3">
-                <h2 className="text-2xl md:text-3xl font-black text-text font-display uppercase">STEP 5 — YOUR RECOMMENDED STARTERS</h2>
+                <h2 className="text-2xl md:text-3xl font-black text-text font-display uppercase">STEP 4 — YOUR RECOMMENDED STARTERS</h2>
                 <p className="text-muted text-sm md:text-base">
                   Based on your goals ({reason || 'Curiosity'} / {timeCommitment || '2-5h'}), we recommend starting with one of these courses:
                 </p>
@@ -1161,7 +1035,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                 </div>
               </div>
             </div>
-          </>
+          </div>
         )}
 
       </div>
