@@ -88,6 +88,19 @@ export const Resources: React.FC<ResourcesProps> = () => {
   const courses = Array.from(new Set(RESOURCES.map(f => f.courseName)));
   const accessLevels = Array.from(new Set(RESOURCES.map(f => f.accessLevel)));
 
+  const normalizeUrl = (raw?: string) => {
+    if (!raw) return raw || '';
+    try {
+      const u = new URL(raw, window.location.origin);
+      // If path contains /public/, strip it so asset is requested from root
+      u.pathname = u.pathname.replace(/(^|\/)public\//, '/');
+      return u.href;
+    } catch (e) {
+      // raw might be a relative path
+      return raw.replace(/(^|\/)public\//, '/');
+    }
+  };
+
   const getFileIcon = (type: ResourceFile['type']) => {
     switch (type) {
       case 'pdf': return <FileText className="w-4 h-4 text-red" />;
@@ -385,7 +398,7 @@ export const Resources: React.FC<ResourcesProps> = () => {
 
                 <div className="flex items-center space-x-2 mt-4">
                   <button 
-                    onClick={() => setPreviewFile(file)}
+                    onClick={() => setPreviewFile({ ...file, url: normalizeUrl(file.url) })}
                     className="flex-1 bg-bg hover:bg-line border border-line text-[10px] font-bold py-2 rounded-lg transition-colors"
                   >
                     Preview
@@ -480,7 +493,7 @@ export const Resources: React.FC<ResourcesProps> = () => {
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end space-x-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
-                          onClick={() => setPreviewFile(file)}
+                          onClick={() => setPreviewFile({ ...file, url: normalizeUrl(file.url) })}
                           className="p-1.5 rounded-lg bg-bg border border-line text-muted hover:text-cyan transition-colors"
                           title="Preview"
                         >
