@@ -17,14 +17,42 @@ import {
   BookOpen,
   Code2,
   Globe,
+  Upload,
+  Trash2,
 } from 'lucide-react';
-import defaultAvatar from '../../assets/Avatar.png';
+// Import custom avatars
+import boy from '../../assets/avatars/boy.png';
+import girl from '../../assets/avatars/girl.png';
+import man from '../../assets/avatars/man.png';
+import man1 from '../../assets/avatars/man(1).png';
+import woman from '../../assets/avatars/woman.png';
+import woman1 from '../../assets/avatars/woman(1).png';
+import woman2 from '../../assets/avatars/woman(2).png';
+import fox from '../../assets/avatars/fox.png';
+import rabbit from '../../assets/avatars/rabbit.png';
+import profile from '../../assets/avatars/profile.png';
+import avatarAsset from '../../assets/avatars/avatar.png';
+import AvatarAssetLarge from '../../assets/avatars/Avatar.png';
 
 interface OnboardingProps {
   onNavigate: (page: string) => void;
 }
 
-// Removed generateInitialsAvatar
+// Avatar presets for quick selection
+const AVATAR_PRESETS = [
+  boy,
+  girl,
+  man,
+  man1,
+  woman,
+  woman1,
+  woman2,
+  fox,
+  rabbit,
+  profile,
+  avatarAsset,
+  AvatarAssetLarge,
+];
 
 export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   const {
@@ -64,11 +92,11 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   // Step 3 inputs
   const [avatar, setAvatar] = useState<string>(() => {
     const saved = localStorage.getItem('onboarding_avatar');
-    // Ignore old cached placeholder URLs
-    if (saved && (saved.includes('unsplash.com') || saved.includes('ui-avatars.com'))) {
-      return '';
+    // Ignore old cached placeholder URLs or empty strings
+    if (saved && (saved.includes('dicebear.com') || saved.includes('pravatar.cc') || saved === '')) {
+      return AVATAR_PRESETS[0];
     }
-    return saved || '';
+    return saved || AVATAR_PRESETS[0];
   });
 
   const [backgroundImage, setBackgroundImage] = useState<string>(() => {
@@ -239,7 +267,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
       courseToStart.enrolled = true;
       setActiveCourseId(courseToStart.id);
     }
-    const finalAvatar = avatar || defaultAvatar;
+    const finalAvatar = avatar || boy;
     if (user && (finalAvatar !== user.avatar || backgroundImage !== user.backgroundImage)) {
       updateProfile(user.name, user.bio, finalAvatar, backgroundImage);
     }
@@ -250,7 +278,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   };
 
   const handleBrowseCatalog = () => {
-    const finalAvatar = avatar || defaultAvatar;
+    const finalAvatar = avatar || boy;
     if (user && (finalAvatar !== user.avatar || backgroundImage !== user.backgroundImage)) {
       updateProfile(user.name, user.bio, finalAvatar, backgroundImage);
     }
@@ -609,8 +637,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
         )}
 
         {/* Step 2 — Unified Questionnaire */}
-        {/* Step 2 — Unified Questionnaire */}
-{/* Step 2 — Unified Questionnaire */}
 {step === 2 && (
   <div className="
     w-full bg-bg animate-[fadeIn_0.5s_ease-out]
@@ -801,115 +827,142 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
         {/* Step 3 — Profile Picture */}
         {step === 3 && (
-          <div className="max-w-3xl mx-auto mt-8 md:mt-16 bg-panel border border-line rounded-3xl p-6 md:p-10 shadow-2xl animate-[fadeIn_0.5s_ease-out]">
-            {/* Background SVG Watermark */}
-            <div className="absolute -right-6 -bottom-6 w-80 h-80 pointer-events-none opacity-[0.08] dark:opacity-[0.04] z-0 select-none">
-              <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                <style>{`
-                  @keyframes scan-glow {
-                    0%, 100% { transform: scale(0.96); opacity: 0.3; }
-                    50% { transform: scale(1.04); opacity: 0.8; }
-                  }
-                  .anim-scan { animation: scan-glow 2.5s ease-in-out infinite; transform-origin: 100px 100px; }
-                `}</style>
-                <circle cx="100" cy="100" r="55" fill="var(--purple)" opacity="0.03" />
-                <circle cx="100" cy="100" r="50" fill="none" stroke="var(--purple)" stroke-width="2.5" stroke-dasharray="10 6" className="anim-scan" />
-                <g transform="translate(65, 60)">
-                  <circle cx="35" cy="25" r="18" fill="none" stroke="var(--text)" stroke-width="3" />
-                  <path d="M5,70 C5,45 65,45 65,70" fill="none" stroke="var(--text)" stroke-width="3" stroke-linecap="round" />
-                </g>
-                <path d="M40,40 L42,45 L47,47 L42,49 L40,54 L38,49 L33,47 L38,45 Z" fill="var(--cyan)" />
-                <path d="M150,140 L151.5,144 L155.5,145.5 L151.5,147 L150,151 L148.5,147 L144.5,145.5 L148.5,144 Z" fill="var(--yellow)" />
-              </svg>
+          <div className="
+            w-full bg-bg animate-[fadeIn_0.5s_ease-out]
+            flex flex-col
+            md:flex-row md:h-full md:overflow-hidden
+          ">
+
+            {/* LEFT PANEL */}
+            <div className="
+              w-full md:w-[38%] lg:w-[35%]
+              bg-gradient-to-br from-panel2 via-panel to-bg
+              flex flex-col justify-center
+              p-8 md:p-12 lg:p-16
+              border-b md:border-b-0 md:border-r border-line
+              relative overflow-hidden shrink-0
+            ">
+              <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-cyan/20 blur-[100px] rounded-full pointer-events-none" />
+              <div className="absolute bottom-[-10%] left-[-10%] w-80 h-80 bg-purple/10 blur-[120px] rounded-full pointer-events-none" />
+              <div className="relative z-10 space-y-5">
+                <div className="w-12 h-12 border border-cyan rounded-xl flex items-center justify-center text-cyan shadow-sm">
+                  <Camera className="w-6 h-6" />
+                </div>
+                <div className="space-y-3">
+                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-text font-sans tracking-tight leading-tight">
+                    Finalize <br />Your Identity
+                  </h2>
+                  <p className="text-muted text-sm md:text-base leading-relaxed max-w-sm">
+                    Customize your visual presence. People with profile pictures are 3x more likely to finish courses and engage with mentors.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="relative z-10 space-y-4">
-              <div className="text-left space-y-1 border-b border-line pb-3">
-                <h2 className="text-2xl md:text-3xl font-black text-text font-display uppercase">STEP 3 — SETUP PROFILE PICTURE</h2>
-                <p className="text-muted text-sm md:text-base">
-                  Customize your visual presence. Upload an avatar image file or generate initials-based badge.
-                </p>
-              </div>
+            {/* RIGHT PANEL */}
+            <div className="flex-1 bg-panel md:min-h-0 md:flex md:flex-col">
+              <div className="
+                flex-1 md:min-h-0 md:overflow-y-auto scrollbar-hide
+                flex flex-col md:justify-center
+                pt-16 md:pt-24
+              ">
+                <div className="max-w-xl mx-auto w-full px-6 md:px-8 py-8 md:py-12 space-y-10">
 
-              <div className="flex flex-col items-center justify-center gap-6 py-4">
-
-                {/* Large Avatar preview */}
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-cyan via-purple to-yellow rounded-full blur opacity-25 group-hover:opacity-40 transition-opacity" />
-                  <div className="relative w-32 h-32 rounded-full border-4 border-cyan bg-bg overflow-hidden flex items-center justify-center">
-                    <img
-                      src={avatar || defaultAvatar}
-                      alt="Avatar preview"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-
-                {/* Select Options */}
-                <div className="space-y-4 max-w-sm w-full">
-                  <div className="space-y-1">
-                    <label className="w-full bg-panel border border-line hover:border-cyan text-text text-sm font-bold p-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-center space-x-2 text-center select-none border-dashed bg-bg/20">
-                      <Camera className="w-4 h-4 text-muted" />
-                      <span>Choose Picture File</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleAvatarUpload}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-
-                  <div className="space-y-1 pt-2">
-                    <label className="text-xs text-muted font-black uppercase tracking-wider block px-1">Background Image</label>
-                    <label className="w-full bg-panel border border-line hover:border-cyan text-text text-sm font-bold p-3.5 rounded-xl transition-all cursor-pointer flex items-center justify-center space-x-2 text-center select-none border-dashed bg-bg/20">
-                      <Camera className="w-4 h-4 text-muted" />
-                      <span>Choose Background File</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleBgUpload}
-                        className="hidden"
-                      />
-                    </label>
-                    {backgroundImage && (
-                      <div className="mt-2 text-xs text-cyan text-center font-bold flex items-center justify-center space-x-1">
-                        <Check className="w-3 h-3" />
-                        <span>Background uploaded</span>
+                  <div className="flex flex-col items-center justify-center space-y-8">
+                    {/* Large Avatar preview */}
+                    <div className="relative group">
+                      <div className="absolute -inset-4 bg-gradient-to-tr from-cyan via-purple to-yellow rounded-full blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
+                      <div className="relative w-32 md:w-40 h-32 md:h-40 rounded-full border-4 border-cyan bg-bg overflow-hidden flex items-center justify-center shadow-2xl">
+                        <img
+                          src={avatar || boy}
+                          alt="Avatar preview"
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                    )}
+                      <div className="absolute bottom-1 right-1 md:bottom-2 md:right-2 w-10 h-10 bg-cyan text-bg rounded-full flex items-center justify-center shadow-lg border-2 border-panel">
+                        <Camera className="w-5 h-5" />
+                      </div>
+                    </div>
+
+                    <div className="w-full space-y-6 mt-12">
+
+                      {/* Upload Options */}
+                      <div className="w-full">
+                        <button
+                          onClick={() => document.getElementById('avatar-upload')?.click()}
+                          className="flex items-center justify-center space-x-3 p-4 w-full bg-bg/20 border-2 border-line hover:border-cyan/40 hover:bg-bg/40 rounded-xl transition-all cursor-pointer group"
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-cyan/10 text-cyan flex items-center justify-center shrink-0">
+                            <Upload className="w-5 h-5" />
+                          </div>
+                          <div className="text-left">
+                            <div className="text-sm font-bold text-text">Upload Custom Image</div>
+                            <div className="text-[11px] text-muted">JPEG, PNG, WEBP</div>
+                          </div>
+                        </button>
+                        <input
+                          id="avatar-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleAvatarUpload}
+                        />
+                      </div>
+
+                      {/* Avatar Presets */}
+                      <div className="space-y-4 pt-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-muted uppercase tracking-wider">Or Choose a Preset</span>
+                          <div className="h-px flex-1 bg-line ml-4" />
+                        </div>
+                        <div className="grid grid-cols-6 gap-3 sm:gap-4 pb-2">
+                          {AVATAR_PRESETS.map((pUrl, idx) => {
+                            const isSelected = avatar === pUrl;
+                            
+                            return (
+                              <button
+                                key={idx}
+                                onClick={() => setAvatar(pUrl)}
+                                className={`relative aspect-square rounded-full overflow-hidden border-2 transition-all hover:scale-110 active:scale-95 cursor-pointer ${isSelected ? 'border-cyan ring-2 ring-cyan/30 scale-110 z-10' : 'border-line hover:border-cyan/40 bg-bg/50'}`}
+                              >
+                                <img src={pUrl} alt={`Preset ${idx}`} className="w-full h-full object-contain p-0.5" />
+                                {isSelected && (
+                                  <div className="absolute inset-0 bg-cyan/20 flex items-center justify-center">
+                                    <Check className="w-3 h-3 text-bg stroke-[3px]" />
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Continue button — MOBILE ONLY */}
+                  <div className="pt-4 md:hidden">
+                    <button
+                      onClick={nextStep}
+                      className="w-full h-10 flex items-center justify-center text-[10px] font-black uppercase tracking-widest rounded-md transition-all bg-cyan text-bg cursor-pointer hover:opacity-90 active:scale-95 shadow-md"
+                    >
+                      <span>Complete Setup</span>
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </button>
                   </div>
                 </div>
-
               </div>
 
-              {/* Step Controls */}
-              <div className="flex items-center justify-between pt-4 border-t border-line mt-4">
+              {/* Continue button — DESKTOP ONLY */}
+              <div className="hidden md:flex shrink-0 px-4 md:px-10 py-6 bg-panel border-t border-line justify-end">
                 <button
-                  onClick={prevStep}
-                  className="text-sm font-bold text-muted hover:text-text px-4 py-2.5 rounded-xl border border-line hover:border-muted flex items-center space-x-1.5 transition-all cursor-pointer"
+                  onClick={nextStep}
+                  className="h-9 px-6 flex items-center text-[10px] font-black uppercase tracking-widest transition-all rounded-md group bg-cyan text-bg cursor-pointer hover:opacity-90 hover:scale-105 active:scale-95 shadow-md"
                 >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span>Back</span>
+                  <span>Complete Setup</span>
+                  <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
                 </button>
-
-                <div className="flex items-center space-x-3">
-                  {/* REQ-ONBOARD-002: Independent step-skippability */}
-                  <button
-                    onClick={handleSkipStep}
-                    className="text-sm font-semibold text-muted hover:text-cyan border border-transparent hover:border-line px-4 py-2.5 rounded-xl transition-all cursor-pointer"
-                  >
-                    Skip Step
-                  </button>
-                  <button
-                    onClick={nextStep}
-                    className="bg-cyan hover:bg-cyan2 text-bg font-bold px-6 py-3 rounded-xl transition-all cursor-pointer flex items-center space-x-2 text-sm md:text-base hover:scale-105 active:scale-95 shadow-lg shadow-cyan/15"
-                  >
-                    <span>Next Step</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
               </div>
+
             </div>
           </div>
         )}
