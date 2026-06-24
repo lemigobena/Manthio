@@ -80,9 +80,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   const [experienceLevel, setExperienceLevel] = useState<string>(() => {
     return localStorage.getItem('onboarding_experience_level') || '';
   });
-  const [learningPreference, setLearningPreference] = useState<string>(() => {
-    return localStorage.getItem('onboarding_learning_preference') || '';
-  });
   const [interestedSubject, setInterestedSubject] = useState<string>(() => {
     return localStorage.getItem('onboarding_interested_subject') || '';
   });
@@ -97,9 +94,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
     return saved || AVATAR_PRESETS[0];
   });
 
-  const [backgroundImage, setBackgroundImage] = useState<string>(() => {
-    return localStorage.getItem('onboarding_bg_image') || '';
-  });
 
   // Step 4 recommended courses selection
   const [selectedCourseId, setSelectedCourseId] = useState<string>('python-bootcamp');
@@ -192,20 +186,12 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   }, [experienceLevel]);
 
   useEffect(() => {
-    localStorage.setItem('onboarding_learning_preference', learningPreference);
-  }, [learningPreference]);
-
-  useEffect(() => {
     localStorage.setItem('onboarding_interested_subject', interestedSubject);
   }, [interestedSubject]);
 
   useEffect(() => {
     localStorage.setItem('onboarding_avatar', avatar);
   }, [avatar]);
-
-  useEffect(() => {
-    localStorage.setItem('onboarding_bg_image', backgroundImage);
-  }, [backgroundImage]);
 
   // Recommendations mapping based on step 2 choices
   const getRecommendedCourses = () => {
@@ -247,8 +233,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
       setActiveCourseId(courseToStart.id);
     }
     const finalAvatar = avatar || boy;
-    if (user && (finalAvatar !== user.avatar || backgroundImage !== user.backgroundImage)) {
-      updateProfile(user.name, user.bio, finalAvatar, backgroundImage);
+    if (user && (finalAvatar !== user.avatar)) {
+      updateProfile(user.name, user.bio, finalAvatar, user.backgroundImage || '');
     }
     completeOnboarding({ reason: reason || 'Curiosity', timePerWeek: timeCommitment || '2-5 Hrs' });
     addXp(150, 'Completed first-time onboarding (+150 XP)');
@@ -258,8 +244,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
   const handleBrowseCatalog = () => {
     const finalAvatar = avatar || boy;
-    if (user && (finalAvatar !== user.avatar || backgroundImage !== user.backgroundImage)) {
-      updateProfile(user.name, user.bio, finalAvatar, backgroundImage);
+    if (user && (finalAvatar !== user.avatar)) {
+      updateProfile(user.name, user.bio, finalAvatar, user.backgroundImage || '');
     }
     completeOnboarding({ reason: reason || 'Curiosity', timePerWeek: timeCommitment || '2-5 Hrs' });
     onNavigate('catalog');
