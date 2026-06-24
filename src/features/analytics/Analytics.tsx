@@ -107,6 +107,10 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [reviewIsCorrect, setReviewIsCorrect] = useState(false);
 
+  // Heatmap mobile interaction: tap to reveal tooltip (since hover doesn't exist on touch)
+  const [activeHeatmapIdx, setActiveHeatmapIdx] = useState<number | null>(null);
+  const heatmapRef = useRef<HTMLDivElement | null>(null);
+
   // Listen to real-time updates from other parts of the application
   useEffect(() => {
     const handleUpdate = () => {
@@ -114,6 +118,23 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
     };
     window.addEventListener('manthio_analytics_update', handleUpdate);
     return () => window.removeEventListener('manthio_analytics_update', handleUpdate);
+  }, []);
+
+  // Close heatmap tooltip when tapping/clicking outside the heatmap area
+  useEffect(() => {
+    const handleOutside = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as Node;
+      if (heatmapRef.current && !heatmapRef.current.contains(target)) {
+        setActiveHeatmapIdx(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('touchstart', handleOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
   }, []);
 
   // Simulate initial load
@@ -170,12 +191,16 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
       const d = new Date(day.date);
       const dateString = d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
       return (
-        <div 
-          key={idx} 
+        <div
+          key={idx}
           className={`w-3.5 h-3.5 rounded-sm ${getIntensityClass(day.minutes)} transition-all duration-300 hover:scale-125 cursor-pointer relative group`}
+          onClick={() => setActiveHeatmapIdx(prev => prev === idx ? null : idx)}
+          role="button"
+          tabIndex={0}
         >
-          {/* Tooltip */}
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-panel border border-line text-[10px] text-text rounded-md px-2 py-1 whitespace-nowrap z-50 shadow-xl pointer-events-none">
+          {/* Tooltip: visible on hover (desktop) OR when tapped on mobile */}
+          <div className={`${activeHeatmapIdx === idx ? 'block' : 'hidden'} group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-panel border border-line text-[10px] text-text rounded-md px-2 py-1 whitespace-nowrap z-50 shadow-xl pointer-events-none`}
+          >
             <span className="font-bold">{dateString}</span>
             <div className="text-cyan">{day.minutes} min studied</div>
             {day.modulesCompleted > 0 && <div className="text-purple">{day.modulesCompleted} module completed</div>}
@@ -837,7 +862,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-1.5 pt-2">
+            <div ref={heatmapRef} className="flex flex-wrap gap-1.5 pt-2">
               {renderHeatmap()}
             </div>
           </div>

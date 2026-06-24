@@ -182,7 +182,8 @@ const NeuralActivityChart: React.FC = () => {
   const maxMins = Math.max(...data.map(d => d.mins));
 
   return (
-    <div className="bg-panel border border-line rounded-2xl p-5 flex flex-col flex-1">
+    // Give the chart a clear minimum height so bars can breathe
+    <div className="bg-panel border border-line rounded-2xl p-5 flex flex-col flex-1 min-h-50">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
@@ -194,8 +195,8 @@ const NeuralActivityChart: React.FC = () => {
         </span>
       </div>
 
-      {/* Bars — flex-1 fills all remaining card height */}
-      <div className="flex-1 flex items-end gap-2 min-h-0">
+      {/* Bars — use fixed container height and percentage heights for each bar */}
+      <div className="flex-1 flex items-end gap-2 min-h-0 h-full">
         {data.map((d, i) => {
           const ratio = d.mins / maxMins;
           return (
@@ -204,15 +205,17 @@ const NeuralActivityChart: React.FC = () => {
               <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-text text-bg text-[9px] px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity font-black whitespace-nowrap z-20 pointer-events-none shadow-xl">
                 {d.label}: {d.mins} min
               </div>
-              {/* Spacer pushes bar down proportionally */}
-              <div className="w-full" style={{ flex: 1 - ratio }} />
-              {/* Bar fills its proportional share */}
-              <div
-                className={`w-full rounded-t-md transition-all duration-500 cursor-pointer relative overflow-hidden bg-cyan/20 border-t-2 border-cyan/40 group-hover:bg-cyan/40`}
-                style={{ flex: ratio }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/10" />
+
+              {/* Bar container controls visual height via child height percentage */}
+              <div className="w-full h-[86%] flex items-end">
+                <div
+                  className={`w-full rounded-t-md transition-all duration-500 cursor-pointer relative overflow-hidden bg-cyan/20 border-t-2 border-cyan/40 group-hover:bg-cyan/40`}
+                  style={{ height: `${Math.max(6, Math.round(ratio * 100))}%` }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/10" />
+                </div>
               </div>
+
               {/* Day label */}
               <span className={`text-[9px] font-black uppercase shrink-0 transition-colors text-muted group-hover:text-text`}>
                 {d.day}
@@ -895,24 +898,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             </div>
 
           </div>
-          
-          {/* Explore Catalog Link */}
-          <button
-            onClick={() => onNavigate('explore')}
-            className="w-full flex items-center justify-between gap-3 px-6 py-5 bg-gradient-to-r from-cyan/10 to-blue-500/10 border border-cyan/30 hover:border-blue-500/50 rounded-2xl transition-all cursor-pointer group shadow-lg shadow-cyan/5 mt-6"
-          >
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-panel rounded-xl shadow-inner border border-line">
-                <BookOpen className="w-6 h-6 text-cyan group-hover:text-blue-500 transition-colors" />
-              </div>
-              <div className="text-left">
-                <span className="text-lg font-black text-text group-hover:text-cyan transition-colors tracking-tight">Explore All Courses</span>
-                <span className="block text-sm text-muted mt-1">Browse the full catalog without personalized filters or enrolled statuses.</span>
-              </div>
-            </div>
-            <ArrowRight className="w-6 h-6 text-muted group-hover:text-cyan group-hover:translate-x-1 transition-all shrink-0" />
-          </button>
-
           {/* Demo Center Link */}
           <button
             onClick={() => onNavigate('demo-center')}
