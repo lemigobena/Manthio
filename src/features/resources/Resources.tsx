@@ -95,7 +95,7 @@ export const Resources: React.FC<ResourcesProps> = () => {
       // If path contains /public/, strip it so asset is requested from root
       u.pathname = u.pathname.replace(/(^|\/)public\//, '/');
       return u.href;
-    } catch (e) {
+    } catch {
       // raw might be a relative path
       return raw.replace(/(^|\/)public\//, '/');
     }
