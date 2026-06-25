@@ -293,7 +293,8 @@ export interface ChatMessage {
   sender: 'user' | 'tutor' | 'system';
   text: string;
   timestamp: string;
-  source?: 'Course docs' | 'Cloud AI';
+  source?: 'Course docs' | 'Cloud AI' | 'Sandbox Evaluation' | string;
+  sourceLink?: string;
   documents?: {
     title: string;
     location: string;

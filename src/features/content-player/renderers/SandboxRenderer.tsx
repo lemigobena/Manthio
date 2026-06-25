@@ -157,28 +157,20 @@ export const SandboxRenderer: React.FC<SandboxRendererProps> = ({ lesson, onComp
 
     // Simulated execution latency
     setTimeout(() => {
-      // Mock execution results based on whether they modified the default code
-      const currentCode = files[0].code;
-      const hasCorrectImplementation = currentCode.includes('return "Hello, World!"') || currentCode.includes("return 'Hello, World!'");
-      
       let outText = "Running Python 3.12 (Pyodide)\n";
       const results = sandboxData.tests.map((test, index) => {
-        const passed = hasCorrectImplementation;
+        // Mock execution results based on user request: one correct and one error
+        const passed = index === 0;
         let error = undefined;
         
-        if (index === 0) {
-          if (!passed) error = `AssertionError: assert greet() == "Hello, World!"\nFound: None`;
-        } else {
-          // Test 2 relies on utils.helper which we assume works if the first test does for the sake of simulation
-          if (!passed) error = `ImportError: cannot import name 'custom_greeting' from 'utils.helper'`;
+        if (!passed) {
+          error = `AssertionError: assert custom_greeting("Alice") == "Hello, Alice!"\nFound: None`;
         }
         
         return { id: test.id, name: test.name, passed, error };
       });
 
-      if (hasCorrectImplementation) {
-        outText += "\n> Hello, World!\n";
-      }
+      outText += "\n> hello world\n";
 
       setTestResults(results);
       setOutput(outText);
@@ -191,12 +183,17 @@ export const SandboxRenderer: React.FC<SandboxRendererProps> = ({ lesson, onComp
     if (!submitted) {
       addXp(75, 'Code exercise submitted');
       setSubmitted(true);
+      
+      const userCode = files.map(f => `// ${f.path}\n${f.code}`).join('\n\n');
+      window.dispatchEvent(new CustomEvent('sandbox_submit', { detail: { code: userCode } }));
+      
       onComplete();
     }
   };
 
   const activeFile = files[activeFileIndex];
   const allTestsPassed = testResults.length > 0 && testResults.every(t => t.passed);
+  const hasEdited = sandboxData ? JSON.stringify(files) !== JSON.stringify(sandboxData.files) : false;
 
   if (!sandboxData || files.length === 0) {
     return (
@@ -220,11 +217,11 @@ export const SandboxRenderer: React.FC<SandboxRendererProps> = ({ lesson, onComp
         <div className="flex items-center space-x-3">
           <button 
             onClick={handleSubmit}
-            disabled={submitted || (!allTestsPassed && !submitted)}
+            disabled={submitted || (!allTestsPassed && !hasEdited && !submitted)}
             className={`text-xs font-bold px-4 py-2 rounded-xl transition-all ${
               submitted 
                 ? 'bg-green/20 text-green border border-green cursor-default' 
-                : allTestsPassed
+                : (allTestsPassed || hasEdited)
                   ? 'bg-cyan hover:bg-cyan2 text-bg cursor-pointer shadow-lg shadow-cyan/20'
                   : 'bg-line text-muted cursor-not-allowed opacity-50'
             }`}

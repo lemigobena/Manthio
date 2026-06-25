@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, ChevronRight, ChevronLeft } from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { useXP } from '../../../context/XPContext';
 import type { Lesson, ChatMessage } from '../../../types';
+import { AITutorChat } from '../../ai-tutor/components/AITutorChat';
+import { NotesTab } from './NotesTab';
 
 interface ToolsPaneProps {
   currentLesson: Lesson;
@@ -49,15 +51,13 @@ export const ToolsPane: React.FC<ToolsPaneProps> = ({ currentLesson, isOpen }) =
       sender: 'tutor', 
       text: `Hello! I am your AI Tutor. Feel free to ask me questions about "${currentLesson.title}"!`, 
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
-      source: 'Course docs' 
+      source: 'Course docs',
+      sourceLink: '#/docs/tools-pane/intro'
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
 
-  // Notes state
-  const [noteText, setNoteText] = useState(() => {
-    return localStorage.getItem(`note-${currentLesson.id}`) || '';
-  });
+  // Notes state (moved to NotesTab)
 
   // Bookmarks state
   const [isBookmarked, setIsBookmarked] = useState(() => {
@@ -70,7 +70,6 @@ export const ToolsPane: React.FC<ToolsPaneProps> = ({ currentLesson, isOpen }) =
     setActiveTab(
       (currentLesson.type === 'Code' || currentLesson.type === 'Assignment') ? 'ai' : 'notes'
     );
-    setNoteText(localStorage.getItem(`note-${currentLesson.id}`) || '');
     setIsBookmarked(localStorage.getItem(`bookmark-${currentLesson.id}`) === 'true');
 
     const handleStorage = () => setIsBookmarked(localStorage.getItem(`bookmark-${currentLesson.id}`) === 'true');
@@ -78,9 +77,6 @@ export const ToolsPane: React.FC<ToolsPaneProps> = ({ currentLesson, isOpen }) =
     return () => window.removeEventListener('storage', handleStorage);
   }, [currentLesson.id, currentLesson.type]);
 
-  const handleSaveNote = () => {
-    localStorage.setItem(`note-${currentLesson.id}`, noteText);
-  };
 
   const handleToggleBookmark = () => {
     const newValue = !isBookmarked;
@@ -89,34 +85,80 @@ export const ToolsPane: React.FC<ToolsPaneProps> = ({ currentLesson, isOpen }) =
     window.dispatchEvent(new Event('storage'));
   };
 
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
+  useEffect(() => {
+    const handleSandboxSubmit = (e: Event) => {
+      const customEvent = e as CustomEvent<{code: string}>;
+      setActiveTab('ai');
+      
+      const userMsg: ChatMessage = {
+        id: Math.random().toString(),
+        sender: 'user',
+        text: `Please review my sandbox submission:\n\n\`\`\`python\n${customEvent.detail.code}\n\`\`\``,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      
+      setChatMessages(prev => [...prev, userMsg]);
+      setIsTyping(true);
+      
+      setTimeout(() => {
+        setIsTyping(false);
+        const replyText = `Great job! Your script executed successfully. 🚀\n\n**Output:**\n\`\`\`text\nHello, World!\n\`\`\`\n\n**Test Cases:**\n✅ Should return "Hello, World!"\n✅ Should handle custom names (Hidden Test)\n\nExcellent work completing your first script! Let me know if you have any questions about how this worked.`;
+        
+        const tutorMsg: ChatMessage = {
+          id: Math.random().toString(),
+          sender: 'tutor',
+          text: replyText,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          source: 'Sandbox Evaluation'
+        };
+        setChatMessages(prev => [...prev, tutorMsg]);
+      }, 2000);
+    };
+
+    window.addEventListener('sandbox_submit', handleSandboxSubmit);
+    return () => window.removeEventListener('sandbox_submit', handleSandboxSubmit);
+  }, []);
+
+  const handleSendMessage = (textOverride?: string, forceCloud?: boolean) => {
+    const text = textOverride || chatInput;
+    if (!text.trim()) return;
 
     const userMsg: ChatMessage = {
       id: Math.random().toString(),
       sender: 'user',
-      text: chatInput,
+      text,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
     setChatMessages(prev => [...prev, userMsg]);
-    setChatInput('');
+    if (!textOverride) setChatInput('');
     setIsTyping(true);
 
     setTimeout(() => {
       setIsTyping(false);
-      const replyText = `Good question about "${currentLesson.title}"! Let's look at it socratically. What do you think happens?`;
+      const replyText = forceCloud 
+        ? `I searched the Cloud AI for you. "${currentLesson.title}" is an interesting topic.`
+        : `Good question about "${currentLesson.title}"! Let's look at it socratically. What do you think happens?`;
 
       const tutorMsg: ChatMessage = {
         id: Math.random().toString(),
         sender: 'tutor',
         text: replyText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        source: 'Course docs'
+        source: forceCloud ? 'Cloud AI' : 'Course docs',
+        sourceLink: forceCloud ? undefined : '#/docs/course-docs/specific-topic'
       };
       setChatMessages(prev => [...prev, tutorMsg]);
       addXp(10, 'Asked AI Tutor a question');
     }, 1500);
+  };
+
+  const handleSaveToNotes = (text: string) => {
+    const currentNote = localStorage.getItem(`note-${currentLesson.id}`) || '';
+    const updatedNote = currentNote + (currentNote ? '\n\n' : '') + `> **AI Tutor:**\n> ${text.replace(/\n/g, '\n> ')}`;
+    localStorage.setItem(`note-${currentLesson.id}`, updatedNote);
+    window.dispatchEvent(new Event('noteUpdated'));
+    setActiveTab('notes');
   };
 
   return (
@@ -177,70 +219,21 @@ export const ToolsPane: React.FC<ToolsPaneProps> = ({ currentLesson, isOpen }) =
       <div className="flex-1 overflow-y-auto p-4 flex flex-col">
         
         {activeTab === 'ai' && (
-          <div className="flex flex-col h-full justify-between">
-            <div className="space-y-4 overflow-y-auto pr-1 flex-1">
-              {chatMessages.map(msg => (
-                <div 
-                  key={msg.id} 
-                  className={`space-y-1 max-w-[85%] ${msg.sender === 'user' ? 'ml-auto' : 'mr-auto'}`}
-                >
-                  <div className={`p-3 rounded-2xl text-xs leading-relaxed ${msg.sender === 'user' ? 'bg-cyan text-bg font-semibold rounded-tr-none' : 'bg-bg border border-line rounded-tl-none text-text shadow-sm'}`}>
-                    {msg.text}
-                  </div>
-                  <div className="flex items-center space-x-1.5 text-[9px] text-muted justify-between px-1">
-                    <span>{msg.timestamp}</span>
-                    {msg.source && (
-                      <span className="bg-panel border border-line px-1 rounded-sm">
-                        {msg.source}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {isTyping && (
-                <div className="text-[10px] text-muted flex items-center space-x-1.5 italic px-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan animate-bounce" />
-                  <span>AI Tutor is responding...</span>
-                </div>
-              )}
-            </div>
-
-            {/* Input Chat Block */}
-            <div className="pt-4 border-t border-line mt-4 flex items-center space-x-2 shrink-0">
-              <input 
-                type="text" 
-                placeholder="Ask a question... (Cmd+K)" 
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                className="flex-1 bg-bg border border-line text-xs rounded-xl px-3 py-2 text-text focus:outline-none focus:border-cyan shadow-inner"
-                id="ai-tutor-input"
-              />
-              <button 
-                onClick={handleSendMessage}
-                className="bg-cyan hover:bg-cyan2 text-bg p-2.5 rounded-xl transition-colors cursor-pointer"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </div>
+          <div className="flex flex-col h-full -m-4">
+            <AITutorChat
+              messages={chatMessages}
+              isTyping={isTyping}
+              onSendMessage={handleSendMessage}
+              suggestedPrompts={['Can you explain the main concept?', 'Give me a quiz on this']}
+              embedded={true}
+              onSaveToNotes={handleSaveToNotes}
+            />
           </div>
         )}
 
         {activeTab === 'notes' && (
-          <div className="space-y-4 flex flex-col h-full justify-between">
-            <div className="space-y-2 flex-1 flex flex-col">
-              <label className="text-[10px] text-muted font-bold uppercase tracking-wider">Personal notes for this lesson</label>
-              <textarea 
-                value={noteText}
-                onChange={(e) => setNoteText(e.target.value)}
-                onBlur={handleSaveNote}
-                placeholder="Write important notes here. Markdown is supported. Auto-saves."
-                className="flex-1 w-full p-4 bg-bg border border-line rounded-xl text-xs text-text focus:outline-none focus:border-cyan resize-none font-mono leading-relaxed"
-              />
-            </div>
-          </div>
+          <NotesTab currentLesson={currentLesson} />
         )}
-
 
 
         {activeTab === 'bookmarks' && (
