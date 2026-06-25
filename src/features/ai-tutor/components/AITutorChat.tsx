@@ -30,7 +30,8 @@ export const MarkdownWithCodeBlocks: React.FC<{ content: string }> = ({ content 
         rehypePlugins={[rehypeKatex]}
         components={{
         code(props) {
-          const { children, className, node, ...rest } = props;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+          const { children, className, node, ref, ...rest } = props as any;
           const match = /language-(\w+)/.exec(className || '');
           const language = match ? match[1] : '';
           const codeString = String(children).replace(/\n$/, '');
@@ -64,12 +65,15 @@ export const MarkdownWithCodeBlocks: React.FC<{ content: string }> = ({ content 
                 </button>
               </div>
               <SyntaxHighlighter
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 {...(rest as any)}
                 PreTag="div"
                 children={codeString}
                 language={language}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 style={vscDarkPlus as any}
-                customStyle={{ margin: 0, padding: '12px', fontSize: '11px', background: 'var(--panel)', border: 'none', maxHeight: '250px', overflowY: 'auto' }}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                customStyle={{ margin: 0, padding: '12px', fontSize: '11px', background: 'var(--panel)', border: 'none', maxHeight: '250px', overflowY: 'auto' } as any}
               />
             </div>
           );

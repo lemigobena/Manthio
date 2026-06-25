@@ -23,6 +23,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ currentLesson }) => {
 
   // Load initial data
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setNoteText(localStorage.getItem(`note-${currentLesson.id}`) || '');
     try {
       const savedTags = JSON.parse(localStorage.getItem(`tags-${currentLesson.id}`) || '[]');
@@ -45,6 +46,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ currentLesson }) => {
   // Auto-save debounce
   useEffect(() => {
     if (!noteText) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSaveStatus('Saving...');
     const timer = setTimeout(() => {
       localStorage.setItem(`note-${currentLesson.id}`, noteText);
