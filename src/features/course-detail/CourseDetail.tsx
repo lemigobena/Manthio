@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronDown, ChevronUp, Star, Award, CheckCircle, Clock, Sparkles, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, ThumbsUp, Layers } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star, Award, CheckCircle, Clock, Sparkles, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, Layers, ChevronRight, Users, ArrowRight, Laptop, PlayCircle } from 'lucide-react';
+import { useNotifications } from '../../context/NotificationContext';
 import type { Review } from '../../types';
 
 interface CourseDetailProps {
@@ -11,6 +12,7 @@ interface CourseDetailProps {
 
 export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic }) => {
   const { activeCourseId, activeTrackId, selectedFormat, setSelectedFormat, setActiveCourseId, setActiveTrackId } = useAuth();
+  const { addNotification } = useNotifications();
   
   // Decide what to show: Track or Course
   // If we came from a track click, activeTrackId will be set.
@@ -26,16 +28,20 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [assessmentLevel, setAssessmentLevel] = useState<number>(0);
 
-  // Initialize global format if not set (for courses)
+  // Initialize global format (for courses)
   React.useEffect(() => {
-    if (!track && course && !selectedFormat) {
-      if (course.availableFormats && course.availableFormats.length > 0) {
-        setSelectedFormat(course.availableFormats[0].format);
-      } else {
-        setSelectedFormat(course.format);
+    if (!track && course) {
+      const isFormatAvailable = course.availableFormats?.some(f => f.format === selectedFormat) || course.format === selectedFormat;
+      
+      if (!selectedFormat || !isFormatAvailable) {
+        if (course.availableFormats && course.availableFormats.length > 0) {
+          setSelectedFormat(course.availableFormats[0].format);
+        } else {
+          setSelectedFormat(course.format);
+        }
       }
     }
-  }, [selectedFormat, course, track, setSelectedFormat]);
+  }, [course, track, selectedFormat, setSelectedFormat]);
   
   const enrolled = displayEnrolled;
 
@@ -48,16 +54,31 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
   };
 
   const handleEnroll = () => {
-    console.log("Navigating to checkout for:", track ? track.id : course!.id);
     if (isPublic) {
       onNavigate('signin');
       return;
     }
+
+    // Direct access for included or employer sponsored courses
+    if (course?.priceStatus === 'included' || course?.priceStatus === 'employer') {
+      const bundleInfo = activeBundle ? ` Plus, your ${activeBundle.durationMonths}-month ${activeBundle.label} has been activated!` : '';
+      
+      addNotification({
+        category: 'course',
+        title: 'Enrolment Successful! 🎓',
+        message: `You have successfully enrolled in ${displayTitle}. Access has been granted via ${course.priceStatus === 'included' ? 'your plan' : 'your employer'}.${bundleInfo}`,
+        critical: false
+      });
+      onNavigate('learning-path');
+      return;
+    }
+
     if (!enrolled) {
       onNavigate('checkout');
     }
   };
 
+  const trainerCourses = COURSES.filter(c => course ? (c.trainer.id === course.trainer.id && c.id !== course.id) : false).slice(0, 2);
   const relatedCourses = COURSES.filter(c => course ? c.id !== course.id : true).slice(0, 3);
   
   const faqs = [
@@ -67,8 +88,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
   ];
 
   return (
-    <div className="relative h-[calc(100dvh-64px)] -mx-3 md:-mx-[44px] -my-6 overflow-y-auto bg-bg border-y border-line px-3 md:px-[44px] py-6">
-      <div className="space-y-8 pb-12 max-w-[1600px] mx-auto">
+    <div className="relative -mx-3 md:-mx-[44px] -my-6 bg-bg border-y border-line px-3 md:px-[44px] py-6">
+      <div className="space-y-8 pb-32 max-w-[1600px] mx-auto">
         {/* Course Hero Header */}
       <div className="bg-panel border border-line rounded-2xl p-6 relative overflow-hidden flex flex-col md:flex-row gap-6 items-center">
         <div className="w-full md:w-1/3 h-48 bg-bg rounded-xl overflow-hidden border border-line">
@@ -85,13 +106,27 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                 Career Track
               </span>
             ) : (
-              <span className="bg-cyan text-bg text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm">
-                {selectedFormat === 'flipped' ? 'Flipped Bootcamp' : selectedFormat === 'cohort' ? 'Cohort-Based' : selectedFormat === 'Multiple formats' ? 'Multi-Mode' : 'Self-Paced'}
-              </span>
+              <div className="flex flex-wrap gap-2">
+                {course?.format === 'Multiple formats' ? (
+                  <span className="bg-bg border border-cyan text-cyan text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm">
+                    Multi-Mode Available
+                  </span>
+                ) : (
+                  <span className={`text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm ${
+                    selectedFormat === 'flipped' ? 'bg-cyan text-bg' : 
+                    selectedFormat === 'cohort' ? 'bg-purple text-white' : 
+                    'bg-amber-500 text-white'
+                  }`}>
+                    {selectedFormat === 'flipped' ? 'Flipped Bootcamp' : 
+                     selectedFormat === 'cohort' ? 'Cohort-Based' : 
+                     'Self-Paced'}
+                  </span>
+                )}
+              </div>
             )}
             <span className="bg-bg/40 backdrop-blur-md border border-line text-[10px] px-2.5 py-1 rounded font-bold uppercase text-muted flex items-center gap-1.5">
-              <Globe className="w-3 h-3 text-cyan" />
-              {course?.language || 'English'}
+              <Clock className="w-3 h-3 text-cyan" />
+              {track ? track.estimatedTime : course?.duration}
             </span>
           </div>
 
@@ -130,30 +165,59 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
             )}
           </div>
 
+          {/* Cohort Progress Bar (REQ-CHECKOUT-015) */}
+          {activeCohort && (
+            <div className="pt-2 max-w-sm">
+              <div className="flex justify-between text-[10px] font-black uppercase tracking-wider mb-1.5">
+                <span className={activeCohort.currentParticipants < activeCohort.minParticipants ? "text-orange" : "text-green"}>
+                  {activeCohort.currentParticipants < activeCohort.minParticipants ? "Reservation Status" : "Booking Confirmed"}
+                </span>
+                <span className="text-text font-bold">
+                  {activeCohort.currentParticipants} / {activeCohort.maxParticipants} <span className="text-muted">Seats</span>
+                </span>
+              </div>
+              <div className="w-full h-1.5 bg-bg border border-line rounded-full overflow-hidden">
+                <div 
+                  className={`h-full transition-all duration-1000 ${activeCohort.currentParticipants < activeCohort.minParticipants ? 'bg-orange animate-[pulse_2s_infinite]' : 'bg-green shadow-[0_0_12px_rgba(34,197,94,0.4)]'}`} 
+                  style={{ width: `${(activeCohort.currentParticipants / activeCohort.maxParticipants) * 100}%` }} 
+                />
+              </div>
+              <p className="text-[9px] text-muted font-bold mt-1.5 flex items-center gap-1.5 italic">
+                <Users className="w-3 h-3 text-cyan" />
+                {activeCohort.currentParticipants < activeCohort.minParticipants 
+                  ? `Only ${activeCohort.minParticipants - activeCohort.currentParticipants} more bookings needed to trigger confirmation.` 
+                  : `Hurry! Only ${activeCohort.maxParticipants - activeCohort.currentParticipants} seats remaining for this session.`}
+              </p>
+            </div>
+          )}
+
           <div className="pt-6 flex flex-col sm:flex-row items-center gap-4">
-            {enrolled ? (
-              <button 
-                onClick={() => {
-                  onNavigate('learning-path');
-                }}
-                className="bg-cyan hover:bg-cyan/90 text-bg font-black px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(45,212,191,0.2)] hover:translate-y-[-2px] cursor-pointer w-full sm:w-auto text-center uppercase tracking-wider text-xs"
-              >
-                {track ? 'Resume Path' : 'Enroll Now'}
-              </button>
-            ) : (
-              <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
+            {/* CTA logic based on enrollment and progress */}
+            {(track ? track.progress < 100 : course!.progress < 100) ? (
+              enrolled ? (
                 <button 
-                  onClick={handleEnroll}
+                  onClick={() => onNavigate('learning-path')}
                   className="bg-cyan hover:bg-cyan/90 text-bg font-black px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(45,212,191,0.2)] hover:translate-y-[-2px] cursor-pointer w-full sm:w-auto text-center uppercase tracking-wider text-xs"
                 >
-                  Enrol now for {course!.availableFormats?.find(f => f.format === selectedFormat)?.price || course!.price}
+                  Continue learning
                 </button>
-                <div className="flex items-center space-x-2 bg-bg/50 border border-line px-4 py-3.5 rounded-xl">
-                  <Sparkles className="w-4 h-4 text-orange" />
-                  <span className="text-[10px] text-muted font-bold uppercase">Includes Premium AI Access</span>
+              ) : (
+                <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
+                  <button 
+                    onClick={handleEnroll}
+                    className="bg-cyan hover:bg-cyan/90 text-bg font-black px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(45,212,191,0.2)] hover:translate-y-[-2px] cursor-pointer w-full sm:w-auto text-center uppercase tracking-wider text-xs whitespace-nowrap"
+                  >
+                    {course!.priceStatus === 'included' ? 'Enrol now (Included in Plan)' : 
+                     course!.priceStatus === 'employer' ? 'Enrol now (Employer Sponsored)' : 
+                     `Enrol now for ${course!.availableFormats?.find(f => f.format === selectedFormat)?.price || course!.price}`}
+                  </button>
+                  <div className="flex items-center space-x-2 bg-bg/50 border border-line px-4 py-3.5 rounded-xl">
+                    <Sparkles className="w-4 h-4 text-orange" />
+                    <span className="text-[10px] text-muted font-bold uppercase">Includes Premium AI Access</span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )
+            ) : null /* No primary CTA if finished */}
           </div>
         </div>
         
@@ -170,6 +234,16 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                 style={{ width: `${track.progress}%` }} 
               />
             </div>
+          </div>
+        )}
+
+        {/* Completion Badge (Bottom Right) */}
+        {(track ? track.progress === 100 : course!.progress === 100) && (
+          <div className="absolute bottom-6 right-6 flex items-center gap-2 bg-green/10 border border-green/30 px-4 py-1 rounded-l shadow-[0_4px_20px_rgba(34,197,94,0.1)] backdrop-blur-md">
+            <div className="bg-green/20 p-1 rounded-full">
+              <CheckCircle className="w-4 h-4 text-green" />
+            </div>
+            <span className="text-[10px] font-black text-green uppercase tracking-[0.1em]">Completed</span>
           </div>
         )}
       </div>
@@ -471,42 +545,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
               </div>
             </div>
           )}
-
-          {/* FAQ Section */}
-          <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 rounded-xl bg-cyan/10">
-                <HelpCircle className="w-5 h-5 text-cyan" />
-              </div>
-              <h2 className="text-xl font-bold text-text tracking-tight">Frequently Asked Questions</h2>
-            </div>
-            
-            <div className="space-y-4">
-              {faqs.map((faq, i) => {
-                const isOpen = openFaqIndex === i;
-                return (
-                  <div key={i} className="group border-b border-line pb-4 last:border-0 last:pb-0">
-                    <button 
-                      onClick={() => setOpenFaqIndex(isOpen ? null : i)}
-                      className="w-full text-left"
-                    >
-                      <h4 className={`text-sm font-bold transition-colors mb-2 flex items-center justify-between ${isOpen ? 'text-cyan' : 'text-text group-hover:text-cyan'}`}>
-                        {faq.q}
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180 text-cyan opacity-100' : 'rotate-0 opacity-30'}`} />
-                      </h4>
-                    </button>
-                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-40 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
-                      <p className="text-xs text-muted leading-relaxed font-medium">
-                        {faq.a}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Reviews and Testimonials Section */}
+          {/* Reviews and Testimonials Section (Moved Up) */}
           <div className="bg-panel border border-line rounded-2xl p-6 space-y-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -552,18 +591,6 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
               </div>
             </div>
 
-            {/* Controls: Sorting */}
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-[10px] font-black uppercase text-muted tracking-widest">Sort By:</span>
-                <select className="bg-bg border border-line rounded-lg text-xs font-bold px-3 py-1.5 focus:outline-none focus:border-cyan transition-colors">
-                  <option>Most Recent</option>
-                  <option>Highest Rated</option>
-                  <option>Most Helpful</option>
-                </select>
-              </div>
-            </div>
-
             <div className="space-y-6">
               {(course?.reviews || []).map((review: Review) => (
                 <div key={review.id} className="space-y-4 pb-6 border-b border-line last:border-0 last:pb-0">
@@ -592,48 +619,98 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                     </div>
                   </div>
                   <p className="text-xs text-text leading-relaxed font-medium">"{review.comment}"</p>
-                  <div className="flex items-center space-x-4">
-                    <button className="flex items-center space-x-1.5 text-[10px] font-bold text-muted hover:text-cyan transition-colors">
-                      <ThumbsUp className="w-3 h-3" />
-                      <span>Helpful ({review.helpfulCount})</span>
-                    </button>
-                    <button className="text-[10px] font-bold text-muted hover:text-text transition-colors uppercase tracking-widest">Report</button>
-                  </div>
                 </div>
               ))}
               {(!course?.reviews || course?.reviews?.length === 0) && (
                 <p className="text-sm text-muted text-center py-4 italic">No reviews available yet for this {track ? 'track' : 'course'}.</p>
               )}
             </div>
-
-            <button className="w-full py-4 border border-line rounded-xl text-[10px] font-black text-text hover:bg-bg/50 transition-all uppercase tracking-widest group">
-              <span className="flex items-center justify-center space-x-2">
-                <span>Load More Reviews</span>
-                <ChevronDown className="w-4 h-4 text-cyan group-hover:translate-y-0.5 transition-transform" />
-              </span>
-            </button>
           </div>
+
+          {/* FAQ Section */}
+          <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-xl bg-cyan/10">
+                <HelpCircle className="w-5 h-5 text-cyan" />
+              </div>
+              <h2 className="text-xl font-bold text-text tracking-tight">Frequently Asked Questions</h2>
+            </div>
+            
+            <div className="space-y-4">
+              {faqs.map((faq, i) => {
+                const isOpen = openFaqIndex === i;
+                return (
+                  <div key={i} className="group border-b border-line pb-4 last:border-0 last:pb-0">
+                    <button 
+                      onClick={() => setOpenFaqIndex(isOpen ? null : i)}
+                      className="w-full text-left"
+                    >
+                      <h4 className={`text-sm font-bold transition-colors mb-2 flex items-center justify-between ${isOpen ? 'text-cyan' : 'text-text group-hover:text-cyan'}`}>
+                        {faq.q}
+                        <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isOpen ? 'rotate-180 text-cyan opacity-100' : 'rotate-0 opacity-30'}`} />
+                      </h4>
+                    </button>
+                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-40 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
+                      <p className="text-xs text-muted leading-relaxed font-medium">
+                        {faq.a}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+
         </div>
 
         {/* Right Column (Sidebar Information) */}
         <div className="space-y-6">
-          {/* Trainer Card */}
-          <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
-            <h3 className="font-bold text-sm uppercase tracking-wider text-muted">Lead Trainer</h3>
-            <div className="flex items-center space-x-3">
-              <img src={course?.trainer?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150'} alt={course?.trainer?.name || 'Lead Trainer'} className="w-12 h-12 rounded-full border border-line object-cover" />
-              <div>
-                <h4 className="font-bold text-text text-sm">{course?.trainer?.name || 'Multiple Trainers'}</h4>
-                <p className="text-muted text-xs">{course?.trainer?.title || 'Industry Experts'}</p>
+          <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
+            <div className="space-y-4">
+              <h3 className="font-bold text-sm uppercase tracking-wider text-muted">Lead Trainer</h3>
+              <div className="flex items-center space-x-3">
+                <img src={course?.trainer?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150'} alt={course?.trainer?.name || 'Lead Trainer'} className="w-12 h-12 rounded-full border border-line object-cover" />
+                <div>
+                  <h4 className="font-bold text-text text-sm">{course?.trainer?.name || 'Multiple Trainers'}</h4>
+                  <p className="text-muted text-xs">{course?.trainer?.title || 'Industry Experts'}</p>
+                </div>
               </div>
+              <p className="text-muted text-xs leading-relaxed">
+                {course?.trainer?.bio || 'This career track is curated and led by multiple industry experts with over 15 years of common experience in the field.'}
+              </p>
+              {course?.trainer?.linkedIn && (
+                <a href={course?.trainer?.linkedIn} target="_blank" rel="noreferrer" className="text-cyan hover:underline text-xs font-semibold block">
+                  View LinkedIn Profile
+                </a>
+              )}
             </div>
-            <p className="text-muted text-xs leading-relaxed">
-              {course?.trainer?.bio || 'This career track is curated and led by multiple industry experts with over 15 years of common experience in the field.'}
-            </p>
-            {course?.trainer?.linkedIn && (
-              <a href={course?.trainer?.linkedIn} target="_blank" rel="noreferrer" className="text-cyan hover:underline text-xs font-semibold block">
-                View LinkedIn Profile
-              </a>
+
+            {/* More from this Trainer - Integrated List */}
+            {trainerCourses.length > 0 && (
+              <div className="pt-5 border-t border-line space-y-3">
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-muted">More from this expert</h4>
+                <div className="space-y-2">
+                  {trainerCourses.map(tc => (
+                    <button 
+                      key={tc.id}
+                      onClick={() => {
+                        setActiveCourseId(tc.id);
+                        onNavigate('course-detail');
+                      }}
+                      className="group flex items-center space-x-3 text-left w-full p-2 rounded-xl border border-line hover:border-cyan/50 hover:bg-cyan/5 transition-all pl-4"
+                    >
+                      <img src={tc.imageUrl} className="w-10 h-10 rounded shadow-sm object-cover shrink-0" alt="" />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[11px] font-bold text-text group-hover:text-cyan transition-colors line-clamp-2 leading-tight">
+                          {tc.title}
+                        </span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted group-hover:text-cyan group-hover:translate-x-1 transition-all duration-300 mr-1" />
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
 
@@ -655,15 +732,17 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                   <div>
                     <span className="text-[10px] font-black text-text uppercase block mb-1">Time Commitment</span>
                     <p className="text-[11px] text-muted leading-relaxed">
-                      {track ? `Estimated path duration: ${track.estimatedTime}.` : course?.format === 'flipped' 
-                        ? "7 self-study modules (10.5h) + 2 half-day workshops."
-                        : `Complete at your own pace. Recommended: 8-10h/week over ${course?.duration}.`}
+                      {track ? `Estimated path duration: ${track.estimatedTime}.` : 
+                       selectedFormat === 'flipped' ? "7 self-study modules (10.5h) + 2 half-day workshops." :
+                       selectedFormat === 'cohort' ? "8-week structured journey with weekly live expert sessions." :
+                       course?.format === 'Multiple formats' ? "Flexible delivery. Select between Self-Paced, Cohort, or Flipped models below." :
+                       `Complete at your own pace. Recommended: 8-10h/week over ${course?.duration}.`}
                     </p>
                   </div>
                 </div>
               </div>
 
-              {course?.format === 'flipped' && (
+              {(selectedFormat === 'flipped' || course?.format === 'flipped') && (
                 <div className="p-4 rounded-xl bg-cyan/5 border border-cyan/20 space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="p-1.5 rounded-lg bg-cyan/10">
@@ -673,6 +752,38 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                       <span className="text-[10px] font-black text-cyan uppercase block mb-1">Workshop Venue</span>
                       <p className="text-[11px] text-muted leading-relaxed">
                         apigenio Training Centre, Muri/Bern. Physical attendance required for Capstone sessions.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedFormat === 'cohort' && (
+                <div className="p-4 rounded-xl bg-purple/5 border border-purple/20 space-y-3">
+                  <div className="flex items-start space-x-3">
+                    <div className="p-1.5 rounded-lg bg-purple/10">
+                      <Globe className="w-4 h-4 text-purple" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-purple uppercase block mb-1">Session Platform</span>
+                      <p className="text-[11px] text-muted leading-relaxed">
+                        Conducted via Microsoft Teams. Direct access links will be shared in your cohort dashboard.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {course?.format === 'Multiple formats' && (
+                <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 space-y-3">
+                  <div className="flex items-start space-x-3">
+                    <div className="p-1.5 rounded-lg bg-amber-500/10">
+                      <Sparkles className="w-4 h-4 text-amber-600" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-amber-600 uppercase block mb-1">Flexible Choice</span>
+                      <p className="text-[11px] text-muted leading-relaxed">
+                        This course offers multiple pedagogy models. Choose the one that fits your learning style best.
                       </p>
                     </div>
                   </div>
@@ -689,34 +800,122 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
             </div>
           </div>
 
+          {/* Preparation & Onboarding Surface (REQ-CHECKOUT-020 & 021) - Flipped only */}
+          {selectedFormat === 'flipped' && ( (activeFormatData?.preCourseRequirements || course?.preCourseRequirements) || (activeFormatData?.preCourseTasks || course?.preCourseTasks) ) && (() => {
+            const requirements = activeFormatData?.preCourseRequirements || course?.preCourseRequirements;
+            const tasks = activeFormatData?.preCourseTasks || course?.preCourseTasks;
+            
+            return (
+              <div className={`rounded-2xl border p-5 space-y-4 shadow-sm transition-all duration-500 ${enrolled ? 'bg-cyan/5 border-cyan/30' : 'bg-panel border-line'}`}>
+                <h3 className="text-xs font-black uppercase text-text tracking-wider flex items-center gap-2">
+                  {enrolled ? <Sparkles className="w-4 h-4 text-cyan" /> : <Laptop className="w-4 h-4 text-cyan" />}
+                  {enrolled ? 'Get Ready Path' : 'Pre-Course Preparation'}
+                </h3>
+                
+                {!enrolled && requirements && (
+                  <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-500">
+                    {requirements.hardware && (
+                      <div className="space-y-1.5">
+                        <span className="text-[9px] font-black text-muted uppercase tracking-tight">Hardware</span>
+                        <ul className="space-y-1">
+                          {requirements.hardware.map((item, i) => (
+                            <li key={i} className="text-[10px] text-text font-medium flex items-start gap-2 leading-snug">
+                              <span className="w-1.5 h-1.5 rounded-full bg-cyan mt-1.5 shrink-0" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {requirements.software && (
+                      <div className="space-y-1.5">
+                        <span className="text-[9px] font-black text-muted uppercase tracking-tight">Software Setup</span>
+                        <ul className="space-y-1">
+                          {requirements.software.map((item, i) => (
+                            <li key={i} className="text-[10px] text-text font-medium flex items-start gap-2 leading-snug">
+                              <CheckCircle className="w-3.5 h-3.5 text-cyan mt-0.5 shrink-0" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {enrolled && tasks && (
+                  <div className="space-y-3 animate-in fade-in zoom-in duration-500">
+                    <p className="text-[10px] text-muted font-medium italic leading-relaxed">
+                      Welcome aboard! Complete these tasks to ensure a smooth start to your session.
+                    </p>
+                    <div className="space-y-2">
+                      {tasks.map((task) => (
+                        <div key={task.id} className="flex items-center gap-3 p-3 rounded-xl bg-bg border border-line/50 hover:border-cyan/30 transition-colors group cursor-pointer">
+                          <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${task.status === 'completed' ? 'bg-green/10 text-green' : 'bg-bg border border-line text-muted'}`}>
+                            {task.type === 'video' ? <PlayCircle className="w-3.5 h-3.5" /> : 
+                             task.type === 'setup' ? <Laptop className="w-3.5 h-3.5" /> : 
+                             <CheckCircle className="w-3.5 h-3.5" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-[10px] font-bold text-text truncate">{task.title}</h4>
+                            <p className="text-[8px] text-muted font-medium truncate">{task.description}</p>
+                          </div>
+                          <ArrowRight className="w-3 h-3 text-muted group-hover:text-cyan transition-colors" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
 
           {/* Pricing Info (Exclusive for non-enrolled) */}
           {!enrolled && (
             <div className="bg-panel border border-line rounded-2xl overflow-hidden shadow-lg flex flex-col">
               <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-sm uppercase tracking-wider text-muted">Total Price</h3>
-                  <div className="text-right">
-                    <span className="text-xl font-black text-text block">
-                      {track ? (track.level === 'Advanced' ? 'CHF 2\'500.00' : 'CHF 1\'800.00') : (activeFormatData?.price || course!.price)}
-                    </span>
-                    {activeBundle && (
-                      <span className="text-[10px] text-cyan font-bold block mt-0.5">
-                        Includes {activeBundle.durationMonths}m {activeBundle.label}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {activeBundle && (
-                  <div className="bg-bg/40 border border-line rounded-xl p-3 space-y-2">
-                    <div className="flex items-center justify-between text-[10px]">
-                      <span className="text-muted font-bold uppercase tracking-tight">Included Value</span>
-                      <span className="text-text font-black">{activeBundle.valueAmount}</span>
+                {course!.priceStatus === 'paid' || !course!.priceStatus ? (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-sm uppercase tracking-wider text-muted">Total Price</h3>
+                      <div className="text-right">
+                        <span className="text-xl font-black text-text block">
+                          {track ? (track.level === 'Advanced' ? 'CHF 2\'500.00' : 'CHF 1\'800.00') : (activeFormatData?.price || course!.price)}
+                        </span>
+                        {activeBundle && (
+                          <span className="text-[10px] text-cyan font-bold block mt-0.5 animate-pulse">
+                            Includes {activeBundle.durationMonths}m {activeBundle.label}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-[9px] text-muted leading-tight font-medium">
-                      Bundle includes platform access after course completion for continued study.
-                    </p>
+
+                    {activeBundle && (
+                      <div className="bg-cyan/5 border border-cyan/20 rounded-xl p-3 space-y-2">
+                        <div className="flex items-center justify-between text-[10px]">
+                          <span className="text-cyan font-black uppercase tracking-tight">Included Value</span>
+                          <span className="text-text font-black">Worth {activeBundle.valueAmount}</span>
+                        </div>
+                        <p className="text-[9px] text-muted leading-tight font-medium italic">
+                          Your purchase includes {activeBundle.durationMonths} months of Premium platform access for AI Tutor and resource analytics, worth {activeBundle.valueAmount}, which activates upon enrollment.
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-3 text-cyan">
+                      <ShieldCheck className="w-6 h-6" />
+                      <h3 className="font-bold text-sm uppercase tracking-wider">Access Covered</h3>
+                    </div>
+                    <div className="p-4 rounded-xl bg-cyan/5 border border-cyan/20">
+                      <p className="text-xs text-muted leading-relaxed font-medium">
+                        {course!.priceStatus === 'included' 
+                          ? "This course is fully included in your active subscription plan. No additional payment is required to start your journey."
+                          : "This course is provided by your employer as part of your professional development. Your access is fully sponsored."}
+                      </p>
+                    </div>
                   </div>
                 )}
 
@@ -751,11 +950,15 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                     onClick={handleEnroll}
                     className="w-full bg-cyan hover:bg-cyan/90 text-bg font-black py-4 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] uppercase tracking-widest text-[10px] cursor-pointer"
                   >
-                    {isPublic ? 'Login to get the course' : (activeCohort && activeCohort.currentParticipants < activeCohort.minParticipants ? 'Reserve Your Seat' : 'Confirm Booking')}
+                    {isPublic ? 'Login to get the course' : 
+                     (course!.priceStatus !== 'paid' && course!.priceStatus) ? 'Get Started Now' :
+                     (activeCohort && activeCohort.currentParticipants < activeCohort.minParticipants ? 'Reserve Your Seat' : 'Confirm Booking')}
                   </button>
-                  <button className="w-full text-[9px] font-black text-cyan hover:text-cyan/80 transition-colors uppercase tracking-widest pt-1 opacity-70">
-                    Team / Corporate Purchase?
-                  </button>
+                  {course!.priceStatus === 'paid' && (
+                    <button className="w-full text-[9px] font-black text-cyan hover:text-cyan/80 transition-colors uppercase tracking-widest pt-1 opacity-70">
+                      Team / Corporate Purchase?
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
