@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Modal from './Modal';
-import { ChevronRight, ChevronLeft, CheckCircle2 } from 'lucide-react';
+import { ChevronRight, ChevronLeft, CheckCircle2} from 'lucide-react';
 
 export interface Question {
   id: number;
@@ -46,7 +46,7 @@ const QuizModal: React.FC<QuizModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Quiz: Step ${currentStep + 1} of ${questions.length}`} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title={`Quiz: Step ${currentStep + 1} of ${questions.length}`} size="lg" preventCloseOnOverlayClick={true}>
       <div className="space-y-8">
         {/* Progress Bar */}
         <div className="w-full h-1.5 bg-line rounded-full overflow-hidden">
@@ -82,16 +82,26 @@ const QuizModal: React.FC<QuizModalProps> = ({
 
         {/* Footer Navigation */}
         <div className="flex items-center justify-between pt-6 border-t border-line">
-          <button
-            onClick={handleBack}
-            disabled={currentStep === 0}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-              currentStep === 0 ? 'opacity-0 pointer-events-none' : 'text-muted hover:text-text'
-            }`}
-          >
-            <ChevronLeft size={20} />
-            Back
-          </button>
+          {/* Left: Cancel + Back */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={onClose}
+              className="px-6 py-2 rounded-xl text-muted hover:text-text hover:bg-line transition-all border border-line"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={handleBack}
+              disabled={currentStep === 0}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                currentStep === 0 ? 'opacity-0 pointer-events-none' : 'text-muted hover:text-text'
+              }`}
+            >
+              <ChevronLeft size={20} />
+              Back
+            </button>
+          </div>
 
           <button
             onClick={handleNext}

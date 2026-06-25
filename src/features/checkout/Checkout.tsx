@@ -136,14 +136,14 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                   <label className="text-[9px] font-black uppercase text-muted tracking-tight ml-1">First Name</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted/50" />
-                    <input type="text" placeholder="Eduard" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 outline-none transition-all text-text" />
+                    <input type="text" placeholder="Eduard" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 !outline-none transition-all text-text" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-[9px] font-black uppercase text-muted tracking-tight ml-1">Last Name</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted/50" />
-                    <input type="text" placeholder="Franz" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 outline-none transition-all text-text" />
+                    <input type="text" placeholder="Franz" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 !outline-none transition-all text-text" />
                   </div>
                 </div>
               </div>
@@ -152,14 +152,14 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                   <label className="text-[9px] font-black uppercase text-muted tracking-tight ml-1">Phone</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted/50" />
-                    <input type="text" placeholder="+41 79 000 00 00" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 outline-none transition-all text-text" />
+                    <input type="text" placeholder="+41 79 000 00 00" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 !outline-none transition-all text-text" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-[9px] font-black uppercase text-muted tracking-tight ml-1">E-mail</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted/50" />
-                    <input type="email" placeholder="eduard.f@example.ch" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 outline-none transition-all text-text" />
+                    <input type="email" placeholder="eduard.f@example.ch" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 !outline-none transition-all text-text" />
                   </div>
                 </div>
               </div>
@@ -197,7 +197,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                     placeholder="Enter code (e.g. EARLY20)" 
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value)}
-                    className="flex-1 bg-panel border-line border rounded-xl px-4 py-3 text-xs focus:border-cyan/50 outline-none transition-all text-text" 
+                    className="flex-1 bg-panel border-line border rounded-xl px-4 py-3 text-xs focus:border-cyan/50 !outline-none transition-all text-text" 
                   />
                   <button 
                     onClick={() => setPromoActive(promoCode.toUpperCase() === 'EARLY20')}
@@ -325,7 +325,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                       <span className="flex-1 text-center">
                         {isReserved ? 'Reserve Your Seat' : 'Enrol Now'}
                       </span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <ArrowRight className="w-3.5 h-3.5 mr-2" />
                     </button>
                     
                     <div className="space-y-3">

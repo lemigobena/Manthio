@@ -22,7 +22,7 @@ const FormModal: React.FC<FormModalProps> = ({
       onClose={onClose} 
       title={title} 
       size="md"
-      preventCloseOnOverlayClick={false}
+      preventCloseOnOverlayClick={true}
     >
       <div className="space-y-6">
         {children}

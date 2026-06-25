@@ -142,7 +142,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
             placeholder={discoveryMode === 'tracks' ? "Search tracks..." : "Search for courses or topics..."} 
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); simulateLoad(); }}
-            className="w-full bg-panel border border-line rounded-xl pl-10 pr-4 py-2 text-sm text-text focus:border-cyan focus:outline-none transition-colors shadow-sm"
+            className="w-full bg-panel border border-line rounded-xl pl-10 pr-4 py-2 text-sm text-text focus:border-cyan focus:outline-none !outline-none transition-colors shadow-sm"
           />
           <Search className="absolute left-3 top-2.5 w-4.5 h-4.5 text-muted" />
         </div>
