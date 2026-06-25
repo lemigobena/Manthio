@@ -5,7 +5,8 @@ import { useXP } from '../../context/XPContext';
 import { 
   Check, Lock, Play, ChevronDown, ChevronUp, ChevronRight, Clock, HelpCircle, 
   FileText, Code2, Users, MapPin, Calendar, AlertCircle,
-  Target, Award, BookOpen, Bookmark, MessageSquare, ExternalLink, Zap, User
+  Target, Award, BookOpen, Bookmark, MessageSquare, ExternalLink, Zap, User,
+  ShieldCheck, CheckCircle
 } from 'lucide-react';
 import type { Lesson, LessonType } from '../../types';
 
@@ -88,8 +89,8 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                            course.modules.find(m => m.status === 'Open');
 
   return (
-    <div className="relative h-[calc(100dvh-64px)] -mx-3 md:-mx-[44px] -my-6 overflow-y-auto bg-bg border-y border-line px-3 md:px-[44px] py-6">
-      <div className="space-y-6 pb-12 max-w-[1600px] mx-auto">
+    <div className="relative -mx-3 md:-mx-[44px] -my-6 bg-bg border-y border-line px-3 md:px-[44px] py-6">
+      <div className="space-y-6 pb-32 max-w-[1600px] mx-auto">
       {/* 14.2 Header Card & Stats */}
       <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -388,17 +389,47 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                           <h3 className="font-bold text-lg text-text mt-1">{mod.title}</h3>
                           <p className="text-muted text-xs leading-relaxed max-w-2xl">{mod.description}</p>
                           
-                          {/* REQ-PATH-016: Prerequisites (Prep work) */}
-                          {mod.prerequisites && mod.prerequisites.length > 0 && (
-                            <div className="flex items-start bg-bg/50 border border-line/40 rounded-lg p-2.5 mt-2 max-w-lg">
-                              <span className="text-red font-black text-[9px] uppercase tracking-tighter mr-2 shrink-0 mt-0.5">Prep Required</span>
-                              <div className="space-y-1">
-                                {mod.prerequisites.map((p: string, i: number) => (
-                                  <div key={i} className="text-[10px] text-text/80 flex items-center space-x-2">
-                                    <div className="w-1 h-1 bg-red/40 rounded-full" />
+                          {/* REQ-PATH-016 & REQ-CHECKOUT-022: Prerequisites (Prep work) */}
+                          {( (mod.prerequisites && mod.prerequisites.length > 0) || (mod.prepModules && mod.prepModules.length > 0) ) && (
+                            <div className="flex flex-col bg-bg/50 border border-line/40 rounded-xl p-3.5 mt-3 max-w-lg space-y-3">
+                              <div className="flex items-center gap-2">
+                                <ShieldCheck className={`w-4 h-4 ${mod.type === 'In-person session' ? 'text-purple' : 'text-cyan'}`} />
+                                <span className={`font-black text-[10px] uppercase tracking-wider ${mod.type === 'In-person session' ? 'text-purple' : 'text-cyan'}`}>
+                                  Required Preparation
+                                </span>
+                              </div>
+                              
+                              <div className="space-y-2">
+                                {/* Text-based prerequisites */}
+                                {mod.prerequisites?.map((p: string, i: number) => (
+                                  <div key={i} className="text-[10px] text-text/80 flex items-start gap-2.5 leading-snug">
+                                    <div className="w-1.5 h-1.5 bg-muted/40 rounded-full mt-1.5 shrink-0" />
                                     <span>{p}</span>
                                   </div>
                                 ))}
+
+                                {/* Module-based prerequisites (REQ-CHECKOUT-022) */}
+                                {mod.prepModules?.map((prepId) => {
+                                  const prepMod = course.modules.find(m => m.id === prepId);
+                                  if (!prepMod) return null;
+                                  const isPrepDone = prepMod.status === 'Completed';
+                                  
+                                  return (
+                                    <div key={prepId} className="flex items-center justify-between p-2 rounded-lg bg-panel/50 border border-line/40">
+                                      <div className="flex items-center gap-2 min-w-0">
+                                        <div className={`w-4 h-4 rounded flex items-center justify-center shrink-0 ${isPrepDone ? 'bg-green/10 text-green' : 'bg-bg/40 text-muted'}`}>
+                                          {isPrepDone ? <CheckCircle className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+                                        </div>
+                                        <span className="text-[10px] font-bold text-text truncate">
+                                          Complete {prepMod.title}
+                                        </span>
+                                      </div>
+                                      <span className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-full ${isPrepDone ? 'bg-green/20 text-green' : 'bg-line text-muted'}`}>
+                                        {isPrepDone ? 'DONE' : 'PENDING'}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
                           )}

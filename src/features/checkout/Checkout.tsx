@@ -89,26 +89,48 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
   if (step === 'success') {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-140px)] animate-in fade-in zoom-in duration-500">
-        <div className="w-20 h-20 bg-green/10 rounded-full flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(34,197,94,0.2)]">
-          <CheckCircle className="w-12 h-12 text-green" />
+        <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 shadow-xl ${isReserved ? 'bg-orange/10 shadow-orange/10' : 'bg-green/10 shadow-green/10'}`}>
+          {isReserved ? <Users className="w-10 h-10 text-orange" /> : <CheckCircle className="w-12 h-12 text-green" />}
         </div>
-        <h2 className="text-2xl font-black text-text uppercase tracking-[2px] text-center">Enrolment Confirmed</h2>
+        <h2 className="text-2xl font-black text-text uppercase tracking-[2px] text-center">
+          {isReserved ? 'Seat Reserved' : 'Enrolment Confirmed'}
+        </h2>
         <p className="text-muted text-center max-w-sm mt-3 text-xs font-medium leading-relaxed opacity-80 px-6">
-          Welcome to <span className="text-text font-bold decoration-cyan underline decoration-2 underline-offset-4">{course.title}</span>. 
-          Your transformation starts now.
+          {isReserved ? (
+            <>
+              Your request for <span className="text-text font-bold decoration-orange underline decoration-2 underline-offset-4">{course.title}</span> is registered. 
+              The course proceeds once {activeCohort.minParticipants} participants join. 
+              <span className="block mt-2 font-black text-[10px] text-orange uppercase tracking-wider">
+                Full confirmation by {new Date(activeCohort.confirmationDate).toLocaleDateString()}
+              </span>
+            </>
+          ) : (
+            <>
+              Welcome to <span className="text-text font-bold decoration-cyan underline decoration-2 underline-offset-4">{course.title}</span>. 
+              Your transformation starts now.
+            </>
+          )}
         </p>
+        
+        {isReserved && (
+          <div className="mt-6 flex items-center space-x-2 bg-panel border border-line p-3 rounded-xl max-w-xs">
+            <Percent className="w-3.5 h-3.5 text-orange" />
+            <span className="text-[10px] font-bold text-muted">Payment status: <span className="text-text">Deferred until confirmation</span></span>
+          </div>
+        )}
+
         <button 
-          onClick={() => onNavigate('learning-path')}
+          onClick={() => onNavigate(isReserved ? 'dashboard' : 'learning-path')}
           className="mt-8 bg-cyan hover:bg-cyan/90 text-bg font-black px-10 py-3 rounded-full transition-all shadow-[0_8px_30px_rgba(45,212,191,0.3)] uppercase tracking-widest text-[10px]"
         >
-          START LEARNING
+          {isReserved ? 'RETURN TO DASHBOARD' : 'START LEARNING'}
         </button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-8 h-[calc(100vh-80px)] flex flex-col">
+    <div className="max-w-7xl mx-auto px-4 lg:px-8 flex flex-col pb-24">
       {/* Compact Header */}
       <div className="flex items-center space-x-4 pb-4 border-b border-line/50 shrink-0">
         <button 
@@ -136,14 +158,14 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                   <label className="text-[9px] font-black uppercase text-muted tracking-tight ml-1">First Name</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted/50" />
-                    <input type="text" placeholder="Eduard" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 outline-none transition-all text-text" />
+                    <input type="text" placeholder="Eduard" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 !outline-none transition-all text-text" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-[9px] font-black uppercase text-muted tracking-tight ml-1">Last Name</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted/50" />
-                    <input type="text" placeholder="Franz" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 outline-none transition-all text-text" />
+                    <input type="text" placeholder="Franz" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 !outline-none transition-all text-text" />
                   </div>
                 </div>
               </div>
@@ -152,14 +174,14 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                   <label className="text-[9px] font-black uppercase text-muted tracking-tight ml-1">Phone</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted/50" />
-                    <input type="text" placeholder="+41 79 000 00 00" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 outline-none transition-all text-text" />
+                    <input type="text" placeholder="+41 79 000 00 00" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 !outline-none transition-all text-text" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-[9px] font-black uppercase text-muted tracking-tight ml-1">E-mail</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted/50" />
-                    <input type="email" placeholder="eduard.f@example.ch" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 outline-none transition-all text-text" />
+                    <input type="email" placeholder="eduard.f@example.ch" className="w-full bg-panel border-line border rounded-xl pl-9 pr-3 py-4 text-xs focus:border-cyan/50 !outline-none transition-all text-text" />
                   </div>
                 </div>
               </div>
@@ -197,7 +219,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                     placeholder="Enter code (e.g. EARLY20)" 
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value)}
-                    className="flex-1 bg-panel border-line border rounded-xl px-4 py-3 text-xs focus:border-cyan/50 outline-none transition-all text-text" 
+                    className="flex-1 bg-panel border-line border rounded-xl px-4 py-3 text-xs focus:border-cyan/50 !outline-none transition-all text-text" 
                   />
                   <button 
                     onClick={() => setPromoActive(promoCode.toUpperCase() === 'EARLY20')}
@@ -301,6 +323,27 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                   </div>
                 </div>
 
+                {/* Cohort Booking Status (REQ-CHECKOUT-015) */}
+                {activeCohort && (
+                  <div className="p-3 bg-bg/50 border border-line rounded-xl space-y-2">
+                    <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-wider">
+                      <span className="text-muted">Booking Progress</span>
+                      <span className="text-text">{activeCohort.currentParticipants}/{activeCohort.maxParticipants} <span className="text-muted">Enrolled</span></span>
+                    </div>
+                    <div className="w-full h-1.5 bg-bg border border-line rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full transition-all duration-1000 ${isReserved ? 'bg-orange animate-pulse' : 'bg-green'}`} 
+                        style={{ width: `${(activeCohort.currentParticipants / activeCohort.maxParticipants) * 100}%` }} 
+                      />
+                    </div>
+                    <p className="text-[8px] text-muted font-medium leading-tight italic">
+                      {isReserved 
+                        ? `Only ${activeCohort.minParticipants - activeCohort.currentParticipants} more bookings needed to confirm this session.`
+                        : `Session confirmed! ${activeCohort.maxParticipants - activeCohort.currentParticipants} seats remaining.`}
+                    </p>
+                  </div>
+                )}
+
                 {/* Conditional Confirmation Message (REQ-CHECKOUT-016) */}
                 {isReserved && (
                   <div className="p-3 bg-orange/10 border border-orange/20 rounded-xl">
@@ -325,7 +368,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                       <span className="flex-1 text-center">
                         {isReserved ? 'Reserve Your Seat' : 'Enrol Now'}
                       </span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <ArrowRight className="w-3.5 h-3.5 mr-2" />
                     </button>
                     
                     <div className="space-y-3">

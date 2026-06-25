@@ -84,14 +84,14 @@ export const DemoCenter: React.FC<DemoCenterProps> = ({ onNavigate }) => {
                     <div className="space-y-1.5">
                       <label className="text-sm font-medium text-muted">Topic</label>
                       <input 
-                        className="w-full bg-bg border border-line rounded-xl px-4 py-2.5 text-text focus:border-cyan outline-none transition-all" 
+                        className="w-full bg-bg border border-line rounded-xl px-4 py-2.5 text-text focus:border-cyan !outline-none transition-all" 
                         placeholder="e.g. Asynchronous Python"
                       />
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-sm font-medium text-muted">Note</label>
                       <textarea 
-                        className="w-full bg-bg border border-line rounded-xl px-4 py-2.5 text-text focus:border-cyan outline-none transition-all min-h-[120px]" 
+                        className="w-full bg-bg border border-line rounded-xl px-4 py-2.5 text-text focus:border-cyan !outline-none transition-all min-h-[120px]" 
                         placeholder="What did you learn today?"
                       />
                     </div>

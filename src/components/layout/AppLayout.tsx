@@ -194,9 +194,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const { liveToasts, dismissLiveToast, markAsRead } = useNotifications();
   const { isAuthenticated } = useAuth();
   
+  const mainRef = useRef<HTMLElement>(null);
+  
   React.useEffect(() => {
-    // No-op
-  }, []);
+    if (mainRef.current) {
+      mainRef.current.scrollTo(0, 0);
+    }
+  }, [activePage]);
   
   const footerPages = ['help-center', 'privacy', 'terms', 'cookies', 'imprint'];
   const isPublicView = activePage === 'explore' || (!isAuthenticated && (activePage === 'course-detail' || footerPages.includes(activePage)));
@@ -228,7 +232,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         />
 
         {/* Content View Body */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden px-3 md:px-[44px] py-6 flex flex-col">
+        <main ref={mainRef} className="flex-1 overflow-y-auto overflow-x-hidden px-3 md:px-[44px] py-6 flex flex-col">
           <div className="max-w-7xl mx-auto w-full flex-1">
             {children}
           </div>

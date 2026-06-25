@@ -116,18 +116,9 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, onNavigate }) 
         <div className="absolute top-8 right-8 z-50">
           <button 
             onClick={toggleTheme}
-            className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300 shadow-lg ${
-              isDark 
-                ? 'bg-panel border border-line text-cyan hover:bg-line group' 
-                : 'bg-white border border-black/5 text-cyan hover:shadow-cyan/10'
-            }`}
-            aria-label="Toggle theme"
+            className="h-8 md:h-9 w-8 md:w-9 flex items-center justify-center rounded-md bg-cyan text-bg hover:opacity-90 transition-all cursor-pointer shadow-md"
           >
-            {isDark ? (
-              <Sun className="w-5 h-5 transition-transform group-hover:rotate-45" />
-            ) : (
-              <Moon className="w-5 h-5 transition-transform hover:-rotate-12" />
-            )}
+            {theme === 'dark' ? <Sun className="w-3.5 md:w-4 h-3.5 md:h-4" /> : <Moon className="w-3.5 md:w-4 h-3.5 md:h-4" />}
           </button>
         </div>
 

@@ -26,6 +26,18 @@ export interface FormatOption {
     maxParticipants: number;
     confirmationDate: string;
   };
+  preCourseRequirements?: {
+    hardware?: string[];
+    software?: string[];
+    knowledge?: string[];
+  };
+  preCourseTasks?: {
+    id: string;
+    title: string;
+    description: string;
+    status: 'pending' | 'completed';
+    type: 'setup' | 'video' | 'quiz' | 'check';
+  }[];
 }
 
 export interface Trainer {
@@ -202,6 +214,7 @@ export interface Module {
   venue?: string;
   availableDate?: string;
   prerequisites?: string[];
+  prepModules?: string[]; // IDs of modules that must be completed before this session
 }
 
 export interface Course {
@@ -245,6 +258,13 @@ export interface Course {
     software?: string[];
     knowledge?: string[];
   };
+  preCourseTasks?: {
+    id: string;
+    title: string;
+    description: string;
+    status: 'pending' | 'completed';
+    type: 'setup' | 'video' | 'quiz' | 'check';
+  }[];
   cancellationPolicy?: string;
 }
 

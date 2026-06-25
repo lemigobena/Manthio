@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
-import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle } from 'lucide-react';
+import { useNotifications } from '../../context/NotificationContext';
+import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface CatalogProps {
   onNavigate: (page: string) => void;
@@ -9,11 +10,14 @@ interface CatalogProps {
 
 export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
   const { setActiveCourseId, setActiveTrackId } = useAuth();
+  const { addNotification } = useNotifications();
   const [discoveryMode, setDiscoveryMode] = useState<'courses' | 'tracks'>(() => {
     const lastUsed = localStorage.getItem('catalogDiscoveryMode');
     return (lastUsed as 'courses' | 'tracks') || (COURSES.some(c => c.enrolled) ? 'courses' : 'tracks');
   });
-  const [activeTab, setActiveTab] = useState<'all' | 'enrolled' | 'completed'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'enrolled' | 'completed'>(() => {
+    return COURSES.some(c => c.enrolled) ? 'enrolled' : 'all';
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<string>('All');
   const [selectedFormat, setSelectedFormat] = useState<string>('All');
@@ -98,6 +102,11 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
   });
 
   const tracksToShow = discoveryMode === 'tracks' ? TRACKS.filter(t => {
+    // Tab filtering
+    if (activeTab === 'enrolled' && !t.enrolled) return false;
+    if (activeTab === 'completed' && t.progress < 100) return false;
+
+    // Search and Level filtering
     if (searchQuery && !t.title.toLowerCase().includes(searchQuery.toLowerCase()) && !t.outcomeStatement.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     if (selectedLevel !== 'All' && t.level !== selectedLevel) return false;
     return true;
@@ -142,7 +151,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
             placeholder={discoveryMode === 'tracks' ? "Search tracks..." : "Search for courses or topics..."} 
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); simulateLoad(); }}
-            className="w-full bg-panel border border-line rounded-xl pl-10 pr-4 py-2 text-sm text-text focus:border-cyan focus:outline-none transition-colors shadow-sm"
+            className="w-full bg-panel border border-line rounded-xl pl-10 pr-4 py-2 text-sm text-text focus:border-cyan focus:outline-none !outline-none transition-colors shadow-sm"
           />
           <Search className="absolute left-3 top-2.5 w-4.5 h-4.5 text-muted" />
         </div>
@@ -173,9 +182,26 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
               </button>
             </>
           ) : (
-            <div className="px-4 py-1.5 text-xs font-semibold text-muted">
-              Curated Curriculum
-            </div>
+            <>
+              <button 
+                onClick={() => handleTabChange('all')}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'all' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
+              >
+                All Tracks ({TRACKS.length})
+              </button>
+              <button 
+                onClick={() => handleTabChange('enrolled')}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'enrolled' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
+              >
+                My Tracks ({TRACKS.filter(t => t.enrolled).length})
+              </button>
+              <button 
+                onClick={() => handleTabChange('completed')}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'completed' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
+              >
+                Completed ({TRACKS.filter(t => t.progress === 100).length})
+              </button>
+            </>
           )}
         </div>
 
@@ -329,16 +355,40 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
               </>
             )
           ) : (
-            <>
-              <h3 className="font-bold text-text">No tracks found</h3>
-              <p className="text-muted text-sm mt-1 max-w-sm mx-auto">Adjust your search query or level selector to find matching career tracks.</p>
-              <button 
-                onClick={() => { setSelectedLevel('All'); setSearchQuery(''); }}
-                className="mt-5 bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
-              >
-                Reset Filters
-              </button>
-            </>
+            activeTab === 'enrolled' ? (
+              <>
+                <h3 className="font-bold text-text">No active tracks</h3>
+                <p className="text-muted text-sm mt-1 max-w-sm mx-auto">You haven't enrolled in any career tracks yet — browse the list to find a track.</p>
+                <button 
+                  onClick={() => handleTabChange('all')}
+                  className="mt-5 bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
+                >
+                  Browse Tracks
+                </button>
+              </>
+            ) : activeTab === 'completed' ? (
+              <>
+                <h3 className="font-bold text-text">No completed tracks</h3>
+                <p className="text-muted text-sm mt-1 max-w-sm mx-auto">You haven't completed any tracks yet. Keep learning to reach your goals.</p>
+                <button 
+                  onClick={() => handleTabChange('enrolled')}
+                  className="mt-5 bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
+                >
+                  Resume Active Track
+                </button>
+              </>
+            ) : (
+              <>
+                <h3 className="font-bold text-text">No tracks found</h3>
+                <p className="text-muted text-sm mt-1 max-w-sm mx-auto">Adjust your search query or level selector to find matching career tracks.</p>
+                <button 
+                  onClick={() => { setSelectedLevel('All'); setSearchQuery(''); }}
+                  className="mt-5 bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
+                >
+                  Reset Filters
+                </button>
+              </>
+            )
           )}
         </div>
       ) : (
@@ -346,7 +396,12 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
           {discoveryMode === 'courses' ? sortedCourses.map(course => (
             <div 
               key={course.id} 
-              className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:translate-y-[-4px] duration-300 h-[420px]"
+              onClick={() => {
+                setActiveTrackId(null);
+                setActiveCourseId(course.id);
+                onNavigate('course-detail');
+              }}
+              className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:translate-y-[-4px] duration-300 h-[420px] cursor-pointer"
             >
               <div>
                 {/* Header Image */}
@@ -400,44 +455,71 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                 <div>
                   {course.enrolled ? (
                     <div className="flex items-center space-x-3">
-                      {/* Premium Progress Ring */}
-                      <div className="relative w-9 h-9">
-                        <svg className="w-9 h-9 -rotate-90">
-                          <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" className="text-line opacity-20" />
-                          <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" strokeDasharray={100} strokeDashoffset={100 - (100 * course.progress) / 100} className="text-cyan transition-all duration-1000 shadow-[0_0_8px_rgba(45,212,191,0.5)]" />
-                        </svg>
-                        <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-text">
-                          {course.progress}%
-                        </span>
+                      {/* Progress Ring or Completed Icon */}
+                      <div className="relative w-9 h-9 flex items-center justify-center">
+                        {course.progress === 100 ? (
+                          <div className="bg-green/10 p-1.5 rounded-full ring-2 ring-green/20">
+                            <CheckCircle className="w-5 h-5 text-green" />
+                          </div>
+                        ) : (
+                          <div className="relative w-9 h-9">
+                            <svg className="w-9 h-9 -rotate-90">
+                              <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" className="text-line opacity-20" />
+                              <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" strokeDasharray={100} strokeDashoffset={100 - (100 * course.progress) / 100} className="text-cyan transition-all duration-1000 shadow-[0_0_8px_rgba(45,212,191,0.5)]" />
+                            </svg>
+                            <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-text">
+                              {course.progress}%
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[10px] text-cyan font-black leading-none mb-1 uppercase tracking-wider">Active</span>
-                        <span className="text-[12px] font-bold text-text opacity-80">Continue Course</span>
+                        <span className="text-[10px] text-cyan font-black leading-none mb-1 uppercase tracking-wider">
+                          {course.progress === 100 ? 'Completed' : 'Active'}
+                        </span>
+                        <span className="text-[12px] font-bold text-text opacity-80">
+                          {course.progress === 100 ? 'Content Reviewed' : 'Continue Course'}
+                        </span>
                       </div>
                     </div>
                   ) : (
                     <div className="flex flex-col">
-                      <span className="text-[10px] text-muted font-bold uppercase mb-0.5 tracking-tight">Booking Info</span>
-                      <span className="text-[15px] font-black text-text tracking-tight">
-                        {course.priceStatus === 'included' ? 'Included' : course.priceStatus === 'employer' ? 'Company Paid' : course.price}
+                      <span className="text-[10px] text-muted font-bold uppercase mb-0.5 tracking-tight">Price Status</span>
+                      <span className="text-[13px] font-black text-text tracking-tight">
+                        {course.priceStatus === 'included' ? 'Included in your plan' : 
+                         course.priceStatus === 'employer' ? 'Provided by your employer' : 
+                         course.price}
                       </span>
                     </div>
                   )}
                 </div>
 
                 <button 
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation(); // Avoid triggering card click
                     setActiveTrackId(null);
                     setActiveCourseId(course.id);
-                    if (course.enrolled) {
+                    if (course.progress === 100) {
+                      onNavigate('course-detail');
+                    } else if (course.enrolled) {
+                      onNavigate('learning-path');
+                    } else if (course.priceStatus === 'included' || course.priceStatus === 'employer') {
+                      addNotification({
+                        category: 'course',
+                        title: 'Enrolment Successful! 🎓',
+                        message: `You have successfully enrolled in ${course.title}. Access has been granted via ${course.priceStatus === 'included' ? 'your plan' : 'your employer'}.`,
+                        critical: false
+                      });
                       onNavigate('learning-path');
                     } else {
-                      onNavigate('course-detail');
+                      onNavigate('checkout');
                     }
                   }}
                   className={`relative overflow-hidden group/btn bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer`}
                 >
-                  <span className="relative z-10">{course.enrolled ? 'Resume Path' : 'Enrol Now'}</span>
+                  <span className="relative z-10">
+                    {course.progress === 100 ? 'Review' : course.enrolled ? 'Continue' : 'Enrol Now'}
+                  </span>
                   <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
                 </button>
               </div>
@@ -445,7 +527,11 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
           )) : tracksToShow.map(track => (
             <div 
               key={track.id} 
-              className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:translate-y-[-4px] duration-300 h-[420px]"
+              onClick={() => {
+                setActiveTrackId(track.id);
+                onNavigate('course-detail');
+              }}
+              className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:translate-y-[-4px] duration-300 h-[420px] cursor-pointer"
             >
               <div>
                 {/* Header Image */}
@@ -490,41 +576,61 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                 <div>
                   {track.enrolled ? (
                     <div className="flex items-center space-x-3">
-                      {/* Premium Progress Ring */}
-                      <div className="relative w-9 h-9">
-                        <svg className="w-9 h-9 -rotate-90">
-                          <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" className="text-line opacity-20" />
-                          <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" strokeDasharray={100} strokeDashoffset={100 - (100 * track.progress) / 100} className="text-cyan transition-all duration-1000 shadow-[0_0_8px_rgba(45,212,191,0.5)]" />
-                        </svg>
-                        <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-text">
-                          {track.progress}%
-                        </span>
+                      {/* Progress Ring or Completed Icon */}
+                      <div className="relative w-9 h-9 flex items-center justify-center">
+                        {track.progress === 100 ? (
+                          <div className="bg-green/10 p-1.5 rounded-full ring-2 ring-green/20">
+                            <CheckCircle className="w-5 h-5 text-green" />
+                          </div>
+                        ) : (
+                          <div className="relative w-9 h-9">
+                            <svg className="w-9 h-9 -rotate-90">
+                              <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" className="text-line opacity-20" />
+                              <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" strokeDasharray={100} strokeDashoffset={100 - (100 * track.progress) / 100} className="text-cyan transition-all duration-1000 shadow-[0_0_8px_rgba(45,212,191,0.5)]" />
+                            </svg>
+                            <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-text">
+                              {track.progress}%
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[10px] text-cyan font-black leading-none mb-1 uppercase tracking-wider">Active</span>
-                        <span className="text-[12px] font-bold text-text opacity-80">Resume Learning</span>
+                        <span className="text-[10px] text-cyan font-black leading-none mb-1 uppercase tracking-wider">
+                          {track.progress === 100 ? 'Completed' : 'Active'}
+                        </span>
+                        <span className="text-[12px] font-bold text-text opacity-80">
+                          {track.progress === 100 ? 'Review Final Step' : 'Resume Learning'}
+                        </span>
                       </div>
                     </div>
                   ) : (
                     <div className="flex flex-col">
                       <span className="text-[10px] text-muted font-bold uppercase mb-0.5 tracking-tight">Track Path</span>
-                      <span className="text-[15px] font-black text-text tracking-tight uppercase">Multi-Course</span>
+                      <span className="text-[13px] font-black text-text tracking-tight uppercase">Multi-Course</span>
                     </div>
                   )}
                 </div>
 
                 <button 
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation(); // Avoid triggering card click
                     setActiveTrackId(track.id);
-                    if (track.enrolled) {
-                      onNavigate('learning-path');
-                    } else {
+                    if (track.progress === 100) {
                       onNavigate('course-detail');
+                    } else if (track.enrolled) {
+                      onNavigate('learning-path');
+                    } else if (track.id === 'python-production-engineer' || track.id === 'some-included-id') { // Tracks might need a similar status check, but mockData for tracks doesn't have priceStatus yet. Adding logic for safety.
+                      // For now, most tracks go to checkout as they are 'paid', but if we add status, it's here.
+                      onNavigate('checkout');
+                    } else {
+                      onNavigate('checkout');
                     }
                   }}
                   className="relative overflow-hidden group/btn bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer"
                 >
-                  <span className="relative z-10">{track.enrolled ? 'Continue Path' : 'Enrol Now'}</span>
+                  <span className="relative z-10">
+                    {track.progress === 100 ? 'Review' : track.enrolled ? 'Continue' : 'Enrol'}
+                  </span>
                   <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
                 </button>
               </div>

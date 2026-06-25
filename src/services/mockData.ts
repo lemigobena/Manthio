@@ -30,7 +30,7 @@ export const COURSES: Course[] = [
     rating: 5.0,
     ratingCount: 1,
     enrolled: true,
-    progress: 0,
+    progress: 100,
     imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80',
     trainer: TRAINERS['david-pinezich'],
     learningOutcomes: ['Finish lesson 1', 'Finish lesson 2'],
@@ -96,6 +96,11 @@ export const COURSES: Course[] = [
       software: ['Python 3.11+', 'Visual Studio Code', 'Git installed'],
       knowledge: ['Basic computer literacy', 'Understanding of logic (if/then)', 'Commitment to 4h prep time']
     },
+    preCourseTasks: [
+      { id: 'task-py-1', title: 'Python 3.11 Setup', description: 'Install Python and verify via terminal.', status: 'completed', type: 'setup' },
+      { id: 'task-py-2', title: 'Welcome & Strategy', description: 'Watch the bootcamp kick-off video.', status: 'pending', type: 'video' },
+      { id: 'task-py-3', title: 'Prerequisites Check', description: 'Confirm your environment is ready.', status: 'pending', type: 'quiz' }
+    ],
     cancellationPolicy: 'Full refund up to 7 days before start. 50% refund between 7 days and 48 hours. No refund within 48 hours of session start.',
     modules: [
       {
@@ -303,6 +308,7 @@ export const COURSES: Course[] = [
         type: 'In-person session',
         scheduledTime: 'Saturday, 09:00 - 12:30',
         venue: 'apigenio Training Centre, Muri',
+        prepModules: ['py-mod-1', 'py-mod-2'],
         lessons: [
           { id: 'py-les-3-1', title: 'Setup verification, first scripts live', type: 'Live Event', duration: '120min', status: 'in_progress', required: true, bloomLevel: 'Analyse' },
           { id: 'py-les-3-2', title: 'Joint Debugging & Peer Review', type: 'Live Event', duration: '90min', status: 'not_started', required: true, bloomLevel: 'Analyse' }
@@ -435,7 +441,7 @@ export const COURSES: Course[] = [
     duration: '3 Days',
     language: 'English',
     tags: ['Advanced', 'Intensive'],
-    priceStatus: 'paid',
+    priceStatus: 'employer',
     xpReward: 1200,
     price: 'CHF 1\'800.00',
     rating: 4.9,
@@ -451,6 +457,12 @@ export const COURSES: Course[] = [
       'Optimize memory usage and execution speed for large-scale apps.',
       'Automate enterprise deployments with advanced CI/CD pipelines.'
     ],
+    cohortProgress: {
+      minParticipants: 4,
+      currentParticipants: 3,
+      maxParticipants: 10,
+      confirmationDate: '2026-07-20'
+    },
     modules: [
       {
         id: 'adv-py-mod-1',
@@ -537,6 +549,11 @@ export const COURSES: Course[] = [
           durationMonths: 2,
           valueAmount: 'CHF 60.00',
           label: 'Premium Access'
+        },
+        preCourseRequirements: {
+          hardware: ['Laptop with 8GB RAM', 'Admin rights to install software'],
+          software: ['Git Bash / Terminal', 'VS Code', 'GitHub Account'],
+          knowledge: ['Command line basics', 'Basic file management']
         }
       }
     ],
@@ -863,6 +880,12 @@ export const COURSES: Course[] = [
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1697577418970-95d99b5a55cf?auto=format&fit=crop&w=800&q=80',
     trainer: TRAINERS['david-pinezich'],
+    priceStatus: 'paid',
+    bundledSubscription: {
+      durationMonths: 2,
+      valueAmount: 'CHF 60.00',
+      label: 'Premium Platform Access'
+    },
     learningOutcomes: [
       'Articulate basic neural network architectures.',
       'Explain embeddings and perform vector calculations.',
@@ -1132,6 +1155,22 @@ export const COURSES: Course[] = [
       'Build robust API endpoints using async/await handlers.',
       'Implement strict validation models with Pydantic.',
       'Configure authentication guards using JWT tokens.'
+    ],
+    cohortProgress: {
+      minParticipants: 5,
+      currentParticipants: 2,
+      maxParticipants: 15,
+      confirmationDate: '2026-08-15'
+    },
+    preCourseRequirements: {
+      hardware: ['Modern Laptop (Apple M1 or i5 equivalent)', '16GB RAM recommended'],
+      software: ['Docker Desktop installed', 'Python 3.12+', 'VS Code with Python extension'],
+      knowledge: ['Proficiency in Python basics', 'Understanding of HTTP methods']
+    },
+    preCourseTasks: [
+      { id: 'task-fast-1', title: 'Install Docker & FastAPI', description: 'Ensure docker is running and install fastapi[all] via pip.', status: 'pending', type: 'setup' },
+      { id: 'task-fast-2', title: 'Watch: The Async Mindset', description: 'Mandatory 10-min video on asynchronous programming in Python.', status: 'pending', type: 'video' },
+      { id: 'task-fast-3', title: 'Hello World API', description: 'Run a minimal FastAPI server and access /docs.', status: 'pending', type: 'quiz' }
     ],
     modules: [
       {

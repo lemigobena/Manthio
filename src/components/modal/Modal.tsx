@@ -20,6 +20,9 @@ const Modal: React.FC<ModalProps> = ({
   size = 'md',
   centerOnMobile = false
 }) => {
+  // Alias for readability: when preventCloseOnOverlayClick is true, the modal
+  // requires an explicit in-modal action (Submit / Discard / Finish) and must
+  // not be dismissed by Escape or overlay click.
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -29,7 +32,7 @@ const Modal: React.FC<ModalProps> = ({
       document.body.style.overflow = 'hidden';
       
       const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
+        if (e.key === 'Escape' && !preventCloseOnOverlayClick) {
           onClose();
         }
         
@@ -74,7 +77,7 @@ const Modal: React.FC<ModalProps> = ({
         }
       };
     }
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, preventCloseOnOverlayClick]);
 
   if (!isOpen) return null;
 
