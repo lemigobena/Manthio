@@ -221,6 +221,10 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
   };
 
   const handleSkipOnboarding = () => {
+    const finalAvatar = avatar || boy;
+    if (user && (finalAvatar !== user.avatar)) {
+      updateProfile(user.name, user.bio, finalAvatar, user.backgroundImage || '');
+    }
     skipOnboarding();
     addToast('info', 'Onboarding skipped. You can complete your profile later from settings.');
     onNavigate('dashboard');

@@ -70,7 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'analytics', label: 'Analytics', icon: PieChart },
     { id: 'resources', label: 'Files', icon: Folder },
     { id: 'community', label: 'Community', icon: MessagesSquare },
-    { id: 'live-session', label: 'Live Sessions', icon: Video },
+    { id: 'live-sessions', label: 'Live Sessions', icon: Video },
   ];
 
   const bottomItems: NavItem[] = [

@@ -5,43 +5,21 @@ import {
   Send, Hand, BarChart3, Bot, ChevronRight, Mail,
   ExternalLink, Info, Star, Plus, ShieldCheck, ArrowUp
 } from 'lucide-react';
+import { AITutorChat } from '../ai-tutor/components/AITutorChat';
+import type { ChatMessage } from '../../types';
+
+import { liveSessionsData } from './data/liveSessionsData';
+import type { SessionState } from './data/liveSessionsData';
 
 interface LiveSessionProps {
+  sessionId?: string;
   onNavigate?: (page: string) => void;
 }
 
-type SessionState = 'pre' | 'live' | 'post';
-
-const sessionData = {
-  title: "Advanced React Patterns & Performance",
-  description: "Deep dive into React 19's new features including useActionState, better hydration, and architecture patterns for large-scale enterprise apps.",
-  trainer: {
-    name: "Dr. Sarah Chen",
-    role: "Lead Frontend Architect",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
-    status: "Available"
-  },
-  startTime: new Date('2026-06-22T14:30:00Z'),
-  materials: [
-    { name: "Preparation Slides.pdf", size: "2.4 MB" },
-    { name: "Code Snippets.zip", size: "1.1 MB" }
-  ],
-  recording: "https://example.com/recording",
-  notes: [
-    "React Compiler will handle memoization automatically in most cases.",
-    "The useActionState hook simplifies form handling significantly.",
-    "Server Components are recommended for data fetching to reduce bundle size."
-  ],
-  assignments: [
-    { id: 1, title: "Refactor existing form to use useActionState", status: "pending" },
-    { id: 2, title: "Implement a Server Component for the dashboard", status: "pending" }
-  ]
-};
-
-type SessionData = typeof sessionData;
-
-export const LiveSession: React.FC<LiveSessionProps> = () => {
-  const [sessionState, setSessionState] = useState<SessionState>('pre');
+export const LiveSession: React.FC<LiveSessionProps> = ({ sessionId = 'session-1', onNavigate }) => {
+  const sessionData = liveSessionsData[sessionId] || liveSessionsData['session-1'];
+  
+  const [sessionState, setSessionState] = useState<SessionState>(sessionData.state || 'pre');
   const [showTrainerDirect, setShowTrainerDirect] = useState(false);
 
   if (showTrainerDirect) {
@@ -60,35 +38,16 @@ export const LiveSession: React.FC<LiveSessionProps> = () => {
         <div>
           <div className="flex items-center space-x-2 text-[10px] font-bold text-muted uppercase tracking-widest mb-1">
             <Video size={12} className="text-cyan" />
-            <span>Live Academy</span>
+            <span 
+              className="text-muted hover:text-cyan cursor-pointer transition-colors"
+              onClick={() => onNavigate?.('live-sessions')}
+            >
+              Live Sessions
+            </span>
             <ChevronRight size={10} />
             <span className="text-text">Session View</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-text">{sessionData.title}</h1>
-        </div>
-      </div>
-
-      {/* Toggler */}
-      <div className="flex justify-end md:justify-start">
-        <div className="flex bg-panel border border-line rounded-xl p-1 w-full md:w-auto">
-          {(['pre', 'live', 'post'] as SessionState[]).map((state) => (
-            <button
-              key={state}
-              onClick={() => setSessionState(state)}
-              className={`flex-1 md:flex-none px-3 md:px-5 py-2 md:py-1.5 text-[10px] md:text-xs font-bold rounded-lg transition-all capitalize whitespace-nowrap ${
-                sessionState === state 
-                  ? 'bg-cyan text-bg shadow-lg shadow-cyan/20' 
-                  : 'text-muted hover:text-text'
-              }`}
-            >
-              <span className="hidden md:inline">
-                {state === 'pre' ? 'Pre-Session' : state === 'live' ? 'During Session' : 'Post-Session'}
-              </span>
-              <span className="md:hidden">
-                {state === 'pre' ? 'Pre' : state === 'live' ? 'Live' : 'Post'}
-              </span>
-            </button>
-          ))}
         </div>
       </div>
 
@@ -103,6 +62,7 @@ export const LiveSession: React.FC<LiveSessionProps> = () => {
         <ActiveSessionView 
           data={sessionData} 
           onLeave={() => setSessionState('post')}
+          onNavigate={onNavigate}
         />
       )}
       {sessionState === 'post' && (
@@ -140,7 +100,8 @@ const FlipUnit: React.FC<{ value: string, label: string }> = ({ value, label }) 
 };
 
 const PreSessionView: React.FC<{ 
-  data: SessionData, 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any, 
   onJoin: () => void,
   onContactTrainer: () => void
 }> = ({ data, onContactTrainer }) => {
@@ -207,7 +168,8 @@ const PreSessionView: React.FC<{
             <span>Pre-session Materials</span>
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {data.materials.map((file, i) => (
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {data.materials.map((file: any, i: number) => (
               <div key={i} className="group bg-bg border border-line rounded-xl p-4 flex items-center justify-between hover:border-cyan/50 transition-all cursor-pointer">
                 <div className="flex items-center space-x-3 overflow-hidden">
                   <div className="w-10 h-10 bg-panel2 rounded-lg flex items-center justify-center text-muted group-hover:text-cyan transition-colors">
@@ -288,25 +250,108 @@ const PreSessionView: React.FC<{
   );
 };
 
-const ActiveSessionView: React.FC<{ data: SessionData, onLeave: () => void }> = ({ data, onLeave }) => {
+const ActiveSessionView: React.FC<{ 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any, 
+  onLeave: () => void,
+  onNavigate?: (page: string) => void
+}> = ({ data, onLeave, onNavigate }) => {
   const [activeTab, setActiveTab] = useState<'chat' | 'polls' | 'materials' | 'ai-tutor'>('chat');
+  const [groupChatInput, setGroupChatInput] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [groupChatMessages, setGroupChatMessages] = useState<any[]>([
+    {
+      id: 'msg-1',
+      sender: 'Alex M.',
+      isUser: false,
+      isTutor: false,
+      isModerator: false,
+      time: '14:55',
+      text: 'Is there any performance overhead when using useActionState compared to standard useEffect?'
+    },
+    {
+      id: 'msg-2',
+      sender: 'Moderator',
+      isUser: false,
+      isTutor: false,
+      isModerator: true,
+      time: '14:56',
+      text: 'Great question Alex! Sarah will address this in the Q&A section in 5 minutes.'
+    },
+    {
+      id: 'msg-3',
+      sender: 'AI Tutor Hint',
+      isUser: false,
+      isTutor: true,
+      isModerator: false,
+      time: '14:56',
+      text: "Wait, are you wondering about 'memoization'? I have a snippet for that in the local resources."
+    }
+  ]);
+
+  const handleGroupChatSend = () => {
+    if (!groupChatInput.trim()) return;
+    const userMsg = {
+      id: Math.random().toString(),
+      sender: 'You',
+      isUser: true,
+      isTutor: false,
+      isModerator: false,
+      time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+      text: groupChatInput
+    };
+    setGroupChatMessages(prev => [...prev, userMsg]);
+    setGroupChatInput('');
+  };
+
+  const handleGroupChatKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleGroupChatSend();
+    }
+  };
+
   const [aiChatInput, setAiChatInput] = useState('');
-  const [aiMessages, setAiMessages] = useState<{ sender: 'user' | 'tutor', text: string }[]>([
-    { sender: 'tutor', text: "Hello! I'm your private AI Tutor. Ask me anything about today's session without interrupting the group." }
+  const [aiMessages, setAiMessages] = useState<ChatMessage[]>([
+    { 
+      id: 'ls-msg-1',
+      sender: 'system', 
+      text: 'Tutor is context-aware of current slide: "React 19 Server Components"', 
+      timestamp: '14:29' 
+    },
+    { 
+      id: 'ls-msg-2',
+      sender: 'tutor', 
+      text: "Hello! I'm your private AI Tutor. Ask me anything about today's session without interrupting the group.", 
+      source: 'Course docs',
+      sourceLink: '#/docs/react-19/server-components',
+      timestamp: '14:30'
+    }
   ]);
   const [isAiTyping, setIsAiTyping] = useState(false);
 
-  const handleAiSend = () => {
-    if (!aiChatInput.trim()) return;
-    const userMsg = { sender: 'user' as const, text: aiChatInput };
+  const handleAiSend = (textOverride?: string, forceCloud?: boolean) => {
+    const text = textOverride || aiChatInput;
+    if (!text.trim()) return;
+    const userMsg: ChatMessage = { 
+      id: Math.random().toString(),
+      sender: 'user', 
+      text,
+      timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+    };
     setAiMessages(prev => [...prev, userMsg]);
-    setAiChatInput('');
+    if (!textOverride) setAiChatInput('');
     setIsAiTyping(true);
 
     setTimeout(() => {
       setAiMessages(prev => [...prev, { 
-        sender: 'tutor' as const, 
-        text: "That's a great question about React 19! The 'useActionState' hook essentially manages form status, errors, and data in a unified way, which is what Sarah is showing right now." 
+        id: Math.random().toString(),
+        sender: 'tutor', 
+        text: forceCloud 
+          ? "I searched the Cloud AI for you. React 19 introduces 'useActionState' which is designed to help manage forms, replacing some complex useState/useEffect combos." 
+          : "That's a great question about React 19! The 'useActionState' hook essentially manages form status, errors, and data in a unified way, which is what Sarah is showing right now.",
+        source: forceCloud ? 'Cloud AI' : 'Course docs',
+        sourceLink: forceCloud ? undefined : '#/docs/react-19/use-action-state',
+        timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
       }]);
       setIsAiTyping(false);
     }, 1500);
@@ -420,38 +465,48 @@ const ActiveSessionView: React.FC<{ data: SessionData, onLeave: () => void }> = 
           {activeTab === 'chat' && (
             <>
               <div className="flex-1 space-y-4">
-                <div className="bg-bg/50 rounded-xl p-3 border border-line/50">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-bold text-purple">Alex M.</span>
-                    <span className="text-[9px] text-muted">14:55</span>
-                  </div>
-                  <p className="text-[11px] text-text leading-relaxed">Is there any performance overhead when using useActionState compared to standard useEffect?</p>
-                </div>
-                <div className="bg-bg/50 rounded-xl p-3 border border-line/50">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-bold text-cyan">Moderator</span>
-                    <span className="text-[9px] text-muted">14:56</span>
-                  </div>
-                  <p className="text-[11px] text-text leading-relaxed">Great question Alex! Sarah will address this in the Q&A section in 5 minutes.</p>
-                </div>
-
-                <div className="bg-purple/5 border border-purple/20 rounded-xl p-3 flex space-x-3">
-                  <Bot size={16} className="text-purple shrink-0" />
-                  <div className="space-y-1">
-                    <span className="text-[9px] font-bold text-purple uppercase tracking-widest">AI Tutor Hint</span>
-                    <p className="text-[10px] text-text/90 italic">Wait, are you wondering about 'memoization'? I have a snippet for that in the local resources.</p>
-                  </div>
-                </div>
+                {groupChatMessages.map((msg) => {
+                  if (msg.isTutor) {
+                    return (
+                      <div key={msg.id} className="bg-purple/5 border border-purple/20 rounded-xl p-3 flex space-x-3">
+                        <Bot size={16} className="text-purple shrink-0" />
+                        <div className="space-y-1">
+                          <span className="text-[9px] font-bold text-purple uppercase tracking-widest">{msg.sender}</span>
+                          <p className="text-[10px] text-text/90 italic">{msg.text}</p>
+                        </div>
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <div key={msg.id} className="bg-bg/50 rounded-xl p-3 border border-line/50">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className={`text-[10px] font-bold ${msg.isModerator ? 'text-cyan' : msg.isUser ? 'text-green' : 'text-purple'}`}>
+                          {msg.sender}
+                        </span>
+                        <span className="text-[9px] text-muted">{msg.time}</span>
+                      </div>
+                      <p className="text-[11px] text-text leading-relaxed">{msg.text}</p>
+                    </div>
+                  );
+                })}
               </div>
 
-              <div className="mt-4 pt-4 border-t border-line space-y-3">
+              <div className="mt-4 pt-4 border-t border-line space-y-3 shrink-0">
                  <div className="flex items-center space-x-2 bg-bg border border-line rounded-xl px-3 py-1.5">
                    <input 
                      type="text" 
                      placeholder="Type a message..." 
                      className="flex-1 bg-transparent border-none text-[11px] focus:outline-none text-text"
+                     value={groupChatInput}
+                     onChange={(e) => setGroupChatInput(e.target.value)}
+                     onKeyDown={handleGroupChatKeyDown}
                    />
-                   <button className="text-cyan hover:scale-110 transition-transform">
+                   <button 
+                     onClick={handleGroupChatSend}
+                     disabled={!groupChatInput.trim()}
+                     className={`transition-transform ${groupChatInput.trim() ? 'text-cyan hover:scale-110' : 'text-muted/50 cursor-not-allowed'}`}
+                   >
                      <Send size={16} />
                    </button>
                  </div>
@@ -460,52 +515,16 @@ const ActiveSessionView: React.FC<{ data: SessionData, onLeave: () => void }> = 
           )}
 
           {activeTab === 'ai-tutor' && (
-            <>
-              <div className="flex-1 space-y-4">
-                {aiMessages.map((msg, i) => (
-                  <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[90%] p-3 rounded-xl text-[11px] ${
-                      msg.sender === 'user' ? 'bg-cyan text-bg rounded-tr-none' : 'bg-bg/50 border border-line/50 text-text rounded-tl-none'
-                    }`}>
-                      {msg.text}
-                    </div>
-                  </div>
-                ))}
-                {isAiTyping && (
-                  <div className="flex justify-start">
-                    <div className="bg-bg/50 border border-line/50 p-3 rounded-xl rounded-tl-none flex space-x-1">
-                      <div className="w-1 h-1 bg-cyan rounded-full animate-bounce" />
-                      <div className="w-1 h-1 bg-cyan rounded-full animate-bounce [animation-delay:0.2s]" />
-                      <div className="w-1 h-1 bg-cyan rounded-full animate-bounce [animation-delay:0.4s]" />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-line space-y-3 shrink-0">
-                <div className="flex items-center space-x-2 bg-bg border border-line rounded-xl px-3 py-1.5 focus-within:border-cyan transition-colors">
-                  <input 
-                    type="text" 
-                    value={aiChatInput}
-                    onChange={(e) => setAiChatInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAiSend()}
-                    placeholder="Ask AI private question..." 
-                    className="flex-1 bg-transparent border-none text-[11px] focus:outline-none text-text"
-                  />
-                  <button 
-                    onClick={handleAiSend}
-                    disabled={!aiChatInput.trim()}
-                    className={`transition-all ${aiChatInput.trim() ? 'text-cyan scale-110' : 'text-muted'}`}
-                  >
-                    <Send size={16} />
-                  </button>
-                </div>
-                <div className="flex items-center justify-center space-x-1.5 text-[9px] text-muted font-bold uppercase tracking-widest text-center py-1">
-                   <ShieldCheck size={10} className="text-cyan" />
-                   <span>Private Session</span>
-                </div>
-              </div>
-            </>
+            <div className="flex-1 flex flex-col h-full -m-4">
+              <AITutorChat
+                messages={aiMessages}
+                isTyping={isAiTyping}
+                onSendMessage={handleAiSend}
+                suggestedPrompts={['What is React 19?', 'Can you explain useActionState?']}
+                embedded={true}
+                onSourceClick={() => onNavigate && onNavigate('content-player')}
+              />
+            </div>
           )}
 
           {activeTab === 'polls' && (
@@ -546,7 +565,8 @@ const ActiveSessionView: React.FC<{ data: SessionData, onLeave: () => void }> = 
 
           {activeTab === 'materials' && (
             <div className="space-y-3">
-               {data.materials.map((file, i) => (
+               {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+               {data.materials.map((file: any, i: number) => (
                 <div key={i} className="bg-bg border border-line rounded-xl p-3 flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Download size={16} className="text-muted" />
@@ -563,7 +583,8 @@ const ActiveSessionView: React.FC<{ data: SessionData, onLeave: () => void }> = 
   );
 };
 
-const PostSessionView: React.FC<{ data: SessionData, onContactTrainer: () => void }> = ({ data, onContactTrainer }) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PostSessionView: React.FC<{ data: any, onContactTrainer: () => void }> = ({ data, onContactTrainer }) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-6">
@@ -595,6 +616,47 @@ const PostSessionView: React.FC<{ data: SessionData, onContactTrainer: () => voi
                </button>
             </div>
             <span className="text-[10px] text-muted font-medium">Recorded today, 14:30 - 16:04 (94 mins)</span>
+          </div>
+        </div>
+
+        {/* Poll Results */}
+        <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
+          <h3 className="text-sm font-bold text-text flex items-center space-x-2">
+            <BarChart3 size={16} className="text-cyan" />
+            <span>Session Poll Results</span>
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-bg border border-line rounded-xl p-4 space-y-3">
+               <p className="text-[11px] font-bold text-text">Which React version are you currently using in production?</p>
+               <div className="space-y-2">
+                 <div className="space-y-1">
+                   <div className="flex justify-between text-[10px] mb-1 text-muted"><span>React 17 or older</span><span>15%</span></div>
+                   <div className="w-full bg-line h-1.5 rounded-full overflow-hidden"><div className="bg-muted h-full w-[15%]" /></div>
+                 </div>
+                 <div className="space-y-1">
+                   <div className="flex justify-between text-[10px] mb-1 text-cyan font-bold"><span>React 18</span><span>75%</span></div>
+                   <div className="w-full bg-line h-1.5 rounded-full overflow-hidden"><div className="bg-cyan h-full w-[75%]" /></div>
+                 </div>
+                 <div className="space-y-1">
+                   <div className="flex justify-between text-[10px] mb-1 text-muted"><span>React 19 (Alpha/Beta)</span><span>10%</span></div>
+                   <div className="w-full bg-line h-1.5 rounded-full overflow-hidden"><div className="bg-muted h-full w-[10%]" /></div>
+                 </div>
+               </div>
+            </div>
+            
+            <div className="bg-bg border border-line rounded-xl p-4 space-y-3">
+               <p className="text-[11px] font-bold text-text">Have you used Server Actions before?</p>
+               <div className="space-y-2">
+                 <div className="space-y-1">
+                   <div className="flex justify-between text-[10px] mb-1 text-cyan font-bold"><span>Yes</span><span>62%</span></div>
+                   <div className="w-full bg-line h-1.5 rounded-full overflow-hidden"><div className="bg-cyan h-full w-[62%]" /></div>
+                 </div>
+                 <div className="space-y-1">
+                   <div className="flex justify-between text-[10px] mb-1 text-muted"><span>No</span><span>38%</span></div>
+                   <div className="w-full bg-line h-1.5 rounded-full overflow-hidden"><div className="bg-muted h-full w-[38%]" /></div>
+                 </div>
+               </div>
+            </div>
           </div>
         </div>
 
@@ -637,7 +699,8 @@ const PostSessionView: React.FC<{ data: SessionData, onContactTrainer: () => voi
         <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
           <h3 className="text-[10px] font-bold text-muted uppercase tracking-widest">Follow-up Assignments</h3>
           <div className="space-y-3">
-             {data.assignments.map((task) => (
+             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+             {data.assignments.map((task: any) => (
                <div key={task.id} className="group bg-bg border border-line rounded-xl p-4 space-y-3 hover:border-cyan/50 transition-all cursor-pointer">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold text-muted uppercase tracking-widest">Project {task.id}</span>
@@ -695,7 +758,8 @@ const generateId = () => {
 };
 
 const TrainerDirectView: React.FC<{ 
-  trainer: SessionData['trainer'], 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  trainer: any, 
   onBack: () => void 
 }> = ({ trainer, onBack }) => {
   const [isAnswerExpanded, setIsAnswerExpanded] = useState(false);
@@ -711,10 +775,15 @@ const TrainerDirectView: React.FC<{
       id: '3', sender: 'trainer', text: "Exactly! Fixed constants are always better if the data is truly static. The document above shows the micro-benchmarks for the dependency array check. It's negligible but worth understanding!", time: "Jun 12, 11:45 AM", type: 'resource'
     }
   ]);
-  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   }, [messages]);
 
   const handleSendMessage = () => {
@@ -792,7 +861,7 @@ const TrainerDirectView: React.FC<{
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6 space-y-6">
         <div className="text-center">
            <span className="px-3 py-1 bg-panel border border-line rounded-full text-[9px] font-bold text-muted uppercase tracking-widest">Conversation Started 2 weeks ago</span>
         </div>
@@ -868,7 +937,6 @@ const TrainerDirectView: React.FC<{
              </div>
            </div>
         </div>
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}

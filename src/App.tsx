@@ -13,6 +13,7 @@ import { TermsOfUse } from './features/info/TermsOfUse';
 import { CookieSettings } from './features/info/CookieSettings';
 import { Imprint } from './features/info/Imprint';
 import { LiveSession } from './features/live-session/LiveSession';
+import { LiveSessionsDirectory } from './features/live-session/LiveSessionsDirectory';
 // Page Views
 import { Dashboard } from './features/dashboard/Dashboard';
 import { Catalog } from './features/catalog/Catalog';
@@ -116,8 +117,10 @@ const MainApp: React.FC = () => {
         return <Imprint onNavigate={handleNavigate} />;
       case 'checkout':
         return <Checkout onNavigate={handleNavigate} />;
+      case 'live-sessions':
+        return <LiveSessionsDirectory onNavigate={handleNavigate} />;
       case 'live-session':
-        return <LiveSession onNavigate={handleNavigate} />;
+        return <LiveSession sessionId={tab} onNavigate={handleNavigate} />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }

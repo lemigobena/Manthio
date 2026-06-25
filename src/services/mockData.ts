@@ -115,7 +115,7 @@ export const COURSES: Course[] = [
             title: 'Your first script', 
             type: 'Code', 
             duration: '20min', 
-            status: 'completed', 
+            status: 'in_progress', 
             required: true, 
             bloomLevel: 'Apply',
             sandboxData: {

@@ -146,6 +146,14 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handlePrevious, handleNext, addToast]);
 
+  useEffect(() => {
+    const handleSandboxSubmit = () => {
+      setToolsOpen(true);
+    };
+    window.addEventListener('sandbox_submit', handleSandboxSubmit);
+    return () => window.removeEventListener('sandbox_submit', handleSandboxSubmit);
+  }, []);
+
   const renderCenterContent = () => {
     switch (currentLesson.type) {
       case 'Video':

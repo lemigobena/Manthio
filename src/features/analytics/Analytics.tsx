@@ -93,7 +93,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
   // Controls
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'quarter' | 'year' | 'allTime'>('week');
   const [chartMode, setChartMode] = useState<'7days' | '30days'>('7days');
-  const [chartStyle, setChartStyle] = useState<'bar' | 'curve'>('curve');
+  const [chartStyle, setChartStyle] = useState<'bar' | 'curve'>('bar');
   const [showCohort, setShowCohort] = useState(false);
   const [competencyFilter, setCompetencyFilter] = useState<'all' | 'python'>('all');
   
@@ -110,6 +110,8 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
   // Heatmap mobile interaction: tap to reveal tooltip (since hover doesn't exist on touch)
   const [activeHeatmapIdx, setActiveHeatmapIdx] = useState<number | null>(null);
   const heatmapRef = useRef<HTMLDivElement | null>(null);
+  const [activeChartIdx, setActiveChartIdx] = useState<number | null>(null);
+  const chartRef = useRef<HTMLDivElement | null>(null);
 
   // Listen to real-time updates from other parts of the application
   useEffect(() => {
@@ -126,6 +128,9 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
       const target = e.target as Node;
       if (heatmapRef.current && !heatmapRef.current.contains(target)) {
         setActiveHeatmapIdx(null);
+      }
+      if (chartRef.current && !chartRef.current.contains(target)) {
+        setActiveChartIdx(null);
       }
     };
 
@@ -534,7 +539,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
               </div>
 
               {/* Graphic Chart with CSS Columns and SVG overlays */}
-              <div className="h-56 flex items-end justify-between pt-6 border-b border-line px-4 relative mt-2">
+              <div className="h-56 flex items-end justify-between pt-6 border-b border-line px-4 relative mt-2" ref={chartRef}>
                 {/* Background horizontal grid lines */}
                 <div className="absolute inset-x-0 top-1/4 border-t border-line/30 text-[9px] text-muted/50 pt-0.5 pointer-events-none">{(maxVal * 0.75).toFixed(0)}m</div>
                 <div className="absolute inset-x-0 top-2/4 border-t border-line/30 text-[9px] text-muted/50 pt-0.5 pointer-events-none">{(maxVal * 0.5).toFixed(0)}m</div>
@@ -591,9 +596,9 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                 {chartData.current.map((d, idx) => {
                   const percent = Math.min(100, (d.minutes / maxVal) * 100);
                   return (
-                    <div key={idx} className="flex flex-col items-center z-10 w-full group relative">
-                      {/* Hover Tooltip */}
-                      <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center bg-panel border border-line text-[9px] text-text rounded-md px-2 py-1.5 whitespace-nowrap z-50 shadow-2xl pointer-events-none">
+                    <div key={idx} className="flex flex-col items-center z-10 w-full group relative cursor-pointer" onClick={() => setActiveChartIdx(prev => prev === idx ? null : idx)} role="button" tabIndex={0}>
+                      {/* Hover Tooltip / Mobile Tap Tooltip */}
+                      <div className={`absolute bottom-full mb-2 ${activeChartIdx === idx ? 'flex' : 'hidden'} group-hover:flex flex-col items-center bg-panel border border-line text-[9px] text-text rounded-md px-2 py-1.5 whitespace-nowrap z-50 shadow-2xl pointer-events-none`}>
                         <span className="font-bold">{new Date(d.date).toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
                         <div className="text-cyan font-semibold">{d.minutes} mins studied</div>
                         <div className="text-orange/80">Previous: {chartData.previous[idx]?.minutes || 0} mins</div>
@@ -731,13 +736,13 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                       </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-line/45">
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-line/45">
                       <div className="text-[10px] text-muted">
                         <span className="font-bold text-text/80 block">Recommended Action:</span>
                         <span className="capitalize text-cyan">{w.recommendedAction}</span>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2 mt-1 sm:mt-0">
                         {/* Spaced-repetition Quiz option */}
                         {reviewStatus.available ? (
                           <button 

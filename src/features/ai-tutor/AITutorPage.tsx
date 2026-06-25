@@ -1,75 +1,25 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useXP } from '../../context/XPContext';
 import { useAuth } from '../../context/AuthContext';
-import { BookOpen, 
-  Mic, ThumbsUp, ThumbsDown, Copy, Plus, Search, MessageSquare,
-  Share2, PanelLeftClose, PanelLeft, PanelRightClose, PanelRight, ArrowUp,
-  Globe
-} from 'lucide-react';
+import { BookOpen, Search, MessageSquare, Share2, PanelLeftClose, PanelLeft, PanelRightClose, PanelRight, Plus } from 'lucide-react';
 import type { ChatMessage } from '../../types';
 import { analyticsService } from '../../services/analyticsService';
+import { AITutorChat } from './components/AITutorChat';
 
 interface AITutorPageProps {
   onNavigate?: (page: string) => void;
   initialTab?: string;
 }
 
-
-// --- Sub-components ---
-
-const RichMessage: React.FC<{ text: string; sender: 'user' | 'tutor' | 'system' }> = ({ text, sender }) => {
-  if (sender === 'system') {
-    return <div className="text-center italic text-muted text-[10px] my-4 px-8 border-y border-line/30 py-2 truncate">{text}</div>;
-  }
-
-  return (
-    <div className="whitespace-pre-wrap break-words leading-relaxed">
-      {text}
-    </div>
-  );
-};
-
 const generateId = () => {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return crypto.randomUUID();
+    try {
+      return crypto.randomUUID();
+    } catch {
+      // Ignore
+    }
   }
   return Date.now().toString() + Math.random().toString(36).substring(2);
-};
-
-const AutoExpandingTextarea: React.FC<{
-  value: string;
-  onChange: (val: string) => void;
-  onSend: () => void;
-  disabled?: boolean;
-}> = ({ value, onChange, onSend, disabled }) => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
-    }
-  }, [value]);
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      onSend();
-    }
-  };
-
-  return (
-    <textarea
-      ref={textareaRef}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      onKeyDown={handleKeyDown}
-      disabled={disabled}
-      placeholder="Ask a question..."
-      rows={1}
-      className="flex-1 bg-transparent border-none !border-none !outline-none text-xs py-2.5 text-text focus:outline-none focus:ring-0 focus:shadow-none outline-none resize-none min-h-[40px] max-h-[200px] transition-all"
-    />
-  );
 };
 
 // --- Data Mocking ---
@@ -90,75 +40,70 @@ interface ChatSessionData {
 const MOCK_SESSIONS: Record<string, ChatSessionData> = {
   'chat-1': {
     id: 'chat-1',
-    title: 'Recursion Base Case',
+    title: 'Contextual Awareness (16.5)',
     messages: [
       { id: 's1', sender: 'system', text: 'Session started: Module 3 Context Active', timestamp: '14:29' },
-      { id: 'm1', sender: 'tutor', text: 'Hello Alex! I see you\'re working on Module 3: Workshop A. I am your personal AI Tutor. How can I help you today?', timestamp: '14:30', source: 'Course docs' }
+      { id: 'm1', sender: 'tutor', text: 'Hello! I see you\'re working on Module 3: Workshop A. I also notice you\'ve struggled with OOP Concepts in the past. How can I help you today?', timestamp: '14:30', source: 'Course docs', sourceLink: '#/docs/module-3/oop-concepts' }
     ],
     context: {
       module: 'Module 3: Workshop A',
-      lesson: 'Lesson 4.2: Recursion',
+      lesson: 'Lesson 4.2: OOP & Recursion',
       progress: 60,
       weakPoints: [
         { label: 'OOP Concepts', color: 'bg-red' },
         { label: 'Recursion', color: 'bg-orange' }
       ],
       snippets: [
-        { title: 'Binary Search Helper', content: '"The base case is when low > high..."' }
+        { title: 'Class Definition', content: '"class Node: def __init__(self):..."' }
       ]
     }
   },
   'chat-2': {
     id: 'chat-2',
-    title: 'Difference List vs Tuple',
+    title: 'Rich Content Demo (16.4.2)',
     messages: [
       { id: 's2', sender: 'system', text: 'History Loaded: Yesterday', timestamp: 'Jun 21 16:00' },
-      { id: 'u2', sender: 'user', text: 'When should I use a tuple instead of a list?', timestamp: '16:05' },
-      { id: 'm2', sender: 'tutor', text: 'Tuples should be used for immutable data—items that shouldn\'t change during execution. Lists are for collections where you need to add, remove, or modify items.', timestamp: '16:06', source: 'Course docs' }
+      { id: 'u2', sender: 'user', text: 'Can you show me a Python code block and some math?', timestamp: '16:05' },
+      { id: 'm2', sender: 'tutor', text: 'Certainly! Here is a simple Python function to calculate the area of a circle:\n\n```python\nimport math\n\ndef circle_area(radius):\n    return math.pi * (radius ** 2)\n```\n\nThe mathematical formula for this is:\n\n$$ A = \\pi r^2 $$\n\nWhere $A$ is the area and $r$ is the radius.', timestamp: '16:06', source: 'Course docs', sourceLink: '#/docs/python-math/formulas' }
     ],
     context: {
-      module: 'Module 2: Data Structures',
-      lesson: 'Lesson 2.1: Advanced Collections',
+      module: 'Module 2: Math and Logic',
+      lesson: 'Lesson 2.1: Advanced Math',
       progress: 100,
-      weakPoints: [
-        { label: 'Tuple Packing', color: 'bg-yellow' }
-      ],
-      snippets: [
-        { title: 'Zip and Unzip', content: 'pair = (x, y); x, y = pair' }
-      ]
+      weakPoints: [],
+      snippets: []
     }
   },
   'chat-3': {
     id: 'chat-3',
-    title: 'Error with venv PowerShell',
+    title: 'Source Fallback (16.10.3)',
     messages: [
-      { id: 's3', sender: 'system', text: 'Session: Technical Troubleshooting', timestamp: 'Jun 12 09:10' },
-      { id: 'u3', sender: 'user', text: 'I am getting a scripts execution policy error in VS Code.', timestamp: '09:12' },
-      { id: 'm3', sender: 'tutor', text: 'This is common on Windows. Run the policy bypass command in your terminal.', timestamp: '09:13', source: 'Cloud AI' }
+      { id: 's3', sender: 'system', text: 'Diagnostic Mode: Source Engine Testing', timestamp: 'Jun 08 10:00' },
+      { id: 'u3', sender: 'user', text: 'What is the speed of light in a vacuum?', timestamp: '10:01' },
+      { 
+        id: 'm3', 
+        sender: 'tutor', 
+        text: 'I can\'t find specific data about physical constants in the Python Bootcamp materials. Would you like me to ask the Cloud AI?', 
+        timestamp: '10:02', 
+        source: 'Course docs',
+        sourceLink: '#/docs/python/constants'
+      }
     ],
     context: {
       module: 'Module 1: Setup',
       lesson: 'Lesson 1.4: Virtual Environments',
       progress: 85,
       weakPoints: [],
-      snippets: [
-        { title: 'PS Policy Fix', content: 'Set-ExecutionPolicy RemoteSigned -Scope Process' }
-      ]
+      snippets: []
     }
   },
   'chat-4': {
     id: 'chat-4',
-    title: 'Simple arithmetic operators',
+    title: 'Rate Limit (16.9)',
     messages: [
-      { id: 's4', sender: 'system', text: 'Diagnostic Mode: Source Engine Testing', timestamp: 'Jun 08 10:00' },
-      { id: 'u4a', sender: 'user', text: 'What is the speed of light in a vacuum?', timestamp: '10:01' },
-      { 
-        id: 'm4a', 
-        sender: 'tutor', 
-        text: 'I can\'t find specific data about physical constants in the Python Bootcamp materials. Would you like me to ask the Cloud AI?', 
-        timestamp: '10:02', 
-        source: 'Course docs'
-      }
+      { id: 's4', sender: 'system', text: 'Session: Rate Limit Test', timestamp: 'Jun 08 10:00' },
+      { id: 'u4', sender: 'user', text: 'Please analyze this 5000 line dataset.', timestamp: '10:01' },
+      { id: 'sys1', sender: 'system', text: 'You\'ve reached today\'s free AI Tutor limit (10/10 messages). Please upgrade to PRO for unlimited access, or try again tomorrow.', timestamp: '10:02' }
     ],
     context: {
       module: 'Module 1: Intro',
@@ -167,10 +112,26 @@ const MOCK_SESSIONS: Record<string, ChatSessionData> = {
       weakPoints: [],
       snippets: []
     }
+  },
+  'chat-5': {
+    id: 'chat-5',
+    title: 'Socratic Mode (16.9.1)',
+    messages: [
+      { id: 's5', sender: 'system', text: 'Socratic Comprehension Probe Active', timestamp: 'Jun 08 10:00' },
+      { id: 'u5', sender: 'user', text: 'Can you just give me the answer for the exercise 4.1? My code keeps failing.', timestamp: '10:01' },
+      { id: 'm5', sender: 'tutor', text: 'I noticed your loop condition is causing an infinite loop. Instead of giving you the exact answer, can you tell me in your own words what happens when `i` is never incremented inside the `while` block?', timestamp: '10:02', source: 'Course docs' }
+    ],
+    context: {
+      module: 'Module 4: Loops',
+      lesson: 'Exercise 4.1',
+      progress: 40,
+      weakPoints: [],
+      snippets: []
+    }
   }
 };
 
-export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab }) => {
+export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab, onNavigate }) => {
   const { addXp } = useXP();
   const { user, onboardingAnswers } = useAuth();
 
@@ -188,19 +149,19 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab }) => {
           title: `Remediation: ${weakness.topic}`,
           messages: [
             { 
-              id: crypto.randomUUID(), 
+              id: generateId(), 
               sender: 'system', 
               text: `Socratic Remediation Mode Active: Focused on ${weakness.topic}`, 
               timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
             },
             { 
-              id: crypto.randomUUID(), 
+              id: generateId(), 
               sender: 'system', 
               text: `Learner wrong-answer pattern: "${weakness.wrongPatterns}"`, 
               timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
             },
             { 
-              id: crypto.randomUUID(), 
+              id: generateId(), 
               sender: 'tutor', 
               text: `Hello ${user?.name ? user.name.split(' ')[0] : 'learner'}! I've loaded a Socratic remediation session for "${weakness.topic}". I noticed you recently had some incorrect answers matching patterns: "${weakness.wrongPatterns}". Let's work together to close this gap. I will ask you a few questions. To start, ${weakness.remediationPlan[0]}`, 
               timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -242,19 +203,19 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab }) => {
       if (weakness) {
         return [
           { 
-            id: crypto.randomUUID(), 
+            id: generateId(), 
             sender: 'system', 
             text: `Socratic Remediation Mode Active: Focused on ${weakness.topic}`, 
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
           },
           { 
-            id: crypto.randomUUID(), 
+            id: generateId(), 
             sender: 'system', 
             text: `Learner wrong-answer pattern: "${weakness.wrongPatterns}"`, 
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
           },
           { 
-            id: crypto.randomUUID(), 
+            id: generateId(), 
             sender: 'tutor', 
             text: `Hello ${user?.name ? user.name.split(' ')[0] : 'learner'}! I've loaded a Socratic remediation session for "${weakness.topic}". I noticed you recently had some incorrect answers matching patterns: "${weakness.wrongPatterns}". Let's work together to close this gap. I will ask you a few questions. To start, ${weakness.remediationPlan[0]}`, 
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -270,16 +231,14 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab }) => {
       welcomeText = `Hello ${firstName}! I am your personal AI Tutor. I see you are here for ${onboardingAnswers.reason} with a goal of investing ${onboardingAnswers.timePerWeek} weekly. Let's work together to achieve your goals! How can I help you today?`;
     }
     
-    // Copy the messages from chat-1 and update the tutor message
-    const messages = [...MOCK_SESSIONS['chat-1'].messages];
+    const messages = [...MOCK_SESSIONS[activeChatId]?.messages || MOCK_SESSIONS['chat-1'].messages];
     const tutorMsgIndex = messages.findIndex(m => m.sender === 'tutor');
-    if (tutorMsgIndex !== -1) {
+    if (tutorMsgIndex !== -1 && activeChatId === 'chat-1') {
       messages[tutorMsgIndex] = { ...messages[tutorMsgIndex], text: welcomeText };
     }
     return messages;
   });
   const [isTyping, setIsTyping] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   // Collapse States
@@ -292,11 +251,6 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [chatMessages, isTyping]);
 
   const remediationSessions = Object.values(sessions).filter(s => s.id.startsWith('remediation-'));
 
@@ -305,14 +259,15 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab }) => {
       label: 'Today', 
       items: [
         ...remediationSessions.map(s => ({ id: s.id, title: s.title, date: 'Now' })),
-        { id: 'chat-1', title: 'Recursion Base Case', date: '14:30' }
+        { id: 'chat-1', title: 'Contextual Awareness', date: '14:30' },
+        { id: 'chat-2', title: 'Rich Content Demo', date: '16:00' }
       ] 
     },
-    { label: 'Yesterday', items: [{ id: 'chat-2', title: 'Difference List vs Tuple', date: 'Jun 21' }] },
-    { label: 'Last Week', items: [
-      { id: 'chat-3', title: 'Error with venv PowerShell', date: 'Jun 12' },
-      { id: 'chat-4', title: 'Simple arithmetic operators', date: 'Jun 08' }
-    ]}
+    { label: 'Yesterday', items: [
+      { id: 'chat-3', title: 'Source Fallback', date: 'Jun 21' },
+      { id: 'chat-4', title: 'Rate Limit Warning', date: 'Jun 21' },
+      { id: 'chat-5', title: 'Socratic Mode', date: 'Jun 21' }
+    ]},
   ];
 
   const handleSelectChat = (id: string) => {
@@ -582,99 +537,13 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab }) => {
               <div className="w-1/3 h-12 bg-cyan/5 rounded-xl ml-auto animate-pulse" />
             </div>
           ) : (
-            <>
-              <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 md:p-6 space-y-8">
-                {chatMessages.map((msg, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`flex animate-cel-reveal ${
-                      msg.sender === 'user' ? 'justify-end' : msg.sender === 'system' ? 'justify-center w-full' : 'justify-start'
-                    }`}
-                  >
-                    <div className={`${
-                      msg.sender === 'system' 
-                        ? 'w-full px-4' 
-                        : 'max-w-[95%] md:max-w-[70%] p-4 rounded-2xl'
-                    } ${
-                      msg.sender === 'user' 
-                        ? 'bg-cyan text-bg rounded-tr-none' 
-                        : msg.sender === 'system' 
-                          ? 'bg-transparent' 
-                          : 'bg-panel border border-line rounded-tl-none text-text'
-                    }`}>
-                      <RichMessage text={msg.text} sender={msg.sender} />
-                      {msg.sender === 'tutor' && (
-                        <div className="mt-3 pt-3 border-t border-line/30 flex items-center justify-between text-[9px]">
-                          <div className={`flex items-center space-x-1.5 font-bold uppercase tracking-wider ${
-                            msg.source === 'Cloud AI' ? 'text-cyan' : 'text-purple'
-                          }`}>
-                            {msg.source === 'Cloud AI' ? <Globe size={11} /> : <BookOpen size={11} />}
-                            <span className="truncate">{msg.source}</span>
-                          </div>
-                          <div className="flex items-center space-x-2 shrink-0 text-muted">
-                            <button className="hover:text-cyan transition-colors"><ThumbsUp size={12} /></button>
-                            <button className="hover:text-red transition-colors"><ThumbsDown size={12} /></button>
-                            <button onClick={() => navigator.clipboard.writeText(msg.text)} className="hover:text-cyan transition-colors"><Copy size={12} /></button>
-                          </div>
-                        </div>
-                      )}
-                      {msg.sender === 'tutor' && msg.source === 'Course docs' && msg.text.toLowerCase().includes('cloud ai') && (
-                        <button 
-                          onClick={() => { 
-                            handleSendMessage(chatMessages.filter(m => m.sender === 'user').slice(-1)[0]?.text || 'Use Cloud AI', true); 
-                          }}
-                          className="mt-3 bg-transparent border border-cyan text-cyan text-[10px] font-bold px-4 py-2 rounded-lg hover:bg-cyan hover:text-bg transition-all flex items-center justify-center space-x-2"
-                        >
-                          <BookOpen size={14} />
-                          <span>Ask Cloud AI</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                {isTyping && (
-                  <div className="flex justify-start"><div className="bg-panel border border-line p-4 rounded-2xl rounded-tl-none flex space-x-1"><div className="w-1.5 h-1.5 bg-cyan rounded-full animate-bounce [animation-delay:-0.3s]" /><div className="w-1.5 h-1.5 bg-cyan rounded-full animate-bounce [animation-delay:-0.15s]" /><div className="w-1.5 h-1.5 bg-cyan rounded-full animate-bounce" /></div></div>
-                )}
-              </div>
-
-              <div className="p-4 border-t border-line bg-transparent">
-                <div className="max-w-4xl mx-auto space-y-4">
-                  {chatMessages.filter(m => m.sender === 'user').length === 0 && (
-                    <div className="flex flex-wrap gap-2 px-2">
-                      {suggestedPrompts.map((p, i) => <button key={i} onClick={() => handleSendMessage(p)} className="text-[10px] bg-panel border border-line px-3 py-1.5 rounded-full text-muted hover:text-cyan truncate max-w-[150px] transition-all">{p}</button>)}
-                    </div>
-                  )}
-                  <div className="flex items-center space-x-2 bg-panel rounded-full px-4 py-1.5 transition-all">
-                    <button className="p-2 text-muted hover:text-text transition-colors grow-0 shrink-0">
-                      <Plus size={20} />
-                    </button>
-                    
-                    <AutoExpandingTextarea value={chatInput} onChange={setChatInput} onSend={handleSendMessage} disabled={isTyping} />
-                    
-                    <div className="flex items-center space-x-2 shrink-0">
-                      <button className="p-2 text-muted hover:text-text transition-colors">
-                        <Mic size={20} />
-                      </button>
-                      
-                      <button 
-                        onClick={() => handleSendMessage()} 
-                        disabled={!chatInput.trim()} 
-                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-all shrink-0 shadow-lg ${
-                          chatInput.trim() 
-                            ? 'bg-cyan text-bg scale-100 shadow-cyan/20' 
-                            : 'bg-line/20 text-muted/40 scale-95 opacity-50'
-                        }`}
-                      >
-                        <ArrowUp size={20} className="shrink-0" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="text-center mt-1.5">
-                    <p className="text-[10px] text-muted/100">Manthio AI can make mistakes. Please verify important information.</p>
-                  </div>
-                </div>
-              </div>
-            </>
+            <AITutorChat
+              messages={chatMessages}
+              isTyping={isTyping}
+              onSendMessage={handleSendMessage}
+              suggestedPrompts={suggestedPrompts}
+              onSourceClick={() => onNavigate && onNavigate('content-player')}
+            />
           )}
         </div>
       </div>
