@@ -1,33 +1,32 @@
-import React, { useState } from 'react';
-import { COURSES, TRACKS } from '../../services/mockData';
+import React, { useState, useRef, useEffect } from 'react';
+import { COURSES } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { 
   Check, Lock, Play, ChevronDown, ChevronUp, ChevronRight, Clock, HelpCircle, 
   FileText, Code2, Users, MapPin, Calendar, AlertCircle,
-  Target, Award, BookOpen, Bookmark, MessageSquare, ExternalLink, Zap, User,
-  ShieldCheck, CheckCircle
+  Target, Award, BookOpen, Bookmark, MessageSquare, ExternalLink,
+  ShieldCheck, CheckCircle, Video,
 } from 'lucide-react';
-import type { Lesson, LessonType } from '../../types';
+import { useTrack } from '../track-detail/useTrack';
+import { calculateCourseProgress } from '../../services/progressUtils';
+import type { Course, Lesson, LessonType } from '../../types';
 
 interface LearningPathProps {
   onNavigate: (page: string) => void;
 }
 
 export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
-  const { activeCourseId, activeTrackId, setActiveCourseId } = useAuth();
+  const { activeCourseId } = useAuth();
   const { addXp } = useXP();
+  const { completedLessonIds, completeLesson } = useTrack();
   
-  const track = activeTrackId ? TRACKS.find(t => t.id === activeTrackId) : null;
-  const course = track 
-    ? (COURSES.find(c => c.id === activeCourseId) || COURSES.find(c => c.id === track.milestones[0].courses[0].id) || COURSES[0])
-    : (COURSES.find(c => c.id === activeCourseId) || COURSES[0]);
+  const course = COURSES.find(c => c.id === activeCourseId) || COURSES[0];
 
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) return null;
     return course.modules[0]?.id || null;
   });
-  const [expandedCourseId, setExpandedCourseId] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -88,6 +87,28 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
   const inProgressModule = course.modules.find(m => m.status === 'In progress') || 
                            course.modules.find(m => m.status === 'Open');
 
+  // DOM-measured tracker fill
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const [trackerFillPx, setTrackerFillPx] = useState(0);
+
+  useEffect(() => {
+    const measure = () => {
+      if (!timelineRef.current) return;
+      const container = timelineRef.current;
+      // Find the active module row — direct child of timeline container
+      const activeRow = container.querySelector('[data-active-row="true"]') as HTMLElement | null;
+      if (activeRow) {
+        // Icon is absolutely positioned at top-1.5 (6px), height 32px → center at 22px
+        setTrackerFillPx(activeRow.offsetTop + 22);
+      } else {
+        const allCompleted = course.modules.every(m => m.status === 'Completed');
+        setTrackerFillPx(allCompleted ? container.scrollHeight : 0);
+      }
+    };
+    const t = setTimeout(measure, 80);
+    return () => clearTimeout(t);
+  }, [expandedModuleId, course.modules, isLoading]);
+
   return (
     <div className="relative -mx-3 md:-mx-[44px] -my-6 bg-bg border-y border-line px-3 md:px-[44px] py-6">
       <div className="space-y-6 pb-32 max-w-[1600px] mx-auto">
@@ -96,24 +117,20 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <span className="text-[10px] text-cyan font-bold uppercase tracking-wider bg-bg px-2 py-0.5 rounded border border-line">
-              {track ? track.level : course.level} • {course.format === 'flipped' ? 'Flipped Bootcamp' : 'Self-Paced'}
+              {course.level} • {course.format === 'flipped' ? 'Flipped Bootcamp' : course.format === 'cohort' ? 'Cohort Based' : 'Self-Paced'}
             </span>
-            <h1 className="text-2xl font-bold text-text mt-2">
-              {track ? track.title : `${course.title} Learning Path`}
-            </h1>
-            <p className="text-muted text-xs mt-1">
-              {track ? `Track Focus: ${course.title} — ${course.description}` : course.description}
-            </p>
+            <h1 className="text-2xl font-bold text-text mt-2">{course.title} Learning Path</h1>
+            <p className="text-muted text-xs mt-1">{course.description}</p>
           </div>
           
           <div className="text-right">
-            <span className="text-xs text-muted">{track ? 'Track Progress' : 'Course Progress'}</span>
-            <div className="text-2xl font-bold text-cyan">{track ? track.progress : course.progress}%</div>
+            <span className="text-xs text-muted">Course Progress</span>
+            <div className="text-2xl font-bold text-cyan">{calculateCourseProgress(course as Course, completedLessonIds)}%</div>
           </div>
         </div>
 
         <div className="w-full h-2 bg-bg rounded-full overflow-hidden border border-line">
-          <div className="h-full bg-cyan transition-all duration-500" style={{ width: `${track ? track.progress : course.progress}%` }} />
+          <div className="h-full bg-cyan transition-all duration-500" style={{ width: `${calculateCourseProgress(course as Course, completedLessonIds)}%` }} />
         </div>
 
         {/* Header Stats Grid */}
@@ -171,165 +188,34 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
         </div>
       ) : (
         /* 14.2 Timeline */
-        <div className="relative pl-8 space-y-8 mt-8">
-          {/* 14.4 REQ-PATH-003 Dynamic Connector */}
-          <div className="absolute left-[15px] top-4 bottom-4 w-0.5 bg-line rounded-full" />
-          <div className="absolute left-[15px] top-4 w-0.5 bg-cyan rounded-full transition-all duration-1000" style={{ height: `${track ? track.progress : course.progress}%` }} />
+        <div className="relative pl-8 space-y-8 mt-8" ref={timelineRef}>
+          {/* 14.4 REQ-PATH-003 Dynamic Connector: completed=filled, in-progress=animated, locked=dashed */}
+          {/* Base track line */}
+          <div className="absolute left-[15px] top-4 bottom-4 w-0.5 bg-line/40 rounded-full" />
+          {/* Dashed locked segment — renders over full length, clipped by the cyan fill */}
+          <div
+            className="absolute left-[14px] top-4 bottom-4 bg-transparent"
+            style={{ 
+              borderLeft: '2px dashed',
+              borderColor: 'color-mix(in srgb, var(--color-line, #334155) 60%, transparent)',
+            }}
+          />
+          {/* Cyan completed/in-progress fill — covers and hides the dashed section up to active module */}
+          <div
+            className="absolute left-[15px] top-4 w-0.5 bg-cyan rounded-full transition-all duration-700"
+            style={{ height: `${trackerFillPx}px` }}
+          />
+          {/* REQ-PATH-003: Animated pulse on the active module position */}
+          {trackerFillPx > 0 && (
+            <div
+              className="absolute left-[11px] w-2 h-2 rounded-full bg-cyan animate-ping z-20"
+              style={{ top: `calc(${trackerFillPx}px - 4px + 1rem)` }}
+            />
+          )}
 
-          {track ? (
-            // Track Milestone Timeline
-            track.milestones.map((milestone, idx) => {
-              const isCompleted = milestone.status === 'completed';
-              const isInProgress = milestone.status === 'active';
-              const isLocked = milestone.status === 'locked';
-              
-              return (
-                <div key={milestone.id} className="relative">
-                  <div 
-                    className={`absolute -left-[33px] top-1.5 w-8 h-8 rounded-full border-2 flex items-center justify-center z-10 transition-colors ${
-                      isCompleted ? 'bg-green border-green text-bg' :
-                      isInProgress ? 'bg-panel border-cyan text-cyan' :
-                      'bg-bg border-line text-muted'
-                    }`}
-                  >
-                    {isCompleted ? <Check className="w-4 h-4 stroke-[3px]" /> : 
-                     isLocked ? <Lock className="w-3.5 h-3.5" /> : 
-                     <span className="text-xs font-bold">{idx + 1}</span>}
-                  </div>
-
-                  <div className={`bg-panel border rounded-2xl p-6 space-y-5 ${isInProgress ? 'border-cyan shadow-lg shadow-cyan/5' : 'border-line opacity-80'}`}>
-                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                      <div className="space-y-2 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className={`text-[9px] font-black uppercase tracking-[0.2em] ${isInProgress ? 'text-cyan' : isCompleted ? 'text-green' : 'text-muted'}`}>
-                            MILESTONE {idx + 1} {isCompleted ? '• COMPLETED' : isInProgress ? '• CURRENT FOCUS' : ''}
-                          </span>
-                          {isInProgress && (
-                            <span className="bg-cyan/10 text-cyan border border-cyan/20 text-[8px] font-black px-2 py-0.5 rounded-full uppercase">
-                              Active Phase
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="font-bold text-xl text-text">{milestone.title}</h3>
-                        <p className="text-muted text-xs leading-relaxed max-w-2xl">{milestone.description}</p>
-                      </div>
-
-                      <div className="flex flex-col items-end gap-2 shrink-0">
-                        <div className="text-[10px] font-bold text-muted uppercase tracking-widest">Milestone Progress</div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-24 h-1.5 bg-bg border border-line rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full ${isCompleted ? 'bg-green' : 'bg-cyan'} transition-all duration-1000`} 
-                              style={{ width: `${isCompleted ? 100 : isInProgress ? 45 : 0}%` }} 
-                            />
-                          </div>
-                          <span className="text-xs font-black text-text">{isCompleted ? '100%' : isInProgress ? '45%' : '0%'}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Skill Badges (REQ-TRACK-005 placeholder) */}
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      <span className="flex items-center gap-1 text-[9px] font-bold text-muted bg-bg/50 px-2 py-1 rounded border border-line">
-                        <Zap className="w-3 h-3 text-cyan" /> Core Systems
-                      </span>
-                      <span className="flex items-center gap-1 text-[9px] font-bold text-muted bg-bg/50 px-2 py-1 rounded border border-line">
-                        <Award className="w-3 h-3 text-purple" /> Architecture
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-2">
-                      {milestone.courses.map((mCourseEntry) => {
-                        const mCourse = COURSES.find(c => c.id === mCourseEntry.id);
-                        if (!mCourse) return null;
-                        const isCourseExpanded = expandedCourseId === mCourse.id;
-
-                        return (
-                          <div key={mCourse.id} className="lg:col-span-2 group/course">
-                            <div className="bg-bg/40 border border-line p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between group hover:border-cyan/30 transition-all gap-4">
-                              <div className="flex items-start gap-4">
-                                <div className="w-16 h-16 rounded-xl overflow-hidden bg-bg border border-line shrink-0">
-                                  <img src={mCourse.imageUrl} alt="" className="w-full h-full object-cover" />
-                                </div>
-                                <div className="space-y-1 min-w-0">
-                                  <div className="flex items-center gap-2">
-                                    <h4 className="text-sm font-bold text-text truncate group-hover:text-cyan transition-colors">{mCourse.title}</h4>
-                                    {mCourseEntry.isOptional && <span className="bg-purple/10 text-purple text-[8px] font-black px-1.5 py-0.5 rounded border border-purple/20 uppercase">Optional</span>}
-                                  </div>
-                                  <div className="flex items-center gap-3 text-[10px] text-muted font-bold">
-                                    <div className="flex items-center gap-1"><Clock className="w-3 h-3" /> {mCourse.duration}</div>
-                                    <div className="flex items-center gap-1 text-cyan"><Award className="w-3 h-3" /> +{mCourse.xpReward} XP</div>
-                                  </div>
-                                  <div className="text-[10px] text-muted flex items-center gap-1.5 pt-1">
-                                    <User className="w-3 h-3" /> <span>Trainer: {mCourse.trainer.name}</span>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              <div className="flex gap-2">
-                                <button 
-                                  onClick={() => {
-                                    setActiveCourseId(mCourse.id);
-                                    onNavigate('content-player');
-                                  }}
-                                  className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all flex items-center gap-2 ${
-                                    isInProgress 
-                                      ? 'bg-cyan text-bg hover:bg-cyan2 shadow-lg shadow-cyan/10' 
-                                      : 'bg-line/10 text-muted cursor-not-allowed'
-                                  }`}
-                                >
-                                  <Play className="w-3 h-3 fill-current" />
-                                  {isCompleted ? 'Review' : 'Continue'}
-                                </button>
-                                <button 
-                                  onClick={() => {
-                                    setExpandedCourseId(isCourseExpanded ? null : mCourse.id);
-                                  }}
-                                  className={`px-4 py-2 bg-panel border ${isCourseExpanded ? 'border-cyan text-cyan' : 'border-line text-text'} hover:border-cyan/30 text-[10px] font-black rounded-xl transition-all flex items-center gap-2`}
-                                >
-                                  {isCourseExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                                  <span>Details</span>
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Inline Course Modules for Track View (Universal) */}
-                            {isCourseExpanded && (
-                              <div className="mt-3 ml-4 sm:ml-8 border-l-2 border-line/50 space-y-3 animate-[slideDown_0.3s_ease-out]">
-                                {mCourse.modules.map((mMod, mIdx) => (
-                                  <div key={mMod.id} className="relative pl-5 sm:pl-6 group/mod">
-                                    <div className="absolute left-[-5px] top-3 w-2 h-2 rounded-full bg-line group-hover/mod:bg-cyan transition-colors" />
-                                    <div className="bg-bg/20 border border-line/30 rounded-xl p-3 flex items-center justify-between hover:bg-bg/40 transition-all">
-                                      <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
-                                        <span className="text-[10px] font-black text-muted opacity-50 shrink-0">#{(mIdx + 1).toString().padStart(2, '0')}</span>
-                                        <div className="space-y-0.5 min-w-0">
-                                          <div className="text-xs font-bold text-text truncate">{mMod.title}</div>
-                                          <div className="text-[9px] text-muted font-bold flex items-center gap-2 flex-wrap">
-                                            <span className="uppercase">{mMod.type}</span>
-                                            <span>•</span>
-                                            <span>{mMod.duration}</span>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <button className="p-1.5 text-muted hover:text-cyan transition-all shrink-0">
-                                        <Play className="w-3 h-3" />
-                                      </button>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            // Course Module Timeline (Existing)
-            course.modules.map((mod, idx) => {
+          <>
+            {/* Course Module Timeline */}
+            {course.modules.map((mod, idx) => {
               const isCompleted = mod.status === 'Completed';
               const isInProgress = mod.status === 'In progress';
               const isLocked = mod.status === 'Locked';
@@ -342,7 +228,7 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
               };
 
               return (
-                <div key={mod.id} className="relative">
+                <div key={mod.id} className="relative" data-active-row={isInProgress ? "true" : undefined}>
                   {/* ... icon ... */}
                   <div 
                     className={`absolute -left-[33px] top-1.5 w-8 h-8 rounded-full border-2 flex items-center justify-center z-10 transition-colors ${
@@ -356,11 +242,13 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                      <span className="text-xs font-bold">{idx + 1}</span>}
                   </div>
 
-                  {/* 14.3 Module Card */}
+                  {/* 14.3 Module Card — REQ-PATH-006: Completed = reduced weight, REQ-PATH-007: Locked tooltip on wrapper */}
                   <div 
                     className={`bg-panel border rounded-2xl overflow-hidden transition-all ${
                       isInProgress ? 'border-cyan shadow-lg shadow-cyan/5' : 
-                      isLocked ? 'border-line opacity-60' : 'border-line'}`}
+                      isLocked ? 'border-line/50 opacity-55' : 
+                      isCompleted ? 'border-line opacity-80' : 'border-line'}`}
+                    title={isLocked ? `Complete Module ${idx} to unlock this module` : undefined}
                   >
                     <div className="p-5">
                       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
@@ -374,16 +262,36 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                               'bg-line/20 text-muted border-line/30'
                             }`}>
                               {isLocked && mod.availableDate ? `Available ${mod.availableDate}` : mod.status}
+                              {isInProgress && (
+                                <span className="ml-1 text-[8px] opacity-70">
+                                  ({Math.round((mod.lessons.filter(l => l.status === 'completed').length / mod.lessons.length) * 100)}%)
+                                </span>
+                              )}
                             </span>
                             
                             <span className={`flex items-center space-x-1 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${
                               mod.type !== 'Self-study' ? 'bg-purple/10 text-purple border-purple/20' : 'bg-bg text-muted border-line italic'
                             }`}>
-                              {mod.type === 'In-person session' ? <Users className="w-3 h-3" /> : <BookOpen className="w-3 h-3" />}
+                              {mod.type === 'In-person session' ? <Users className="w-3 h-3" /> : 
+                               mod.type === 'Live online session' ? <Video className="w-3 h-3" /> : 
+                               <BookOpen className="w-3 h-3" />}
                               <span>{mod.type}</span>
                             </span>
 
-                            {materialCounts.quiz > 0 && <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-yellow/10 text-yellow border border-yellow/20">Quiz Included</span>}
+                            {/* REQ-PATH-005: Quiz shortcut — opens quiz without entering Content Player */}
+                            {materialCounts.quiz > 0 && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); if (!isLocked) onNavigate('content-player'); }}
+                                title={isLocked ? `Complete Module ${idx} to unlock` : 'Jump straight to quiz'}
+                                className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border transition-colors ${
+                                  isLocked 
+                                    ? 'bg-line/10 text-muted border-line/30 cursor-not-allowed' 
+                                    : 'bg-yellow/10 text-yellow border-yellow/20 hover:bg-yellow/20 cursor-pointer'
+                                }`}
+                              >
+                                ⚡ Take Quiz
+                              </button>
+                            )}
                           </div>
                           
                           <h3 className="font-bold text-lg text-text mt-1">{mod.title}</h3>
@@ -434,11 +342,49 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                             </div>
                           )}
 
-                          {/* 14.3.1 Material Chips */}
+                          {/* 14.3.1 Material Chips — REQ-PATH-004: Hover to peek lesson titles */}
                           <div className="flex flex-wrap items-center gap-3 pt-1">
                             <div className="flex items-center space-x-1 text-[10px] text-muted"><Clock className="w-3 h-3" /> <span>{mod.duration}</span></div>
-                            {materialCounts.video > 0 && <div className="flex items-center space-x-1 text-[10px] text-muted border-l border-line pl-3"><Play className="w-3 h-3" /> <span>{materialCounts.video} Videos</span></div>}
-                            {materialCounts.code > 0 && <div className="flex items-center space-x-1 text-[10px] text-muted border-l border-line pl-3"><Code2 className="w-3 h-3" /> <span>{materialCounts.code} Exercises</span></div>}
+                            {materialCounts.video > 0 && (
+                              <div className="relative group/peek">
+                                <div className="flex items-center space-x-1 text-[10px] text-muted border-l border-line pl-3 cursor-default hover:text-cyan transition-colors">
+                                  <Play className="w-3 h-3" /> <span>{materialCounts.video} Videos</span>
+                                </div>
+                                <div className="absolute bottom-full left-0 mb-2 hidden group-hover/peek:flex flex-col gap-1.5 bg-panel border border-cyan/30 rounded-xl p-3 shadow-xl shadow-cyan/5 z-50 min-w-[220px] animate-in fade-in zoom-in-95 duration-150">
+                                  <div className="flex items-center gap-1.5 pb-1.5 border-b border-cyan/20 mb-0.5">
+                                    <Play className="w-3 h-3 text-cyan" />
+                                    <span className="text-[9px] font-black text-cyan uppercase tracking-wider">Video Lessons</span>
+                                  </div>
+                                  {mod.lessons.filter(l => l.type === 'Video').map(l => (
+                                    <div key={l.id} className="flex items-center gap-2 text-xs text-text font-medium">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-cyan shrink-0" />
+                                      <span className="truncate">{l.title}</span>
+                                      <span className="text-cyan text-[10px] font-bold ml-auto shrink-0">{l.duration}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {materialCounts.code > 0 && (
+                              <div className="relative group/peekcode">
+                                <div className="flex items-center space-x-1 text-[10px] text-muted border-l border-line pl-3 cursor-default hover:text-cyan transition-colors">
+                                  <Code2 className="w-3 h-3" /> <span>{materialCounts.code} Exercises</span>
+                                </div>
+                                <div className="absolute bottom-full left-0 mb-2 hidden group-hover/peekcode:flex flex-col gap-1.5 bg-panel border border-cyan/30 rounded-xl p-3 shadow-xl shadow-cyan/5 z-50 min-w-[230px] animate-in fade-in zoom-in-95 duration-150">
+                                  <div className="flex items-center gap-1.5 pb-1.5 border-b border-cyan/20 mb-0.5">
+                                    <Code2 className="w-3 h-3 text-cyan" />
+                                    <span className="text-[9px] font-black text-cyan uppercase tracking-wider">Code Exercises</span>
+                                  </div>
+                                  {mod.lessons.filter(l => l.type === 'Code').map(l => (
+                                    <div key={l.id} className="flex items-center gap-2 text-xs text-text font-medium">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-cyan shrink-0" />
+                                      <span className="truncate">{l.title}</span>
+                                      <span className="text-cyan text-[10px] font-bold ml-auto shrink-0">{l.duration}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -539,18 +485,19 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                                    <button className="p-1.5 text-muted hover:text-cyan transition-colors"><Bookmark className="w-3.5 h-3.5" /></button>
                                    <button className="p-1.5 text-muted hover:text-cyan transition-colors"><MessageSquare className="w-3.5 h-3.5" /></button>
                                 </div>
-                                {les.status === 'completed' ? (
+                                {completedLessonIds.includes(les.id) ? (
                                   <span className="text-green text-xs font-bold flex items-center space-x-1"><Check className="w-4 h-4 stroke-[3px]" /> <span>Done</span></span>
-                                ) : les.status === 'locked' ? (
-                                  /* REQ-PATH-024: Locked tooltip */
-                                  <div 
-                                    title="Complete previous lesson to unlock"
-                                    className="cursor-help"
-                                  >
-                                    <Lock className="w-3.5 h-3.5 text-muted" />
-                                  </div>
                                 ) : (
-                                  <button className="bg-cyan hover:bg-cyan2 text-bg text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase">Start</button>
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      completeLesson(les.id);
+                                      addXp(15, `Completed lesson: ${les.title}`);
+                                    }}
+                                    className="bg-cyan hover:bg-cyan2 text-bg text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase"
+                                  >
+                                    Mark Done
+                                  </button>
                                 )}
                               </div>
                             </div>
@@ -561,15 +508,15 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                   </div>
                 </div>
               );
-            })
-          )}
+            })}
+          </>
 
           {/* Certificate Milestone */}
           <div className="relative">
-            <div className={`absolute -left-[33px] top-1.5 w-8 h-8 rounded-full border-2 flex items-center justify-center z-10 ${course.progress === 100 ? 'bg-yellow border-yellow text-bg' : 'bg-bg border-line text-muted opacity-50'}`}>
+            <div className={`absolute -left-[33px] top-1.5 w-8 h-8 rounded-full border-2 flex items-center justify-center z-10 ${calculateCourseProgress(course as Course, completedLessonIds) === 100 ? 'bg-yellow border-yellow text-bg' : 'bg-bg border-line text-muted opacity-50'}`}>
               <Award className="w-4 h-4" />
             </div>
-            <div className={`bg-panel border rounded-2xl p-6 border-dashed ${course.progress === 100 ? 'border-yellow' : 'border-line opacity-60'}`}>
+            <div className={`bg-panel border rounded-2xl p-6 border-dashed ${calculateCourseProgress(course as Course, completedLessonIds) === 100 ? 'border-yellow' : 'border-line opacity-60'}`}>
                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="space-y-1 text-center sm:text-left">
                      <h3 className="font-bold text-lg text-text">Course Certificate</h3>

@@ -40,6 +40,8 @@ import { Checkout } from './features/checkout/Checkout';
 import { PublicProfile } from './features/profile/PublicProfile';
 import { DemoCenter } from './features/demo/DemoCenter';
 import { Explore } from './features/catalog/Explore';
+import { TrackDetail } from './features/track-detail/TrackDetail';
+import { TrackProvider } from './features/track-detail/TrackContext';
 
 const MainApp: React.FC = () => {
   const { isAuthenticated, isOnboardingCompleted } = useAuth();
@@ -109,6 +111,8 @@ const MainApp: React.FC = () => {
         return <DashboardEmptyTemplate onNavigate={handleNavigate} />;
       case 'demo-livesessions-empty':
         return <LiveSessionsEmptyTemplate onNavigate={handleNavigate} />;
+      case 'track-detail':
+        return <TrackDetail onNavigate={handleNavigate} />;
       case 'profile':
         return <PublicProfile onNavigate={handleNavigate} />;
       case 'help-center':
@@ -132,7 +136,7 @@ const MainApp: React.FC = () => {
     }
   };
 
-  const publicPages = ['explore', 'course-detail', 'signin', 'signup', 'onboarding', 'privacy', 'terms', 'cookies', 'imprint', 'help-center', 'checkout'];
+  const publicPages = ['explore', 'course-detail', 'track-detail', 'signin', 'signup', 'onboarding', 'privacy', 'terms', 'cookies', 'imprint', 'help-center', 'checkout'];
   const isPublicPage = publicPages.includes(page);
 
   if (!isAuthenticated && !isPublicPage) {
@@ -181,7 +185,9 @@ function App() {
         <XPProvider>
           <NotificationProvider>
             <ModalProvider>
-              <MainApp />
+              <TrackProvider>
+                <MainApp />
+              </TrackProvider>
             </ModalProvider>
           </NotificationProvider>
         </XPProvider>

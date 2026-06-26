@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
+import { useTrack } from '../track-detail/useTrack';
+import { calculateCourseProgress } from '../../services/progressUtils';
+import type { Course } from '../../types';
 import { COURSES, TRACKS } from '../../services/mockData';
+import { ContinueYourTrackCard } from '../track-detail/ContinueYourTrackCard';
 import { 
   Play,
   BookOpen,
@@ -231,6 +235,7 @@ const NeuralActivityChart: React.FC = () => {
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const { user, setActiveCourseId, setActiveTrackId, isOnboardingSkipped, resetOnboarding, onboardingAnswers } = useAuth();
   const { level, streak, xp, addToast } = useXP();
+  const { completedLessonIds } = useTrack();
 
   // Progress Sync States (REQ-LOAD-003)
   const [isSyncing, setIsSyncing] = useState(false);
@@ -495,6 +500,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             {/* Left Column (Courses & Activity) */}
             <div className="lg:col-span-2 space-y-6">
               
+              {/* ── Continue Your Track Card (REQ-TRACK-010) ── */}
+              <ContinueYourTrackCard onNavigate={onNavigate} setActiveTrackId={setActiveTrackId} />
+
               {/* Active Course Card (Continue Learning CTA) */}
               {activeCourse && (
                 <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
@@ -509,11 +517,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                       <div className="shrink-0">
                         {/* Mobile: Circular Progress */}
                         <div className="md:hidden">
-                          <RingProgress progress={activeCourse.progress} size={56} strokeWidth={4} />
+                          <RingProgress progress={calculateCourseProgress(activeCourse as unknown as Course, completedLessonIds)} size={56} strokeWidth={4} />
                         </div>
                         {/* Desktop: Pill Progress */}
                         <div className="hidden md:block">
-                          <PillProgress progress={activeCourse.progress} />
+                          <PillProgress progress={calculateCourseProgress(activeCourse as unknown as Course, completedLessonIds)} />
                         </div>
                       </div>
                     </div>

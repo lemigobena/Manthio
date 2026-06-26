@@ -9,6 +9,14 @@ export const TRAINERS: Record<string, Trainer> = {
     bio: 'Experienced IT architect and trainer specializing in Python, Cloud Architecture, and Enterprise Security. David has over 15 years of industry experience and has led bootcamps for major corporations in Switzerland.',
     linkedIn: 'https://linkedin.com/in/davidpinezich',
     website: 'https://apigenio.ch'
+  },
+  'marc-kaufmann': {
+    id: 'marc-kaufmann',
+    name: 'Marc Kaufmann',
+    title: 'DevOps & Automation Engineer',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150',
+    bio: 'Expert in streamlining development pipelines and cloud-native deployments. Marc has helped dozens of teams migrate to automated CI/CD workflows and high-availability container clusters.',
+    linkedIn: 'https://linkedin.com/in/marckaufmann'
   }
 };
 
@@ -1180,7 +1188,7 @@ export const COURSES: Course[] = [
         description: 'FastAPI features, Pydantic type specifications, automatic query parameter extraction.',
         duration: '4.5h',
         status: 'Open',
-        type: 'Self-study',
+        type: 'Live online session',
         lessons: [
           { id: 'fast-les-1-1', title: 'Why FastAPI beats older tools', type: 'Video', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Remember' },
           { id: 'fast-les-1-2', title: 'Designing Pydantic Schema inputs', type: 'Code', duration: '50min', status: 'not_started', required: true, bloomLevel: 'Apply' },
@@ -1194,7 +1202,7 @@ export const COURSES: Course[] = [
         description: 'FastAPI Depends parameters, database session injection, reusable auth logic.',
         duration: '4.5h',
         status: 'Locked',
-        type: 'Self-study',
+        type: 'Live online session',
         lessons: [
           { id: 'fast-les-2-1', title: 'Dependency Injection Principles', type: 'Video', duration: '35min', status: 'locked', required: true, bloomLevel: 'Understand' },
           { id: 'fast-les-2-2', title: 'Writing Custom Dependencies', type: 'Code', duration: '45min', status: 'locked', required: true, bloomLevel: 'Apply' }
@@ -1272,7 +1280,7 @@ export const COURSES: Course[] = [
         description: 'In-memory stores, string/hash records, cache invalidation protocols.',
         duration: '6h',
         status: 'Locked',
-        type: 'Self-study',
+        type: 'Live online session',
         availableDate: 'Oct 24, 09:00',
         lessons: [
           { id: 'arch-les-2-1', title: 'Why DB queries are slow', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
@@ -1336,6 +1344,143 @@ export const COURSES: Course[] = [
         lessons: [
           { id: 'arch-les-6-1', title: 'Security Best Practices', type: 'Video', duration: '40min', status: 'locked', required: true, bloomLevel: 'Understand' },
           { id: 'arch-les-6-2', title: 'Vulnerability Scanning Tools', type: 'Code', duration: '60min', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'github-actions-automation',
+    title: 'GitHub Actions & CI/CD Mastery',
+    description: 'Automate your entire build, test, and deployment workflow with GitHub Actions.',
+    longDescription: 'Learn to build professional-grade CI/CD pipelines. We cover runner configurations, multi-stage builds, matrix testing, secret management, and continuous deployment to AWS/Azure.',
+    level: 'Intermediate',
+    format: 'flipped',
+    duration: '8 Hours',
+    xpReward: 1200,
+    price: 'CHF 850.00',
+    rating: 4.8,
+    ratingCount: 156,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1760536928911-40831dacdbc3?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['marc-kaufmann'],
+    learningOutcomes: [
+      'Write complex YAML workflows from scratch.',
+      'Configure self-hosted runners for private infra.',
+      'Implement gated deployments with environment protection.',
+      'Automate semantic versioning and changelog generation.'
+    ],
+    modules: [
+      {
+        id: 'ga-mod-1',
+        number: 1,
+        title: 'Workflows & Events',
+        description: 'YAML syntax, triggers, push vs pull requests, schedule events.',
+        duration: '2h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'ga-les-1-1', title: 'YAML Anatomy for Actions', type: 'Video', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Understand' },
+          { id: 'ga-les-1-2', title: 'Triggering on specific events', type: 'Code', duration: '40min', status: 'not_started', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'terraform-iac-fundamentals',
+    title: 'Terraform & Infrastructure as Code',
+    description: 'Learn to provision and manage cloud resources across AWS and Azure using Terraform.',
+    longDescription: 'Master IaC with Terraform. Learn HCL syntax, state management, modules, and how to build reproducible environments for development and production.',
+    level: 'Intermediate',
+    format: 'self-paced',
+    duration: '10 Hours',
+    xpReward: 1500,
+    price: 'CHF 950.00',
+    rating: 4.9,
+    ratingCount: 88,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['marc-kaufmann'],
+    learningOutcomes: ['Write HCL code', 'Manage remote state', 'Build reusable modules'],
+    modules: [
+      {
+        id: 'tf-mod-1',
+        number: 1,
+        title: 'HCL Syntax & Providers',
+        description: 'Learn the fundamentals of HashiCorp Configuration Language.',
+        duration: '45min',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'tf-les-1-1', title: 'Terraform Workflow Intro', type: 'Video', duration: '15min', status: 'not_started', required: true, bloomLevel: 'Understand' },
+          { id: 'tf-les-1-2', title: 'Configuring AWS Provider', type: 'Code', duration: '30min', status: 'not_started', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'python-data-processing',
+    title: 'Python for Data Engineering',
+    description: 'Techniques for processing large datasets efficiently using Pandas and NumPy.',
+    longDescription: 'Learn to build robust data processing pipelines. We cover data cleaning, transformation, vectorized operations, and memory optimization for big data tasks.',
+    level: 'Intermediate',
+    format: 'flipped',
+    duration: '12 Hours',
+    xpReward: 1400,
+    price: 'CHF 1,100.00',
+    rating: 4.7,
+    ratingCount: 62,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['david-pinezich'],
+    learningOutcomes: ['Pandas optimization', 'Data cleaning at scale'],
+    modules: [
+      {
+        id: 'pdy-mod-1',
+        number: 1,
+        title: 'Pandas & NumPy Essentials',
+        description: 'Master the core libraries for data manipulation in Python.',
+        duration: '65min',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'pdy-les-1-1', title: 'Vectorized Operations', type: 'Video', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Understand' },
+          { id: 'pdy-les-1-2', title: 'Cleaning Messy Data', type: 'Code', duration: '45min', status: 'not_started', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'airflow-etl-automation',
+    title: 'Data Orchestration with Airflow',
+    description: 'Schedule and monitor complex data pipelines with Apache Airflow.',
+    longDescription: 'Learn to write DAGs, handle retries, and manage dependencies in your data stack using the industry-standard orchestration tool.',
+    level: 'Advanced',
+    format: 'self-paced',
+    duration: '14 Hours',
+    xpReward: 1800,
+    price: 'CHF 1,250.00',
+    rating: 4.8,
+    ratingCount: 45,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1518433278993-2a2ec217c79f?auto=format&fit=crop&w=800&q=80',
+    trainer: TRAINERS['marc-kaufmann'],
+    learningOutcomes: ['Write Airflow DAGs', 'Manage Task Groups', 'Scale with Executors'],
+    modules: [
+      {
+        id: 'af-mod-1',
+        number: 1,
+        title: 'DAG Design & Scheduling',
+        description: 'Learn the core concepts of Airflow DAGs.',
+        duration: '60min',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'af-les-1-1', title: 'Introduction to Airflow 2.x', type: 'Video', duration: '25min', status: 'not_started', required: true, bloomLevel: 'Understand' },
+          { id: 'af-les-1-2', title: 'Your First Python Operator', type: 'Code', duration: '35min', status: 'not_started', required: true, bloomLevel: 'Apply' }
         ]
       }
     ]
@@ -1424,14 +1569,18 @@ export const TRACKS: CareerTrack[] = [
         id: 'devops-mile-3', 
         title: 'CI/CD Pipelines', 
         description: 'Automate build, test, and deploy workflows with GitHub Actions.', 
-        courses: [], 
+        courses: [
+          { id: 'github-actions-automation' }
+        ], 
         status: 'locked' 
       },
       { 
         id: 'devops-mile-4', 
         title: 'Cloud Infrastructure with Terraform', 
         description: 'Provision and manage AWS or Azure resources as code.', 
-        courses: [], 
+        courses: [
+          { id: 'terraform-iac-fundamentals' }
+        ], 
         status: 'locked' 
       }
     ]
@@ -1463,14 +1612,18 @@ export const TRACKS: CareerTrack[] = [
         id: 'data-mile-2', 
         title: 'Python for Data', 
         description: 'Work with Pandas, data cleaning, transformation, and file I/O pipelines.', 
-        courses: [], 
+        courses: [
+          { id: 'python-data-processing' }
+        ], 
         status: 'locked' 
       },
       { 
         id: 'data-mile-3', 
         title: 'Data Pipelines & Orchestration', 
         description: 'Build Airflow DAGs and schedule end-to-end ETL workflows.', 
-        courses: [], 
+        courses: [
+          { id: 'airflow-etl-automation' }
+        ], 
         status: 'locked' 
       }
     ]
