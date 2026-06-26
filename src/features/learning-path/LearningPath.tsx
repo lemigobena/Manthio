@@ -560,14 +560,11 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                                        );
                                      }
                                      
-                                     let buttonClass = "";
-                                     if (status === 'completed') {
-                                       buttonClass = "bg-bg border border-line hover:border-cyan text-text";
-                                     } else if (status === 'in_progress') {
-                                       buttonClass = "bg-bg border border-cyan text-cyan hover:bg-cyan/10";
-                                     } else {
-                                       buttonClass = "bg-cyan hover:bg-cyan2 text-bg border border-cyan";
-                                     }
+                                     const buttonClass = status === 'completed' 
+                                       ? "bg-bg border border-line hover:border-cyan text-text" 
+                                       : status === 'in_progress'
+                                       ? "bg-bg border border-cyan text-cyan hover:bg-cyan/10"
+                                       : "bg-cyan hover:bg-cyan2 text-bg border border-cyan";
                                      
                                      const buttonText = status === 'completed' ? 'Review' 
                                        : status === 'in_progress' ? 'Continue' : 'Start';
