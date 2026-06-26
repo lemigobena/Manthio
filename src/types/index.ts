@@ -199,6 +199,7 @@ export interface Lesson {
   checkpoints?: number;
   sandboxData?: SandboxData;
   h5pData?: H5PData;
+  unlockCondition?: string;
 }
 
 export interface Module {

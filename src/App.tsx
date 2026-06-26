@@ -86,7 +86,7 @@ const MainApp: React.FC = () => {
       case 'module-detail':
         return <ModuleDetail moduleId={tab} onNavigate={handleNavigate} />;
       case 'content-player':
-        return <ContentPlayer onNavigate={handleNavigate} />;
+        return <ContentPlayer onNavigate={handleNavigate} initialTab={tab} />;
       case 'ai-tutor':
         return <AITutorPage onNavigate={handleNavigate} initialTab={tab} />;
       case 'analytics':

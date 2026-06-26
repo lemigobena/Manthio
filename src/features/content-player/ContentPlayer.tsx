@@ -23,9 +23,10 @@ import { ExternalLinkRenderer } from './renderers/ExternalLinkRenderer';
 
 interface ContentPlayerProps {
   onNavigate: (page: string) => void;
+  initialTab?: string;
 }
 
-export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
+export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initialTab }) => {
   const { activeCourseId } = useAuth();
   const { addXp, addToast } = useXP();
   const { openModal } = useModal();
@@ -36,16 +37,31 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
   });
 
   const [currentLesson, setCurrentLesson] = useState<Lesson>(() => {
+    // REQ-PATH-022 Check for active lesson passed via localStorage
+    const activeLessonId = localStorage.getItem('manthio_active_lesson');
+    if (activeLessonId) {
+      const explicitLesson = course.modules.flatMap(m => m.lessons).find(l => l.id === activeLessonId);
+      if (explicitLesson) {
+        // Clear it once consumed (optional, but good practice if we only want it on entry, 
+        // though we'll sync it below to preserve reloads anyway)
+        return explicitLesson;
+      }
+    }
     const currentModule = course.modules.find(m => m.status === 'In progress') || course.modules[0];
     return currentModule.lessons.find(l => l.status === 'in_progress') || currentModule.lessons[0];
   });
+
+  // Sync active lesson to localStorage for reloads
+  useEffect(() => {
+    localStorage.setItem('manthio_active_lesson', currentLesson.id);
+  }, [currentLesson.id]);
 
   // Responsive layout defaults (simple width check)
   const isMobile = window.innerWidth < 768;
   const isTablet = window.innerWidth >= 768 && window.innerWidth < 1200;
   
   const [curriculumOpen, setCurriculumOpen] = useState(!isMobile && !isTablet);
-  const [toolsOpen, setToolsOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(!!initialTab);
 
   // Flatten lessons to find previous/next easily
   const allLessons = course.modules.flatMap(m => m.lessons);
@@ -207,7 +223,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        <ToolsPane currentLesson={currentLesson} isOpen={toolsOpen} />
+        <ToolsPane currentLesson={currentLesson} isOpen={toolsOpen} initialTab={initialTab} />
       </div>
 
       <PlayerBottomBar 

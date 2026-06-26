@@ -345,8 +345,8 @@ export const COURSES: Course[] = [
         status: 'Locked',
         type: 'Self-study',
         lessons: [
-          { id: 'py-les-5-1', title: 'Conditions & Loops', type: 'Video', duration: '25min', status: 'locked', required: true, bloomLevel: 'Remember' },
-          { id: 'py-les-5-2', title: 'List Comprehensions', type: 'Article', duration: '20min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'py-les-5-1', title: 'Conditions & Loops', type: 'Video', duration: '25min', status: 'locked', required: true, bloomLevel: 'Remember', unlockCondition: 'Complete Module 4 to unlock' },
+          { id: 'py-les-5-2', title: 'List Comprehensions', type: 'Article', duration: '20min', status: 'locked', required: true, bloomLevel: 'Understand', unlockCondition: 'Available 18 May' },
           { id: 'py-les-5-3', title: 'Exercise: Loops and Comprehensions', type: 'Code', duration: '45min', status: 'locked', required: true, bloomLevel: 'Apply' }
         ]
       },
