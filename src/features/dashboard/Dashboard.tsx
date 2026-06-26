@@ -24,7 +24,9 @@ import {
   PlayCircle,
   TrendingUp,
   Trophy,
-  ChevronRight
+  ChevronRight,
+  Calendar,
+  MapPin
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -118,6 +120,31 @@ const PillProgress: React.FC<{ progress: number }> = ({ progress }) => {
         </div>
         <div className="text-sm font-black text-text font-mono shrink-0">{progress}%</div>
       </div>
+    </div>
+  );
+};
+
+const FlipUnit: React.FC<{ value: string, label: string, size?: 'sm' | 'md' | 'lg' }> = ({ value, label, size = 'md' }) => {
+  const sizeClasses = size === 'sm' ? 'w-10 h-12 md:w-12 md:h-14' : size === 'lg' ? 'w-16 h-20 md:w-24 md:h-28' : 'w-14 h-18 md:w-20 md:h-24';
+  const textClasses = size === 'sm' ? 'text-lg md:text-xl' : size === 'lg' ? 'text-3xl md:text-5xl' : 'text-2xl md:text-4xl';
+
+  return (
+    <div className="flex flex-col items-center space-y-1 md:space-y-2">
+      <div className={`relative ${sizeClasses} bg-panel border border-line rounded-xl overflow-hidden shadow-xl flex flex-col`}>
+        {/* Top half */}
+        <div className="h-1/2 bg-panel2 border-b border-line/30 flex items-end justify-center overflow-hidden">
+          <span className={`${textClasses} font-mono font-black text-text translate-y-1/2 leading-none uppercase`}>{value}</span>
+        </div>
+        {/* Bottom half */}
+        <div className="h-1/2 flex items-start justify-center overflow-hidden">
+          <span className={`${textClasses} font-mono font-black text-text -translate-y-1/2 leading-none uppercase`}>{value}</span>
+        </div>
+        {/* Divider Hinge */}
+        <div className="absolute top-1/2 left-0 right-0 h-px bg-bg/80 z-10" />
+        <div className="absolute top-1/2 left-0 w-1 h-3 bg-line -translate-y-1/2 rounded-r" />
+        <div className="absolute top-1/2 right-0 w-1 h-3 bg-line -translate-y-1/2 rounded-l" />
+      </div>
+      <span className="text-[9px] md:text-[10px] font-bold text-muted uppercase tracking-[0.2em]">{label}</span>
     </div>
   );
 };
@@ -247,6 +274,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [showBanner, setShowBanner] = useState(true);
 
+  // Mock toggle for Pre-cohort state
+  const [simulatePreCohort, setSimulatePreCohort] = useState(true);
+
   useEffect(() => {
     const timer = setTimeout(() => setIsPageLoading(false), 950);
     return () => {
@@ -373,16 +403,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   <span>Complete Profile</span>
                   <ArrowRight className="w-3.5 h-3.5 text-bg" />
                 </button>
-                <button
+                <button 
                   onClick={() => setShowBanner(false)}
-                  className="text-muted hover:text-text p-2 hover:bg-bg rounded-lg transition-colors cursor-pointer"
-                  title="Dismiss alert"
+                  className="text-text hover:text-cyan transition-colors"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
           )}
+
+          {/* Dev mock toggle */}
+          <div className="flex justify-end mb-2">
+            <button
+              onClick={() => setSimulatePreCohort(!simulatePreCohort)}
+              className="text-[10px] text-muted border border-line bg-panel px-2 py-1 rounded hover:bg-line transition-colors"
+            >
+              Toggle Pre-Cohort State ({simulatePreCohort ? 'ON' : 'OFF'})
+            </button>
+          </div>
 
           {/* Hero Greeting Section */}
           <div className="pt-2">
@@ -392,7 +431,46 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   {getGreeting()}, {user?.name.split(' ')[0]} 👋
                 </h1>
               </div>
-              {primaryActive.type !== 'none' ? (
+              {simulatePreCohort ? (
+                <div className="bg-panel border border-cyan/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-cyan/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-cyan/20 transition-all duration-700" />
+                  
+                  <div className="relative z-10 space-y-4 w-full">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-cyan animate-pulse" />
+                      <span className="text-[10px] font-black uppercase tracking-wider text-cyan">Cohort Pre-Start</span>
+                    </div>
+                    <div>
+                      <h2 className="text-xl md:text-2xl font-black text-text leading-tight mb-2">Winter '26 Engineering Cohort</h2>
+                      <p className="text-muted text-sm md:text-base max-w-xl">
+                        Your cohort officially kicks off soon. While you wait, we highly recommend reviewing the pre-reading materials below to ensure you hit the ground running.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                      <button 
+                        onClick={() => onNavigate('learning-path')}
+                        className="bg-cyan hover:bg-cyan2 text-bg text-xs font-black px-6 py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(0,255,242,0.3)] active:scale-95 flex items-center justify-center gap-2"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        Access Pre-Reading
+                      </button>
+                      <button 
+                        onClick={() => onNavigate('community')}
+                        className="bg-bg border border-line hover:border-cyan/30 text-text text-xs font-bold px-6 py-3 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        Introduce Yourself
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="relative z-10 hidden md:flex items-center space-x-3 md:space-x-4 shrink-0 mr-[30px]">
+                    <FlipUnit value="14" label="Days" size="lg" />
+                    <FlipUnit value="08" label="Hours" size="lg" />
+                  </div>
+                </div>
+              ) : primaryActive.type !== 'none' ? (
                 <p className="text-muted text-sm md:text-base">
                   You are currently {primaryActive.type === 'track' ? 'on the track' : 'learning'} <span className="text-cyan font-semibold">{primaryActive.data.title}</span>. 
                   {primaryActive.type === 'course' && (
@@ -414,20 +492,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   )}
                 </p>
               ) : (
-                <div className="bg-panel border border-line rounded-2xl p-5 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group">
+                <div className="bg-panel border border-cyan/20 rounded-2xl p-6 md:p-8 flex flex-col gap-6 relative group overflow-hidden">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-cyan/5 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-cyan/10 transition-all duration-700" />
-                  <div className="relative z-10 space-y-2 text-center md:text-left">
-                    <h2 className="text-xl md:text-2xl font-black text-text leading-tight">Master Your Next Frontier §11.4</h2>
-                    <p className="text-muted text-sm md:text-base max-w-lg">
-                      You haven't started a technical track yet. Explore our curated laboratory paths and build your engineering legacy today.
+                  
+                  <div className="relative z-10 w-full">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Sparkles className="w-4 h-4 text-yellow animate-pulse" />
+                      <span className="text-[10px] font-black uppercase tracking-wider text-yellow">Personalised Recommendation</span>
+                    </div>
+                    <h2 className="text-xl md:text-2xl font-black text-text leading-tight mb-2">Python Fundamentals</h2>
+                    <p className="text-muted text-sm md:text-base max-w-xl">
+                      Based on your onboarding profile and interest in robust software engineering, we recommend beginning your journey with our foundational Python track.
                     </p>
                   </div>
-                  <button 
-                    onClick={() => onNavigate('browse-courses')}
-                    className="relative z-10 w-full md:w-auto bg-cyan hover:bg-cyan2 text-bg text-xs font-black px-10 py-4 rounded-xl transition-all shadow-lg active:scale-95 uppercase tracking-widest"
-                  >
-                    Begin Discovery
-                  </button>
+
+                  <div className="relative z-10 flex flex-col sm:flex-row items-center gap-3 w-full">
+                    <button 
+                      onClick={() => onNavigate('course/python-basics')}
+                      className="w-full sm:w-auto bg-cyan hover:bg-cyan2 text-bg text-xs font-black px-8 py-3.5 rounded-xl transition-all shadow-[0_0_15px_rgba(0,255,242,0.3)] active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      <PlayCircle className="w-4 h-4" />
+                      Start Track
+                    </button>
+                    <button 
+                      onClick={() => onNavigate('browse-courses')}
+                      className="w-full sm:w-auto bg-bg hover:bg-line border border-line text-text text-xs font-bold px-8 py-3.5 rounded-xl transition-all active:scale-95 text-center"
+                    >
+                      Explore All Paths
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -794,27 +887,77 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               {/* REQ-DASH-007: Activity Chart - Right Column Visualization */}
               <NeuralActivityChart />
               
-              {/* Upcoming Community Event */}
-              <div className="bg-panel border border-line rounded-xl p-5 space-y-4">
-                <div className="flex justify-between items-center">
+              {/* REQ-DASH-010: Upcoming Events */}
+              <div className="bg-panel border border-line rounded-2xl p-6 space-y-5">
+                <div className="flex justify-between items-center mb-2">
                   <div className="flex items-center space-x-2">
-                    <BookOpen className="w-4 h-4 text-purple" />
-                    <h3 className="font-bold text-sm uppercase tracking-wider text-muted">Upcoming Session</h3>
+                    <Calendar className="w-4 h-4 text-orange" />
+                    <h3 className="font-bold text-base text-text">Upcoming Events</h3>
                   </div>
-                  <span className="bg-purple/20 text-purple text-[10px] px-2 py-0.5 rounded font-bold">TODAY</span>
+                  <button 
+                    onClick={() => onNavigate('live-sessions')}
+                    className="text-cyan hover:text-cyan2 text-[10px] uppercase tracking-wider font-bold transition-colors"
+                  >
+                    View All
+                  </button>
                 </div>
                 
-                <div className="space-y-1">
-                  <h4 className="font-bold text-base text-text">Flipped Session A</h4>
-                  <p className="text-xs text-muted">Python Basics Review & Group Exercise</p>
-                  <p className="text-[10px] text-muted pt-1">Time: 18:00 - 20:00 &bull; Venue: Zürich Lab Room 4</p>
-                  <button 
-                    onClick={() => onNavigate('live-session')}
-                    className="text-cyan hover:text-cyan2 text-xs font-semibold flex items-center space-x-1 pt-1"
-                  >
-                    <span>Join</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                <div className="space-y-4">
+                  {/* Event 1 - Live Session */}
+                  <div className="flex gap-4 group">
+                    <div className="flex flex-col items-center mt-0.5 shrink-0 w-12">
+                      <div className="text-[10px] font-bold text-muted uppercase">Today</div>
+                      <div className="text-lg font-black text-text leading-none mt-1">18:00</div>
+                    </div>
+                    <div className="w-0.5 bg-purple/30 group-hover:bg-purple transition-colors rounded-full" />
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="bg-purple/20 text-purple text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Live Session</span>
+                        <span className="text-[9px] text-muted font-bold flex items-center gap-1"><MapPin className="w-2.5 h-2.5"/> Zürich Lab</span>
+                      </div>
+                      <h4 className="font-bold text-sm text-text leading-snug">Flipped Session A</h4>
+                      <p className="text-xs text-muted mb-2">Python Basics Review & Group Exercise</p>
+                      <button 
+                        onClick={() => onNavigate('live-session')}
+                        className="text-cyan hover:text-cyan2 text-xs font-semibold flex items-center space-x-1 transition-colors"
+                      >
+                        <span>Join Session</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Event 2 - Assignment Deadline */}
+                  <div className="flex gap-4 group">
+                    <div className="flex flex-col items-center mt-0.5 shrink-0 w-12">
+                      <div className="text-[10px] font-bold text-muted uppercase">Tmrw</div>
+                      <div className="text-lg font-black text-text leading-none mt-1">23:59</div>
+                    </div>
+                    <div className="w-0.5 bg-yellow/30 group-hover:bg-yellow transition-colors rounded-full" />
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="bg-yellow/20 text-yellow text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Deadline</span>
+                      </div>
+                      <h4 className="font-bold text-sm text-text leading-snug">Capstone Draft</h4>
+                      <p className="text-xs text-muted">Submit initial project architecture.</p>
+                    </div>
+                  </div>
+
+                  {/* Event 3 - Cohort Milestone */}
+                  <div className="flex gap-4 group">
+                    <div className="flex flex-col items-center mt-0.5 shrink-0 w-12">
+                      <div className="text-[10px] font-bold text-muted uppercase">Oct 12</div>
+                      <div className="text-lg font-black text-text leading-none mt-1">09:00</div>
+                    </div>
+                    <div className="w-0.5 bg-cyan/30 group-hover:bg-cyan transition-colors rounded-full" />
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="bg-cyan/20 text-cyan text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Milestone</span>
+                      </div>
+                      <h4 className="font-bold text-sm text-text leading-snug">Module 1 Unlock</h4>
+                      <p className="text-xs text-muted">Next phase of Python engineering.</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 

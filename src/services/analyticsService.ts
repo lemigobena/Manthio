@@ -19,6 +19,7 @@ export interface ActivityDay {
   date: string; // YYYY-MM-DD
   minutes: number;
   modulesCompleted: number;
+  xpEarned?: number;
 }
 
 export interface AnalyticsData {
@@ -68,11 +69,15 @@ const generateHistoryDays = (count: number, offsetDays = 0): ActivityDay[] => {
     
     // Modules completed on some days
     const modulesCompleted = (i > 0 && i % 12 === 0) ? 1 : 0;
+    
+    // Simulate some XP earned
+    const xpEarned = Math.floor(minutes * 5 + modulesCompleted * 500 + Math.random() * 50);
 
     days.push({
       date: dateStr,
       minutes,
-      modulesCompleted
+      modulesCompleted,
+      xpEarned
     });
   }
   return days;
@@ -174,6 +179,21 @@ export const analyticsService = {
         if (currentStreak > parsed.longestStreak) {
           parsed.longestStreak = currentStreak;
         }
+
+        // Migration: backfill xpEarned if missing from previous save
+        let migrated = false;
+        if (parsed.activityLog) {
+          parsed.activityLog.forEach((day: ActivityDay) => {
+            if (day.xpEarned === undefined) {
+              day.xpEarned = Math.floor(day.minutes * 5 + day.modulesCompleted * 500 + Math.random() * 50);
+              migrated = true;
+            }
+          });
+        }
+        if (migrated) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+        }
+
         return parsed;
       } catch (e) {
         console.error('Failed to parse analytics data', e);
@@ -208,6 +228,21 @@ export const analyticsService = {
     data.totalStudyTime.week += minutes;
     data.totalStudyTime.month += minutes;
     data.totalStudyTime.allTime += minutes;
+
+    this.saveAnalyticsData(data);
+  },
+
+  // Track XP earned
+  incrementXpEarned(xpAmount: number) {
+    const data = this.getAnalyticsData();
+    const todayStr = formatDate(new Date());
+
+    let todayEntry = data.activityLog.find(d => d.date === todayStr);
+    if (!todayEntry) {
+      todayEntry = { date: todayStr, minutes: 0, modulesCompleted: 0, xpEarned: 0 };
+      data.activityLog.unshift(todayEntry);
+    }
+    todayEntry.xpEarned = (todayEntry.xpEarned || 0) + xpAmount;
 
     this.saveAnalyticsData(data);
   },

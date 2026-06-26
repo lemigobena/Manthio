@@ -18,7 +18,8 @@ import {
   Check,
   ChevronDown,
   Activity,
-  BarChart3
+  BarChart3,
+  Lock
 } from 'lucide-react';
 
 const ModernDropdown: React.FC<{
@@ -203,12 +204,12 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
           role="button"
           tabIndex={0}
         >
-          {/* Tooltip: visible on hover (desktop) OR when tapped on mobile */}
           <div className={`${activeHeatmapIdx === idx ? 'block' : 'hidden'} group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-panel border border-line text-[10px] text-text rounded-md px-2 py-1 whitespace-nowrap z-50 shadow-xl pointer-events-none`}
           >
             <span className="font-bold">{dateString}</span>
             <div className="text-cyan">{day.minutes} min studied</div>
             {day.modulesCompleted > 0 && <div className="text-purple">{day.modulesCompleted} module completed</div>}
+            {(day.xpEarned ?? 0) > 0 && <div className="text-yellow font-bold">+{day.xpEarned?.toLocaleString()} XP earned</div>}
           </div>
         </div>
       );
@@ -779,7 +780,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
           </div>
 
           {/* 18.2.5 Course Progress Overview */}
-          <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
+          <div className="space-y-4">
             <div>
               <h3 className="font-bold text-base font-display">My Courses & Certifications</h3>
               <p className="text-muted text-xs">Direct course resume operations and completion checkpoints.</p>
@@ -869,6 +870,89 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
 
             <div ref={heatmapRef} className="flex flex-wrap gap-1.5 pt-2">
               {renderHeatmap()}
+            </div>
+          </div>
+
+          {/* Phase 2/3 Placeholders: Badges & Leaderboards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+            {/* Badges Placeholder */}
+            <div className="bg-panel border border-line rounded-2xl p-6 relative overflow-hidden">
+              <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-purple/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="font-bold text-base font-display">Badges & Certifications</h3>
+                  <p className="text-muted text-xs">Achievement, skill, and streak badges</p>
+                </div>
+                <span className="text-[9px] font-black uppercase tracking-wider text-purple bg-purple/10 border border-purple/20 px-2 py-1 rounded">
+                  3 Earned
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-4">
+                {/* Mock Badges */}
+                <div className="flex flex-col items-center gap-1 group cursor-default">
+                  <div className="w-14 h-14 bg-cyan/10 border border-cyan/30 rounded-full flex items-center justify-center group-hover:border-cyan transition-colors">
+                    <Award className="w-6 h-6 text-cyan" />
+                  </div>
+                  <span className="text-[10px] font-bold text-text">First Steps</span>
+                </div>
+                <div className="flex flex-col items-center gap-1 group cursor-default">
+                  <div className="w-14 h-14 bg-purple/10 border border-purple/30 rounded-full flex items-center justify-center group-hover:border-purple transition-colors">
+                    <Flame className="w-6 h-6 text-purple" />
+                  </div>
+                  <span className="text-[10px] font-bold text-text">Firestarter</span>
+                </div>
+                <div className="flex flex-col items-center gap-1 group cursor-default">
+                  <div className="w-14 h-14 bg-yellow/10 border border-yellow/30 rounded-full flex items-center justify-center group-hover:border-yellow transition-colors">
+                    <CheckCircle2 className="w-6 h-6 text-yellow" />
+                  </div>
+                  <span className="text-[10px] font-bold text-text">Certified</span>
+                </div>
+                
+                <div className="flex flex-col items-center gap-1 opacity-50 cursor-default">
+                  <div className="w-14 h-14 bg-bg border border-dashed border-line/60 rounded-full flex items-center justify-center">
+                    <Lock className="w-5 h-5 text-muted" />
+                  </div>
+                  <span className="text-[10px] font-bold text-muted">Locked</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Leaderboards Placeholder */}
+            <div className="bg-panel border border-line rounded-2xl p-6 relative overflow-hidden">
+              <div className="absolute -top-10 -left-10 w-32 h-32 bg-cyan/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="font-bold text-base font-display">Leaderboards</h3>
+                  <p className="text-muted text-xs">Global and cohort rankings (Opt-in)</p>
+                </div>
+                <span className="text-[9px] font-black uppercase tracking-wider text-cyan bg-cyan/10 border border-cyan/20 px-2 py-1 rounded">
+                  Global Weekly
+                </span>
+              </div>
+              <div className="space-y-3">
+                {/* Mock Leaderboard */}
+                {[
+                  { rank: 1, name: 'Alex M.', xp: 45200, isCurrentUser: false },
+                  { rank: 2, name: 'You', xp: analyticsData.totalStudyTime.allTime * 10, isCurrentUser: true },
+                  { rank: 3, name: 'Sarah J.', xp: 39800, isCurrentUser: false }
+                ].map(user => (
+                  <div key={user.rank} className={`flex items-center justify-between p-2 rounded-lg ${user.isCurrentUser ? 'bg-cyan/10 border border-cyan/20' : 'bg-bg border border-line'}`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                        user.rank === 1 ? 'bg-yellow/20 text-yellow' : 
+                        user.rank === 2 ? 'bg-zinc-300/20 text-zinc-300' : 
+                        'bg-orange/20 text-orange'
+                      }`}>
+                        {user.rank}
+                      </div>
+                      <span className={`text-xs ${user.isCurrentUser ? 'font-bold text-cyan' : 'font-medium text-text'}`}>
+                        {user.name}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold text-muted">{user.xp.toLocaleString()} XP</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </>

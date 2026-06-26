@@ -240,6 +240,54 @@ export const PublicProfile: React.FC<PublicProfileProps> = ({ onNavigate }) => {
         </div>
       </div>
 
+      {/* Badges (Phase 2 Placeholder) */}
+      <div className="bg-panel border border-line rounded-2xl p-6 relative overflow-hidden mt-12 mb-4">
+        {/* Decorative blur */}
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple/5 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-text text-sm">Achievements & Badges</h3>
+            <p className="text-xs text-muted mt-0.5">Showcase your verified skills and milestones.</p>
+          </div>
+          <span className="text-[9px] font-black uppercase tracking-wider text-purple bg-purple/10 border border-purple/20 px-2 py-1 rounded">
+            3 Earned
+          </span>
+        </div>
+        
+        <div className="mt-6 flex gap-4 overflow-x-auto pb-2 -mx-2 px-2 snap-x">
+          {/* Mock Badges */}
+          <div className="shrink-0 w-24 h-28 bg-bg border border-cyan/30 rounded-xl flex flex-col items-center justify-center snap-start hover:border-cyan transition-colors cursor-default">
+            <div className="w-12 h-12 rounded-full bg-cyan/10 flex items-center justify-center mb-2">
+              <Award size={24} className="text-cyan" />
+            </div>
+            <span className="text-[10px] font-bold text-text text-center px-1">First Steps</span>
+            <span className="text-[8px] text-muted">Completed 1 Course</span>
+          </div>
+
+          <div className="shrink-0 w-24 h-28 bg-bg border border-purple/30 rounded-xl flex flex-col items-center justify-center snap-start hover:border-purple transition-colors cursor-default">
+            <div className="w-12 h-12 rounded-full bg-purple/10 flex items-center justify-center mb-2">
+              <Flame size={24} className="text-purple" />
+            </div>
+            <span className="text-[10px] font-bold text-text text-center px-1">Firestarter</span>
+            <span className="text-[8px] text-muted">7 Day Streak</span>
+          </div>
+
+          <div className="shrink-0 w-24 h-28 bg-bg border border-yellow/30 rounded-xl flex flex-col items-center justify-center snap-start hover:border-yellow transition-colors cursor-default">
+            <div className="w-12 h-12 rounded-full bg-yellow/10 flex items-center justify-center mb-2">
+              <CheckCircle size={24} className="text-yellow" />
+            </div>
+            <span className="text-[10px] font-bold text-text text-center px-1">Certified</span>
+            <span className="text-[8px] text-muted">Python Basics</span>
+          </div>
+
+          <div className="shrink-0 w-24 h-28 bg-bg border border-dashed border-line/60 rounded-xl flex flex-col items-center justify-center opacity-60 snap-start">
+            <Lock size={20} className="text-muted/50 mb-2" />
+            <span className="text-[10px] text-muted text-center leading-tight">Locked<br/>Badge</span>
+          </div>
+        </div>
+      </div>
+
       {/* Visible Courses */}
       <div className="bg-panel border border-line rounded-2xl p-6 space-y-5">
         <div>
