@@ -22,7 +22,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 }) => {
   const { user, signOut } = useAuth();
   const { streak } = useXP();
-  const { theme, toggleTheme } = useTheme();
+  const { resolvedTheme, toggleTheme } = useTheme();
   const { notifications, unreadCount, markAllAsRead, markAsRead } = useNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -110,7 +110,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           />
           <div className="flex items-center gap-3">
             <button onClick={toggleTheme} className="p-2 rounded-xl text-muted hover:text-text hover:bg-bg/50 transition-colors">
-              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {resolvedTheme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
             <button onClick={() => { signOut(); onNavigate('signin'); }} className="bg-cyan hover:bg-cyan2 text-bg text-sm font-bold px-4 py-2 rounded-xl transition-colors">
               Login
@@ -178,9 +178,9 @@ export const TopBar: React.FC<TopBarProps> = ({
           <button 
             onClick={toggleTheme}
             className="h-9 w-9 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer"
-            title={theme === 'dark' ? 'Switch to light design' : 'Switch to dark design'}
+            title={resolvedTheme === 'dark' ? 'Switch to light design' : 'Switch to dark design'}
           >
-            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
           {/* Notifications Dropdown (REQ-TOPBAR-002) */}

@@ -61,7 +61,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
     updateProfile
   } = useAuth();
   const { addXp, addToast } = useXP();
-  const { theme, toggleTheme } = useTheme();
+  const { resolvedTheme, toggleTheme } = useTheme();
 
   const [step, setStep] = useState<number>(() => {
     const saved = localStorage.getItem('onboarding_current_step');
@@ -292,7 +292,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
               onClick={toggleTheme}
               className="h-8 md:h-9 w-8 md:w-9 flex items-center justify-center rounded-md bg-cyan text-bg hover:opacity-90 transition-all cursor-pointer shadow-md"
             >
-              {theme === 'dark' ? <Sun className="w-3.5 md:w-4 h-3.5 md:h-4" /> : <Moon className="w-3.5 md:w-4 h-3.5 md:h-4" />}
+              {resolvedTheme === 'dark' ? <Sun className="w-3.5 md:w-4 h-3.5 md:h-4" /> : <Moon className="w-3.5 md:w-4 h-3.5 md:h-4" />}
             </button>
           </div>
         </div>
@@ -546,11 +546,11 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                         <span className="text-[8px] md:text-[9px] font-black text-cyan uppercase tracking-[0.2em]">{s.badge}</span>
                       </div>
 
-                      <h2 className={`text-xl md:text-2xl lg:text-3xl xl:text-4xl font-black leading-tight mb-2 md:mb-3 drop-shadow-sm ${theme === 'dark' ? 'text-white' : 'text-text'}`}>
+                      <h2 className={`text-xl md:text-2xl lg:text-3xl xl:text-4xl font-black leading-tight mb-2 md:mb-3 drop-shadow-sm ${resolvedTheme === 'dark' ? 'text-white' : 'text-text'}`}>
                         {s.title}
                       </h2>
 
-                      <p className={`text-[11px] md:text-xs lg:text-[13px] xl:text-sm font-medium leading-relaxed max-w-[85%] md:max-w-[280px] lg:max-w-md xl:max-w-lg ${theme === 'dark' ? 'text-white/60' : 'text-text/70'}`}>
+                      <p className={`text-[11px] md:text-xs lg:text-[13px] xl:text-sm font-medium leading-relaxed max-w-[85%] md:max-w-[280px] lg:max-w-md xl:max-w-lg ${resolvedTheme === 'dark' ? 'text-white/60' : 'text-text/70'}`}>
                         {s.desc}
                       </p>
                     </div>

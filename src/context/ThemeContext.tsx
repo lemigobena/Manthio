@@ -4,6 +4,7 @@ type Theme = 'light' | 'dark' | 'system';
 
 interface ThemeContextType {
   theme: Theme;
+  resolvedTheme: 'light' | 'dark';
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
 }
@@ -17,24 +18,29 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return 'system';
   });
 
+  const [systemPreference, setSystemPreference] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    }
+    return 'dark';
+  });
+
+  const resolvedTheme = theme === 'system' ? systemPreference : theme as 'light' | 'dark';
+
   useEffect(() => {
     localStorage.setItem('theme', theme);
+    document.documentElement.setAttribute('data-theme', resolvedTheme);
     
     if (theme === 'system') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
-      const applySystemTheme = (e: MediaQueryListEvent | MediaQueryList) => {
-        document.documentElement.setAttribute('data-theme', e.matches ? 'light' : 'dark');
+      const listener = (e: MediaQueryListEvent) => {
+        setSystemPreference(e.matches ? 'light' : 'dark');
       };
       
-      applySystemTheme(mediaQuery);
-      
-      const listener = (e: MediaQueryListEvent) => applySystemTheme(e);
       mediaQuery.addEventListener('change', listener);
       return () => mediaQuery.removeEventListener('change', listener);
-    } else {
-      document.documentElement.setAttribute('data-theme', theme);
     }
-  }, [theme]);
+  }, [theme, resolvedTheme]);
 
   const toggleTheme = () => {
     setTheme(prev => {
@@ -46,7 +52,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

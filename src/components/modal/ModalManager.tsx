@@ -42,11 +42,7 @@ const ModalManager: React.FC = () => {
           onClose={closeModal}
           title={modalOptions.title || 'Congratulations!'}
           subtitle={modalOptions.description || 'You reached a new milestone.'}
-          // Center this modal on mobile so the celebration card doesn't span full width
           {...modalOptions.props}
-          // pass through a mobile-centering flag to the underlying Modal
-          // CelebrationModal will forward props to Modal
-          centerOnMobile={true}
         />
       );
 

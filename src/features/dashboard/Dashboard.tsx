@@ -537,12 +537,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                         } else if (primaryActive.type === 'course') {
                           setActiveCourseId(primaryActive.data.id);
                         }
-                        onNavigate('learning-path');
+                        onNavigate('content-player');
                       }}
                       className="bg-cyan hover:bg-cyan2 text-bg font-semibold px-5 py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-colors cursor-pointer"
                     >
                       <Play className="w-4 h-4 fill-current" />
-                      <span>{primaryActive.type === 'track' ? 'RESUME TRACK PATH' : 'OPEN LEARNING PATH'}</span>
+                      <span>Continue learning</span>
                     </button>
                   </div>
                 </div>

@@ -13,7 +13,7 @@ interface SettingsProps {
   onNavigate?: (page: string) => void;
 }
 
-export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account' }) => {
+export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account', onNavigate }) => {
   const { user } = useAuth();
   const { addToast } = useXP();
   const { theme, setTheme } = useTheme();
@@ -128,6 +128,7 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account' }) =>
                       onEditPassword={() => openPasswordModal('password')}
                       onExport={handleDataExport}
                       onDelete={() => openConfirmModal('delete')}
+                      onRestartOnboarding={() => onNavigate?.('onboarding')}
                     />
                   )}
                   {isActive && tab.id === 'billing' && (
@@ -197,9 +198,10 @@ interface AccountTabProps {
   onEditPassword: () => void;
   onExport: () => void;
   onDelete: () => void;
+  onRestartOnboarding: () => void;
 }
 
-const AccountTab: React.FC<AccountTabProps> = ({ user, onEditEmail, onEditPassword, onExport, onDelete }) => {
+const AccountTab: React.FC<AccountTabProps> = ({ user, onEditEmail, onEditPassword, onExport, onDelete, onRestartOnboarding }) => {
   const { addToast } = useXP();
   return (
   <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -315,6 +317,21 @@ const AccountTab: React.FC<AccountTabProps> = ({ user, onEditEmail, onEditPasswo
           </div>
           <button onClick={() => addToast('success', 'Opening address editor...')} className="px-4 py-2 bg-panel border border-line hover:border-green hover:text-green rounded-lg text-xs font-bold transition-colors">Edit</button>
         </div>
+      </div>
+    </div>
+
+    {/* Account Setup */}
+    <div className="pt-6 border-t border-line space-y-4">
+      <h3 className="font-bold text-text">Account Setup</h3>
+      
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-bg border border-line rounded-xl gap-4">
+        <div>
+          <h4 className="font-bold text-sm text-text">Repeat onboarding</h4>
+          <p className="text-xs text-muted mt-0.5">Revisit the initial setup process to configure your goals and interests.</p>
+        </div>
+        <button onClick={onRestartOnboarding} className="px-4 py-2 bg-panel border border-line hover:border-cyan hover:text-cyan rounded-lg text-xs font-bold transition-colors shrink-0">
+          Start Onboarding
+        </button>
       </div>
     </div>
 

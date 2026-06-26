@@ -65,7 +65,9 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
     }
   }, [hasNext, currentIndex, allLessons]);
 
-  const markLessonComplete = useCallback((xpAmount: number = 50) => {
+  const markLessonComplete = useCallback((xpAmountOrEvent?: number | React.MouseEvent | unknown) => {
+    const xpAmount = typeof xpAmountOrEvent === 'number' ? xpAmountOrEvent : 50;
+
     if (currentLesson.status !== 'completed') {
       // Award specified XP (default 50) per lesson completion
       addXp(xpAmount, `Lesson "${currentLesson.title}" completed`);
@@ -98,8 +100,8 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate }) => {
                 addXp(1000, `Course "${newCourse.title}" completed`);
                 addToast('success', '🏆 Course Completed! +1000 XP! Certificate available.');
                 openModal('celebration', {
-                  title: 'Course Completed!',
-                  description: `You have successfully completed "${newCourse.title}". Excellent work!`,
+                  title: 'Congratulations!',
+                  description: `You have finished the course successfully.`,
                   props: { achievementName: 'Course Graduate', points: 1000 }
                 });
               }

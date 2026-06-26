@@ -24,8 +24,8 @@ const CAROUSEL_DATA = [
 
 export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, onNavigate }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { theme, toggleTheme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme, toggleTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -118,7 +118,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, onNavigate }) 
             onClick={toggleTheme}
             className="h-8 md:h-9 w-8 md:w-9 flex items-center justify-center rounded-md bg-cyan text-bg hover:opacity-90 transition-all cursor-pointer shadow-md"
           >
-            {theme === 'dark' ? <Sun className="w-3.5 md:w-4 h-3.5 md:h-4" /> : <Moon className="w-3.5 md:w-4 h-3.5 md:h-4" />}
+            {resolvedTheme === 'dark' ? <Sun className="w-3.5 md:w-4 h-3.5 md:h-4" /> : <Moon className="w-3.5 md:w-4 h-3.5 md:h-4" />}
           </button>
         </div>
 

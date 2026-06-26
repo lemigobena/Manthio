@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
+
 
 interface SignUpProps {
   onNavigate: (page: string) => void;
@@ -9,7 +9,6 @@ interface SignUpProps {
 
 export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
   const { signUp } = useAuth();
-  const { theme } = useTheme();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -19,7 +18,6 @@ export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
   const [agree, setAgree] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
 
-  const isDark = theme === 'dark';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -165,7 +163,15 @@ export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
           Google
         </button>
         <button type="button" className="flex items-center justify-center gap-2.5 bg-panel border border-line rounded-xl py-3 font-bold text-text hover:border-cyan transition-all text-sm active:scale-[0.98] cursor-pointer">
-          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/apple.svg" className={`w-5 h-5 transition-all ${isDark ? 'invert' : ''}`} alt="Apple" />
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons/icons/microsoft.svg" className="w-4.5 h-4.5 transition-all logo-invert" alt="Microsoft" />
+          Microsoft
+        </button>
+        <button type="button" className="flex items-center justify-center gap-2.5 bg-panel border border-line rounded-xl py-3 font-bold text-text hover:border-cyan transition-all text-sm active:scale-[0.98] cursor-pointer">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons/icons/github.svg" className="w-4.5 h-4.5 transition-all logo-invert" alt="GitHub" />
+          GitHub
+        </button>
+        <button type="button" className="flex items-center justify-center gap-2.5 bg-panel border border-line rounded-xl py-3 font-bold text-text hover:border-cyan transition-all text-sm active:scale-[0.98] cursor-pointer">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons/icons/apple.svg" className="w-5 h-5 transition-all logo-invert" alt="Apple" />
           Apple
         </button>
       </div>

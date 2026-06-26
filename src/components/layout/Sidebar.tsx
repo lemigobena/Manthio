@@ -1,10 +1,47 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { 
   LayoutDashboard, BookOpen, Compass, BrainCircuit, PieChart, 
   Folder, MessagesSquare, Settings, ChevronLeft, X, Video
 } from 'lucide-react';
+
+function useAnimatedValue(endValue: number, duration: number = 1000) {
+  const [displayValue, setDisplayValue] = useState(endValue);
+  const currentVisual = useRef(endValue);
+
+  useEffect(() => {
+    if (currentVisual.current === endValue) return;
+    
+    const startValue = currentVisual.current;
+    let startTime: number | null = null;
+    let animationFrameId: number;
+
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      // easeOutExpo
+      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      
+      const nextVal = startValue + (endValue - startValue) * easeProgress;
+      currentVisual.current = nextVal;
+      // We round for display
+      setDisplayValue(Math.round(nextVal));
+
+      if (progress < 1) {
+        animationFrameId = window.requestAnimationFrame(step);
+      } else {
+        currentVisual.current = endValue;
+        setDisplayValue(endValue);
+      }
+    };
+
+    animationFrameId = window.requestAnimationFrame(step);
+    return () => window.cancelAnimationFrame(animationFrameId);
+  }, [endValue, duration]);
+
+  return displayValue;
+}
 
 interface NavItem {
   id: string;
@@ -30,9 +67,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setIsMobileOpen
 }) => {
   const { user } = useAuth();
-  const { level, currentXpInLevel, xpNeededForNextLevel } = useXP();
+  const { xp, level, currentXpInLevel, xpNeededForNextLevel } = useXP();
 
   const progressPercentage = Math.round((currentXpInLevel / xpNeededForNextLevel) * 100);
+  
+  // Animate these values for a smooth flow
+  const animatedXp = useAnimatedValue(xp, 1500);
+  const animatedProgress = useAnimatedValue(progressPercentage, 1500);
 
   // Swipe-left-to-close tracking
   const touchStartX = useRef<number | null>(null);
@@ -225,13 +266,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span className="text-[10px] font-bold text-cyan ml-2">LVL {level}</span>
                   </div>
                   <div className="flex justify-between items-center mb-1 overflow-hidden">
-                    <span className="text-[9px] font-medium text-muted uppercase tracking-wider whitespace-nowrap">Advancement</span>
-                    <span className="text-[9px] font-bold text-muted">{progressPercentage}%</span>
+                    <span className="text-[9px] font-bold text-cyan uppercase tracking-wider whitespace-nowrap">{animatedXp.toLocaleString()} XP</span>
+                    <span className="text-[9px] font-bold text-muted">{animatedProgress}%</span>
                   </div>
                   <div className="w-full h-[2px] bg-line/30 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-cyan transition-all duration-1000 ease-out"
-                      style={{ width: `${progressPercentage}%` }}
+                      className="h-full bg-cyan"
+                      style={{ width: `${animatedProgress}%` }}
                     />
                   </div>
                 </div>

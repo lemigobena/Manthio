@@ -48,6 +48,41 @@ export const DemoCenter: React.FC<DemoCenterProps> = ({ onNavigate }) => {
         <ArrowRight className="w-6 h-6 text-muted group-hover:text-cyan group-hover:translate-x-1 transition-all shrink-0" />
       </button>
 
+      {/* Template View Links */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <button
+          onClick={() => onNavigate('demo-dashboard-empty')}
+          className="w-full flex items-center justify-between gap-3 px-6 py-5 bg-panel border border-line hover:border-cyan/40 rounded-2xl transition-all cursor-pointer group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-yellow/10 rounded-xl">
+              <Sparkles className="w-6 h-6 text-yellow" />
+            </div>
+            <div className="text-left">
+              <span className="text-lg font-bold text-text group-hover:text-cyan transition-colors">Dashboard (New User)</span>
+              <span className="block text-sm text-muted mt-1">Empty state template for new users.</span>
+            </div>
+          </div>
+          <ArrowRight className="w-6 h-6 text-muted group-hover:text-cyan group-hover:translate-x-1 transition-all shrink-0" />
+        </button>
+
+        <button
+          onClick={() => onNavigate('demo-livesessions-empty')}
+          className="w-full flex items-center justify-between gap-3 px-6 py-5 bg-panel border border-line hover:border-cyan/40 rounded-2xl transition-all cursor-pointer group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-purple/10 rounded-xl">
+              <BookOpen className="w-6 h-6 text-purple" />
+            </div>
+            <div className="text-left">
+              <span className="text-lg font-bold text-text group-hover:text-cyan transition-colors">Live Sessions (Empty)</span>
+              <span className="block text-sm text-muted mt-1">Empty state template for live sessions.</span>
+            </div>
+          </div>
+          <ArrowRight className="w-6 h-6 text-muted group-hover:text-cyan group-hover:translate-x-1 transition-all shrink-0" />
+        </button>
+      </div>
+
       {/* Modal System Showcase */}
       <div className="bg-panel border border-line rounded-2xl p-8 space-y-6">
         <div className="flex items-center space-x-2">

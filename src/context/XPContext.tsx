@@ -45,7 +45,10 @@ const calculateLevelFromXp = (xpVal: number) => {
 let toastIdCounter = 0;
 
 export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [xp, setXp] = useState(() => Number(localStorage.getItem('xp') || '42500'));
+  const [xp, setXp] = useState(() => {
+    const val = Number(localStorage.getItem('xp'));
+    return isNaN(val) ? 42500 : val;
+  });
   const [streak, setStreak] = useState(() => Number(localStorage.getItem('streak') || '12'));
   const [streakFreezeAvailable, setStreakFreezeAvailable] = useState(() => localStorage.getItem('streakFreezeAvailable') !== 'false');
   
@@ -63,7 +66,8 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   }, [level, xp]);
 
   const addXp = (amount: number, reason: string) => {
-    const nextXp = xp + amount;
+    const validAmount = typeof amount === 'number' && !isNaN(amount) ? amount : 50;
+    const nextXp = xp + validAmount;
     const prevLvl = calculateLevelFromXp(xp).level;
     const nextLvl = calculateLevelFromXp(nextXp).level;
     if (nextLvl > prevLvl) {

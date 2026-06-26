@@ -16,6 +16,8 @@ import { LiveSession } from './features/live-session/LiveSession';
 import { LiveSessionsDirectory } from './features/live-session/LiveSessionsDirectory';
 // Page Views
 import { Dashboard } from './features/dashboard/Dashboard';
+import { DashboardEmptyTemplate } from './features/demo/DashboardEmptyTemplate';
+import { LiveSessionsEmptyTemplate } from './features/demo/LiveSessionsEmptyTemplate';
 import { Catalog } from './features/catalog/Catalog';
 import { CourseDetail } from './features/course-detail/CourseDetail';
 import { LearningPath } from './features/learning-path/LearningPath';
@@ -103,6 +105,10 @@ const MainApp: React.FC = () => {
         return <NotificationTestPage onNavigate={handleNavigate} />;
       case 'demo-center':
         return <DemoCenter onNavigate={handleNavigate} />;
+      case 'demo-dashboard-empty':
+        return <DashboardEmptyTemplate onNavigate={handleNavigate} />;
+      case 'demo-livesessions-empty':
+        return <LiveSessionsEmptyTemplate onNavigate={handleNavigate} />;
       case 'profile':
         return <PublicProfile onNavigate={handleNavigate} />;
       case 'help-center':
