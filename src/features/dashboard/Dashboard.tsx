@@ -20,7 +20,6 @@ import {
   Check,
   Clock,
   PlayCircle,
-  TrendingUp,
   Trophy,
   ChevronRight,
   Calendar,
@@ -260,7 +259,7 @@ const NeuralActivityChart: React.FC = () => {
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const { user, setActiveCourseId, setActiveTrackId, isOnboardingSkipped, resetOnboarding, onboardingAnswers } = useAuth();
   const { level, streak, xp, addToast } = useXP();
-  const {  } = useTrack();
+  useTrack();
 
   // Progress Sync States (REQ-LOAD-003)
   const [isSyncing, setIsSyncing] = useState(false);
