@@ -105,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems: NavItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'catalog', label: 'Browse Courses', icon: Compass },
+    { id: 'catalog', label: 'Catalog', icon: Compass },
     { id: 'learning-path', label: 'Learning Path', icon: BookOpen },
     { id: 'ai-tutor', label: 'AI Tutor', icon: BrainCircuit },
     { id: 'analytics', label: 'Analytics', icon: PieChart },

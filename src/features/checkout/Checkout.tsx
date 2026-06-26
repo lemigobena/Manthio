@@ -11,7 +11,8 @@ import {
   Laptop,
   Users,
   Percent,
-  Sparkles
+  Sparkles,
+  Check
 } from 'lucide-react';
 import { useXP } from '../../context/XPContext';
 
@@ -372,18 +373,26 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                     </button>
                     
                     <div className="space-y-3">
-                      <div className="flex items-start space-x-2.5">
-                        <input 
-                          type="checkbox" 
-                          id="terms-check"
-                          checked={agreedToTerms}
-                          onChange={(e) => setAgreedToTerms(e.target.checked)}
-                          className="mt-0.5 accent-cyan w-3 h-3 cursor-pointer" 
-                        />
-                        <label htmlFor="terms-check" className="text-[11px] text-muted leading-tight cursor-pointer font-medium">
-                          I accept the <span className="text-cyan underline">terms of agreement</span> and the <span className="text-cyan underline">cancellation policy</span>
-                        </label>
-                      </div>
+                      <label className="flex items-center gap-3 cursor-pointer group">
+                        <div className="relative shrink-0">
+                          <input 
+                            type="checkbox" 
+                            id="terms-check"
+                            className="peer sr-only"
+                            checked={agreedToTerms}
+                            onChange={(e) => setAgreedToTerms(e.target.checked)}
+                          />
+                          <div className="w-5 h-5 rounded-lg border-2 border-line bg-bg transition-all duration-300 peer-checked:bg-cyan peer-checked:border-cyan peer-focus:ring-2 peer-focus:ring-cyan/40 flex items-center justify-center">
+                            <Check
+                              className={`w-3 h-3 text-bg transition-opacity duration-300 ${agreedToTerms ? 'opacity-100' : 'opacity-0'}`}
+                              strokeWidth={4}
+                            />
+                          </div>
+                        </div>
+                        <span className="text-[11px] text-muted leading-tight font-medium select-none">
+                          I accept the <span className="text-cyan underline cursor-pointer">terms of agreement</span> and the <span className="text-cyan underline cursor-pointer">cancellation policy</span>
+                        </span>
+                      </label>
                       {course.cancellationPolicy && (
                         <div className="p-3 bg-bg/50 border border-line rounded-xl text-[9px] text-muted leading-relaxed font-medium italic">
                           <strong>Cancellation:</strong> {course.cancellationPolicy}

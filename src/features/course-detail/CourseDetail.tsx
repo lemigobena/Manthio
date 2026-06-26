@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { ChevronDown, ChevronUp, Star, Award, CheckCircle, Clock, Sparkles, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, Layers, ChevronRight, Users, ArrowRight, Laptop, PlayCircle } from 'lucide-react';
-import { useNotifications } from '../../context/NotificationContext';
+import { useXP } from '../../context/XPContext';
 import { useTrack } from '../track-detail/useTrack';
 import { calculateCourseProgress } from '../../services/progressUtils';
 import type { CareerTrack, Course, Review } from '../../types';
@@ -14,7 +14,7 @@ interface CourseDetailProps {
 
 export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic }) => {
   const { activeCourseId, activeTrackId, selectedFormat, setSelectedFormat, setActiveCourseId, setActiveTrackId } = useAuth();
-  const { addNotification } = useNotifications();
+  const { addToast } = useXP();
   const { getTrackPercentage, completedLessonIds } = useTrack();
   
   // Decide what to show: Track or Course
@@ -64,14 +64,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
 
     // Direct access for included or employer sponsored courses
     if (course?.priceStatus === 'included' || course?.priceStatus === 'employer') {
-      const bundleInfo = activeBundle ? ` Plus, your ${activeBundle.durationMonths}-month ${activeBundle.label} has been activated!` : '';
-      
-      addNotification({
-        category: 'course',
-        title: 'Enrolment Successful! 🎓',
-        message: `You have successfully enrolled in ${displayTitle}. Access has been granted via ${course.priceStatus === 'included' ? 'your plan' : 'your employer'}.${bundleInfo}`,
-        critical: false
-      });
+      const bundleInfo = activeBundle ? ` + ${activeBundle.durationMonths}m ${activeBundle.label} activated!` : '';
+      addToast('success', `🎓 Enrolled in ${displayTitle}— access via ${course.priceStatus === 'included' ? 'your plan' : 'your employer'}.${bundleInfo}`);
       onNavigate('learning-path');
       return;
     }
