@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { useTrack } from '../track-detail/useTrack';
-import { calculateCourseProgress } from '../../services/progressUtils';
-import type { Course } from '../../types';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { ContinueYourTrackCard } from '../track-detail/ContinueYourTrackCard';
 import { 
@@ -262,7 +260,7 @@ const NeuralActivityChart: React.FC = () => {
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const { user, setActiveCourseId, setActiveTrackId, isOnboardingSkipped, resetOnboarding, onboardingAnswers } = useAuth();
   const { level, streak, xp, addToast } = useXP();
-  const { completedLessonIds } = useTrack();
+  const {  } = useTrack();
 
   // Progress Sync States (REQ-LOAD-003)
   const [isSyncing, setIsSyncing] = useState(false);
@@ -610,11 +608,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                       <div className="shrink-0">
                         {/* Mobile: Circular Progress */}
                         <div className="md:hidden">
-                          <RingProgress progress={calculateCourseProgress(activeCourse as unknown as Course, completedLessonIds)} size={56} strokeWidth={4} />
+                          <RingProgress progress={46} size={56} strokeWidth={4} />
                         </div>
                         {/* Desktop: Pill Progress */}
                         <div className="hidden md:block">
-                          <PillProgress progress={calculateCourseProgress(activeCourse as unknown as Course, completedLessonIds)} />
+                          <PillProgress progress={46} />
                         </div>
                       </div>
                     </div>
@@ -716,29 +714,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                       );
                     } else if (course.title === 'Python Bootcamp') {
                       rightSection = (
-                        <div className="flex flex-col space-y-4 justify-between h-full">
-                          <div className="space-y-3">
-                            <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 rounded-full bg-bg flex items-center justify-center shrink-0"><Clock className="w-4 h-4 text-muted" /></div>
-                              <div>
-                                <div className="text-[9px] text-muted font-bold uppercase tracking-widest">Est. Time</div>
-                                <div className="text-xs font-black text-text mt-0.5">12h 45m</div>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 rounded-full bg-bg flex items-center justify-center shrink-0"><PlayCircle className="w-4 h-4 text-muted" /></div>
-                              <div>
-                                <div className="text-[9px] text-muted font-bold uppercase tracking-widest">Lessons</div>
-                                <div className="text-xs font-black text-text mt-0.5">8 of 30</div>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 rounded-full bg-bg flex items-center justify-center shrink-0"><TrendingUp className="w-4 h-4 text-muted" /></div>
-                              <div>
-                                <div className="text-[9px] text-muted font-bold uppercase tracking-widest">Next Up</div>
-                                <div className="text-xs font-black text-text mt-0.5 truncate max-w-[120px]">Functions</div>
-                              </div>
-                            </div>
+                        <div className="flex flex-col items-center justify-center space-y-4 h-full">
+                          <div className="flex flex-col items-center mt-auto">
+                            <RingProgress progress={46} size={72} strokeWidth={6} color={color === 'cyan' ? '#00fff2' : color === 'purple' ? '#b624ff' : color === 'yellow' ? '#ffb800' : '#00ff9d'} />
+                            <span className="text-[10px] text-muted font-bold mt-3 uppercase tracking-widest">In Progress</span>
                           </div>
                           <button 
                             onClick={() => {
