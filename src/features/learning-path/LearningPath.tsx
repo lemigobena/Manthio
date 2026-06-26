@@ -6,11 +6,12 @@ import {
   Check, Lock, Play, ChevronDown, ChevronUp, ChevronRight, Clock, HelpCircle, 
   FileText, Code2, Users, MapPin, Calendar, AlertCircle,
   Target, Award, BookOpen, Bookmark, MessageSquare, ExternalLink,
-  ShieldCheck, CheckCircle, Video,
+  ShieldCheck, CheckCircle, Video, Gamepad2, ClipboardEdit
 } from 'lucide-react';
 import { useTrack } from '../track-detail/useTrack';
 import { calculateCourseProgress } from '../../services/progressUtils';
-import type { Course, Lesson, LessonType } from '../../types';
+import { useModal } from '../../context/ModalContext';
+import type { Course, LessonType } from '../../types';
 
 interface LearningPathProps {
   onNavigate: (page: string) => void;
@@ -19,9 +20,22 @@ interface LearningPathProps {
 export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
   const { activeCourseId } = useAuth();
   const { addXp } = useXP();
-  const { completedLessonIds, completeLesson } = useTrack();
+  const { completedLessonIds } = useTrack();
+  const { openModal } = useModal();
+  const [bookmarkedLessons, setBookmarkedLessons] = useState<Set<string>>(new Set());
+
+  const toggleBookmark = (e: React.MouseEvent, lessonId: string) => {
+    e.stopPropagation();
+    setBookmarkedLessons(prev => {
+      const next = new Set(prev);
+      if (next.has(lessonId)) next.delete(lessonId);
+      else next.add(lessonId);
+      return next;
+    });
+  };
   
   const course = COURSES.find(c => c.id === activeCourseId) || COURSES[0];
+  const displayedProgress = course.id === 'python-bootcamp' ? 46 : calculateCourseProgress(course as Course, completedLessonIds);
 
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) return null;
@@ -73,15 +87,13 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
       case 'Quiz': return <HelpCircle className="w-3.5 h-3.5" />;
       case 'Code': return <Code2 className="w-3.5 h-3.5" />;
       case 'Live Event': return <Users className="w-3.5 h-3.5" />;
+      case 'H5P': return <Gamepad2 className="w-3.5 h-3.5" />;
+      case 'Assignment': return <ClipboardEdit className="w-3.5 h-3.5" />;
+      case 'External': return <ExternalLink className="w-3.5 h-3.5" />;
       default: return <FileText className="w-3.5 h-3.5" />;
     }
   };
 
-  const startLesson = (lesson: Lesson) => {
-    if (lesson.status === 'locked') return;
-    addXp(10, `Lesson ${lesson.title} started`);
-    onNavigate('content-player');
-  };
 
   const completedCount = course.modules.filter(m => m.status === 'Completed').length;
   const inProgressModule = course.modules.find(m => m.status === 'In progress') || 
@@ -125,12 +137,12 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
           
           <div className="text-right">
             <span className="text-xs text-muted">Course Progress</span>
-            <div className="text-2xl font-bold text-cyan">{calculateCourseProgress(course as Course, completedLessonIds)}%</div>
+            <div className="text-2xl font-bold text-cyan">{displayedProgress}%</div>
           </div>
         </div>
 
         <div className="w-full h-2 bg-bg rounded-full overflow-hidden border border-line">
-          <div className="h-full bg-cyan transition-all duration-500" style={{ width: `${calculateCourseProgress(course as Course, completedLessonIds)}%` }} />
+          <div className="h-full bg-cyan transition-all duration-500" style={{ width: `${displayedProgress}%` }} />
         </div>
 
         {/* Header Stats Grid */}
@@ -281,7 +293,22 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                             {/* REQ-PATH-005: Quiz shortcut — opens quiz without entering Content Player */}
                             {materialCounts.quiz > 0 && (
                               <button
-                                onClick={(e) => { e.stopPropagation(); if (!isLocked) onNavigate('content-player'); }}
+                                onClick={(e) => { 
+                                  e.stopPropagation(); 
+                                  if (!isLocked) {
+                                    openModal('quiz', {
+                                      props: {
+                                        questions: [
+                                          { id: 1, text: `What is the primary goal of ${mod.title}?`, options: ['To learn basics', 'To build projects', 'To pass a test', 'All of the above'] },
+                                          { id: 2, text: 'Which of the following is correct?', options: ['A', 'B', 'C', 'D'] }
+                                        ],
+                                        onComplete: () => {
+                                          addXp(50, `Completed quiz for ${mod.title}`);
+                                        }
+                                      }
+                                    });
+                                  } 
+                                }}
                                 title={isLocked ? `Complete Module ${idx} to unlock` : 'Jump straight to quiz'}
                                 className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border transition-colors ${
                                   isLocked 
@@ -452,7 +479,21 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                           <div className="text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-2 opacity-50">Curriculum Structure</div>
                           {mod.lessons.map(les => (
                             /* 14.6.2 Lesson card */
-                            <div key={les.id} onClick={() => startLesson(les)} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-5 rounded-2xl border transition-all ${les.status === 'locked' ? 'opacity-50 grayscale cursor-not-allowed border-line' : 'bg-panel border-line hover:border-cyan/40 cursor-pointer shadow-sm hover:translate-x-1 duration-300'}`}>
+                            <div 
+                              key={les.id}
+                              onClick={() => {
+                                if (les.status !== 'locked') {
+                                  localStorage.setItem('manthio_active_lesson', les.id);
+                                  onNavigate('content-player');
+                                }
+                              }}
+                              className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-5 rounded-2xl border transition-all ${
+                                les.status === 'locked' 
+                                  ? 'bg-bg/50 border-line opacity-60 grayscale cursor-not-allowed' 
+                                  : 'bg-panel border-line hover:border-cyan/40 cursor-pointer shadow-sm active:scale-[0.98] hover:translate-x-1 duration-300'
+                              }`}
+                              title={les.status === 'locked' ? (les.unlockCondition || 'Complete previous lesson to unlock') : undefined}
+                            >
                               <div className="flex items-center space-x-4">
                                 <div className={`p-3 rounded-xl border ${les.status === 'completed' ? 'bg-green/10 border-green/20 text-green' : les.status === 'in_progress' ? 'bg-cyan text-bg border-cyan' : 'bg-bg border-line text-muted'}`}>
                                   {getLessonIcon(les.type)}
@@ -480,25 +521,71 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                                 </div>
                               </div>
 
-                              <div className="flex items-center space-x-3 mt-3 sm:mt-0 self-end sm:self-center">
-                                <div className="flex items-center space-x-1 border-r border-line pr-2 mr-1">
-                                   <button className="p-1.5 text-muted hover:text-cyan transition-colors"><Bookmark className="w-3.5 h-3.5" /></button>
-                                   <button className="p-1.5 text-muted hover:text-cyan transition-colors"><MessageSquare className="w-3.5 h-3.5" /></button>
+                              <div className="flex items-center mt-3 sm:mt-0 self-end sm:self-center min-w-[200px] justify-end">
+                                <div className="flex items-center space-x-1 border-r border-line pr-3 mr-3">
+                                   <button 
+                                      onClick={(e) => toggleBookmark(e, les.id)}
+                                      className={`p-1.5 transition-colors ${bookmarkedLessons.has(les.id) ? 'text-cyan' : 'text-muted hover:text-cyan'}`}
+                                   >
+                                      <Bookmark className={`w-3.5 h-3.5 ${bookmarkedLessons.has(les.id) ? 'fill-cyan' : ''}`} />
+                                   </button>
+                                   <button 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (les.status !== 'locked') onNavigate('content-player:notes');
+                                      }} 
+                                      className="p-1.5 text-muted hover:text-cyan transition-colors"
+                                   >
+                                      <MessageSquare className="w-3.5 h-3.5" />
+                                   </button>
                                 </div>
-                                {completedLessonIds.includes(les.id) ? (
-                                  <span className="text-green text-xs font-bold flex items-center space-x-1"><Check className="w-4 h-4 stroke-[3px]" /> <span>Done</span></span>
-                                ) : (
-                                  <button 
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      completeLesson(les.id);
-                                      addXp(15, `Completed lesson: ${les.title}`);
-                                    }}
-                                    className="bg-cyan hover:bg-cyan2 text-bg text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase"
-                                  >
-                                    Mark Done
-                                  </button>
-                                )}
+                                <div className="flex items-center space-x-3 w-[100px] justify-end shrink-0">
+                                   {/* Status Indicator */}
+                                   {(() => {
+                                     const status = completedLessonIds.includes(les.id) ? 'completed' : les.status;
+                                     if (status === 'locked') {
+                                       return <span className="text-muted text-[10px] font-bold flex items-center space-x-1 uppercase tracking-wider"><Lock className="w-3.5 h-3.5" /> <span>Locked</span></span>;
+                                     }
+                                     return null;
+                                   })()}
+                                   
+                                   {/* Primary Action */}
+                                   {(() => {
+                                     const status = completedLessonIds.includes(les.id) ? 'completed' : les.status;
+                                     if (status === 'locked') {
+                                       return (
+                                         <button disabled className="w-full bg-bg border border-line text-muted text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase cursor-not-allowed">
+                                           Locked
+                                         </button>
+                                       );
+                                     }
+                                     
+                                     let buttonClass = "";
+                                     if (status === 'completed') {
+                                       buttonClass = "bg-bg border border-line hover:border-cyan text-text";
+                                     } else if (status === 'in_progress') {
+                                       buttonClass = "bg-bg border border-cyan text-cyan hover:bg-cyan/10";
+                                     } else {
+                                       buttonClass = "bg-cyan hover:bg-cyan2 text-bg border border-cyan";
+                                     }
+                                     
+                                     const buttonText = status === 'completed' ? 'Review' 
+                                       : status === 'in_progress' ? 'Continue' : 'Start';
+                                       
+                                     return (
+                                       <button 
+                                         onClick={(e) => {
+                                           e.stopPropagation();
+                                           localStorage.setItem('manthio_active_lesson', les.id);
+                                           onNavigate('content-player');
+                                         }}
+                                         className={`w-full ${buttonClass} text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase transition-all`}
+                                       >
+                                         {buttonText}
+                                       </button>
+                                     );
+                                   })()}
+                                </div>
                               </div>
                             </div>
                           ))}
@@ -513,10 +600,10 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
 
           {/* Certificate Milestone */}
           <div className="relative">
-            <div className={`absolute -left-[33px] top-1.5 w-8 h-8 rounded-full border-2 flex items-center justify-center z-10 ${calculateCourseProgress(course as Course, completedLessonIds) === 100 ? 'bg-yellow border-yellow text-bg' : 'bg-bg border-line text-muted opacity-50'}`}>
+            <div className={`absolute -left-[33px] top-1.5 w-8 h-8 rounded-full border-2 flex items-center justify-center z-10 ${displayedProgress === 100 ? 'bg-yellow border-yellow text-bg' : 'bg-bg border-line text-muted opacity-50'}`}>
               <Award className="w-4 h-4" />
             </div>
-            <div className={`bg-panel border rounded-2xl p-6 border-dashed ${calculateCourseProgress(course as Course, completedLessonIds) === 100 ? 'border-yellow' : 'border-line opacity-60'}`}>
+            <div className={`bg-panel border rounded-2xl p-6 border-dashed ${displayedProgress === 100 ? 'border-yellow' : 'border-line opacity-60'}`}>
                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="space-y-1 text-center sm:text-left">
                      <h3 className="font-bold text-lg text-text">Course Certificate</h3>

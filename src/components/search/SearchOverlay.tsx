@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Search, X, BookOpen, Clock, FileText, MessageSquare, 
-  Trash2, Video, Code, Award, CheckCircle, HelpCircle as QuestionIcon
+  Trash2, Video, Code, Award, CheckCircle, HelpCircle as QuestionIcon,
+  Gamepad2, ClipboardEdit, ExternalLink
 } from 'lucide-react';
 import { COURSES, RESOURCES, FORUM_CHANNELS, MOCK_NOTES, MOCK_TUTOR_CONVERSATIONS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
@@ -260,6 +261,9 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
       case 'Code': return <Code className="w-4 h-4 text-yellow" />;
       case 'Quiz': return <Award className="w-4 h-4 text-purple" />;
       case 'Live Event': return <Clock className="w-4 h-4 text-orange" />;
+      case 'H5P': return <Gamepad2 className="w-4 h-4 text-pink-400" />;
+      case 'Assignment': return <ClipboardEdit className="w-4 h-4 text-blue-400" />;
+      case 'External': return <ExternalLink className="w-4 h-4 text-green-400" />;
       default: return <BookOpen className="w-4 h-4 text-muted" />;
     }
   };

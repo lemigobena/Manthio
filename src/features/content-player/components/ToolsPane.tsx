@@ -8,15 +8,16 @@ import { NotesTab } from './NotesTab';
 interface ToolsPaneProps {
   currentLesson: Lesson;
   isOpen: boolean;
+  initialTab?: string;
 }
 
-export const ToolsPane: React.FC<ToolsPaneProps> = ({ currentLesson, isOpen }) => {
+export const ToolsPane: React.FC<ToolsPaneProps> = ({ currentLesson, isOpen, initialTab }) => {
   const { addXp } = useXP();
   
   // REQ-PLAYER-012 AI Tutor tab opens by default if the lesson type is complex (code, math); Notes tab default otherwise.
   const isComplex = currentLesson.type === 'Code' || currentLesson.type === 'Assignment';
   const [activeTab, setActiveTab] = useState<'ai' | 'notes' | 'bookmarks' | 'resources'>(
-    isComplex ? 'ai' : 'notes'
+    (initialTab as 'ai' | 'notes' | 'bookmarks' | 'resources') || (isComplex ? 'ai' : 'notes')
   );
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -68,14 +69,14 @@ export const ToolsPane: React.FC<ToolsPaneProps> = ({ currentLesson, isOpen }) =
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveTab(
-      (currentLesson.type === 'Code' || currentLesson.type === 'Assignment') ? 'ai' : 'notes'
+      (initialTab as 'ai' | 'notes' | 'bookmarks' | 'resources') || ((currentLesson.type === 'Code' || currentLesson.type === 'Assignment') ? 'ai' : 'notes')
     );
     setIsBookmarked(localStorage.getItem(`bookmark-${currentLesson.id}`) === 'true');
 
     const handleStorage = () => setIsBookmarked(localStorage.getItem(`bookmark-${currentLesson.id}`) === 'true');
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
-  }, [currentLesson.id, currentLesson.type]);
+  }, [currentLesson.id, currentLesson.type, initialTab]);
 
 
   const handleToggleBookmark = () => {

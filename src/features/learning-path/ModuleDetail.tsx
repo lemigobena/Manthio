@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { COURSES } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { 
-  ArrowLeft, Play, Clock, Check, Lock, 
-  ChevronRight, Target, Bookmark, MessageSquare,
-  FileText, Code2, HelpCircle, Users
+  ArrowLeft, Play, Clock, Lock,
+  Target, Bookmark, MessageSquare,
+  FileText, Code2, HelpCircle, Users, ExternalLink, Gamepad2, ClipboardEdit
 } from 'lucide-react';
 import type { LessonType } from '../../types';
 
@@ -17,6 +17,17 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({ moduleId, onNavigate
   const { activeCourseId } = useAuth();
   const course = COURSES.find(c => c.id === activeCourseId) || COURSES[0];
   const module = course.modules.find(m => m.id === moduleId);
+  const [bookmarkedLessons, setBookmarkedLessons] = useState<Set<string>>(new Set());
+
+  const toggleBookmark = (e: React.MouseEvent, lessonId: string) => {
+    e.stopPropagation();
+    setBookmarkedLessons(prev => {
+      const next = new Set(prev);
+      if (next.has(lessonId)) next.delete(lessonId);
+      else next.add(lessonId);
+      return next;
+    });
+  };
 
   if (!module) {
     return (
@@ -42,6 +53,9 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({ moduleId, onNavigate
       case 'Quiz': return <HelpCircle className="w-4 h-4" />;
       case 'Code': return <Code2 className="w-4 h-4" />;
       case 'Live Event': return <Users className="w-4 h-4" />;
+      case 'H5P': return <Gamepad2 className="w-4 h-4" />;
+      case 'Assignment': return <ClipboardEdit className="w-4 h-4" />;
+      case 'External': return <ExternalLink className="w-4 h-4" />;
       default: return <FileText className="w-4 h-4" />;
     }
   };
@@ -115,12 +129,18 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({ moduleId, onNavigate
           {module.lessons.map(lesson => (
             <div 
               key={lesson.id}
-              onClick={() => lesson.status !== 'locked' && onNavigate('content-player')}
+              onClick={() => {
+                if (lesson.status !== 'locked') {
+                  localStorage.setItem('manthio_active_lesson', lesson.id);
+                  onNavigate('content-player');
+                }
+              }}
               className={`p-4 rounded-2xl border transition-all ${
                 lesson.status === 'locked' 
                   ? 'bg-bg/50 border-line opacity-60 grayscale cursor-not-allowed' 
                   : 'bg-panel border-line hover:border-cyan/40 cursor-pointer shadow-sm active:scale-[0.98]'
               }`}
+              title={lesson.status === 'locked' ? (lesson.unlockCondition || 'Complete previous lesson to unlock') : undefined}
             >
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center space-x-4">
@@ -149,28 +169,71 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({ moduleId, onNavigate
                   </div>
                 </div>
 
-                <div className="shrink-0">
-                  {lesson.status === 'completed' ? (
-                    <div className="w-8 h-8 rounded-full bg-green/10 flex items-center justify-center text-green">
-                      <Check className="w-5 h-5 stroke-[2.5px]" />
-                    </div>
-                  ) : lesson.status === 'locked' ? (
-                    <Lock className="w-4 h-4 text-muted" />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-cyan/10 flex items-center justify-center text-cyan">
-                      <ChevronRight className="w-5 h-5" />
-                    </div>
-                  )}
+                <div className="shrink-0 flex items-center space-x-3 w-[100px] justify-end">
+                  {/* Status Indicator */}
+                  {(() => {
+                    if (lesson.status === 'locked') {
+                      return <span className="text-muted text-[10px] font-bold flex items-center space-x-1 uppercase tracking-wider"><Lock className="w-3.5 h-3.5" /> <span>Locked</span></span>;
+                    }
+                    return null;
+                  })()}
+
+                  {/* Primary Action */}
+                  {(() => {
+                    if (lesson.status === 'locked') {
+                      return (
+                        <button disabled className="w-full bg-bg border border-line text-muted text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase cursor-not-allowed">
+                          Locked
+                        </button>
+                      );
+                    }
+                    
+                    let buttonClass = "";
+                    if (lesson.status === 'completed') {
+                      buttonClass = "bg-bg border border-line hover:border-cyan text-text";
+                    } else if (lesson.status === 'in_progress') {
+                      buttonClass = "bg-bg border border-cyan text-cyan hover:bg-cyan/10";
+                    } else {
+                      buttonClass = "bg-cyan hover:bg-cyan2 text-bg border border-cyan";
+                    }
+                    
+                    const buttonText = lesson.status === 'completed' ? 'Review' 
+                      : lesson.status === 'in_progress' ? 'Continue' : 'Start';
+                      
+                    return (
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          localStorage.setItem('manthio_active_lesson', lesson.id);
+                          onNavigate('content-player');
+                        }}
+                        className={`w-full ${buttonClass} text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase transition-all`}
+                      >
+                        {buttonText}
+                      </button>
+                    );
+                  })()}
                 </div>
               </div>
 
               {/* Lesson Utility Actions - Mobile focused */}
               <div className="flex items-center space-x-1.5 pt-4 mt-4 border-t border-line/40">
-                 <button className="flex-1 flex items-center justify-center space-x-2 py-2 rounded-xl bg-bg border border-line text-[10px] font-bold text-muted hover:text-text transition-colors">
-                    <Bookmark className="w-3.5 h-3.5" />
-                    <span>Save</span>
+                 <button 
+                    onClick={(e) => toggleBookmark(e, lesson.id)}
+                    className={`flex-1 flex items-center justify-center space-x-2 py-2 rounded-xl bg-bg border border-line text-[10px] font-bold transition-colors ${
+                      bookmarkedLessons.has(lesson.id) ? 'text-cyan border-cyan/30' : 'text-muted hover:text-text'
+                    }`}
+                 >
+                    <Bookmark className={`w-3.5 h-3.5 ${bookmarkedLessons.has(lesson.id) ? 'fill-cyan' : ''}`} />
+                    <span>{bookmarkedLessons.has(lesson.id) ? 'Saved' : 'Save'}</span>
                  </button>
-                 <button className="flex-1 flex items-center justify-center space-x-2 py-2 rounded-xl bg-bg border border-line text-[10px] font-bold text-muted hover:text-text transition-colors">
+                 <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (lesson.status !== 'locked') onNavigate('content-player:notes');
+                    }}
+                    className="flex-1 flex items-center justify-center space-x-2 py-2 rounded-xl bg-bg border border-line text-[10px] font-bold text-muted hover:text-text transition-colors"
+                 >
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>Discuss</span>
                  </button>
