@@ -3,7 +3,9 @@ import { COURSES, TRACKS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { ChevronDown, ChevronUp, Star, Award, CheckCircle, Clock, Sparkles, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, Layers, ChevronRight, Users, ArrowRight, Laptop, PlayCircle } from 'lucide-react';
 import { useNotifications } from '../../context/NotificationContext';
-import type { Review } from '../../types';
+import { useTrack } from '../track-detail/useTrack';
+import { calculateCourseProgress } from '../../services/progressUtils';
+import type { CareerTrack, Course, Review } from '../../types';
 
 interface CourseDetailProps {
   onNavigate: (page: string) => void;
@@ -13,6 +15,7 @@ interface CourseDetailProps {
 export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic }) => {
   const { activeCourseId, activeTrackId, selectedFormat, setSelectedFormat, setActiveCourseId, setActiveTrackId } = useAuth();
   const { addNotification } = useNotifications();
+  const { getTrackPercentage, completedLessonIds } = useTrack();
   
   // Decide what to show: Track or Course
   // If we came from a track click, activeTrackId will be set.
@@ -193,7 +196,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
 
           <div className="pt-6 flex flex-col sm:flex-row items-center gap-4">
             {/* CTA logic based on enrollment and progress */}
-            {(track ? track.progress < 100 : course!.progress < 100) ? (
+            {(track ? getTrackPercentage(track as unknown as CareerTrack) < 100 : calculateCourseProgress(course as unknown as Course, completedLessonIds) < 100) ? (
               enrolled ? (
                 <button 
                   onClick={() => onNavigate('learning-path')}
@@ -226,19 +229,19 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
           <div className="absolute top-0 right-0 p-6 flex flex-col items-end">
             <div className="flex items-center gap-3 mb-1">
               <span className="text-[10px] font-black text-muted uppercase tracking-widest">Track Progress</span>
-              <span className="text-xl font-black text-cyan">{track.progress}%</span>
+              <span className="text-xl font-black text-cyan">{getTrackPercentage(track as unknown as CareerTrack)}%</span>
             </div>
             <div className="w-48 h-1.5 bg-bg border border-line rounded-full overflow-hidden">
               <div 
                 className="h-full bg-cyan shadow-[0_0_10px_rgba(0,245,212,0.4)] transition-all duration-1000" 
-                style={{ width: `${track.progress}%` }} 
+                style={{ width: `${getTrackPercentage(track as unknown as CareerTrack)}%` }} 
               />
             </div>
           </div>
         )}
 
         {/* Completion Badge (Bottom Right) */}
-        {(track ? track.progress === 100 : course!.progress === 100) && (
+        {(track ? getTrackPercentage(track as unknown as CareerTrack) === 100 : calculateCourseProgress(course as unknown as Course, completedLessonIds) === 100) && (
           <div className="absolute bottom-6 right-6 flex items-center gap-2 bg-green/10 border border-green/30 px-4 py-1 rounded-l shadow-[0_4px_20px_rgba(34,197,94,0.1)] backdrop-blur-md">
             <div className="bg-green/20 p-1 rounded-full">
               <CheckCircle className="w-4 h-4 text-green" />

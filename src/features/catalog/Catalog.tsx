@@ -3,6 +3,9 @@ import { COURSES, TRACKS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, CheckCircle } from 'lucide-react';
+import { useTrack } from '../track-detail/useTrack';
+import { calculateCourseProgress } from '../../services/progressUtils';
+import type { CareerTrack, Course } from '../../types';
 
 interface CatalogProps {
   onNavigate: (page: string) => void;
@@ -11,6 +14,7 @@ interface CatalogProps {
 export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
   const { setActiveCourseId, setActiveTrackId } = useAuth();
   const { addNotification } = useNotifications();
+  const { getTrackPercentage, completedLessonIds } = useTrack();
   const [discoveryMode, setDiscoveryMode] = useState<'courses' | 'tracks'>(() => {
     const lastUsed = localStorage.getItem('catalogDiscoveryMode');
     return (lastUsed as 'courses' | 'tracks') || (COURSES.some(c => c.enrolled) ? 'courses' : 'tracks');
@@ -22,6 +26,8 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
   const [selectedLevel, setSelectedLevel] = useState<string>('All');
   const [selectedFormat, setSelectedFormat] = useState<string>('All');
   const [selectedTopic, setSelectedTopic] = useState<string>('All');
+  const [selectedGoal, setSelectedGoal] = useState<string>('All');
+  const [selectedTimeRange, setSelectedTimeRange] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('Recommended');
 
   // Loading & Error States (REQ-LOAD-002, REQ-LOAD-004)
@@ -109,6 +115,20 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
     // Search and Level filtering
     if (searchQuery && !t.title.toLowerCase().includes(searchQuery.toLowerCase()) && !t.outcomeStatement.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     if (selectedLevel !== 'All' && t.level !== selectedLevel) return false;
+    
+    // REQ-TRACK-022 filters
+    if (selectedGoal !== 'All') {
+      const goalType = t.id.includes('cloud') ? 'Role' : t.id.includes('data') ? 'Certification' : 'Role';
+      if (goalType !== selectedGoal) return false;
+    }
+    
+    if (selectedTimeRange !== 'All') {
+      const hours = parseInt(t.estimatedTime.split(' ')[0]);
+      if (selectedTimeRange === '<20' && hours >= 20) return false;
+      if (selectedTimeRange === '20-40' && (hours < 20 || hours > 40)) return false;
+      if (selectedTimeRange === '40+' && hours <= 40) return false;
+    }
+
     return true;
   }) : [];
 
@@ -252,6 +272,33 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                 <option value="Most popular">Most popular</option>
                 <option value="Highest rated">Highest rated</option>
                 <option value="Alphabetical">A-Z</option>
+              </select>
+            </>
+          )}
+
+          {discoveryMode === 'tracks' && (
+            <>
+              <select 
+                value={selectedGoal}
+                onChange={(e) => { setSelectedGoal(e.target.value); simulateLoad(); }}
+                className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
+              >
+                <option value="All">Goal: All</option>
+                <option value="Certification">Certification</option>
+                <option value="Role">Role</option>
+                <option value="Project">Project</option>
+                <option value="Topic">Topic</option>
+              </select>
+
+              <select 
+                value={selectedTimeRange}
+                onChange={(e) => { setSelectedTimeRange(e.target.value); simulateLoad(); }}
+                className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
+              >
+                <option value="All">Time: All</option>
+                <option value="<20">Under 20h</option>
+                <option value="20-40">20-40h</option>
+                <option value="40+">40h+</option>
               </select>
             </>
           )}
@@ -499,7 +546,8 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                     e.stopPropagation(); // Avoid triggering card click
                     setActiveTrackId(null);
                     setActiveCourseId(course.id);
-                    if (course.progress === 100) {
+                    const cProg = calculateCourseProgress(course as unknown as Course, completedLessonIds);
+                    if (cProg === 100) {
                       onNavigate('course-detail');
                     } else if (course.enrolled) {
                       onNavigate('learning-path');
@@ -518,7 +566,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                   className={`relative overflow-hidden group/btn bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer`}
                 >
                   <span className="relative z-10">
-                    {course.progress === 100 ? 'Review' : course.enrolled ? 'Continue' : 'Enrol Now'}
+                    {calculateCourseProgress(course as unknown as Course, completedLessonIds) === 100 ? 'Review' : course.enrolled ? 'Continue' : 'Enrol Now'}
                   </span>
                   <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
                 </button>
@@ -529,7 +577,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
               key={track.id} 
               onClick={() => {
                 setActiveTrackId(track.id);
-                onNavigate('course-detail');
+                onNavigate('track-detail');
               }}
               className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:translate-y-[-4px] duration-300 h-[420px] cursor-pointer"
             >
@@ -578,7 +626,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                     <div className="flex items-center space-x-3">
                       {/* Progress Ring or Completed Icon */}
                       <div className="relative w-9 h-9 flex items-center justify-center">
-                        {track.progress === 100 ? (
+                        {getTrackPercentage(track as unknown as CareerTrack) === 100 ? (
                           <div className="bg-green/10 p-1.5 rounded-full ring-2 ring-green/20">
                             <CheckCircle className="w-5 h-5 text-green" />
                           </div>
@@ -586,20 +634,20 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                           <div className="relative w-9 h-9">
                             <svg className="w-9 h-9 -rotate-90">
                               <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" className="text-line opacity-20" />
-                              <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" strokeDasharray={100} strokeDashoffset={100 - (100 * track.progress) / 100} className="text-cyan transition-all duration-1000 shadow-[0_0_8px_rgba(45,212,191,0.5)]" />
+                              <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" strokeDasharray={100} strokeDashoffset={100 - (100 * getTrackPercentage(track as unknown as CareerTrack)) / 100} className="text-cyan transition-all duration-1000 shadow-[0_0_8px_rgba(45,212,191,0.5)]" />
                             </svg>
                             <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-text">
-                              {track.progress}%
+                              {getTrackPercentage(track as unknown as CareerTrack)}%
                             </span>
                           </div>
                         )}
                       </div>
                       <div className="flex flex-col">
                         <span className="text-[10px] text-cyan font-black leading-none mb-1 uppercase tracking-wider">
-                          {track.progress === 100 ? 'Completed' : 'Active'}
+                          {getTrackPercentage(track as unknown as CareerTrack) === 100 ? 'Completed' : 'Active'}
                         </span>
                         <span className="text-[12px] font-bold text-text opacity-80">
-                          {track.progress === 100 ? 'Review Final Step' : 'Resume Learning'}
+                          {getTrackPercentage(track as unknown as CareerTrack) === 100 ? 'Review Final Step' : 'Resume Learning'}
                         </span>
                       </div>
                     </div>
@@ -613,18 +661,9 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
 
                 <button 
                   onClick={(e) => {
-                    e.stopPropagation(); // Avoid triggering card click
+                    e.stopPropagation();
                     setActiveTrackId(track.id);
-                    if (track.progress === 100) {
-                      onNavigate('course-detail');
-                    } else if (track.enrolled) {
-                      onNavigate('learning-path');
-                    } else if (track.id === 'python-production-engineer' || track.id === 'some-included-id') { // Tracks might need a similar status check, but mockData for tracks doesn't have priceStatus yet. Adding logic for safety.
-                      // For now, most tracks go to checkout as they are 'paid', but if we add status, it's here.
-                      onNavigate('checkout');
-                    } else {
-                      onNavigate('checkout');
-                    }
+                    onNavigate('track-detail');
                   }}
                   className="relative overflow-hidden group/btn bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer"
                 >

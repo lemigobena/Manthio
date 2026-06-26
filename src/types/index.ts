@@ -293,6 +293,18 @@ export interface CareerTrack {
   selfAssessmentOptions?: string[];
 }
 
+export type SelfAssessmentLevel = 'nothing' | 'basics' | 'experience';
+
+export interface UserTrackProgress {
+  userId: string;
+  trackId: string;
+  enrolledAt: Date | null;
+  completedAt: Date | null;
+  selfAssessmentLevel: SelfAssessmentLevel;
+  completedMilestoneIds: string[];
+  bookmarkedAt: Date | null;
+}
+
 export interface UserProfile {
   name: string;
   email: string;
