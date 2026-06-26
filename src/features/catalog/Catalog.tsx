@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
-import { useNotifications } from '../../context/NotificationContext';
+import { useXP } from '../../context/XPContext';
 import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, CheckCircle } from 'lucide-react';
 import { useTrack } from '../track-detail/useTrack';
 import { calculateCourseProgress } from '../../services/progressUtils';
@@ -13,7 +13,7 @@ interface CatalogProps {
 
 export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
   const { setActiveCourseId, setActiveTrackId } = useAuth();
-  const { addNotification } = useNotifications();
+  const { addToast } = useXP();
   const { getTrackPercentage, completedLessonIds } = useTrack();
   const [discoveryMode, setDiscoveryMode] = useState<'courses' | 'tracks'>(() => {
     const lastUsed = localStorage.getItem('catalogDiscoveryMode');
@@ -552,12 +552,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                     } else if (course.enrolled) {
                       onNavigate('learning-path');
                     } else if (course.priceStatus === 'included' || course.priceStatus === 'employer') {
-                      addNotification({
-                        category: 'course',
-                        title: 'Enrolment Successful! 🎓',
-                        message: `You have successfully enrolled in ${course.title}. Access has been granted via ${course.priceStatus === 'included' ? 'your plan' : 'your employer'}.`,
-                        critical: false
-                      });
+                      addToast('success', `🎓 Enrolled in ${course.title} — access granted via ${course.priceStatus === 'included' ? 'your plan' : 'your employer'}.`);
                       onNavigate('learning-path');
                     } else {
                       onNavigate('checkout');
