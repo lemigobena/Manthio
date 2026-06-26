@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { analyticsService } from '../services/analyticsService';
 
 export interface ToastMessage {
   id: string;
@@ -75,7 +76,10 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       setCelebrationActive(true);
     }
     setXp(nextXp);
-    addToast('xp', `+${amount} XP — ${reason}`);
+    addToast('xp', `+${validAmount} XP — ${reason}`);
+    
+    // Track XP earned in analytics
+    analyticsService.incrementXpEarned(validAmount);
   };
 
   const incrementStreak = () => {
