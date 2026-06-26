@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
+
 
 interface SignInProps {
   onNavigate: (page: string) => void;
@@ -9,13 +9,12 @@ interface SignInProps {
 
 export const SignIn: React.FC<SignInProps> = ({ onNavigate }) => {
   const { signIn } = useAuth();
-  const { theme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const isDark = theme === 'dark';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +61,31 @@ export const SignIn: React.FC<SignInProps> = ({ onNavigate }) => {
           </button>
         </div>
 
-        <div className="flex justify-end pt-1">
+        <div className="flex justify-between pt-1 items-center">
+          <label className="flex items-center gap-3.5 group cursor-pointer">
+            <div className="relative">
+              <input 
+                type="checkbox" 
+                className="peer sr-only"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <div className="w-5 h-5 rounded-lg border-2 border-line bg-panel transition-all duration-300 peer-checked:bg-cyan peer-checked:border-cyan peer-focus:ring-2 peer-focus:ring-cyan/40 flex items-center justify-center">
+                <svg 
+                  className={`w-3 h-3 text-bg transition-opacity duration-300 ${rememberMe ? 'opacity-100' : 'opacity-0'}`} 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor" 
+                  strokeWidth="4"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+            <span className="text-[0.875rem] font-medium text-muted leading-none select-none transition-colors duration-500">
+              Remember me
+            </span>
+          </label>
            <button type="button" className="text-sm font-medium text-muted hover:text-text transition-colors cursor-pointer">
              Forgot password?
            </button>
@@ -94,7 +117,15 @@ export const SignIn: React.FC<SignInProps> = ({ onNavigate }) => {
           Google
         </button>
         <button type="button" className="flex items-center justify-center gap-2.5 bg-panel border border-line rounded-xl py-3 font-bold text-text hover:border-cyan transition-all text-sm active:scale-[0.98] cursor-pointer">
-          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v14/icons/apple.svg" className={`w-5 h-5 transition-all ${isDark ? 'invert' : ''}`} alt="Apple" />
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons/icons/microsoft.svg" className="w-4.5 h-4.5 transition-all logo-invert" alt="Microsoft" />
+          Microsoft
+        </button>
+        <button type="button" className="flex items-center justify-center gap-2.5 bg-panel border border-line rounded-xl py-3 font-bold text-text hover:border-cyan transition-all text-sm active:scale-[0.98] cursor-pointer">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons/icons/github.svg" className="w-4.5 h-4.5 transition-all logo-invert" alt="GitHub" />
+          GitHub
+        </button>
+        <button type="button" className="flex items-center justify-center gap-2.5 bg-panel border border-line rounded-xl py-3 font-bold text-text hover:border-cyan transition-all text-sm active:scale-[0.98] cursor-pointer">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons/icons/apple.svg" className="w-5 h-5 transition-all logo-invert" alt="Apple" />
           Apple
         </button>
       </div>

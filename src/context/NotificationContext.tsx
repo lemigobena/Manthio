@@ -96,8 +96,7 @@ const defaultPreferences: NotificationPreferences = {
   digest: 'instant'
 };
 
-// Max live toasts visible simultaneously
-const MAX_LIVE_TOASTS = 4;
+
 
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<AppNotification[]>(initialNotifications);
@@ -127,16 +126,8 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     // Add to main notification list
     setNotifications(prev => [newN, ...prev]);
 
-    // Add to live toast queue (cap at MAX_LIVE_TOASTS)
-    const toastId = `toast-${id}`;
-    const toast: LiveNotificationToast = { ...newN, toastId };
-    setLiveToasts(prev => [toast, ...prev].slice(0, MAX_LIVE_TOASTS));
+    // Note: We no longer spawn a toast for in-app notifications per requirements.
 
-    // Auto-dismiss after 5s (critical = 8s)
-    const delay = n.critical ? 8000 : 5000;
-    setTimeout(() => {
-      setLiveToasts(prev => prev.filter(t => t.toastId !== toastId));
-    }, delay);
   }, []);
 
   const dismissAll = () => {

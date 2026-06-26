@@ -221,3 +221,11 @@ code, pre {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+/* Invert simple icons in dark mode (default) */
+.logo-invert {
+  filter: invert(100%);
+}
+[data-theme='light'] .logo-invert {
+  filter: none;
+}

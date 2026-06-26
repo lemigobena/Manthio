@@ -10,7 +10,7 @@ interface MonacoEditorProps {
 }
 
 export const MonacoEditor: React.FC<MonacoEditorProps> = ({ code, language, onChange, path }) => {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   const handleBeforeMount = (monaco: Monaco) => {
     monaco.editor.defineTheme('manthio-dark', {
@@ -49,7 +49,7 @@ export const MonacoEditor: React.FC<MonacoEditorProps> = ({ code, language, onCh
       path={path}
       language={language}
       value={code}
-      theme={theme === 'dark' ? 'manthio-dark' : 'manthio-light'}
+      theme={resolvedTheme === 'dark' ? 'manthio-dark' : 'manthio-light'}
       beforeMount={handleBeforeMount}
       onChange={onChange}
       options={{
