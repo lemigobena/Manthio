@@ -256,7 +256,12 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
           </div>
         </div>
 
-        <ToolsPane currentLesson={currentLesson} isOpen={toolsOpen} initialTab={initialTab} />
+        <ToolsPane 
+          currentLesson={currentLesson} 
+          isOpen={toolsOpen} 
+          initialTab={initialTab} 
+          setIsOpen={handleSetToolsOpen} 
+        />
       </div>
 
       <PlayerBottomBar 

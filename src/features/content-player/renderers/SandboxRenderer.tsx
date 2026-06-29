@@ -47,12 +47,24 @@ export const SandboxRenderer: React.FC<SandboxRendererProps> = ({ lesson, onComp
   const [panelSize, setPanelSize] = useState(300);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState<number>(1000);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      if (entries[0]) {
+        setContainerWidth(entries[0].contentRect.width);
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const startResize = () => {
     // e.preventDefault() is often problematic on touchstart if not passive, but fine here
     setIsDragging(true);
 
-    const isColumn = window.innerWidth < 768;
+    const isColumn = containerWidth < 800;
 
     const handleMove = (clientX: number, clientY: number) => {
       if (containerRef.current) {
@@ -206,15 +218,19 @@ export const SandboxRenderer: React.FC<SandboxRendererProps> = ({ lesson, onComp
   return (
     <div className="flex flex-col h-[700px] w-full overflow-hidden border border-line rounded-xl bg-bg shadow-xl">
       {/* Top Header */}
-      <div className="bg-panel border-b border-line px-4 py-3 flex items-center justify-between shrink-0">
-        <div className="flex items-center space-x-2 text-text">
+      <div className={`bg-panel border-b border-line px-4 py-3 flex shrink-0 ${
+        containerWidth < 550 ? 'flex-col gap-3 items-stretch' : 'items-center justify-between'
+      }`}>
+        <div className="flex items-center space-x-2 text-text flex-wrap">
           <TerminalSquare className="w-5 h-5 text-cyan" />
           <span className="font-bold tracking-wide">Interactive Sandbox</span>
           <span className="bg-cyan/10 text-cyan px-2 py-0.5 rounded text-[10px] font-bold uppercase ml-2">
             {sandboxData.language}
           </span>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className={`flex items-center space-x-3 ${
+          containerWidth < 550 ? 'justify-end' : ''
+        }`}>
           <button 
             onClick={handleSubmit}
             disabled={submitted || (!allTestsPassed && !hasEdited && !submitted)}
@@ -234,7 +250,9 @@ export const SandboxRenderer: React.FC<SandboxRendererProps> = ({ lesson, onComp
       {/* Main Split Content */}
       <div 
         ref={containerRef}
-        className={`flex-1 flex flex-col md:flex-row overflow-hidden relative ${isDragging ? 'select-none pointer-events-none' : ''}`}
+        className={`flex-1 flex overflow-hidden relative ${
+          containerWidth < 800 ? 'flex-col' : 'flex-row'
+        } ${isDragging ? 'select-none pointer-events-none' : ''}`}
       >
         
         {/* Editor Area */}
@@ -271,26 +289,33 @@ export const SandboxRenderer: React.FC<SandboxRendererProps> = ({ lesson, onComp
         </div>
 
         {/* Resizer Handle */}
-        <div 
-          onMouseDown={startResize}
-          onTouchStart={startResize}
-          className="flex md:hidden h-1.5 hover:h-2 w-full bg-line hover:bg-cyan/50 cursor-row-resize z-10 transition-colors shrink-0 pointer-events-auto"
-          title="Drag to resize"
-        />
-        <div 
-          onMouseDown={startResize}
-          onTouchStart={startResize}
-          className="hidden md:flex w-1 hover:w-1.5 h-full bg-line hover:bg-cyan/50 cursor-col-resize z-10 transition-colors shrink-0 pointer-events-auto"
-          title="Drag to resize"
-        />
+        {containerWidth < 800 ? (
+          <div 
+            onMouseDown={startResize}
+            onTouchStart={startResize}
+            className="flex h-1.5 hover:h-2 w-full bg-line hover:bg-cyan/50 cursor-row-resize z-10 transition-colors shrink-0 pointer-events-auto"
+            title="Drag to resize"
+          />
+        ) : (
+          <div 
+            onMouseDown={startResize}
+            onTouchStart={startResize}
+            className="flex w-1 hover:w-1.5 h-full bg-line hover:bg-cyan/50 cursor-col-resize z-10 transition-colors shrink-0 pointer-events-auto"
+            title="Drag to resize"
+          />
+        )}
 
         {/* Execution & Output Panel */}
         <div 
-          className="shrink-0 border-t md:border-t-0 md:border-l border-line pointer-events-auto min-h-[150px] md:min-h-0 md:min-w-[300px]"
-          style={{ 
+          className={`shrink-0 border-line pointer-events-auto ${
+            containerWidth < 800 
+              ? 'border-t min-h-[150px]'
+              : 'border-l min-w-[300px]'
+          }`}
+          style={{
             '--panel-size': `${panelSize}px`,
-            height: window.innerWidth < 768 ? 'var(--panel-size)' : '100%',
-            width: window.innerWidth < 768 ? '100%' : 'var(--panel-size)'
+            height: containerWidth < 800 ? 'var(--panel-size)' : '100%',
+            width: containerWidth < 800 ? '100%' : 'var(--panel-size)'
           } as React.CSSProperties}
         >
           <div className="h-full w-full">

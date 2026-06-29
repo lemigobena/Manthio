@@ -32,7 +32,7 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
       {/* Backdrop overlay for tablet/mobile when drawer is open */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-transparent z-30 min-[1024px]:hidden" 
+          className="absolute inset-0 bg-transparent z-30 min-[1024px]:hidden" 
           onClick={() => setIsOpen(false)} 
         />
       )}
@@ -77,7 +77,7 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
                 placeholder="Search lessons..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-bg border border-line text-xs rounded-lg pl-9 pr-3 py-2 text-text focus:outline-none focus:border-cyan"
+                className="w-full bg-bg border border-line text-xs rounded-lg pl-9 pr-3 py-2 text-text focus:outline-none focus:border-cyan !outline-none"
               />
             </div>
           ) : (

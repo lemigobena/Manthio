@@ -8,9 +8,15 @@ interface ToolsPaneProps {
   currentLesson: Lesson;
   isOpen: boolean;
   initialTab?: string;
+  setIsOpen?: (isOpen: boolean) => void;
 }
 
-export const ToolsPane: React.FC<ToolsPaneProps> = ({ currentLesson, isOpen, initialTab }) => {
+export const ToolsPane: React.FC<ToolsPaneProps> = ({ 
+  currentLesson, 
+  isOpen, 
+  initialTab,
+  setIsOpen 
+}) => {
   const { addXp } = useXP();
   
   // REQ-PLAYER-012 AI Tutor tab opens by default if the lesson type is complex (code, math); Notes tab default otherwise.
@@ -140,11 +146,18 @@ export const ToolsPane: React.FC<ToolsPaneProps> = ({ currentLesson, isOpen, ini
   };
 
   return (
-    <div className={`bg-panel border-l border-line flex flex-col overflow-hidden shrink-0 transition-all absolute right-0 min-[1024px]:relative z-40 h-full ${
-      isOpen 
-        ? 'w-full md:w-[320px] opacity-100 pointer-events-auto shadow-2xl min-[1024px]:shadow-none' 
-        : 'w-0 opacity-0 pointer-events-none min-[1024px]:w-0'
-    }`}>
+    <>
+      {isOpen && setIsOpen && (
+        <div 
+          className="absolute inset-0 bg-transparent z-30 min-[1024px]:hidden" 
+          onClick={() => setIsOpen(false)} 
+        />
+      )}
+      <div className={`bg-panel border-l border-line flex flex-col overflow-hidden shrink-0 transition-all absolute right-0 min-[1024px]:relative z-40 h-full ${
+        isOpen 
+          ? 'w-full md:w-[320px] opacity-100 pointer-events-auto shadow-2xl min-[1024px]:shadow-none' 
+          : 'w-0 opacity-0 pointer-events-none min-[1024px]:w-0'
+      }`}>
       {/* Header Tabs */}
       <div className="border-b border-line bg-bg/40 flex items-center shrink-0 w-full px-2 h-[44px]">
         <div className="grid grid-cols-4 gap-1 w-full">
@@ -233,5 +246,6 @@ export const ToolsPane: React.FC<ToolsPaneProps> = ({ currentLesson, isOpen, ini
 
       </div>
     </div>
+  </>
   );
 };
