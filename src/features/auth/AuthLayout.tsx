@@ -122,7 +122,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, onNavigate }) 
           </button>
         </div>
 
-        <div className="w-full max-w-[460px] mx-auto py-12">
+        <div className="w-full max-w-[460px] mx-auto py-12 md:overflow-y-hidden">
           {children}
         </div>
       </section>

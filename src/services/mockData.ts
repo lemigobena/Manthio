@@ -318,7 +318,7 @@ export const COURSES: Course[] = [
         venue: 'apigenio Training Centre, Muri',
         prepModules: ['py-mod-1', 'py-mod-2'],
         lessons: [
-          { id: 'py-les-3-1', title: 'Setup verification, first scripts live', type: 'Live Event', duration: '120min', status: 'in_progress', required: true, bloomLevel: 'Analyse' },
+          { id: 'py-les-3-1', title: 'Setup verification, first scripts live', type: 'Article', duration: '15min', status: 'in_progress', required: true, bloomLevel: 'Analyse', completionCriteria: { type: 'scroll', threshold: 0.9 } },
           { id: 'py-les-3-2', title: 'Joint Debugging & Peer Review', type: 'Live Event', duration: '90min', status: 'not_started', required: true, bloomLevel: 'Analyse' }
         ]
       },
