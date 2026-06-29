@@ -17,6 +17,50 @@ interface LearningPathProps {
   onNavigate: (page: string) => void;
 }
 
+const getLearningObjectives = (modTitle: string) => {
+  const title = modTitle.toLowerCase();
+  if (title.includes('setup') || title.includes('basics') || title.includes('syntax')) {
+    return [
+      'Set up local virtual environments and configure requirements.',
+      'Understand and apply standard variables, operators, and basic syntax.',
+      'Write, structure, and execute your first standalone scripts.'
+    ];
+  }
+  if (title.includes('flow') || title.includes('control') || title.includes('conditional')) {
+    return [
+      'Construct if/else conditional blocks to steer script execution.',
+      'Work with basic comparison and boolean logic operators.',
+      'Implement nested branch paths to handle complex scenarios.'
+    ];
+  }
+  if (title.includes('function')) {
+    return [
+      'Define modular reusable functions with parameters and return values.',
+      'Differentiate scopes between global and local variable bindings.',
+      'Leverage keyword arguments and fallback defaults inside calls.'
+    ];
+  }
+  if (title.includes('loop') || title.includes('list') || title.includes('collection')) {
+    return [
+      'Iterate through collections (lists, tuples, dicts) using loops.',
+      'Draft elegant list comprehensions to filter and transform data.',
+      'Manage collection state and apply item lookups efficiently.'
+    ];
+  }
+  if (title.includes('oop') || title.includes('classes') || title.includes('object')) {
+    return [
+      'Model real-world entities using classes and initializers.',
+      'Apply class inheritance to share common state and behavior.',
+      'Differentiate instance variables from class-level attributes.'
+    ];
+  }
+  return [
+    `Master the fundamental blocks of ${modTitle}.`,
+    'Apply these theoretical concepts to real-world code exercises.',
+    'Test outcomes using custom scripts and assertion statements.'
+  ];
+};
+
 export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
   const { activeCourseId } = useAuth();
   const { addXp } = useXP();
@@ -36,6 +80,26 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
   
   const course = COURSES.find(c => c.id === activeCourseId) || COURSES[0];
   const displayedProgress = course.id === 'python-bootcamp' ? 46 : calculateCourseProgress(course as Course, completedLessonIds);
+
+  const getRemainingTime = (mod: typeof course.modules[0]) => {
+    const incomplete = mod.lessons.filter(l => !completedLessonIds.includes(l.id));
+    if (incomplete.length === 0) return '0 min left';
+    let mins = 0;
+    incomplete.forEach(l => {
+      const dur = l.duration.toLowerCase();
+      if (dur.includes('h')) {
+        mins += parseFloat(dur) * 60;
+      } else {
+        mins += parseInt(dur) || 10;
+      }
+    });
+    if (mins >= 60) {
+      const hrs = Math.floor(mins / 60);
+      const remainingMins = Math.round(mins % 60);
+      return `${hrs}h ${remainingMins > 0 ? remainingMins + 'm' : ''} left`;
+    }
+    return `${Math.round(mins)} min left`;
+  };
 
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) return null;
@@ -468,15 +532,30 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                       <div className="border-t border-line bg-bg/25">
                         {/* Learning Objectives */}
                         <div className="p-6 md:p-8 border-b border-line bg-bg/40">
-                           <div className="flex items-center space-x-2 mb-3"><Target className="w-4 h-4 text-cyan" /> <span className="text-[11px] font-black text-muted uppercase tracking-wider">Learning Objectives</span></div>
-                           <div className="text-sm text-muted leading-relaxed italic border-l-2 border-cyan/50 pl-5 max-w-3xl">
-                              Unlock the core potential of this module by applying industry-standard methods to solve enterprise-scale challenges. 
-                              You will build a robust foundation in {(mod.title).toLowerCase()} while preparing for advanced certifications.
-                           </div>
+                           <div className="flex items-center space-x-2 mb-4"><Target className="w-4 h-4 text-cyan" /> <span className="text-[11px] font-black text-muted uppercase tracking-wider">Learning Objectives</span></div>
+                           <ul className="space-y-2 border-l-2 border-cyan/50 pl-5 max-w-3xl">
+                              {getLearningObjectives(mod.title).map((obj, i) => (
+                                <li key={i} className="text-sm text-text/80 flex items-start gap-2.5">
+                                  <div className="w-1.5 h-1.5 bg-cyan rounded-full mt-2 shrink-0" />
+                                  <span>{obj}</span>
+                                </li>
+                              ))}
+                           </ul>
                         </div>
 
                         <div className="p-6 md:p-8 space-y-4">
-                          <div className="text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-2 opacity-50">Curriculum Structure</div>
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2 pb-2 border-b border-line/30">
+                            <div className="text-[10px] font-black text-muted uppercase tracking-[0.2em] opacity-60">Curriculum Structure</div>
+                            <div className="flex flex-wrap items-center gap-3 text-[10px] text-muted font-semibold bg-bg/50 border border-line px-3 py-1.5 rounded-xl">
+                              <span className="text-cyan">{getRemainingTime(mod)}</span>
+                              <span className="opacity-40">•</span>
+                              <span>{mod.lessons.length} Lessons</span>
+                              {materialCounts.video > 0 && <><span className="opacity-40">•</span><span>{materialCounts.video} Videos</span></>}
+                              {mod.lessons.filter(l => l.type === 'Article').length > 0 && <><span className="opacity-40">•</span><span>{mod.lessons.filter(l => l.type === 'Article').length} Articles</span></>}
+                              {materialCounts.code > 0 && <><span className="opacity-40">•</span><span>{materialCounts.code} Exercises</span></>}
+                              {materialCounts.quiz > 0 && <><span className="opacity-40">•</span><span>{materialCounts.quiz} Quizzes</span></>}
+                            </div>
+                          </div>
                           {mod.lessons.map(les => (
                             /* 14.6.2 Lesson card */
                             <div 
