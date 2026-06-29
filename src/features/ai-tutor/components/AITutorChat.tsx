@@ -24,7 +24,7 @@ interface AITutorChatProps {
 
 export const MarkdownWithCodeBlocks: React.FC<{ content: string }> = ({ content }) => {
   return (
-    <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-pre:p-0 prose-pre:bg-transparent text-[11px]">
+    <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-pre:p-0 prose-pre:bg-transparent text-[13px]">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}
@@ -73,7 +73,7 @@ export const MarkdownWithCodeBlocks: React.FC<{ content: string }> = ({ content 
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 style={vscDarkPlus as any}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                customStyle={{ margin: 0, padding: '12px', fontSize: '11px', background: 'var(--panel)', border: 'none', maxHeight: '250px', overflowY: 'auto' } as any}
+                customStyle={{ margin: 0, padding: '12px', fontSize: '13px', background: 'var(--panel)', border: 'none', maxHeight: '250px', overflowY: 'auto' } as any}
               />
             </div>
           );
@@ -133,7 +133,7 @@ const AutoExpandingTextarea: React.FC<{
       disabled={disabled}
       placeholder="Ask a question..."
       rows={1}
-      className="flex-1 bg-transparent border-none !border-none !outline-none text-xs py-2.5 text-text focus:outline-none focus:ring-0 focus:shadow-none outline-none resize-none min-h-[40px] max-h-[200px] transition-all"
+      className="flex-1 bg-transparent border-none !border-none !outline-none text-sm py-2.5 text-text focus:outline-none focus:ring-0 focus:shadow-none outline-none resize-none min-h-[40px] max-h-[200px] transition-all"
     />
   );
 };
@@ -200,9 +200,9 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
               {msg.sender === 'tutor' && (
                 <div className="mt-3 pt-3 border-t border-line/30 flex flex-wrap gap-2 items-center justify-between text-[9px]">
                   <div className="group relative">
-                    {msg.sourceLink ? (
+                    {msg.sourceLink || (msg.source === 'Course docs' && onSourceClick) ? (
                       <button 
-                        onClick={() => onSourceClick && onSourceClick(msg.sourceLink!)} 
+                        onClick={() => onSourceClick && onSourceClick(msg.sourceLink || '')} 
                         className={`flex items-center space-x-1.5 font-bold uppercase tracking-wider cursor-pointer hover:underline ${
                           msg.source === 'Cloud AI' ? 'text-cyan' : 'text-purple'
                         }`}
@@ -225,17 +225,17 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
                         : 'Answer grounded strictly in the local course materials and verified transcripts.'}
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2 shrink-0 text-muted">
-                    <button className="hover:text-cyan transition-colors" title="Helpful"><ThumbsUp size={12} /></button>
-                    <button className="hover:text-red transition-colors" title="Not helpful"><ThumbsDown size={12} /></button>
-                    <button onClick={() => navigator.clipboard.writeText(msg.text)} className="hover:text-cyan transition-colors" title="Copy to clipboard"><Copy size={12} /></button>
+                  <div className="flex items-center space-x-3 shrink-0 text-muted">
+                    <button className="hover:text-cyan transition-colors" title="Helpful"><ThumbsUp size={15} /></button>
+                    <button className="hover:text-red transition-colors" title="Not helpful"><ThumbsDown size={15} /></button>
+                    <button onClick={() => navigator.clipboard.writeText(msg.text)} className="hover:text-cyan transition-colors" title="Copy to clipboard"><Copy size={15} /></button>
                     {onSaveToNotes && (
                       <button 
                         onClick={() => onSaveToNotes(msg.text)} 
                         className="hover:text-cyan transition-colors" 
                         title="Save to Notes"
                       >
-                        <BookOpen size={12} />
+                        <BookOpen size={15} />
                       </button>
                     )}
                   </div>
@@ -285,7 +285,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
               ))}
             </div>
           )}
-          <div className="flex items-center space-x-2 bg-panel rounded-2xl px-4 py-1.5 transition-all relative">
+          <div className="flex items-center space-x-2 bg-panel rounded-3xl px-4 py-1.5 transition-all relative">
             <button className="p-2 text-muted hover:text-cyan transition-colors grow-0 shrink-0" title="Attach file">
               <Plus size={20} />
             </button>

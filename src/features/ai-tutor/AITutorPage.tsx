@@ -374,6 +374,39 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab, onNavigate
     }, 1500);
   };
 
+  const handleExportMarkdown = () => {
+    let markdown = `# ${sessions[activeChatId]?.title || 'AI Tutor Session'}\n\n`;
+    chatMessages.forEach(msg => {
+      if (msg.sender === 'user') {
+        markdown += `**User:**\n${msg.text}\n\n`;
+      } else if (msg.sender === 'tutor') {
+        markdown += `**AI Tutor** (${msg.source || 'Course docs'}):\n${msg.text}\n\n`;
+      } else if (msg.sender === 'system') {
+        markdown += `_${msg.text}_\n\n`;
+      }
+    });
+    
+    const blob = new Blob([markdown], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(sessions[activeChatId]?.title || 'chat').replace(/\s+/g, '-').toLowerCase()}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleSaveToNotes = (text: string) => {
+    // Generate a predictable mock lesson ID from the lesson name
+    const lessonId = activeContext.lesson.replace(/[\s\W]+/g, '-').toLowerCase();
+    const currentNote = localStorage.getItem(`note-${lessonId}`) || '';
+    const updatedNote = currentNote + (currentNote ? '\n\n' : '') + `> **AI Tutor:**\n> ${text.replace(/\n/g, '\n> ')}`;
+    localStorage.setItem(`note-${lessonId}`, updatedNote);
+    window.dispatchEvent(new Event('noteUpdated'));
+  };
+
+
   return (
     <div className="relative flex flex-col md:flex-row h-[calc(100dvh-64px)] -mx-3 md:-mx-[44px] -my-6 border-y border-line overflow-hidden bg-bg">
       
@@ -413,7 +446,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab, onNavigate
               placeholder="Search..."
               value={historySearch}
               onChange={(e) => setHistorySearch(e.target.value)}
-              className="w-full bg-bg border border-line rounded-lg py-1.5 pl-8 pr-3 text-[11px] focus:outline-none"
+              className="w-full bg-bg border border-line focus:border-cyan rounded-lg py-1.5 pl-8 pr-3 text-[11px] focus:outline-none !outline-none"
             />
           </div>
         </div>
@@ -452,7 +485,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab, onNavigate
         </div>
 
         <div className="p-3 border-t border-line">
-          <button className={`w-full bg-line/50 hover:bg-line text-text text-[11px] font-bold py-2 rounded-xl transition-all flex items-center justify-center space-x-2 ${leftCollapsed ? 'p-2' : ''}`}>
+          <button onClick={handleExportMarkdown} className={`w-full bg-line/50 hover:bg-line text-text text-[11px] font-bold py-2 ${leftCollapsed ? 'rounded-3xl' : 'rounded-xl'} transition-all flex items-center justify-center space-x-2 ${leftCollapsed ? 'p-2' : ''}`}>
             <Share2 className="w-3.5 h-3.5 shrink-0" />
             {!leftCollapsed && <span className="truncate">Export</span>}
           </button>
@@ -543,6 +576,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab, onNavigate
               onSendMessage={handleSendMessage}
               suggestedPrompts={suggestedPrompts}
               onSourceClick={() => onNavigate && onNavigate('content-player')}
+              onSaveToNotes={handleSaveToNotes}
             />
           )}
         </div>
