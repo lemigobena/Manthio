@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useModal } from '../../context/ModalContext';
-import { Sparkles, AlertCircle, BookOpen, Award, Bell, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Sparkles, AlertCircle, BookOpen, Award, Bell, ArrowRight, ArrowLeft, ArrowDownToLine, X } from 'lucide-react';
+import { FileUpload } from '../../components/modules/FileUpload';
 
 interface DemoCenterProps {
   onNavigate: (page: string) => void;
@@ -8,6 +9,7 @@ interface DemoCenterProps {
 
 export const DemoCenter: React.FC<DemoCenterProps> = ({ onNavigate }) => {
   const { openModal } = useModal();
+  const [showUpload, setShowUpload] = useState(false);
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-16">
@@ -227,6 +229,55 @@ export const DemoCenter: React.FC<DemoCenterProps> = ({ onNavigate }) => {
             <span className="font-bold text-purple">Multi-step Quiz</span>
           </button>
         </div>
+      </div>
+
+      {/* Upload Widget Test Lab */}
+      <div className="bg-panel border border-line rounded-2xl p-8 space-y-6 mt-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <ArrowDownToLine className="w-6 h-6 text-cyan" />
+            <h2 className="text-xl font-bold font-display">Upload Widget Test Lab</h2>
+          </div>
+          <button 
+            onClick={() => setShowUpload(!showUpload)}
+            className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+              showUpload ? 'bg-panel border border-cyan/50 text-cyan' : 'bg-cyan hover:bg-cyan2 text-bg shadow-lg shadow-cyan/20'
+            }`}
+          >
+            {showUpload ? (
+              <>
+                <X className="w-4 h-4" />
+                <span>Close Uploader</span>
+              </>
+            ) : (
+              <>
+                <ArrowDownToLine className="w-4 h-4 rotate-180" />
+                <span>Test Resource Uploader</span>
+              </>
+            )}
+          </button>
+        </div>
+        <p className="text-muted text-sm">
+          Test the file upload component and drag-and-drop interaction independent of the resources page.
+        </p>
+
+        {showUpload && (
+          <div className="bg-bg/40 border border-line/50 rounded-2xl p-6 animate-in slide-in-from-top-4 duration-300">
+             <div className="mb-6 flex items-center justify-between">
+                <div className="space-y-1">
+                  <h3 className="text-base font-bold text-text">Sub-Space Transfer Protocol</h3>
+                  <p className="text-xs text-muted">Upload course materials or assignment attachments for encrypted storage.</p>
+                </div>
+                <div className="flex items-center space-x-4">
+                   <div className="text-right">
+                      <p className="text-[10px] font-bold text-muted uppercase">Cloud Status</p>
+                      <p className="text-[10px] font-bold text-green">Online</p>
+                   </div>
+                </div>
+             </div>
+             <FileUpload mode="attachment" />
+          </div>
+        )}
       </div>
       {/* E-Commerce UI Showcase */}
       <div className="bg-panel border border-line rounded-2xl p-8 space-y-6 mt-8">

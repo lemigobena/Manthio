@@ -9,8 +9,6 @@ import type { ResourceFile, Lesson } from '../../types';
 import { PdfRenderer } from '../content-player/renderers/PdfRenderer';
 import { DocxRenderer } from '../content-player/renderers/DocxRenderer';
 import { CodeRenderer } from '../content-player/renderers/CodeRenderer';
-import { FileUpload } from '../../components/modules/FileUpload';
-
 interface ResourcesProps {
   onNavigate?: (page: string) => void;
 }
@@ -24,7 +22,6 @@ export const Resources: React.FC<ResourcesProps> = () => {
   const [layout, setLayout] = useState<'table' | 'grid'>('table');
   const [previewFile, setPreviewFile] = useState<ResourceFile | null>(null);
   const [fetchedContent, setFetchedContent] = useState<string | null>(null);
-  const [showUpload, setShowUpload] = useState(false);
 
   // Loading & Error States (REQ-LOAD-002, REQ-LOAD-004)
   const [isLoading, setIsLoading] = useState(true);
@@ -159,27 +156,6 @@ export const Resources: React.FC<ResourcesProps> = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <button 
-              onClick={() => setShowUpload(!showUpload)}
-              className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                showUpload ? 'bg-panel border border-cyan/50 text-cyan' : 'bg-cyan hover:bg-cyan2 text-bg shadow-lg shadow-cyan/20'
-              }`}
-            >
-              {showUpload ? (
-                <>
-                  <X className="w-4 h-4" />
-                  <span>Close Uploader</span>
-                </>
-              ) : (
-                <>
-                  <ArrowDownToLine className="w-4 h-4 rotate-180" />
-                  <span>Upload Resource</span>
-                </>
-              )}
-            </button>
-
-            <div className="h-8 w-px bg-line hidden md:block" />
-
             <div className="hidden md:flex items-center bg-bg border border-line rounded-xl p-1">
               <button 
                 onClick={() => setLayout('table')}
@@ -206,6 +182,8 @@ export const Resources: React.FC<ResourcesProps> = () => {
               </button>
             </div>
 
+            <div className="h-8 w-px bg-line hidden md:block" />
+
             <div className="relative flex-1 md:flex-initial">
               <input 
                 type="text" 
@@ -216,30 +194,8 @@ export const Resources: React.FC<ResourcesProps> = () => {
               />
               <Search className="absolute left-3 top-3 w-4 h-4 text-muted" />
             </div>
-            
-            <button className="lg:hidden p-2.5 rounded-xl bg-bg border border-line text-muted">
-              <Filter className="w-4 h-4" />
-            </button>
           </div>
         </div>
-
-        {showUpload && (
-          <div className="bg-panel/30 border border-line/50 rounded-2xl p-6 animate-in slide-in-from-top-4 duration-300">
-             <div className="mb-6 flex items-center justify-between">
-                <div className="space-y-1">
-                  <h3 className="text-base font-bold text-text">Sub-Space Transfer Protocol</h3>
-                  <p className="text-xs text-muted">Upload course materials or assignment attachments for encrypted storage.</p>
-                </div>
-                <div className="flex items-center space-x-4">
-                   <div className="text-right">
-                      <p className="text-[10px] font-bold text-muted uppercase">Cloud Status</p>
-                      <p className="text-[10px] font-bold text-green">Online</p>
-                   </div>
-                </div>
-             </div>
-             <FileUpload mode="attachment" />
-          </div>
-        )}
 
         {/* Advanced Filters */}
         <div className="flex flex-wrap items-center gap-3">
@@ -397,15 +353,24 @@ export const Resources: React.FC<ResourcesProps> = () => {
                 </div>
 
                 <div className="flex items-center space-x-2 mt-4">
-                  <button 
-                    onClick={() => setPreviewFile({ ...file, url: normalizeUrl(file.url) })}
-                    className="flex-1 bg-bg hover:bg-line border border-line text-[10px] font-bold py-2 rounded-lg transition-colors"
-                  >
-                    Preview
-                  </button>
-                  <button className="p-2 rounded-lg bg-bg border border-line hover:text-cyan transition-colors">
-                    <ArrowDownToLine className="w-3.5 h-3.5" />
-                  </button>
+                  {file.type !== 'archive' ? (
+                    <>
+                      <button 
+                        onClick={() => setPreviewFile({ ...file, url: normalizeUrl(file.url) })}
+                        className="flex-1 bg-bg hover:bg-line border border-line text-[10px] font-bold py-2 rounded-lg transition-colors"
+                      >
+                        Preview
+                      </button>
+                      <button className="p-2 rounded-lg bg-bg border border-line hover:text-cyan transition-colors" title="Download">
+                        <ArrowDownToLine className="w-3.5 h-3.5" />
+                      </button>
+                    </>
+                  ) : (
+                    <button className="flex-1 flex items-center justify-center space-x-2 bg-bg hover:bg-line border border-line text-[10px] font-bold py-2 rounded-lg hover:text-cyan transition-colors">
+                      <ArrowDownToLine className="w-3.5 h-3.5" />
+                      <span>Download</span>
+                    </button>
+                  )}
                 </div>
               </div>
             ))
@@ -492,13 +457,15 @@ export const Resources: React.FC<ResourcesProps> = () => {
                     <td className="p-4 text-muted font-medium">{file.size}</td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end space-x-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button 
-                          onClick={() => setPreviewFile({ ...file, url: normalizeUrl(file.url) })}
-                          className="p-1.5 rounded-lg bg-bg border border-line text-muted hover:text-cyan transition-colors"
-                          title="Preview"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                        </button>
+                        {file.type !== 'archive' && (
+                          <button 
+                            onClick={() => setPreviewFile({ ...file, url: normalizeUrl(file.url) })}
+                            className="p-1.5 rounded-lg bg-bg border border-line text-muted hover:text-cyan transition-colors"
+                            title="Preview"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                         <a 
                           href="#" 
                           onClick={(e) => e.preventDefault()}

@@ -1631,6 +1631,16 @@ export const TRACKS: CareerTrack[] = [
 ];
 
 export const RESOURCES: ResourceFile[] = [
+  {
+    id: 'file-zip',
+    name: 'Source Assets.zip',
+    type: 'archive',
+    courseName: 'Design Systems',
+    uploadDate: 'Apr 05, 2026',
+    accessLevel: 'All Learners',
+    size: '15.4 MB',
+    url: '/resource/source-assets.zip'
+  },
   { 
     id: 'file-1', 
     name: 'Manthio Requirements.pdf', 
