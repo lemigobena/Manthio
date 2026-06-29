@@ -304,10 +304,16 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
         <p className="text-sm text-muted leading-relaxed max-w-3xl">
           In this video, we'll dive into the fundamental concepts of this topic. You'll learn how to approach the theoretical foundations and apply them practically in your own projects. Pay close attention to the architectural diagrams.
         </p>
-        <div className="flex items-center space-x-3 mt-4">
-          <span className="bg-panel border border-line px-2.5 py-1 rounded text-xs font-semibold text-text uppercase tracking-wider">Video</span>
-          <span className="bg-panel border border-line px-2.5 py-1 rounded text-xs font-semibold text-text uppercase tracking-wider">{lesson.duration}</span>
-          <span className="bg-panel border border-line px-2.5 py-1 rounded text-xs font-semibold text-text uppercase tracking-wider">Level {lesson.difficulty || 1}</span>
+        <div className="flex items-center space-x-2 mt-4 text-cyan">
+          <button className="px-3 py-1 bg-bg border border-cyan rounded-lg text-[10px] font-bold uppercase tracking-wider cursor-default select-none pointer-events-none">
+            Video
+          </button>
+          <button className="px-3 py-1 bg-bg border border-cyan rounded-lg text-[10px] font-bold uppercase tracking-wider cursor-default select-none pointer-events-none">
+            {lesson.duration}
+          </button>
+          <button className="px-3 py-1 bg-bg border border-cyan rounded-lg text-[10px] font-bold uppercase tracking-wider cursor-default select-none pointer-events-none">
+            Level {lesson.difficulty || 1}
+          </button>
         </div>
       </div>
 
@@ -414,19 +420,19 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
             </div>
             
             {/* Right Controls */}
-            <div className="flex items-center space-x-3 md:space-x-5 text-white/90 relative">
-              <button onClick={addBookmark} className="hover:text-cyan transition-colors" title="Add Bookmark">
-                <Bookmark className="w-5 h-5" />
+            <div className="flex items-center space-x-3 md:space-x-5 text-white/90 relative h-6">
+              <button onClick={addBookmark} className="hover:text-cyan transition-colors flex items-center justify-center h-full" title="Add Bookmark">
+                <Bookmark className="w-5 h-5 md:w-5 md:h-5" />
               </button>
               
               {/* Settings Menu */}
-              <div className="relative">
+              <div className="relative flex items-center justify-center h-full">
                 <button 
                   onClick={(e) => {e.stopPropagation(); setShowQualityMenu(!showQualityMenu)}} 
-                  className="hover:text-cyan transition-colors" 
+                  className="hover:text-cyan transition-colors flex items-center justify-center" 
                   title="Settings"
                 >
-                  <Settings className="w-5 h-5" />
+                  <Settings className="w-5 h-5 md:w-5 md:h-5" />
                 </button>
                 {showQualityMenu && (
                   <div className="absolute bottom-full right-0 mb-4 flex flex-col bg-panel border border-line rounded-lg p-2 text-xs md:text-sm whitespace-nowrap z-50 shadow-2xl min-w-[160px]">
@@ -470,16 +476,16 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
               </div>
               
               {/* CC Toggle */}
-              <div className="relative group/cc">
+              <div className="relative group/cc flex items-center justify-center h-full">
                 <button 
                   onClick={(e) => {
                     e.stopPropagation();
                     setCcLanguage(prev => prev === 'off' ? 'en' : prev === 'en' ? 'de' : 'off');
                   }}
-                  className={`hover:text-cyan transition-colors ${ccLanguage !== 'off' ? 'text-cyan' : ''}`}
+                  className={`hover:text-cyan transition-colors flex items-center justify-center ${ccLanguage !== 'off' ? 'text-cyan' : ''}`}
                   title="Closed Captions"
                 >
-                  <Subtitles className="w-5 h-5" />
+                  <Subtitles className="w-5 h-5 md:w-5 md:h-5" />
                 </button>
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 hidden group-hover/cc:flex flex-col bg-panel border border-line rounded-lg p-2 text-xs md:text-sm whitespace-nowrap z-50 shadow-2xl">
                   <div className="text-muted font-bold px-3 py-1 border-b border-line mb-1 uppercase tracking-wider text-[10px]">Captions</div>
@@ -498,11 +504,11 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
                 </div>
               </div>
 
-              <button onClick={(e) => {e.stopPropagation(); togglePiP()}} className="hover:text-cyan transition-colors hidden sm:block" title="Picture in Picture">
-                <PictureInPicture className="w-5 h-5" />
+              <button onClick={(e) => {e.stopPropagation(); togglePiP()}} className="hover:text-cyan transition-colors hidden sm:flex items-center justify-center h-full" title="Picture in Picture">
+                <PictureInPicture className="w-5 h-5 md:w-5 md:h-5" />
               </button>
-              <button onClick={(e) => {e.stopPropagation(); toggleFullscreen()}} className="hover:text-cyan transition-colors" title="Fullscreen">
-                <Maximize className="w-5 h-5" />
+              <button onClick={(e) => {e.stopPropagation(); toggleFullscreen()}} className="hover:text-cyan transition-colors flex items-center justify-center h-full" title="Fullscreen">
+                <Maximize className="w-5 h-5 md:w-5 md:h-5" />
               </button>
             </div>
           </div>

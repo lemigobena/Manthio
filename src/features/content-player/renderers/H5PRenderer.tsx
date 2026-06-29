@@ -40,19 +40,19 @@ export const H5PRenderer: React.FC<H5PRendererProps> = ({ lesson, onComplete }) 
   };
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="bg-bg border-b border-line px-4 py-3 flex justify-between items-center shrink-0">
+    <div className="w-full h-full flex flex-col min-h-0">
+      <div className="bg-bg border-b border-line px-4 flex justify-between items-center shrink-0 h-[44px]">
         <div className="flex items-center space-x-3">
-          <span className="font-bold text-text opacity-80">{lesson.title}</span>
-          <span className="bg-cyan/10 px-2 py-0.5 rounded text-cyan text-[10px] font-bold uppercase tracking-wider">
+          <span className="font-bold text-sm text-text truncate max-w-[200px] md:max-w-md">{lesson.title}</span>
+          <span className="bg-cyan/10 px-2 py-0.5 rounded text-cyan text-[10px] font-bold uppercase tracking-wider shrink-0">
             Interactive: {h5pData.type}
           </span>
         </div>
         {isCompleted && (
-          <span className="text-green text-sm font-bold animate-fade-in">Completed!</span>
+          <span className="text-green text-xs font-bold animate-fade-in shrink-0">✓ Completed</span>
         )}
       </div>
-      <div className="flex-1 w-full bg-bg relative p-4 md:p-6 overflow-hidden">
+      <div className="flex-1 w-full bg-bg relative overflow-y-auto overscroll-contain p-4 md:p-6 min-h-0">
         {renderComponent()}
       </div>
     </div>

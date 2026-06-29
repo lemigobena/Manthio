@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { H5PDragAndDropData } from '../../../../types';
 import { CheckCircle2, RotateCcw } from 'lucide-react';
 
@@ -8,6 +8,20 @@ interface DragAndDropProps {
 }
 
 export const DragAndDrop: React.FC<DragAndDropProps> = ({ data, onComplete }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState<number>(1000);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      if (entries[0]) {
+        setContainerWidth(entries[0].contentRect.width);
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   // Map of draggableItem id -> dropZone id
   const [placements, setPlacements] = useState<Record<string, string>>({});
   const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
@@ -81,10 +95,14 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ data, onComplete }) =>
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-bg border border-line rounded-xl overflow-hidden shadow-xl">
-      <div className="bg-panel px-6 py-4 border-b border-line flex justify-between items-center shrink-0">
-        <h2 className="text-xl font-bold">Drag and Drop Match</h2>
-        <div className="flex space-x-3">
+    <div ref={containerRef} className="w-full h-full flex flex-col bg-bg border border-line rounded-xl overflow-hidden shadow-xl">
+      <div className={`bg-panel px-6 py-4 border-b border-line flex shrink-0 ${
+        containerWidth < 640 ? 'flex-col gap-4 items-stretch' : 'justify-between items-center'
+      }`}>
+        <h2 className="text-xl font-bold truncate">Drag and Drop Match</h2>
+        <div className={`flex items-center gap-3 ${
+          containerWidth < 640 ? 'justify-between flex-wrap w-full' : ''
+        }`}>
           <button 
             onClick={handleReset}
             className="text-muted hover:text-text px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 text-sm font-bold"
@@ -106,20 +124,15 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ data, onComplete }) =>
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+      <div className={`flex-1 flex overflow-hidden relative ${
+        containerWidth < 850 ? 'flex-col' : 'flex-row'
+      }`}>
         {/* Drop Zones Area */}
-        <div className="flex-1 p-8 overflow-y-auto bg-black/5 relative">
-          {data.backgroundImageUrl && (
-            <div className="absolute inset-0 opacity-10 pointer-events-none" 
-                 style={{ 
-                   backgroundImage: `url(${data.backgroundImageUrl})`, 
-                   backgroundSize: 'cover', 
-                   backgroundPosition: 'center' 
-                 }} 
-            />
-          )}
+        <div className="flex-1 p-8 overflow-y-auto relative">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+          <div className={`grid gap-6 relative z-10 ${
+            containerWidth < 600 ? 'grid-cols-1' : 'grid-cols-2'
+          }`}>
             {data.dropZones.map(zone => {
               const placedItemsInZone = data.draggableItems.filter(item => placements[item.id] === zone.id);
               
@@ -166,7 +179,11 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ data, onComplete }) =>
         </div>
 
         {/* Draggable Items Bank */}
-        <div className="w-full md:w-80 bg-panel border-t md:border-t-0 md:border-l border-line p-6 flex flex-col shrink-0">
+        <div className={`bg-panel border-line p-6 flex flex-col shrink-0 ${
+          containerWidth < 850 
+            ? 'w-full border-t max-h-[160px] overflow-y-auto' 
+            : 'w-80 border-l'
+        }`}>
           <h3 className="font-bold text-sm uppercase tracking-wider text-muted mb-6">Word Bank</h3>
           
           <div className="flex flex-wrap gap-3">

@@ -165,7 +165,7 @@ export const InteractiveVideo: React.FC<InteractiveVideoProps> = ({ data, onComp
   return (
     <div 
       ref={containerRef}
-      className="relative w-full min-h-[350px] sm:h-[400px] md:h-[500px] flex flex-col bg-black rounded-xl overflow-hidden shadow-2xl group"
+      className="relative w-full aspect-video flex flex-col bg-black rounded-xl overflow-hidden shadow-2xl group"
       onMouseMove={handleInteract}
       onMouseLeave={() => isPlaying && setShowControls(false)}
     >
