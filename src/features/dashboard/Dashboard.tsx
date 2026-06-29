@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { useTrack } from '../track-detail/useTrack';
 import { COURSES, TRACKS } from '../../services/mockData';
+import { ContentPlayer } from '../content-player/ContentPlayer';
 import { ContinueYourTrackCard } from '../track-detail/ContinueYourTrackCard';
 import { 
   Play,
@@ -274,9 +275,29 @@ const NeuralActivityChart: React.FC<{ heroState?: string }> = ({ heroState }) =>
 };
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) => {
-  const { user, setActiveCourseId, setActiveTrackId, isOnboardingSkipped, resetOnboarding, onboardingAnswers } = useAuth();
+  const { user, setActiveCourseId, setActiveTrackId, isOnboardingSkipped, resetOnboarding, activeCourseId } = useAuth();
   const { level, streak, xp, addToast } = useXP();
   useTrack();
+
+  const [showQuickSession, setShowQuickSession] = useState(false);
+
+  // Get last viewed lesson
+  const lastViewedLesson = (() => {
+    const courseId = activeCourseId || 'python-bootcamp';
+    const courseObj = COURSES.find(c => c.id === courseId) || COURSES[0];
+    const activeLessonId = localStorage.getItem('manthio_active_lesson');
+    if (activeLessonId) {
+      const les = courseObj.modules.flatMap(m => m.lessons).find(l => l.id === activeLessonId);
+      if (les) {
+        const mod = courseObj.modules.find(m => m.lessons.some(l => l.id === activeLessonId));
+        return { lesson: les, module: mod, course: courseObj };
+      }
+    }
+    // Fallback: first incomplete or first lesson
+    const currentModule = courseObj.modules.find(m => m.status === 'In progress') || courseObj.modules[0];
+    const les = currentModule.lessons.find(l => l.status === 'in_progress') || currentModule.lessons[0];
+    return { lesson: les, module: currentModule, course: courseObj };
+  })();
 
   // Progress Sync States (REQ-LOAD-003)
   const [isSyncing, setIsSyncing] = useState(false);
@@ -580,28 +601,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                 </div>
               )}
 
-              {onboardingAnswers && (
-                <div className="mt-3 p-3 bg-bg/40 border border-line rounded-xl text-xs text-muted flex items-start space-x-2.5 max-w-2xl">
-                  <span className="text-cyan font-bold select-none shrink-0">💡 AI TUTOR PATH:</span>
-                  <div>
-                    {onboardingAnswers.timePerWeek === '< 2h' && (
-                      <p>Since you have less than 2 hours to invest this week, keep it bite-sized! Study 15 minutes a day to lock in your daily streak.</p>
-                    )}
-                    {onboardingAnswers.timePerWeek === '2–5h' && (
-                      <p>With 2–5 hours per week, try finishing 1 module every 3 days. Your AI Tutor will guide you on the key concepts.</p>
-                    )}
-                    {onboardingAnswers.timePerWeek === '5–10h' && (
-                      <p>Aiming for 5–10 hours! You are on an accelerated path. Review Modules 2 and 4 early to secure your Capstone project timeline.</p>
-                    )}
-                    {onboardingAnswers.timePerWeek === '> 10h' && (
-                      <p>Bootcamp mode active! (&gt;10 hours/week). We recommend completing 2 lessons per day and submitting 1 code critique to your AI Tutor.</p>
-                    )}
-                    <span className="text-[10px] text-cyan/70 mt-1 block font-semibold hover:underline cursor-pointer" onClick={() => onNavigate('ai-tutor')}>
-                      Ask your AI Tutor about customized schedule tips &rarr;
-                    </span>
-                  </div>
+              <div 
+                onClick={() => setShowQuickSession(true)}
+                className="mt-3 p-4 bg-cyan/5 hover:bg-cyan/10 border border-cyan/30 hover:border-cyan/50 rounded-2xl text-xs text-muted flex items-start space-x-3 max-w-2xl cursor-pointer transition-all duration-300 active:scale-[0.99] group/quick"
+              >
+                <div className="p-2.5 rounded-xl bg-cyan/10 text-cyan shrink-0 group-hover/quick:scale-110 transition-transform duration-300 flex items-center justify-center">
+                  <PlayCircle className="w-5 h-5 fill-current" />
                 </div>
-              )}
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] font-black uppercase tracking-wider text-cyan mb-1">Quick Session (Resume learning)</div>
+                  <p className="text-text font-bold text-sm truncate">
+                    Last viewed: {lastViewedLesson.lesson.title}
+                  </p>
+                  <p className="text-[11px] text-muted truncate mt-0.5">
+                    Module: {lastViewedLesson.module?.title} • {lastViewedLesson.lesson.duration}
+                  </p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted/50 self-center group-hover/quick:translate-x-1 transition-transform" />
+              </div>
             </div>
           </div>
 
@@ -1134,6 +1151,27 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
             </div>
             <ArrowRight className="w-6 h-6 text-muted group-hover:text-cyan group-hover:translate-x-1 transition-all shrink-0" />
           </button>
+        </div>
+      )}
+
+      {showQuickSession && (
+        <div 
+          onClick={() => setShowQuickSession(false)}
+          className="fixed inset-0 bg-bg/90 backdrop-blur-md z-[100] flex items-center justify-center p-4 sm:p-6 md:p-8 animate-in fade-in duration-200 cursor-pointer"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="w-full h-full max-w-[1400px] max-h-[90dvh] bg-panel border border-line rounded-3xl overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-200 relative cursor-default"
+          >
+            <ContentPlayer 
+              isQuickSession={true} 
+              onCloseQuickSession={() => setShowQuickSession(false)} 
+              onNavigate={(page) => {
+                setShowQuickSession(false);
+                onNavigate(page);
+              }}
+            />
+          </div>
         </div>
       )}
     </div>

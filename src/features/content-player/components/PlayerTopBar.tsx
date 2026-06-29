@@ -11,6 +11,8 @@ interface PlayerTopBarProps {
   curriculumOpen: boolean;
   setCurriculumOpen: (open: boolean) => void;
   onNavigate: (page: string) => void;
+  isQuickSession?: boolean;
+  onCloseQuickSession?: () => void;
 }
 
 export const PlayerTopBar: React.FC<PlayerTopBarProps> = ({
@@ -20,7 +22,9 @@ export const PlayerTopBar: React.FC<PlayerTopBarProps> = ({
   setToolsOpen,
   curriculumOpen,
   setCurriculumOpen,
-  onNavigate
+  onNavigate,
+  isQuickSession = false,
+  onCloseQuickSession
 }) => {
   const { addToast } = useXP();
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -51,7 +55,13 @@ export const PlayerTopBar: React.FC<PlayerTopBarProps> = ({
     <div className="bg-panel border-b border-line px-4 md:px-6 flex items-center justify-between z-20 shrink-0 h-[44px]">
       <div className="flex items-center space-x-3">
         <button 
-          onClick={() => onNavigate('learning-path')}
+          onClick={() => {
+            if (isQuickSession && onCloseQuickSession) {
+              onCloseQuickSession();
+            } else {
+              onNavigate('learning-path');
+            }
+          }}
           className="p-1 rounded-lg bg-bg border border-line text-muted hover:text-text cursor-pointer transition-colors"
           title="Back to Learning Path"
         >
@@ -78,30 +88,53 @@ export const PlayerTopBar: React.FC<PlayerTopBarProps> = ({
         </div>
 
         <div className="flex items-center space-x-2">
-          <button 
-            onClick={handleBookmark}
-            className={`p-2 rounded-lg transition-colors cursor-pointer ${isBookmarked ? 'bg-cyan/15 text-cyan' : 'bg-transparent text-muted hover:bg-line/50 hover:text-text'}`}
-            title={isBookmarked ? "Remove Bookmark" : "Bookmark Lesson"}
-          >
-            <Bookmark className="w-4 h-4" fill={isBookmarked ? "currentColor" : "none"} />
-          </button>
-          <div className="w-px h-4 bg-line mx-1 hidden md:block"></div>
-          
-          <button 
-            onClick={() => setCurriculumOpen(!curriculumOpen)}
-            className={`p-1.5 rounded-lg transition-colors cursor-pointer block min-[1024px]:hidden text-muted hover:text-cyan ${curriculumOpen ? 'text-cyan' : ''}`}
-            title="Toggle Curriculum"
-          >
-            {curriculumOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeft className="w-5 h-5" />}
-          </button>
+          {isQuickSession ? (
+            <>
+              <button
+                onClick={() => {
+                  if (onCloseQuickSession) onCloseQuickSession();
+                  onNavigate('content-player');
+                }}
+                className="bg-cyan hover:bg-cyan2 text-bg text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Go to module
+              </button>
+              <button
+                onClick={onCloseQuickSession}
+                className="p-1.5 rounded-lg bg-bg border border-line text-muted hover:text-text cursor-pointer transition-colors text-xs font-bold font-mono"
+                title="Close Quick Session"
+              >
+                ✕
+              </button>
+            </>
+          ) : (
+            <>
+              <button 
+                onClick={handleBookmark}
+                className={`p-2 rounded-lg transition-colors cursor-pointer ${isBookmarked ? 'bg-cyan/15 text-cyan' : 'bg-transparent text-muted hover:bg-line/50 hover:text-text'}`}
+                title={isBookmarked ? "Remove Bookmark" : "Bookmark Lesson"}
+              >
+                <Bookmark className="w-4 h-4" fill={isBookmarked ? "currentColor" : "none"} />
+              </button>
+              <div className="w-px h-4 bg-line mx-1 hidden md:block"></div>
+              
+              <button 
+                onClick={() => setCurriculumOpen(!curriculumOpen)}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer block min-[1024px]:hidden text-muted hover:text-cyan ${curriculumOpen ? 'text-cyan' : ''}`}
+                title="Toggle Curriculum"
+              >
+                {curriculumOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeft className="w-5 h-5" />}
+              </button>
 
-          <button 
-            onClick={() => setToolsOpen(!toolsOpen)}
-            className={`p-1.5 rounded-lg transition-colors cursor-pointer text-muted hover:text-cyan ${toolsOpen ? 'text-cyan' : ''}`}
-            title="Toggle AI Tutor & Tools"
-          >
-            {toolsOpen ? <PanelRightClose className="w-5 h-5" /> : <PanelRight className="w-5 h-5" />}
-          </button>
+              <button 
+                onClick={() => setToolsOpen(!toolsOpen)}
+                className={`p-1.5 rounded-lg transition-colors cursor-pointer text-muted hover:text-cyan ${toolsOpen ? 'text-cyan' : ''}`}
+                title="Toggle AI Tutor & Tools"
+              >
+                {toolsOpen ? <PanelRightClose className="w-5 h-5" /> : <PanelRight className="w-5 h-5" />}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -457,26 +457,27 @@ const BillingTab: React.FC<BillingTabProps> = ({ onCancelSub }) => {
     </div>
 
     {/* Plans Overview */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div className="bg-bg border border-line p-5 rounded-xl text-center space-y-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+      <div className="bg-bg border border-line p-4 rounded-xl text-center space-y-3 flex flex-col">
         <h4 className="font-bold text-sm text-muted">BASIC</h4>
         <div className="text-2xl font-black text-text">Free</div>
-        <p className="text-xs text-muted h-10">Essential tools, limited AI Tutor.</p>
+        <p className="text-xs text-muted flex-1">Essential tools, limited AI Tutor.</p>
         <button className="w-full border border-line text-xs font-bold py-2.5 rounded-lg text-muted cursor-not-allowed">Included</button>
       </div>
       
-      <div className="bg-cyan/5 border border-cyan p-5 rounded-xl text-center space-y-4 relative overflow-hidden">
-        <div className="absolute top-0 right-0 bg-cyan text-bg text-[10px] font-black px-3 py-1 rounded-bl-lg uppercase tracking-wider">Current</div>
+      <div className="bg-cyan/5 border border-cyan p-4 rounded-xl text-center space-y-3 relative overflow-hidden flex flex-col">
+        <div className="absolute top-0 right-0 bg-cyan text-bg text-[10px] font-black px-2.5 py-1 rounded-bl-lg uppercase tracking-wider">Current</div>
         <h4 className="font-bold text-sm text-cyan mt-2">PREMIUM</h4>
         <div className="text-2xl font-black text-text">CHF 9.99 <span className="text-xs font-normal text-muted">/mo</span></div>
-        <p className="text-xs text-text h-10">Unlimited AI Tutor, detailed analytics.</p>
+        <p className="text-xs text-text flex-1">Unlimited AI Tutor, detailed analytics.</p>
         <button onClick={() => addToast('success', 'Opening billing portal...')} className="w-full bg-cyan hover:bg-cyan2 text-bg text-xs font-bold py-2.5 rounded-lg transition-colors">Manage Plan</button>
       </div>
 
-      <div className="bg-bg border border-line p-5 rounded-xl text-center space-y-4">
+      {/* At lg (1024-1279px): span full row, cap to ~50% width and center */}
+      <div className="bg-bg border border-line p-4 rounded-xl text-center space-y-3 flex flex-col lg:[grid-column:1/-1] lg:max-w-[calc(50%-6px)] lg:mx-auto lg:w-full xl:[grid-column:auto] xl:max-w-none xl:mx-0">
         <h4 className="font-bold text-sm text-purple">BUSINESS</h4>
         <div className="text-2xl font-black text-text">Custom</div>
-        <p className="text-xs text-muted h-10">For companies & enterprise teams.</p>
+        <p className="text-xs text-muted flex-1">For companies &amp; enterprise teams.</p>
         <button onClick={() => addToast('success', 'Redirecting to upgrade options...')} className="w-full border border-line hover:border-purple hover:text-purple text-xs font-bold py-2.5 rounded-lg text-text transition-colors">Upgrade</button>
       </div>
     </div>
