@@ -266,7 +266,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete, timeLimit = 
 
           <button 
             onClick={handleCloseModal}
-            className="w-full bg-text text-bg py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm transition-all hover:scale-[1.02] flex items-center justify-center space-x-2"
+            className="w-full bg-cyan text-bg py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm transition-all hover:scale-[1.02] flex items-center justify-center space-x-2"
           >
             <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>{passed ? 'Continue Learning' : 'Retry Assessment'}</span>
@@ -328,7 +328,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete, timeLimit = 
             </div>
             <button
               onClick={() => setRecallRevealed(true)}
-              className="flex items-center space-x-2 bg-text text-bg px-6 py-2.5 rounded-xl text-xs font-bold hover:scale-105 transition-transform"
+              className="flex items-center space-x-2 bg-cyan text-bg px-6 py-2.5 rounded-xl text-xs font-bold hover:scale-105 transition-transform"
             >
               <span>Verify My Knowledge</span>
               <ChevronRight className="w-4 h-4" />
@@ -349,7 +349,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete, timeLimit = 
                   if (e.key === 'Enter' && textInput.trim() && !submitted) handleSubmit();
                   else if (e.key === 'Enter' && submitted) handleNext();
                 }}
-                className={`w-full bg-bg !border ${submitted ? '!border-line opacity-50' : '!border-line focus:!border-cyan'} rounded-xl pl-12 pr-4 py-4 text-sm text-text !focus:outline-none !ring-0 transition-all placeholder:text-muted/50`}
+                className={`w-full bg-bg !border ${submitted ? '!border-line opacity-50' : '!border-line focus:!border-cyan'} !outline-none rounded-xl pl-12 pr-4 py-4 text-sm text-text !focus:outline-none !ring-0 transition-all placeholder:text-muted/50`}
               />
             </div>
             {submitted && (

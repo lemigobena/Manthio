@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FORUM_CHANNELS, COURSES } from '../../services/mockData';
 import { useXP } from '../../context/XPContext';
 import { useAuth } from '../../context/AuthContext';
-import { MessageSquare, ArrowUp, Check, Sparkles, Send, Hash, X, MessageCircle, ChevronRight, PanelLeft, Code, Image as ImageIcon, ArrowLeft, Bell, BellOff } from 'lucide-react';
+import { MessageSquare, ArrowUp, ArrowDown, Check, Sparkles, Send, Hash, X, MessageCircle, ChevronRight, PanelLeft, Code, Image as ImageIcon, ArrowLeft, Bell, BellOff } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { ForumChannel, ChannelMessage, ForumReply } from '../../types';
@@ -148,6 +148,12 @@ export const Community: React.FC<CommunityProps> = () => {
     }
   }, [activeThreadId, activeThread?.replies.length]);
 
+  const getDateGroup = (timestamp: string) => {
+    if (timestamp.includes('ago') || timestamp.includes('AM') || timestamp.includes('PM') || /^\d{1,2}:\d{2}/.test(timestamp)) return 'Today';
+    if (timestamp.toLowerCase().includes('yesterday')) return 'Yesterday';
+    return timestamp.split(',')[0].trim();
+  };
+
   // Simulate AI Tutor auto-answer (5 seconds)
   useEffect(() => {
     if (!activeChannel) return;
@@ -185,10 +191,11 @@ export const Community: React.FC<CommunityProps> = () => {
   }, [activeChannelId, channels, activeChannel, user?.name, addToast]);
 
   const handlePostThread = () => {
-    if (!newThreadTitle.trim() || !newThreadBody.trim()) return;
+    if (!newThreadBody.trim()) return;
+    const finalTitle = newThreadTitle.trim() || `Question ${activeChannel ? activeChannel.messages.length + 1 : 1}`;
     const newMsg: ChannelMessage = {
       id: generateId(),
-      title: newThreadTitle,
+      title: finalTitle,
       author: user?.name || 'Alex Chen',
       body: newThreadBody,
       category: activeChannel?.name || 'General',
@@ -249,6 +256,20 @@ export const Community: React.FC<CommunityProps> = () => {
     }));
   };
 
+  const handleDownvoteThread = (threadId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setChannels(prev => prev.map(ch => {
+      if (ch.id !== activeChannelId) return ch;
+      return {
+        ...ch,
+        messages: ch.messages.map(msg => {
+          if (msg.id !== threadId) return msg;
+          return { ...msg, upvotes: msg.upvotes - 1 };
+        })
+      };
+    }));
+  };
+
   const handleUpvoteReply = (replyId: string) => {
     setChannels(prev => prev.map(ch => {
       if (ch.id !== activeChannelId) return ch;
@@ -261,6 +282,25 @@ export const Community: React.FC<CommunityProps> = () => {
             replies: msg.replies.map(rep => {
               if (rep.id !== replyId) return rep;
               return { ...rep, upvotes: rep.upvotes + 1 };
+            })
+          };
+        })
+      };
+    }));
+  };
+
+  const handleDownvoteReply = (replyId: string) => {
+    setChannels(prev => prev.map(ch => {
+      if (ch.id !== activeChannelId) return ch;
+      return {
+        ...ch,
+        messages: ch.messages.map(msg => {
+          if (msg.id !== activeThreadId) return msg;
+          return {
+            ...msg,
+            replies: msg.replies.map(rep => {
+              if (rep.id !== replyId) return rep;
+              return { ...rep, upvotes: rep.upvotes - 1 };
             })
           };
         })
@@ -325,7 +365,7 @@ export const Community: React.FC<CommunityProps> = () => {
                   key={channel.id}
                   onClick={() => { setActiveChannelId(channel.id); setActiveThreadId(null); setIsSidebarOpen(false); }}
                   className={`w-full text-left px-3 py-1.5 rounded-lg flex items-center space-x-3 text-sm transition-colors ${
-                    activeChannelId === channel.id ? 'bg-cyan/10 text-cyan font-bold' : 'text-muted hover:bg-line hover:text-text'
+                    activeChannelId === channel.id ? 'bg-cyan/10 text-cyan font-bold' : 'text-muted hover:text-cyan'
                   }`}
                 >
                   <img src={imageUrl} alt={channel.name} className="w-6 h-6 rounded-md object-cover shrink-0" />
@@ -345,7 +385,7 @@ export const Community: React.FC<CommunityProps> = () => {
       {/* 2. Main Feed (Channel Messages) */}
       <div className={`flex-1 flex flex-col min-w-0 ${activeThreadId ? 'hidden lg:flex' : 'flex'}`}>
         {/* Header */}
-        <div className="h-14 border-b border-line flex items-center px-4 justify-between bg-bg/50 backdrop-blur-md shrink-0">
+        <div className="h-14 border-b border-line flex items-center px-4 justify-between bg-bg/50 backdrop-blur-md shrink-0 relative">
           <div className="flex items-center space-x-3">
             <button className="md:hidden text-muted hover:text-text" onClick={() => setIsSidebarOpen(true)}>
               <PanelLeft size={20} />
@@ -362,7 +402,7 @@ export const Community: React.FC<CommunityProps> = () => {
             {activeChannel && (
               <button
                 onClick={() => toggleMuteChannel(activeChannel.id)}
-                className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors border ${
+                className={`flex items-center justify-center sm:space-x-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors border ${
                   mutedChannels.has(activeChannel.id)
                     ? 'bg-red/10 text-red border-red/20 hover:bg-red/20'
                     : 'bg-bg text-muted border-line hover:border-cyan/40 hover:text-cyan'
@@ -378,9 +418,22 @@ export const Community: React.FC<CommunityProps> = () => {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-6" ref={feedScrollRef}>
-          {activeChannel?.messages.map(msg => (
-            <div key={msg.id} className="flex space-x-3 group">
-              <div className="w-10 h-10 rounded-xl bg-purple/20 flex items-center justify-center shrink-0 text-purple font-bold">
+          {activeChannel?.messages.map((msg, index) => {
+            const currentDate = getDateGroup(msg.timestamp);
+            const prevMessage = activeChannel.messages[index - 1];
+            const showDateHeader = index === 0 || getDateGroup(prevMessage.timestamp) !== currentDate;
+
+            return (
+              <React.Fragment key={msg.id}>
+                {showDateHeader && (
+                  <div className="flex items-center space-x-4 my-6">
+                    <div className="h-px bg-line flex-1" />
+                    <span className="text-[10px] font-bold text-cyan capitalize tracking-wider">{currentDate}</span>
+                    <div className="h-px bg-line flex-1" />
+                  </div>
+                )}
+                <div className="flex space-x-3 group">
+                  <div className="w-10 h-10 rounded-xl bg-purple/20 flex items-center justify-center shrink-0 text-purple font-bold">
                 {msg.author.charAt(0)}
               </div>
               <div className="flex-1 min-w-0">
@@ -403,13 +456,25 @@ export const Community: React.FC<CommunityProps> = () => {
 
                 {/* Actions */}
                 <div className="flex items-center space-x-3 mt-3">
-                  <button 
-                    onClick={(e) => handleUpvoteThread(msg.id, e)}
-                    className="flex items-center space-x-1 text-muted hover:text-cyan text-xs font-semibold px-2 py-1 rounded hover:bg-cyan/10 transition-colors border border-transparent"
-                  >
-                    <ArrowUp size={14} />
-                    <span>{msg.upvotes}</span>
-                  </button>
+                  <div className="flex items-center space-x-3">
+                    <span className="text-muted text-sm font-bold min-w-[20px] text-center">{msg.upvotes}</span>
+                    <div className="flex items-center space-x-2 rounded-lg p-0.5">
+                      <button 
+                        onClick={(e) => handleUpvoteThread(msg.id, e)}
+                        className="bg-line/20 p-1.5 text-muted hover:text-cyan hover:bg-cyan/10 rounded-md transition-colors"
+                        title="Helpful"
+                      >
+                        <ArrowUp size={18} />
+                      </button>
+                      <button 
+                        onClick={(e) => handleDownvoteThread(msg.id, e)}
+                        className="bg-line/20 p-1.5 text-muted hover:text-red hover:bg-red/10 rounded-md transition-colors"
+                        title="Not Helpful"
+                      >
+                        <ArrowDown size={18} />
+                      </button>
+                    </div>
+                  </div>
                   <button 
                     onClick={() => setActiveThreadId(msg.id)}
                     className="flex items-center space-x-1 text-muted hover:text-purple text-xs font-semibold px-2 py-1 rounded hover:bg-purple/10 transition-colors"
@@ -429,19 +494,24 @@ export const Community: React.FC<CommunityProps> = () => {
                 {msg.replies.length > 0 && activeThreadId !== msg.id && (
                   <div 
                     onClick={() => setActiveThreadId(msg.id)}
-                    className="mt-2 flex items-center space-x-2 text-xs text-cyan cursor-pointer hover:underline"
+                    className="mt-2 flex items-center space-x-2 text-xs text-cyan cursor-pointer group"
                   >
-                    <div className="w-6 h-6 rounded-md bg-cyan/20 flex items-center justify-center text-cyan">
+                    <div className="w-6 h-6 rounded-md bg-cyan/20 flex items-center justify-center text-cyan shrink-0">
                       <MessageCircle size={12} />
                     </div>
-                    <span className="font-semibold">{msg.replies.length} replies</span>
-                    <span className="text-muted">Last reply from {msg.replies[msg.replies.length - 1].author}</span>
+                    <span className="font-semibold hidden sm:inline">{msg.replies.length} replies</span>
+                    <span className="text-muted group-hover:underline decoration-cyan">Last reply from {msg.replies[msg.replies.length - 1].author}</span>
                     <ChevronRight size={14} className="text-muted" />
                   </div>
                 )}
               </div>
             </div>
-          ))}
+            {index < activeChannel.messages.length - 1 && (
+              <div className="h-px bg-line/40 mt-2" />
+            )}
+            </React.Fragment>
+          );
+        })}
           <div ref={feedEndRef} />
         </div>
 
@@ -451,10 +521,10 @@ export const Community: React.FC<CommunityProps> = () => {
             <div className="px-3 py-2">
               <input 
                 type="text"
-                placeholder="Question Title"
+                placeholder="Question Title (Optional)"
                 value={newThreadTitle}
                 onChange={(e) => setNewThreadTitle(e.target.value)}
-                className="w-full bg-transparent text-sm font-bold text-text outline-none placeholder:font-normal"
+                className="w-full bg-transparent text-sm font-bold text-text !outline-none border-none focus:ring-0 focus:outline-none placeholder:font-normal"
               />
             </div>
             <div className="px-3 py-2 border-t border-line/50">
@@ -463,7 +533,7 @@ export const Community: React.FC<CommunityProps> = () => {
                 value={newThreadBody}
                 onChange={(e) => setNewThreadBody(e.target.value)}
                 rows={2}
-                className="w-full bg-transparent text-sm text-text outline-none resize-none"
+                className="w-full bg-transparent text-sm text-text !outline-none border-none focus:ring-0 focus:outline-none resize-none"
               />
             </div>
             <div className="bg-line/20 px-3 py-2 flex items-center justify-between border-t border-line/50">
@@ -491,7 +561,7 @@ export const Community: React.FC<CommunityProps> = () => {
               </div>
               <button 
                 onClick={handlePostThread}
-                disabled={!newThreadTitle.trim() || !newThreadBody.trim()}
+                disabled={!newThreadBody.trim()}
                 className="bg-cyan hover:bg-cyan2 text-bg px-4 py-1.5 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
               >
                 <Send size={14} />
@@ -538,9 +608,12 @@ export const Community: React.FC<CommunityProps> = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-3 mt-4 ml-13">
-                <div className="flex items-center space-x-1 text-muted text-xs font-semibold px-2 py-1 rounded bg-line/50 border border-line">
-                  <ArrowUp size={14} />
-                  <span>{activeThread.upvotes}</span>
+                <div className="flex items-center space-x-3">
+                  <span className="text-muted text-sm font-bold min-w-[20px] text-center">{activeThread.upvotes}</span>
+                  <div className="flex items-center space-x-2 rounded-lg p-0.5">
+                    <button onClick={(e) => handleUpvoteThread(activeThread.id, e)} className="bg-line/20 p-1.5 text-muted hover:text-cyan hover:bg-cyan/10 rounded-md transition-colors" title="Helpful"><ArrowUp size={18} /></button>
+                    <button onClick={(e) => handleDownvoteThread(activeThread.id, e)} className="bg-line/20 p-1.5 text-muted hover:text-red hover:bg-red/10 rounded-md transition-colors" title="Not Helpful"><ArrowDown size={18} /></button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -570,13 +643,25 @@ export const Community: React.FC<CommunityProps> = () => {
                     </div>
 
                     <div className="flex items-center space-x-3 mt-2">
-                      <button 
-                        onClick={() => handleUpvoteReply(reply.id)}
-                        className="flex items-center space-x-1 text-muted hover:text-cyan text-xs font-semibold px-2 py-1 rounded hover:bg-cyan/10 transition-colors"
-                      >
-                        <ArrowUp size={12} />
-                        <span>{reply.upvotes}</span>
-                      </button>
+                      <div className="flex items-center space-x-3">
+                        <span className="text-muted text-sm font-bold min-w-[20px] text-center">{reply.upvotes}</span>
+                        <div className="flex items-center space-x-2 rounded-lg p-0.5">
+                          <button 
+                            onClick={() => handleUpvoteReply(reply.id)}
+                            className="bg-line/20 p-1.5 text-muted hover:text-cyan hover:bg-cyan/10 rounded-md transition-colors"
+                            title="Helpful"
+                          >
+                            <ArrowUp size={16} />
+                          </button>
+                          <button 
+                            onClick={() => handleDownvoteReply(reply.id)}
+                            className="bg-line/20 p-1.5 text-muted hover:text-red hover:bg-red/10 rounded-md transition-colors"
+                            title="Not Helpful"
+                          >
+                            <ArrowDown size={16} />
+                          </button>
+                        </div>
+                      </div>
                       
                       {reply.isAcceptedAnswer ? (
                         <div className="flex items-center space-x-1 text-green text-xs font-bold px-2 py-1">
@@ -611,7 +696,7 @@ export const Community: React.FC<CommunityProps> = () => {
                   value={replyInput}
                   onChange={(e) => setReplyInput(e.target.value)}
                   rows={2}
-                  className="w-full bg-transparent text-sm text-text outline-none resize-none max-h-32 overflow-y-auto"
+                  className="w-full bg-transparent text-sm text-text !outline-none border-none focus:ring-0 focus:outline-none resize-none max-h-32 overflow-y-auto"
                 />
               </div>
               <div className="bg-line/20 px-3 py-2 flex items-center justify-between border-t border-line/50">
