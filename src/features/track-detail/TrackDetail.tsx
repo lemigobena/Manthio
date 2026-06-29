@@ -38,10 +38,10 @@ const DIFFICULTY_COLORS: Record<string, string> = {
 };
 
 export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
-  const { activeTrackId, user, setActiveCourseId, setActiveTrackId } = useAuth();
+  const { activeTrackId, user, setActiveCourseId, setActiveTrackId, setCheckoutItem } = useAuth();
   const { addNotification } = useNotifications();
   const {
-    enrollInTrack, bookmarkTrack, setSelfAssessment, getProgress,
+    bookmarkTrack, setSelfAssessment, getProgress,
     dismissCompletionModal, completedLessonIds
   } = useTrack();
 
@@ -97,14 +97,9 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
   }, [track.id]);
 
   const handleEnroll = () => {
-    enrollInTrack(track.id);
     setShowEnrollConfirm(false);
-    addNotification({
-      category: 'course',
-      title: `Enrolled in ${track.title} 🚀`,
-      message: 'Your track journey has begun! The visual path below shows your milestones.',
-      critical: false,
-    });
+    setCheckoutItem({ type: 'track', id: track.id });
+    onNavigate('checkout');
   };
 
   const handleBookmark = () => {

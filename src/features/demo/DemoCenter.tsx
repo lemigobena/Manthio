@@ -67,6 +67,54 @@ export const DemoCenter: React.FC<DemoCenterProps> = ({ onNavigate }) => {
         </button>
 
         <button
+          onClick={() => onNavigate('dashboard:pre-cohort')}
+          className="w-full flex items-center justify-between gap-3 px-6 py-5 bg-panel border border-line hover:border-cyan/40 rounded-2xl transition-all cursor-pointer group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-cyan/10 rounded-xl">
+              <Sparkles className="w-6 h-6 text-cyan" />
+            </div>
+            <div className="text-left">
+              <span className="text-lg font-bold text-text group-hover:text-cyan transition-colors">Dashboard (Pre-Cohort)</span>
+              <span className="block text-sm text-muted mt-1">Waiting for cohort to start.</span>
+            </div>
+          </div>
+          <ArrowRight className="w-6 h-6 text-muted group-hover:text-cyan group-hover:translate-x-1 transition-all shrink-0" />
+        </button>
+
+        <button
+          onClick={() => onNavigate('dashboard:long-break')}
+          className="w-full flex items-center justify-between gap-3 px-6 py-5 bg-panel border border-line hover:border-cyan/40 rounded-2xl transition-all cursor-pointer group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-orange/10 rounded-xl">
+              <Sparkles className="w-6 h-6 text-orange" />
+            </div>
+            <div className="text-left">
+              <span className="text-lg font-bold text-text group-hover:text-cyan transition-colors">Dashboard (Long Break)</span>
+              <span className="block text-sm text-muted mt-1">Returning after {'>'}30 days.</span>
+            </div>
+          </div>
+          <ArrowRight className="w-6 h-6 text-muted group-hover:text-cyan group-hover:translate-x-1 transition-all shrink-0" />
+        </button>
+
+        <button
+          onClick={() => onNavigate('dashboard:all-completed')}
+          className="w-full flex items-center justify-between gap-3 px-6 py-5 bg-panel border border-line hover:border-cyan/40 rounded-2xl transition-all cursor-pointer group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-yellow/10 rounded-xl">
+              <Award className="w-6 h-6 text-yellow" />
+            </div>
+            <div className="text-left">
+              <span className="text-lg font-bold text-text group-hover:text-cyan transition-colors">Dashboard (All Completed)</span>
+              <span className="block text-sm text-muted mt-1">Celebrating completion of all courses.</span>
+            </div>
+          </div>
+          <ArrowRight className="w-6 h-6 text-muted group-hover:text-cyan group-hover:translate-x-1 transition-all shrink-0" />
+        </button>
+
+        <button
           onClick={() => onNavigate('demo-livesessions-empty')}
           className="w-full flex items-center justify-between gap-3 px-6 py-5 bg-panel border border-line hover:border-cyan/40 rounded-2xl transition-all cursor-pointer group"
         >
@@ -178,6 +226,44 @@ export const DemoCenter: React.FC<DemoCenterProps> = ({ onNavigate }) => {
             <Sparkles className="w-8 h-8 text-purple mb-3 group-hover:scale-110 transition-transform" />
             <span className="font-bold text-purple">Multi-step Quiz</span>
           </button>
+        </div>
+      </div>
+      {/* E-Commerce UI Showcase */}
+      <div className="bg-panel border border-line rounded-2xl p-8 space-y-6 mt-8">
+        <div className="flex items-center space-x-2">
+          <Award className="w-6 h-6 text-cyan" />
+          <h2 className="text-xl font-bold font-display">E-Commerce Widgets</h2>
+        </div>
+        <p className="text-muted text-sm">
+          Standalone e-commerce UI components for course detail and checkout pages.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          {/* Money-Back Guarantee Component */}
+          <div className="p-5 border border-line rounded-xl bg-bg/50 flex flex-col justify-center items-center text-center space-y-3">
+            <div className="w-12 h-12 bg-green/10 rounded-full flex items-center justify-center mb-1">
+              <Sparkles className="w-6 h-6 text-green" />
+            </div>
+            <h3 className="font-black text-text text-sm uppercase tracking-widest">30-Day Guarantee</h3>
+            <p className="text-xs text-muted max-w-xs leading-relaxed">
+              We stand behind our quality. If you're not satisfied with the course material within the first 30 days, get a full, no-questions-asked refund.
+            </p>
+          </div>
+
+          {/* Group Purchase Option */}
+          <div className="p-5 border border-line rounded-xl bg-bg/50 flex flex-col justify-center items-center text-center space-y-3">
+            <div className="w-12 h-12 bg-cyan/10 rounded-full flex items-center justify-center mb-1">
+              <Award className="w-6 h-6 text-cyan" />
+            </div>
+            <h3 className="font-black text-text text-sm uppercase tracking-widest">Team Purchase</h3>
+            <p className="text-xs text-muted max-w-xs leading-relaxed">
+              Want to enroll your entire development team? We offer scalable corporate billing and group discounts.
+            </p>
+            <button className="text-cyan text-xs font-black uppercase tracking-widest hover:underline mt-2">
+              Contact Enterprise Sales
+            </button>
+          </div>
+
         </div>
       </div>
 

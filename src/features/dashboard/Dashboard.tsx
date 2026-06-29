@@ -23,11 +23,14 @@ import {
   Trophy,
   ChevronRight,
   Calendar,
-  MapPin
+  MapPin,
+  Award,
+  Star
 } from 'lucide-react';
 
 interface DashboardProps {
   onNavigate: (page: string) => void;
+  mockState?: 'normal' | 'pre-cohort' | 'long-break' | 'all-completed';
 }// Sub-component for individual Neural Insight Card
 const NeuralInsightCard: React.FC<{ 
   category: string; 
@@ -59,7 +62,7 @@ const NeuralInsightCard: React.FC<{
 };
 
 // Progress Indicator for mobile with smooth SVG animations
-const RingProgress: React.FC<{ progress: number; size?: number; strokeWidth?: number; color?: string }> = ({ 
+export const RingProgress: React.FC<{ progress: number; size?: number; strokeWidth?: number; color?: string }> = ({ 
   progress, size = 64, strokeWidth = 5, color = 'var(--cyan)' 
 }) => {
   const radius = (size - strokeWidth) / 2;
@@ -89,7 +92,7 @@ const RingProgress: React.FC<{ progress: number; size?: number; strokeWidth?: nu
 };
 
 // High-fidelity Pill Progress component for desktop
-const PillProgress: React.FC<{ progress: number }> = ({ progress }) => {
+export const PillProgress: React.FC<{ progress: number }> = ({ progress }) => {
   const getStatusLabel = (val: number) => {
     if (val === 0) return "Not started yet";
     if (val < 25) return "Just getting started...";
@@ -196,9 +199,9 @@ const StickyNoteStat: React.FC<{
 };
 
 // Neural Activity Chart - High Fidelity Bar Visualization
-const NeuralActivityChart: React.FC = () => {
+const NeuralActivityChart: React.FC<{ heroState?: string }> = ({ heroState }) => {
   // Minutes of learning per day (Mon–Sun)
-  const data = [
+  let data = [
     { day: 'M', mins: 42, label: 'Mon' },
     { day: 'T', mins: 78, label: 'Tue' },
     { day: 'W', mins: 55, label: 'Wed' },
@@ -207,11 +210,16 @@ const NeuralActivityChart: React.FC = () => {
     { day: 'S', mins: 30, label: 'Sat' },
     { day: 'S', mins: 95, label: 'Sun' },
   ];
-  const maxMins = Math.max(...data.map(d => d.mins));
+
+  if (heroState === 'long-break') {
+    data = data.map(d => ({ ...d, mins: 0 }));
+  }
+
+  const maxMins = Math.max(1, ...data.map(d => d.mins));
 
   return (
     // Give the chart a clear minimum height so bars can breathe
-    <div className="bg-panel border border-line rounded-2xl p-5 flex flex-col flex-1 min-h-50">
+    <div className="bg-panel border border-line rounded-2xl p-5 flex flex-col flex-1 min-h-50 relative">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
@@ -223,8 +231,17 @@ const NeuralActivityChart: React.FC = () => {
         </span>
       </div>
 
+      {/* Empty State Overlay for Long Break */}
+      {heroState === 'long-break' && (
+        <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none mt-10">
+          <span className="bg-panel/90 backdrop-blur-sm px-4 py-2 rounded-xl text-[11px] font-bold text-muted border border-line shadow-sm uppercase tracking-wider">
+            No actions this week
+          </span>
+        </div>
+      )}
+
       {/* Bars — use fixed container height and percentage heights for each bar */}
-      <div className="flex-1 flex items-end gap-2 min-h-0 h-full">
+      <div className="flex-1 flex items-end gap-2 min-h-0 h-full relative">
         {data.map((d, i) => {
           const ratio = d.mins / maxMins;
           return (
@@ -256,7 +273,7 @@ const NeuralActivityChart: React.FC = () => {
   );
 };
 
-export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) => {
   const { user, setActiveCourseId, setActiveTrackId, isOnboardingSkipped, resetOnboarding, onboardingAnswers } = useAuth();
   const { level, streak, xp, addToast } = useXP();
   useTrack();
@@ -272,7 +289,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [showBanner, setShowBanner] = useState(true);
 
   // Mock toggle for Pre-cohort state
-  const [simulatePreCohort, setSimulatePreCohort] = useState(true);
+  const [heroState, setHeroState] = useState<'normal' | 'pre-cohort' | 'long-break' | 'all-completed'>(mockState || 'normal');
 
   useEffect(() => {
     const timer = setTimeout(() => setIsPageLoading(false), 950);
@@ -313,19 +330,27 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     addToast('info', 'Sync cancelled');
   };
 
-  const enrolledTracks = TRACKS.filter(t => t.enrolled);
-  const enrolledCourses = COURSES.filter(c => c.enrolled).slice(0, 4);
-  
-  const activeTrack = enrolledTracks.find(t => t.progress > 0 && t.progress < 100) || enrolledTracks[0];
-  const activeCourse = enrolledCourses.find(c => c.progress > 0 && c.progress < 100) || enrolledCourses[0];
+  let displayTracks = TRACKS.filter(t => t.enrolled);
+  let displayCourses = COURSES.filter(c => c.enrolled).slice(0, 4);
+
+  if (heroState === 'all-completed') {
+    displayTracks = displayTracks.map(t => ({ ...t, progress: 100 }));
+    displayCourses = displayCourses.map(c => ({ ...c, progress: 100 }));
+  } else if (heroState === 'pre-cohort') {
+    displayTracks = [];
+    // Keep displayCourses populated as before
+  }
+
+  const activeTrack = displayTracks.find(t => t.progress > 0 && t.progress < 100) || (heroState === 'all-completed' ? undefined : displayTracks[0]);
+  const activeCourse = displayCourses.find(c => c.progress > 0 && c.progress < 100) || (heroState === 'all-completed' ? undefined : displayCourses[0]);
 
   const primaryActive: (
     { type: 'track'; data: typeof TRACKS[0] } | 
     { type: 'course'; data: typeof COURSES[0] } |
     { type: 'none'; data: null }
-  ) = (activeTrack && activeTrack.enrolled) 
+  ) = (activeTrack && activeTrack.enrolled && heroState !== 'all-completed') 
     ? { type: 'track', data: activeTrack } 
-    : (activeCourse && activeCourse.enrolled)
+    : (activeCourse && activeCourse.enrolled && heroState !== 'all-completed')
       ? { type: 'course', data: activeCourse }
       : { type: 'none', data: null };
 
@@ -411,13 +436,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           )}
 
           {/* Dev mock toggle */}
-          <div className="flex justify-end mb-2">
-            <button
-              onClick={() => setSimulatePreCohort(!simulatePreCohort)}
-              className="text-[10px] text-muted border border-line bg-panel px-2 py-1 rounded hover:bg-line transition-colors"
-            >
-              Toggle Pre-Cohort State ({simulatePreCohort ? 'ON' : 'OFF'})
-            </button>
+          <div className="flex justify-end gap-2 mb-2">
+            <button onClick={() => setHeroState('normal')} className={`text-[10px] border border-line px-2 py-1 rounded transition-colors ${heroState === 'normal' ? 'bg-cyan text-bg' : 'text-muted bg-panel hover:bg-line'}`}>Normal</button>
+            <button onClick={() => setHeroState('pre-cohort')} className={`text-[10px] border border-line px-2 py-1 rounded transition-colors ${heroState === 'pre-cohort' ? 'bg-cyan text-bg' : 'text-muted bg-panel hover:bg-line'}`}>Pre-Cohort</button>
+            <button onClick={() => setHeroState('long-break')} className={`text-[10px] border border-line px-2 py-1 rounded transition-colors ${heroState === 'long-break' ? 'bg-cyan text-bg' : 'text-muted bg-panel hover:bg-line'}`}>Long Break</button>
+            <button onClick={() => setHeroState('all-completed')} className={`text-[10px] border border-line px-2 py-1 rounded transition-colors ${heroState === 'all-completed' ? 'bg-cyan text-bg' : 'text-muted bg-panel hover:bg-line'}`}>Completed</button>
           </div>
 
           {/* Hero Greeting Section */}
@@ -428,7 +451,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   {getGreeting()}, {user?.name.split(' ')[0]} 👋
                 </h1>
               </div>
-              {simulatePreCohort ? (
+              {heroState === 'pre-cohort' ? (
                 <div className="bg-panel border border-cyan/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-cyan/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-cyan/20 transition-all duration-700" />
                   
@@ -465,6 +488,42 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   <div className="relative z-10 hidden md:flex items-center space-x-3 md:space-x-4 shrink-0 mr-[30px]">
                     <FlipUnit value="14" label="Days" size="lg" />
                     <FlipUnit value="08" label="Hours" size="lg" />
+                  </div>
+                </div>
+              ) : heroState === 'long-break' ? (
+                <div className="bg-panel border border-orange/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-orange/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-orange/20 transition-all duration-700" />
+                  <div className="relative z-10 space-y-4 w-full">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-orange animate-pulse" />
+                      <span className="text-[10px] font-black uppercase tracking-wider text-orange">Welcome Back</span>
+                    </div>
+                    <div>
+                      <h2 className="text-xl md:text-2xl font-black text-text leading-tight mb-2">It's been a while!</h2>
+                      <p className="text-muted text-sm md:text-base max-w-xl">You've been away for over 30 days. Don't worry, we've saved your progress. Would you like a quick refresher or to dive right back in?</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                      <button onClick={() => onNavigate('learning-path')} className="bg-orange hover:bg-orange/90 text-bg text-xs font-black px-6 py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(255,123,0,0.3)] active:scale-95 flex items-center justify-center gap-2"><Play className="w-4 h-4" />Resume Module</button>
+                      <button onClick={() => onNavigate('ai-tutor')} className="bg-bg border border-line hover:border-orange/30 text-text text-xs font-bold px-6 py-3 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2"><RefreshCw className="w-4 h-4" />Quick Refresher</button>
+                    </div>
+                  </div>
+                </div>
+              ) : heroState === 'all-completed' ? (
+                <div className="bg-panel border border-yellow/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-yellow/10 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-yellow/20 transition-all duration-700" />
+                  <div className="relative z-10 space-y-4 w-full">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="w-4 h-4 text-yellow animate-bounce" />
+                      <span className="text-[10px] font-black uppercase tracking-wider text-yellow">Legendary Status</span>
+                    </div>
+                    <div>
+                      <h2 className="text-xl md:text-2xl font-black text-text leading-tight mb-2">Outstanding Achievement!</h2>
+                      <p className="text-muted text-sm md:text-base max-w-xl">You have successfully completed all available courses in your track. Your dedication is truly inspiring. What's next on your journey?</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                      <button onClick={() => onNavigate('catalog')} className="bg-yellow hover:bg-yellow/90 text-bg text-xs font-black px-6 py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(255,184,0,0.3)] active:scale-95 flex items-center justify-center gap-2"><Sparkles className="w-4 h-4" />Explore New Tracks</button>
+                      <button onClick={() => onNavigate('profile')} className="bg-bg border border-line hover:border-yellow/30 text-text text-xs font-bold px-6 py-3 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2"><Award className="w-4 h-4" />View Certificate</button>
+                    </div>
                   </div>
                 </div>
               ) : primaryActive.type !== 'none' ? (
@@ -551,23 +610,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-12 mt-8 md:mt-12 mb-8 md:mb-10">
               <StickyNoteStat 
                 label="Learning Level"
-                value={level}
-                subtext="Mastering the core foundations of engineering"
+                value={heroState === 'pre-cohort' ? 1 : heroState === 'all-completed' ? 50 : level}
+                subtext={heroState === 'pre-cohort' ? 'Ready to begin your journey' : heroState === 'all-completed' ? 'Master of the academy' : 'Mastering the core foundations of engineering'}
                 color="peach"
                 rotation="md:rotate-1"
                 onClick={() => onNavigate('analytics')}
               />
               <StickyNoteStat 
                 label="Current Streak"
-                value={`${streak} Days`}
-                subtext="Consistency is the key to mental muscle memory"
+                value={heroState === 'pre-cohort' || heroState === 'long-break' ? '0 Days' : heroState === 'all-completed' ? '120 Days' : `${streak} Days`}
+                subtext={heroState === 'pre-cohort' ? 'Start your streak soon' : heroState === 'long-break' ? 'Time to rebuild momentum' : 'Consistency is the key to mental muscle memory'}
                 color="lavender"
                 rotation="md:-rotate-2"
                 onClick={() => onNavigate('analytics')}
               />
               <StickyNoteStat 
                 label="Total XP Pool"
-                value={xp.toLocaleString()}
+                value={heroState === 'pre-cohort' ? '0' : heroState === 'all-completed' ? '12,500' : xp.toLocaleString()}
                 subtext="Points earned through vigorous laboratory work"
                 color="sky"
                 rotation="md:rotate-2"
@@ -575,8 +634,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               />
               <StickyNoteStat 
                 label="Module Progress"
-                value="2/10"
-                subtext="Keep moving forward, one block at a time"
+                value={heroState === 'pre-cohort' ? '0/10' : heroState === 'all-completed' ? '10/10' : '2/10'}
+                subtext={heroState === 'all-completed' ? 'All modules mastered' : 'Keep moving forward, one block at a time'}
                 color="mint"
                 rotation="md:-rotate-1"
                 onClick={() => onNavigate('learning-path')}
@@ -591,10 +650,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             <div className="lg:col-span-2 space-y-6">
               
               {/* ── Continue Your Track Card (REQ-TRACK-010) ── */}
-              <ContinueYourTrackCard onNavigate={onNavigate} setActiveTrackId={setActiveTrackId} />
+              <ContinueYourTrackCard onNavigate={onNavigate} setActiveTrackId={setActiveTrackId} forceNoTrack={heroState === 'pre-cohort' || heroState === 'all-completed'} />
 
               {/* Active Course Card (Continue Learning CTA) */}
-              {activeCourse && (
+              {activeCourse && heroState !== 'all-completed' && (
                 <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
                   <div className="space-y-4">
                     <div className="flex justify-between items-start gap-6">
@@ -646,6 +705,47 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 </div>
               )}
 
+              {heroState === 'all-completed' && (
+                <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-start gap-6">
+                      <div>
+                        <span className="bg-purple/20 text-purple border border-purple/30 text-xs px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider">
+                          Recommended Course
+                        </span>
+                        <h2 className="text-xl font-bold mt-2">Advanced System Architecture</h2>
+                      </div>
+                    </div>
+                    <p className="text-muted text-sm leading-relaxed">
+                      Now that you've mastered the fundamentals, dive deep into scalable, distributed systems and enterprise architecture patterns.
+                    </p>
+                    <div className="flex items-center gap-4 text-xs font-bold text-muted">
+                      <div className="flex items-center gap-1.5"><Trophy className="w-4 h-4 text-purple" /> Advanced</div>
+                      <div className="w-1 h-1 rounded-full bg-line" />
+                      <div className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> 12h 30m</div>
+                      <div className="w-1 h-1 rounded-full bg-line" />
+                      <div className="flex items-center gap-1.5"><Star className="w-4 h-4 text-yellow fill-current" /> 4.9 (2.1k)</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-line">
+                    <div className="text-xs text-muted">
+                      Start your next journey
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setActiveCourseId('advanced-system-architecture'); // Mock ID
+                        onNavigate('learning-path');
+                      }}
+                      className="bg-purple hover:bg-purple/90 text-bg font-semibold px-5 py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-colors cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      <span>View course</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Enrolled Courses Grid: Redesigned based on screenshot */}
               <div className="space-y-6">
                 <div className="flex justify-between items-center px-2">
@@ -653,17 +753,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     <h3 className="text-2xl font-bold tracking-tight">Your Learning</h3>
                     <p className="text-muted text-sm">Track your progress and continue building new skills.</p>
                   </div>
-                  <button 
-                    onClick={() => onNavigate('catalog')}
-                    className="text-cyan hover:text-cyan2 text-sm font-bold flex items-center space-x-1 transition-colors"
-                  >
+                  <button onClick={() => onNavigate('catalog')} className="text-cyan hover:text-cyan2 text-sm font-bold flex items-center space-x-1 transition-colors">
                     <span>View all courses</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
                 
                 <div className="space-y-4">
-                  {enrolledCourses.map((course, index) => {
+                  {displayCourses.map((course, index) => {
                     const colors = ['cyan', 'purple', 'yellow', 'green'];
                     const color = colors[index % colors.length];
                     
@@ -692,7 +789,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     };
 
                     let rightSection: React.ReactNode | null;
-                    if (course.title === 'Testing Course') {
+                    if (heroState === 'all-completed' || course.title === 'Command Line Basics' || course.progress === 100) {
+                      rightSection = (
+                        <div className="flex flex-col items-center justify-center space-y-4 h-full">
+                          <div className="w-12 h-12 rounded-full bg-yellow/20 flex items-center justify-center border-2 border-yellow/30">
+                            <Trophy className="w-6 h-6 text-yellow" />
+                          </div>
+                          <div className="text-center space-y-1">
+                            <div className="text-base font-black text-text">Well done!</div>
+                            <div className="text-xs text-muted">Course completed</div>
+                          </div>
+                          <button onClick={() => { setActiveCourseId(course.id); onNavigate('learning-path'); }} className={`w-full flex items-center justify-center space-x-2 border-2 border-yellow text-yellow hover:bg-yellow hover:text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-all mt-3`}>
+                            <span>Review</span>
+                          </button>
+                        </div>
+                      );
+                    } else if (course.title === 'Testing Course') {
                       rightSection = (
                         <div className="flex flex-col items-center justify-center space-y-4">
                           <div className="flex flex-col items-center">
@@ -727,27 +839,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                           >
                             <span>Continue</span>
                             <ChevronRight className="w-4 h-4" />
-                          </button>
-                        </div>
-                      );
-                    } else if (course.title === 'Command Line Basics') {
-                      rightSection = (
-                        <div className="flex flex-col items-center justify-center space-y-4 h-full">
-                          <div className="w-12 h-12 rounded-full bg-yellow/20 flex items-center justify-center border-2 border-yellow/30">
-                            <Trophy className="w-6 h-6 text-yellow" />
-                          </div>
-                          <div className="text-center space-y-1">
-                            <div className="text-base font-black text-text">Well done!</div>
-                            <div className="text-xs text-muted">Course completed</div>
-                          </div>
-                          <button 
-                            onClick={() => {
-                              setActiveCourseId(course.id);
-                              onNavigate('learning-path');
-                            }}
-                            className={`w-full flex items-center justify-center space-x-2 border-2 border-yellow text-yellow hover:bg-yellow hover:text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-all mt-3`}
-                          >
-                            <span>Review</span>
                           </button>
                         </div>
                       );
@@ -863,7 +954,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             <div className="flex flex-col gap-6">
               
               {/* REQ-DASH-007: Activity Chart - Right Column Visualization */}
-              <NeuralActivityChart />
+              <NeuralActivityChart heroState={heroState} />
               
               {/* REQ-DASH-010: Upcoming Events */}
               <div className="bg-panel border border-line rounded-2xl p-6 space-y-5">

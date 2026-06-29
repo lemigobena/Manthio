@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { COURSES } from '../../services/mockData';
+import { COURSES, TRACKS } from '../../services/mockData';
 import { 
   ArrowLeft, 
   CheckCircle, 
@@ -12,9 +12,11 @@ import {
   Users,
   Percent,
   Sparkles,
-  Check
+  Check,
+  AlertCircle
 } from 'lucide-react';
 import { useXP } from '../../context/XPContext';
+import { useTrack } from '../track-detail/useTrack';
 
 // Custom icons for Payment Methods
 const MastercardIcon = () => (
@@ -42,23 +44,29 @@ interface CheckoutProps {
 }
 
 export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
-  const { activeCourseId, selectedFormat } = useAuth();
+  const { activeCourseId, selectedFormat, checkoutItem } = useAuth();
   const { addXp } = useXP();
-  const [step, setStep] = useState<'checkout' | 'processing' | 'success'>('checkout');
-  const [paymentMethod, setPaymentMethod] = useState<'mastercard' | 'visa' | 'apple' | 'paypal' | 'twint'>('visa');
+  const { enrollInTrack } = useTrack();
+  const [step, setStep] = useState<'checkout' | 'processing' | 'success' | 'failed' | 'get-ready'>('checkout');
+  const [paymentMethod, setPaymentMethod] = useState('card');
   const [deliveryMethod, setDeliveryMethod] = useState<'online' | 'hybrid'>('online');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [promoActive, setPromoActive] = useState(false);
+  const [simulateFailure, setSimulateFailure] = useState(false);
 
-  const course = COURSES.find(c => c.id === activeCourseId) || COURSES[0];
+  const isTrack = checkoutItem?.type === 'track';
+  const checkoutId = checkoutItem?.id || activeCourseId;
   
-  const activeFormatData = course.availableFormats?.find(f => f.format === selectedFormat);
-  const activeBundle = activeFormatData?.bundledSubscription || course.bundledSubscription;
-  const activeCohort = activeFormatData?.cohortProgress || course.cohortProgress;
+  const course = isTrack ? null : (COURSES.find(c => c.id === checkoutId) || COURSES[0]);
+  const track = isTrack ? (TRACKS.find(t => t.id === checkoutId) || TRACKS[0]) : null;
+  
+  const activeFormatData = course?.availableFormats?.find(f => f.format === selectedFormat);
+  const activeBundle = activeFormatData?.bundledSubscription || course?.bundledSubscription;
+  const activeCohort = activeFormatData?.cohortProgress || course?.cohortProgress;
   const isReserved = activeCohort && activeCohort.currentParticipants < activeCohort.minParticipants;
 
-  const currentPrice = activeFormatData?.price || course.price;
+  const currentPrice = isTrack ? 'CHF 2,450.00' : (activeFormatData?.price || course?.price);
   const priceValue = parseFloat(currentPrice?.replace(/[^\d.]/g, '') || '0');
   const loyaltyDiscount = priceValue * 0.1; 
   const promoDiscount = promoActive ? (priceValue - loyaltyDiscount) * 0.2 : 0;
@@ -70,8 +78,17 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
     if (!agreedToTerms) return;
     setStep('processing');
     setTimeout(() => {
+      if (simulateFailure) {
+        setStep('failed');
+        return;
+      }
+      if (isTrack && track) {
+        enrollInTrack(track.id);
+        addXp(1000, 'Career Track Enrollment');
+      } else {
+        addXp(500, 'Course Booking Achievement');
+      }
       setStep('success');
-      addXp(500, 'Course Booking Achievement');
     }, 2000);
   };
 
@@ -82,6 +99,37 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
         <div className="text-center">
           <h2 className="text-xl font-bold text-text uppercase tracking-tight">Securing Transaction</h2>
           <p className="text-muted text-xs font-medium">Please wait a moment...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === 'failed') {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-140px)] animate-in fade-in zoom-in duration-500">
+        <div className="w-20 h-20 bg-red/10 shadow-xl shadow-red/10 rounded-full flex items-center justify-center mb-6">
+          <AlertCircle className="w-10 h-10 text-red" />
+        </div>
+        <h2 className="text-2xl font-black text-text uppercase tracking-[2px] text-center">
+          Payment Failed
+        </h2>
+        <p className="text-muted text-center max-w-sm mt-3 text-xs font-medium leading-relaxed px-6">
+          Your card was declined. This could be due to insufficient funds, an expired card, or anti-fraud security measures. Please try a different payment method or contact your bank.
+        </p>
+        
+        <div className="mt-8 flex items-center gap-4">
+          <button 
+            onClick={() => setStep('checkout')}
+            className="bg-bg border border-line hover:border-cyan hover:text-cyan text-text font-black px-8 py-3 rounded-full transition-all uppercase tracking-widest text-[10px]"
+          >
+            USE DIFFERENT METHOD
+          </button>
+          <button 
+            onClick={handleProcessPayment}
+            className="bg-cyan hover:bg-cyan/90 text-bg font-black px-8 py-3 rounded-full transition-all shadow-[0_8px_30px_rgba(45,212,191,0.3)] uppercase tracking-widest text-[10px]"
+          >
+            RETRY PAYMENT
+          </button>
         </div>
       </div>
     );
@@ -99,15 +147,15 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
         <p className="text-muted text-center max-w-sm mt-3 text-xs font-medium leading-relaxed opacity-80 px-6">
           {isReserved ? (
             <>
-              Your request for <span className="text-text font-bold decoration-orange underline decoration-2 underline-offset-4">{course.title}</span> is registered. 
-              The course proceeds once {activeCohort.minParticipants} participants join. 
+              Your request for <span className="text-text font-bold decoration-orange underline decoration-2 underline-offset-4">{isTrack ? track?.title : course?.title}</span> is registered. 
+              The course proceeds once {activeCohort?.minParticipants} participants join. 
               <span className="block mt-2 font-black text-[10px] text-orange uppercase tracking-wider">
-                Full confirmation by {new Date(activeCohort.confirmationDate).toLocaleDateString()}
+                Full confirmation by {activeCohort?.confirmationDate ? new Date(activeCohort.confirmationDate).toLocaleDateString() : 'TBA'}
               </span>
             </>
           ) : (
             <>
-              Welcome to <span className="text-text font-bold decoration-cyan underline decoration-2 underline-offset-4">{course.title}</span>. 
+              Welcome to <span className="text-text font-bold decoration-cyan underline decoration-2 underline-offset-4">{isTrack ? track?.title : course?.title}</span>. 
               Your transformation starts now.
             </>
           )}
@@ -121,11 +169,74 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
         )}
 
         <button 
-          onClick={() => onNavigate(isReserved ? 'dashboard' : 'learning-path')}
+          onClick={() => {
+            if (isReserved) {
+              onNavigate('dashboard');
+            } else {
+              setStep('get-ready');
+            }
+          }}
           className="mt-8 bg-cyan hover:bg-cyan/90 text-bg font-black px-10 py-3 rounded-full transition-all shadow-[0_8px_30px_rgba(45,212,191,0.3)] uppercase tracking-widest text-[10px]"
         >
-          {isReserved ? 'RETURN TO DASHBOARD' : 'START LEARNING'}
+          {isReserved ? 'RETURN TO DASHBOARD' : 'VIEW PRE-COURSE TASKS'}
         </button>
+      </div>
+    );
+  }
+
+  if (step === 'get-ready') {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-140px)] animate-in fade-in zoom-in duration-500">
+        <div className="max-w-xl w-full bg-panel border border-line rounded-2xl p-8 space-y-6">
+          <div className="flex items-center space-x-3 mb-4">
+            <Sparkles className="w-6 h-6 text-cyan" />
+            <h2 className="text-xl font-bold font-display">Get Ready Checklist</h2>
+          </div>
+          <p className="text-muted text-sm leading-relaxed">
+            Please complete these preparatory steps before you dive into the first lesson.
+          </p>
+          
+          <div className="space-y-3">
+            <div className="p-4 rounded-xl border border-line bg-bg flex items-center gap-4">
+              <div className="w-8 h-8 rounded-full bg-cyan/10 flex items-center justify-center shrink-0">
+                <span className="text-cyan font-bold text-xs">1</span>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-text">Verify Environment Setup</h4>
+                <p className="text-xs text-muted mt-1">Ensure Node.js and VS Code are installed correctly.</p>
+              </div>
+            </div>
+            
+            <div className="p-4 rounded-xl border border-line bg-bg flex items-center gap-4 opacity-75">
+              <div className="w-8 h-8 rounded-full bg-bg border border-line flex items-center justify-center shrink-0">
+                <span className="text-muted font-bold text-xs">2</span>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-text">Watch Orientation Video</h4>
+                <p className="text-xs text-muted mt-1">A 5-minute welcome from your lead trainer.</p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-line bg-bg flex items-center gap-4 opacity-75">
+              <div className="w-8 h-8 rounded-full bg-bg border border-line flex items-center justify-center shrink-0">
+                <span className="text-muted font-bold text-xs">3</span>
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-text">Take Prerequisites Self-Check</h4>
+                <p className="text-xs text-muted mt-1">Make sure you are familiar with standard ES6 syntax.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="pt-6 flex justify-end">
+            <button 
+              onClick={() => onNavigate(isTrack ? 'track-detail' : 'learning-path')}
+              className="bg-cyan hover:bg-cyan/90 text-bg font-black px-8 py-3 rounded-full transition-all shadow-[0_8px_30px_rgba(45,212,191,0.3)] uppercase tracking-widest text-[10px]"
+            >
+              PROCEED TO COURSE
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -275,9 +386,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
               <div className="flex-1 flex flex-col space-y-4 min-h-0">
                 {/* Compact Course Preview */}
                 <div className="relative h-32 shrink-0">
-                  <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover rounded-xl border border-line" />
+                  <img src={isTrack ? track?.imageUrl : course?.imageUrl} alt={isTrack ? track?.title : course?.title} className="w-full h-full object-cover rounded-xl border border-line" />
                   <div className="absolute inset-0 bg-gradient-to-t from-bg/80 to-transparent rounded-xl" />
-                  <div className="absolute bottom-3 left-3 pr-3 text-[11px] font-bold text-white line-clamp-1">{course.title}</div>
+                  <div className="absolute bottom-3 left-3 pr-3 text-[11px] font-bold text-white line-clamp-1">{isTrack ? track?.title : course?.title}</div>
                 </div>
 
                 {/* Bundled Access Row (REQ-CHECKOUT-010) */}
@@ -297,11 +408,11 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                 <div className="grid grid-cols-2 gap-3 text-[10px]">
                   <div className="space-y-0.5">
                     <span className="text-[8px] font-black text-muted uppercase">Level</span>
-                    <div className="font-bold text-text">{course.level}</div>
+                    <div className="font-bold text-text">{isTrack ? track?.level : course?.level}</div>
                   </div>
                   <div className="space-y-0.5">
                     <span className="text-[8px] font-black text-muted uppercase">Duration</span>
-                    <div className="font-bold text-text">{course.duration}</div>
+                    <div className="font-bold text-text">{isTrack ? track?.estimatedTime : course?.duration}</div>
                   </div>
                 </div>
 
@@ -373,6 +484,22 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                     </button>
                     
                     <div className="space-y-3">
+                      <label className="flex items-center gap-3 cursor-pointer group mt-4 mb-2">
+                        <div className="relative shrink-0">
+                          <input 
+                            type="checkbox" 
+                            className="peer sr-only"
+                            checked={simulateFailure}
+                            onChange={(e) => setSimulateFailure(e.target.checked)}
+                          />
+                          <div className="w-4 h-4 rounded border-2 border-line bg-bg transition-all peer-checked:bg-red peer-checked:border-red flex items-center justify-center">
+                            <Check className={`w-2.5 h-2.5 text-bg transition-opacity ${simulateFailure ? 'opacity-100' : 'opacity-0'}`} strokeWidth={4} />
+                          </div>
+                        </div>
+                        <span className="text-[10px] text-muted group-hover:text-text transition-colors font-bold uppercase tracking-widest">
+                          Simulate Payment Failure
+                        </span>
+                      </label>
                       <label className="flex items-center gap-3 cursor-pointer group">
                         <div className="relative shrink-0">
                           <input 
@@ -393,7 +520,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                           I accept the <span className="text-cyan underline cursor-pointer">terms of agreement</span> and the <span className="text-cyan underline cursor-pointer">cancellation policy</span>
                         </span>
                       </label>
-                      {course.cancellationPolicy && (
+                      {!isTrack && course?.cancellationPolicy && (
                         <div className="p-3 bg-bg/50 border border-line rounded-xl text-[9px] text-muted leading-relaxed font-medium italic">
                           <strong>Cancellation:</strong> {course.cancellationPolicy}
                         </div>

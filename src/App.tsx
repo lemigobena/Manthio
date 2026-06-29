@@ -36,6 +36,9 @@ import { Onboarding } from './features/onboarding/Onboarding';
 import { SignIn } from './features/auth/SignIn';
 import { SignUp } from './features/auth/SignUp';
 import { AuthLayout } from './features/auth/AuthLayout';
+import { EmailVerification } from './features/auth/EmailVerification';
+import { ForgotPassword } from './features/auth/ForgotPassword';
+import { ResetPassword } from './features/auth/ResetPassword';
 import { Checkout } from './features/checkout/Checkout';
 import { PublicProfile } from './features/profile/PublicProfile';
 import { DemoCenter } from './features/demo/DemoCenter';
@@ -71,10 +74,16 @@ const MainApp: React.FC = () => {
         return <SignIn onNavigate={handleNavigate} />;
       case 'signup':
         return <SignUp onNavigate={handleNavigate} />;
+      case 'verify-email':
+        return <EmailVerification onNavigate={handleNavigate} />;
+      case 'forgot-password':
+        return <ForgotPassword onNavigate={handleNavigate} />;
+      case 'reset-password':
+        return <ResetPassword onNavigate={handleNavigate} />;
       case 'onboarding':
         return <Onboarding onNavigate={handleNavigate} />;
       case 'dashboard':
-        return <Dashboard onNavigate={handleNavigate} />;
+        return <Dashboard onNavigate={handleNavigate} mockState={tab as 'normal' | 'pre-cohort' | 'long-break' | 'all-completed'} />;
       case 'catalog':
         return <Catalog onNavigate={handleNavigate} />;
       case 'explore':
@@ -136,25 +145,33 @@ const MainApp: React.FC = () => {
     }
   };
 
-  const publicPages = ['explore', 'course-detail', 'track-detail', 'signin', 'signup', 'onboarding', 'privacy', 'terms', 'cookies', 'imprint', 'help-center', 'checkout'];
+  const publicPages = ['explore', 'course-detail', 'track-detail', 'signin', 'signup', 'verify-email', 'forgot-password', 'reset-password', 'onboarding', 'privacy', 'terms', 'cookies', 'imprint', 'help-center', 'checkout'];
   const isPublicPage = publicPages.includes(page);
 
   if (!isAuthenticated && !isPublicPage) {
     return (
       <AuthLayout onNavigate={handleNavigate}>
-        {page === 'signup' ? <SignUp onNavigate={handleNavigate} /> : <SignIn onNavigate={handleNavigate} />}
+        {page === 'signup' ? <SignUp onNavigate={handleNavigate} /> : 
+         page === 'verify-email' ? <EmailVerification onNavigate={handleNavigate} /> : 
+         page === 'forgot-password' ? <ForgotPassword onNavigate={handleNavigate} /> : 
+         page === 'reset-password' ? <ResetPassword onNavigate={handleNavigate} /> : 
+         <SignIn onNavigate={handleNavigate} />}
       </AuthLayout>
     );
   }
 
   // If public page but not signed in, we might still want the layout (except for signin/signup/onboarding)
-  const needsAuthLayout = !isAuthenticated && ['signin', 'signup'].includes(page);
+  const needsAuthLayout = !isAuthenticated && ['signin', 'signup', 'verify-email', 'forgot-password', 'reset-password'].includes(page);
   const needsNoLayout = page === 'onboarding';
 
   if (needsAuthLayout) {
     return (
       <AuthLayout onNavigate={handleNavigate}>
-        {page === 'signup' ? <SignUp onNavigate={handleNavigate} /> : <SignIn onNavigate={handleNavigate} />}
+        {page === 'signup' ? <SignUp onNavigate={handleNavigate} /> : 
+         page === 'verify-email' ? <EmailVerification onNavigate={handleNavigate} /> : 
+         page === 'forgot-password' ? <ForgotPassword onNavigate={handleNavigate} /> : 
+         page === 'reset-password' ? <ResetPassword onNavigate={handleNavigate} /> : 
+         <SignIn onNavigate={handleNavigate} />}
       </AuthLayout>
     );
   }

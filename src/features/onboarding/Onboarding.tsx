@@ -72,16 +72,16 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
   // Step 2 inputs
   const [reason, setReason] = useState<string>(() => {
-    return localStorage.getItem('onboarding_reason') || '';
+    return localStorage.getItem('onboarding_reason') || 'Career growth';
   });
   const [timeCommitment, setTimeCommitment] = useState<string>(() => {
-    return localStorage.getItem('onboarding_time_commitment') || '';
+    return localStorage.getItem('onboarding_time_commitment') || '< 2h';
   });
   const [experienceLevel, setExperienceLevel] = useState<string>(() => {
-    return localStorage.getItem('onboarding_experience_level') || '';
+    return localStorage.getItem('onboarding_experience_level') || 'Beginner';
   });
   const [interestedSubject, setInterestedSubject] = useState<string>(() => {
-    return localStorage.getItem('onboarding_interested_subject') || '';
+    return localStorage.getItem('onboarding_interested_subject') || 'AI';
   });
 
   // Step 3 inputs
@@ -435,11 +435,13 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
 
               {/* --- CENTRAL TEXT BLOCK (Pixel-aligned to image - Manthio Colors) --- */}
               <div className="relative z-10 flex flex-col items-center text-center max-w-xl px-6 animate-[cel-reveal_0.8s_ease-out]">
-                <span className="text-cyan font-black text-[13px] uppercase tracking-[0.2em] mb-6 drop-shadow-[0_0_8px_rgba(0,245,228,0.3)]">Manthio Study Hub</span>
-
-                <h1 className="text-4xl md:text-6xl font-[900] text-text leading-[1.1] tracking-[-0.03em] mb-6 font-sans">
-                  The home <br /> for peer <br /> learning
+                <h1 className="text-4xl md:text-6xl font-[900] text-cyan leading-[1.1] tracking-[-0.03em] mb-4 font-sans drop-shadow-sm">
+                  Welcome to Manthio {user?.name?.split(' ')[0] || ''} 👋
                 </h1>
+
+                <h2 className="text-2xl md:text-3xl font-normal text-text mb-8 opacity-90">
+                  The home <br className="md:hidden" /> for peer learning
+                </h2>
 
                 <p className="text-text/70 text-base md:text-lg font-medium leading-relaxed mb-8 max-w-md">
                   Join a community of developers mastering skills together. Share knowledge, collaborate on code, and earn verified recognition.

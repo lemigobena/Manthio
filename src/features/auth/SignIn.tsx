@@ -14,15 +14,69 @@ export const SignIn: React.FC<SignInProps> = ({ onNavigate }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [show2FA, setShow2FA] = useState(false);
+  const [twoFaCode, setTwoFaCode] = useState('');
+  const { is2FAEnabled } = useAuth();
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     // Explicitly navigate without constraints
-    await signIn(email || 'demo@example.com', password || 'password');
-    onNavigate('dashboard');
+    const success = await signIn(email || 'demo@example.com', password || 'password');
+    setIsLoading(false);
+    
+    if (success) {
+      if (is2FAEnabled) {
+        setShow2FA(true);
+      } else {
+        onNavigate('dashboard');
+      }
+    }
   };
+
+  const handle2FASubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      onNavigate('dashboard');
+    }, 1000);
+  };
+
+  if (show2FA) {
+    return (
+      <div className="flex flex-col h-full justify-center">
+        <header className="mb-8">
+          <h1 className="text-[2.75rem] font-bold text-text tracking-tight leading-tight mb-3 transition-colors duration-500">
+            Two-Step Verification
+          </h1>
+          <p className="text-sm text-muted transition-colors duration-500">
+            Enter the 6-digit code from your authenticator app.
+          </p>
+        </header>
+
+        <form onSubmit={handle2FASubmit} className="space-y-4">
+          <input 
+            type="text" 
+            placeholder="000000"
+            maxLength={6}
+            className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 !outline-none focus:border-cyan transition-all text-center tracking-[0.5em] text-xl font-bold"
+            value={twoFaCode}
+            onChange={(e) => setTwoFaCode(e.target.value.replace(/[^0-9]/g, ''))}
+          />
+
+          <button 
+            type="submit" 
+            disabled={isLoading || twoFaCode.length !== 6}
+            className="w-full bg-cyan hover:bg-cyan2 text-bg font-bold py-[0.875rem] rounded-xl transition-all disabled:opacity-50 mt-4 shadow-lg shadow-cyan/10 text-sm active:scale-[0.98] cursor-pointer"
+          >
+            {isLoading ? "Verifying..." : "Verify"}
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full justify-center">
@@ -86,7 +140,11 @@ export const SignIn: React.FC<SignInProps> = ({ onNavigate }) => {
               Remember me
             </span>
           </label>
-           <button type="button" className="text-sm font-medium text-muted hover:text-text transition-colors cursor-pointer">
+           <button 
+             type="button" 
+             onClick={() => onNavigate('forgot-password')}
+             className="text-sm font-medium text-muted hover:text-text transition-colors cursor-pointer"
+           >
              Forgot password?
            </button>
         </div>
