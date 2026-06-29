@@ -282,13 +282,36 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {(collapsed && !isMobileOpen) && (
             <div className="flex flex-col items-center py-2">
-              <div className="relative w-10 h-10">
-                <img 
-                  src={user?.avatar || "https://ui-avatars.com/api/?name=Alex+Chen&background=0D1117&color=00F5D4"} 
-                  alt="Avatar" 
-                  className="w-full h-full rounded-full border border-line object-cover" 
+              {/* Circular XP progress ring around avatar */}
+              <div className="relative w-11 h-11">
+                {/* SVG ring */}
+                <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 44 44">
+                  {/* Track */}
+                  <circle
+                    cx="22" cy="22" r="20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    className="text-line/40"
+                  />
+                  {/* Progress */}
+                  <circle
+                    cx="22" cy="22" r="20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeDasharray={`${2 * Math.PI * 20}`}
+                    strokeDashoffset={`${2 * Math.PI * 20 * (1 - animatedProgress / 100)}`}
+                    className="text-cyan transition-all duration-700 ease-out drop-shadow-[0_0_4px_rgba(0,255,242,0.6)]"
+                  />
+                </svg>
+                {/* Avatar inside ring */}
+                <img
+                  src={user?.avatar || "https://ui-avatars.com/api/?name=Alex+Chen&background=0D1117&color=00F5D4"}
+                  alt="Avatar"
+                  className="absolute inset-[4px] w-[calc(100%-8px)] h-[calc(100%-8px)] rounded-full object-cover"
                 />
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-cyan border-2 border-panel rounded-full" />
               </div>
             </div>
           )}

@@ -1,11 +1,71 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
-import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, CheckCircle, X } from 'lucide-react';
+import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, CheckCircle, X, ChevronDown, Check } from 'lucide-react';
 import { useTrack } from '../track-detail/useTrack';
 import { calculateCourseProgress } from '../../services/progressUtils';
 import type { CareerTrack, Course } from '../../types';
+
+interface CatalogDropdownOption { label: string; value: string; }
+interface CatalogDropdownProps {
+  label: string;
+  value: string;
+  options: CatalogDropdownOption[];
+  onChange: (v: string) => void;
+}
+
+const CatalogDropdown: React.FC<CatalogDropdownProps> = ({ label, value, options, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selectedLabel = options.find(o => o.value === value)?.label ?? value;
+  const isFiltered = value !== 'All' && value !== options[0]?.value;
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+          isFiltered
+            ? 'bg-cyan/15 border-cyan text-cyan shadow-[0_0_10px_rgba(0,255,242,0.15)]'
+            : 'bg-panel border-line text-muted hover:border-cyan/50 hover:text-text'
+        } ${open ? 'border-cyan/60' : ''}`}
+      >
+        <span>{isFiltered ? `${label}: ${selectedLabel}` : label}</span>
+        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div className="absolute top-full mt-2 left-0 z-50 min-w-[150px] bg-panel/95 backdrop-blur-xl border border-line/80 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="p-1.5 space-y-0.5">
+            {options.map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => { onChange(opt.value); setOpen(false); }}
+                className={`w-full flex items-center justify-between gap-3 px-3 py-2 rounded-xl text-[11px] font-medium transition-all duration-150 text-left cursor-pointer ${
+                  opt.value === value
+                    ? 'bg-cyan/15 text-cyan'
+                    : 'text-muted hover:bg-line/50 hover:text-text'
+                }`}
+              >
+                <span>{opt.label}</span>
+                {opt.value === value && <Check className="w-3 h-3 shrink-0" />}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const levenshtein = (a: string, b: string): number => {
   if (a.length === 0) return b.length;
@@ -122,7 +182,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
   };
 
   // Unique values for filters
-  const topics = Array.from(new Set(COURSES.map(c => c.topic))).filter(Boolean);
+  const topics = Array.from(new Set(COURSES.map(c => c.topic))).filter(Boolean) as string[];
 
   // Filter courses
   const filteredCourses = (discoveryMode === 'courses' ? COURSES : []).filter(course => {
@@ -283,91 +343,95 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
         </div>
 
         {/* Dropdown Filters */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <SlidersHorizontal className="w-4 h-4 text-muted hidden sm:block" />
-          
-          <select 
+
+          <CatalogDropdown
+            label="Level"
             value={selectedLevel}
-            onChange={(e) => { setSelectedLevel(e.target.value); simulateLoad(); }}
-            className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
-          >
-            <option value="All">Level: All</option>
-            <option value="Foundation">Foundation</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Advanced">Advanced</option>
-          </select>
+            onChange={(v) => { setSelectedLevel(v); simulateLoad(); }}
+            options={[
+              { label: 'All Levels', value: 'All' },
+              { label: 'Foundation', value: 'Foundation' },
+              { label: 'Intermediate', value: 'Intermediate' },
+              { label: 'Advanced', value: 'Advanced' },
+            ]}
+          />
 
           {discoveryMode === 'courses' && (
             <>
-              <select 
+              <CatalogDropdown
+                label="Topic"
                 value={selectedTopic}
-                onChange={(e) => { setSelectedTopic(e.target.value); simulateLoad(); }}
-                className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
-              >
-                <option value="All">Topic: All</option>
-                {topics.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
+                onChange={(v) => { setSelectedTopic(v); simulateLoad(); }}
+                options={[{ label: 'All Topics', value: 'All' }, ...topics.map((t): CatalogDropdownOption => ({ label: t, value: t }))]}
+              />
 
-              <select 
+              <CatalogDropdown
+                label="Format"
                 value={selectedFormat}
-                onChange={(e) => { setSelectedFormat(e.target.value); simulateLoad(); }}
-                className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
-              >
-                <option value="All">Format: All</option>
-                <option value="flipped">Flipped</option>
-                <option value="self-paced">Self-paced</option>
-                <option value="cohort">Cohort</option>
-              </select>
+                onChange={(v) => { setSelectedFormat(v); simulateLoad(); }}
+                options={[
+                  { label: 'All Formats', value: 'All' },
+                  { label: 'Flipped', value: 'flipped' },
+                  { label: 'Self-paced', value: 'self-paced' },
+                  { label: 'Cohort', value: 'cohort' },
+                ]}
+              />
 
-              <select 
+              <CatalogDropdown
+                label="Language"
                 value={selectedLanguage}
-                onChange={(e) => { setSelectedLanguage(e.target.value); simulateLoad(); }}
-                className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
-              >
-                <option value="All">Language: All</option>
-                <option value="English">English</option>
-                <option value="German">German</option>
-                <option value="French">French</option>
-              </select>
+                onChange={(v) => { setSelectedLanguage(v); simulateLoad(); }}
+                options={[
+                  { label: 'All Languages', value: 'All' },
+                  { label: 'English', value: 'English' },
+                  { label: 'German', value: 'German' },
+                  { label: 'French', value: 'French' },
+                ]}
+              />
 
-              <select 
+              <CatalogDropdown
+                label="Sort"
                 value={sortBy}
-                onChange={(e) => { setSortBy(e.target.value); simulateLoad(); }}
-                className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
-              >
-                <option value="Recommended">Sort: Recommended</option>
-                <option value="Newest">Newest</option>
-                <option value="Most popular">Most popular</option>
-                <option value="Highest rated">Highest rated</option>
-                <option value="Alphabetical">A-Z</option>
-              </select>
+                onChange={(v) => { setSortBy(v); simulateLoad(); }}
+                options={[
+                  { label: 'Recommended', value: 'Recommended' },
+                  { label: 'Newest', value: 'Newest' },
+                  { label: 'Most popular', value: 'Most popular' },
+                  { label: 'Highest rated', value: 'Highest rated' },
+                  { label: 'A–Z', value: 'Alphabetical' },
+                ]}
+              />
             </>
           )}
 
           {discoveryMode === 'tracks' && (
             <>
-              <select 
+              <CatalogDropdown
+                label="Goal"
                 value={selectedGoal}
-                onChange={(e) => { setSelectedGoal(e.target.value); simulateLoad(); }}
-                className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
-              >
-                <option value="All">Goal: All</option>
-                <option value="Certification">Certification</option>
-                <option value="Role">Role</option>
-                <option value="Project">Project</option>
-                <option value="Topic">Topic</option>
-              </select>
+                onChange={(v) => { setSelectedGoal(v); simulateLoad(); }}
+                options={[
+                  { label: 'All Goals', value: 'All' },
+                  { label: 'Certification', value: 'Certification' },
+                  { label: 'Role', value: 'Role' },
+                  { label: 'Project', value: 'Project' },
+                  { label: 'Topic', value: 'Topic' },
+                ]}
+              />
 
-              <select 
+              <CatalogDropdown
+                label="Duration"
                 value={selectedTimeRange}
-                onChange={(e) => { setSelectedTimeRange(e.target.value); simulateLoad(); }}
-                className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
-              >
-                <option value="All">Time: All</option>
-                <option value="<20">Under 20h</option>
-                <option value="20-40">20-40h</option>
-                <option value="40+">40h+</option>
-              </select>
+                onChange={(v) => { setSelectedTimeRange(v); simulateLoad(); }}
+                options={[
+                  { label: 'Any Duration', value: 'All' },
+                  { label: 'Under 20h', value: '<20' },
+                  { label: '20–40h', value: '20-40' },
+                  { label: '40h+', value: '40+' },
+                ]}
+              />
             </>
           )}
         </div>

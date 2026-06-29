@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { RESOURCES } from '../../services/mockData';
 import { 
   Search, FolderOpen, FileText, Video, FolderArchive, ArrowDownToLine, 
-  Eye, AlertCircle, Bookmark, Share2, Filter, ChevronDown, 
+  Eye, AlertCircle, Bookmark, Share2, Filter, ChevronDown, Check,
   FileCode, Database, ImageIcon, Notebook as NotebookIcon, Calendar, X
 } from 'lucide-react';
 import type { ResourceFile, Lesson } from '../../types';
@@ -12,6 +12,69 @@ import { CodeRenderer } from '../content-player/renderers/CodeRenderer';
 interface ResourcesProps {
   onNavigate?: (page: string) => void;
 }
+
+interface ResDropdownOption { label: string; value: string; }
+interface ResDropdownProps {
+  label: string;
+  icon: React.ReactNode;
+  value: string;
+  options: ResDropdownOption[];
+  onChange: (v: string) => void;
+}
+
+const ResourceDropdown: React.FC<ResDropdownProps> = ({ label, icon, value, options, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const isFiltered = value !== options[0]?.value;
+  const selectedLabel = options.find(o => o.value === value)?.label ?? value;
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={`flex items-center gap-2 pl-3 pr-3 py-2 rounded-xl border text-[11px] font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+          isFiltered
+            ? 'bg-cyan/15 border-cyan text-cyan shadow-[0_0_10px_rgba(0,255,242,0.12)]'
+            : 'bg-panel border-line text-muted hover:border-cyan/50 hover:text-text'
+        } ${open ? 'border-cyan/60' : ''}`}
+      >
+        <span className={`shrink-0 ${isFiltered ? 'text-cyan' : 'text-muted'}`}>{icon}</span>
+        <span>{isFiltered ? selectedLabel : label}</span>
+        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div className="absolute top-full mt-2 left-0 z-50 min-w-[175px] bg-panel/95 backdrop-blur-xl border border-line/80 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="p-1.5 space-y-0.5">
+            {options.map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => { onChange(opt.value); setOpen(false); }}
+                className={`w-full flex items-center justify-between gap-3 px-3 py-2 rounded-xl text-[11px] font-medium transition-all duration-150 text-left cursor-pointer ${
+                  opt.value === value
+                    ? 'bg-cyan/15 text-cyan'
+                    : 'text-muted hover:bg-line/50 hover:text-text'
+                }`}
+              >
+                <span>{opt.label}</span>
+                {opt.value === value && <Check className="w-3 h-3 shrink-0" />}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 
 export const Resources: React.FC<ResourcesProps> = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -198,63 +261,51 @@ export const Resources: React.FC<ResourcesProps> = () => {
         </div>
 
         {/* Advanced Filters */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative group">
-            <select 
-              value={selectedType}
-              onChange={(e) => { setSelectedType(e.target.value); simulateLoad(); }}
-              className="appearance-none bg-panel border border-line text-[11px] rounded-xl pl-9 pr-8 py-2 text-text focus:outline-none focus:border-cyan cursor-pointer transition-all hover:bg-line/20"
-            >
-              <option value="All">All File Types</option>
-              <option value="pdf">PDF Documents</option>
-              <option value="video">Video Lessons</option>
-              <option value="archive">Archives (ZIP)</option>
-              <option value="notebook">Jupyter Notebooks</option>
-              <option value="code">Code Files</option>
-              <option value="office">Office Docs</option>
-              <option value="image">Images</option>
-            </select>
-            <FileText className="absolute left-3 top-2.5 w-3.5 h-3.5 text-muted pointer-events-none" />
-            <ChevronDown className="absolute right-2.5 top-2.5 w-3.5 h-3.5 text-muted pointer-events-none" />
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <ResourceDropdown
+            label="File Type"
+            icon={<FileText className="w-3.5 h-3.5" />}
+            value={selectedType}
+            onChange={(v) => { setSelectedType(v); simulateLoad(); }}
+            options={[
+              { label: 'All File Types', value: 'All' },
+              { label: 'PDF Documents', value: 'pdf' },
+              { label: 'Video Lessons', value: 'video' },
+              { label: 'Archives (ZIP)', value: 'archive' },
+              { label: 'Jupyter Notebooks', value: 'notebook' },
+              { label: 'Code Files', value: 'code' },
+              { label: 'Office Docs', value: 'office' },
+              { label: 'Images', value: 'image' },
+            ]}
+          />
 
-          <div className="relative group">
-            <select 
-              value={selectedCourse}
-              onChange={(e) => { setSelectedCourse(e.target.value); simulateLoad(); }}
-              className="appearance-none bg-panel border border-line text-[11px] rounded-xl pl-9 pr-8 py-2 text-text focus:outline-none focus:border-cyan cursor-pointer transition-all hover:bg-line/20"
-            >
-              <option value="All Courses">All Courses</option>
-              {courses.map(course => (
-                <option key={course} value={course}>{course}</option>
-              ))}
-            </select>
-            <FolderOpen className="absolute left-3 top-2.5 w-3.5 h-3.5 text-muted pointer-events-none" />
-            <ChevronDown className="absolute right-2.5 top-2.5 w-3.5 h-3.5 text-muted pointer-events-none" />
-          </div>
+          <ResourceDropdown
+            label="Course"
+            icon={<FolderOpen className="w-3.5 h-3.5" />}
+            value={selectedCourse}
+            onChange={(v) => { setSelectedCourse(v); simulateLoad(); }}
+            options={[
+              { label: 'All Courses', value: 'All Courses' },
+              ...courses.map(c => ({ label: c, value: c }))
+            ]}
+          />
 
-          <div className="relative group">
-            <select 
-              value={selectedAccessLevel}
-              onChange={(e) => { setSelectedAccessLevel(e.target.value); simulateLoad(); }}
-              className="appearance-none bg-panel border border-line text-[11px] rounded-xl pl-9 pr-8 py-2 text-text focus:outline-none focus:border-cyan cursor-pointer transition-all hover:bg-line/20"
-            >
-              <option value="All Levels">All Access Levels</option>
-              {accessLevels.map(level => (
-                <option key={level} value={level}>{level}</option>
-              ))}
-            </select>
-            <Filter className="absolute left-3 top-2.5 w-3.5 h-3.5 text-muted pointer-events-none" />
-            <ChevronDown className="absolute right-2.5 top-2.5 w-3.5 h-3.5 text-muted pointer-events-none" />
-          </div>
+          <ResourceDropdown
+            label="Access Level"
+            icon={<Filter className="w-3.5 h-3.5" />}
+            value={selectedAccessLevel}
+            onChange={(v) => { setSelectedAccessLevel(v); simulateLoad(); }}
+            options={[
+              { label: 'All Access Levels', value: 'All Levels' },
+              ...accessLevels.map(l => ({ label: l, value: l }))
+            ]}
+          />
 
-          <div className="relative group">
-            <button className="flex items-center space-x-2 bg-panel border border-line text-[11px] rounded-xl px-3 py-2 text-text hover:bg-line/20 transition-all cursor-pointer">
-              <Calendar className="w-3.5 h-3.5 text-muted" />
-              <span>Date Range</span>
-              <ChevronDown className="w-3.5 h-3.5 text-muted" />
-            </button>
-          </div>
+          <button className="flex items-center gap-2 pl-3 pr-3 py-2 rounded-xl border border-line bg-panel text-[11px] font-semibold text-muted hover:border-cyan/50 hover:text-text transition-all duration-200 cursor-pointer whitespace-nowrap">
+            <Calendar className="w-3.5 h-3.5 shrink-0" />
+            <span>Date Range</span>
+            <ChevronDown className="w-3 h-3" />
+          </button>
         </div>
       </div>
 
