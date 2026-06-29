@@ -102,6 +102,20 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
   const hasPrevious = currentIndex > 0;
   const hasNext = currentIndex < allLessons.length - 1;
 
+  // REQ-PLAYER-020/021 — criteria gating
+  // A lesson with scroll/video criteria starts locked; others start open.
+  const [criteriaUnlocked, setCriteriaUnlocked] = useState<Record<string, boolean>>({});
+
+  const lessonNeedsCriteria = !!currentLesson.completionCriteria && currentLesson.completionCriteria.type !== 'auto';
+  const effectiveCriteriaMet =
+    currentLesson.status === 'completed' ||
+    !lessonNeedsCriteria ||
+    !!criteriaUnlocked[currentLesson.id];
+
+  const handleCriteriaMet = useCallback(() => {
+    setCriteriaUnlocked(prev => ({ ...prev, [currentLesson.id]: true }));
+  }, [currentLesson.id]);
+
   const handlePrevious = useCallback(() => {
     if (hasPrevious) {
       setCurrentLesson(allLessons[currentIndex - 1]);
@@ -212,7 +226,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
       case 'PDF':
         return <PdfRenderer lesson={currentLesson} />;
       case 'Article':
-        return <ArticleRenderer lesson={currentLesson} />;
+        return <ArticleRenderer lesson={currentLesson} onCriteriaMet={handleCriteriaMet} />;
       case 'Quiz':
         return <QuizRenderer lesson={currentLesson} onComplete={markLessonComplete} />;
       case 'Code':
@@ -224,7 +238,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
       case 'External':
         return <ExternalLinkRenderer lesson={currentLesson} />;
       default:
-        return <ArticleRenderer lesson={currentLesson} />;
+        return <ArticleRenderer lesson={currentLesson} onCriteriaMet={handleCriteriaMet} />;
     }
   };
 
@@ -286,7 +300,8 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
           onPrevious={handlePrevious}
           onNext={handleNext}
           onMarkComplete={markLessonComplete}
-        />
+          criteriaMet={effectiveCriteriaMet}
+      />
       )}
     </div>
   );

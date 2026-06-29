@@ -200,6 +200,10 @@ export interface Lesson {
   sandboxData?: SandboxData;
   h5pData?: H5PData;
   unlockCondition?: string;
+  completionCriteria?: {
+    type: 'scroll' | 'video_watch' | 'auto'; // 'auto' = no gating, mark done freely
+    threshold?: number; // e.g. 0.9 = 90% scroll / video watch
+  };
 }
 
 export interface Module {

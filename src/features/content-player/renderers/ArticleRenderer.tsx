@@ -1,15 +1,55 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import type { Lesson } from '../../../types';
 import { QuizEngine } from '../../../components/modules/QuizEngine';
 
 interface ArticleRendererProps {
   lesson: Lesson;
+  onCriteriaMet?: () => void;
 }
 
-export const ArticleRenderer: React.FC<ArticleRendererProps> = ({ lesson }) => {
+export const ArticleRenderer: React.FC<ArticleRendererProps> = ({ lesson, onCriteriaMet }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollReached, setScrollReached] = useState(false);
+
+  const hasScrollCriteria = lesson.completionCriteria?.type === 'scroll';
+  const threshold = lesson.completionCriteria?.threshold ?? 0.9;
+
+  useEffect(() => {
+    if (!hasScrollCriteria) return;
+
+    // Walk up the DOM to find the actual scrolling ancestor
+    const findScrollParent = (node: HTMLElement | null): HTMLElement | null => {
+      if (!node || node === document.body) return null;
+      const style = window.getComputedStyle(node);
+      if (['auto', 'scroll'].includes(style.overflowY)) return node;
+      return findScrollParent(node.parentElement);
+    };
+
+    const scrollParent = findScrollParent(scrollRef.current);
+    if (!scrollParent) return;
+
+    // Reset at the start of each new subscription (safe: runs after render)
+    setScrollReached(false);
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = scrollParent;
+      const progress = (scrollTop + clientHeight) / scrollHeight;
+      if (progress >= threshold) {
+        setScrollReached(true);
+        onCriteriaMet?.();
+        scrollParent.removeEventListener('scroll', handleScroll);
+      }
+    };
+
+    scrollParent.addEventListener('scroll', handleScroll, { passive: true });
+    // Check immediately in case article is short enough to not need scrolling
+    handleScroll();
+    return () => scrollParent.removeEventListener('scroll', handleScroll);
+  }, [lesson.id, hasScrollCriteria, threshold, onCriteriaMet]);
+
   return (
-    <div className="p-6 md:p-8 space-y-6 prose prose-invert max-w-none w-full">
+    <div ref={scrollRef} className="p-6 md:p-8 space-y-6 prose prose-invert max-w-none w-full">
       <div className="flex justify-between items-start border-b border-line pb-6">
         <div>
           <h2 className="text-xl md:text-3xl font-bold text-text m-0">{lesson.title}</h2>
@@ -26,6 +66,13 @@ export const ArticleRenderer: React.FC<ArticleRendererProps> = ({ lesson }) => {
           in deep detail. You will learn the core mechanics, practical applications, and advanced edge cases 
           that will set you apart.
         </p>
+
+        {hasScrollCriteria && !scrollReached && (
+          <p className="text-xs italic text-cyan/70">Read through the full article to unlock completion — scroll to the bottom when you're ready.</p>
+        )}
+        {hasScrollCriteria && scrollReached && (
+          <p className="text-xs italic text-cyan">You've reached the end — hit <strong>Mark as Done</strong> below to complete this lesson.</p>
+        )}
 
         <h3 className="text-lg font-bold text-text mt-10 mb-4">1. Introduction to the Core Mechanics</h3>
         <p>
