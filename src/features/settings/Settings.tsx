@@ -14,7 +14,7 @@ interface SettingsProps {
 }
 
 export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account', onNavigate }) => {
-  const { user } = useAuth();
+  const { user, is2FAEnabled, setIs2FAEnabled } = useAuth();
   const { addToast } = useXP();
   const { theme, setTheme } = useTheme();
   
@@ -124,6 +124,8 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account', onNa
                   {isActive && tab.id === 'account' && (
                     <AccountTab 
                       user={user!} 
+                      is2FAEnabled={is2FAEnabled}
+                      setIs2FAEnabled={setIs2FAEnabled}
                       onEditEmail={() => openPasswordModal('email')}
                       onEditPassword={() => openPasswordModal('password')}
                       onExport={handleDataExport}
@@ -194,6 +196,8 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account', onNa
 
 interface AccountTabProps {
   user: { name?: string; email?: string };
+  is2FAEnabled: boolean;
+  setIs2FAEnabled: (enabled: boolean) => void;
   onEditEmail: () => void;
   onEditPassword: () => void;
   onExport: () => void;
@@ -201,8 +205,10 @@ interface AccountTabProps {
   onRestartOnboarding: () => void;
 }
 
-const AccountTab: React.FC<AccountTabProps> = ({ user, onEditEmail, onEditPassword, onExport, onDelete, onRestartOnboarding }) => {
+const AccountTab: React.FC<AccountTabProps> = ({ user, is2FAEnabled, setIs2FAEnabled, onEditEmail, onEditPassword, onExport, onDelete, onRestartOnboarding }) => {
   const { addToast } = useXP();
+  const [isSetup2FA, setIsSetup2FA] = useState(false);
+  const [twoFaCode, setTwoFaCode] = useState('');
   return (
   <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
     <div>
@@ -246,11 +252,57 @@ const AccountTab: React.FC<AccountTabProps> = ({ user, onEditEmail, onEditPasswo
             <ShieldCheck className="text-green" size={20} />
           </div>
           <div>
-            <h4 className="font-bold text-sm text-text">Two-factor authentication setup</h4>
-            <p className="text-xs text-muted mt-0.5">Add an extra layer of security to your account</p>
+            <h4 className="font-bold text-sm text-text">Two-factor authentication</h4>
+            <p className="text-xs text-muted mt-0.5">
+              {is2FAEnabled ? 'Active. Extra layer of security added.' : 'Add an extra layer of security to your account'}
+            </p>
           </div>
         </div>
-        <button onClick={() => addToast('success', 'Two-Factor Authentication setup started.')} className="px-4 py-2 bg-cyan text-bg hover:bg-cyan2 rounded-lg text-xs font-bold transition-colors">Setup 2FA</button>
+        
+        {isSetup2FA ? (
+          <div className="flex flex-col gap-2 p-3 bg-panel rounded-xl border border-line w-full max-w-sm">
+            <div className="bg-white w-24 h-24 mx-auto rounded-lg flex items-center justify-center">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=example" alt="QR Code" className="w-20 h-20" />
+            </div>
+            <p className="text-xs text-center text-muted">Scan with Google Authenticator or Authy</p>
+            <input 
+              type="text" 
+              placeholder="6-digit code" 
+              className="bg-bg border border-line rounded-lg px-3 py-2 text-sm text-center tracking-[0.5em] font-bold" 
+              value={twoFaCode}
+              onChange={(e) => setTwoFaCode(e.target.value.replace(/[^0-9]/g, ''))}
+              maxLength={6}
+            />
+            <div className="flex gap-2">
+              <button onClick={() => setIsSetup2FA(false)} className="flex-1 py-2 text-xs font-bold text-muted hover:text-text transition-colors">Cancel</button>
+              <button 
+                onClick={() => {
+                  setIs2FAEnabled(true);
+                  setIsSetup2FA(false);
+                  addToast('success', 'Two-Factor Authentication enabled.');
+                }}
+                disabled={twoFaCode.length !== 6}
+                className="flex-1 py-2 bg-cyan text-bg hover:bg-cyan2 rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
+              >
+                Verify & Enable
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button 
+            onClick={() => {
+              if (is2FAEnabled) {
+                setIs2FAEnabled(false);
+                addToast('success', 'Two-Factor Authentication disabled.');
+              } else {
+                setIsSetup2FA(true);
+              }
+            }} 
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors ${is2FAEnabled ? 'bg-red/10 text-red hover:bg-red/20' : 'bg-cyan text-bg hover:bg-cyan2'}`}
+          >
+            {is2FAEnabled ? 'Disable 2FA' : 'Setup 2FA'}
+          </button>
+        )}
       </div>
 
       {/* Connected Accounts */}

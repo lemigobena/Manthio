@@ -4,13 +4,34 @@ import { isCourseCompleted, calculateTrackProgress } from '../../services/progre
 import type { Course, SelfAssessmentLevel, UserTrackProgress, CareerTrack } from '../../types';
 import { TrackContext } from './TrackContextStore';
 
-const TRACK_STORAGE_KEY = 'track_progress_v1';
-const LESSON_STORAGE_KEY = 'lesson_progress_v1';
+const TRACK_STORAGE_KEY = 'track_progress_v2';
+const LESSON_STORAGE_KEY = 'lesson_progress_v2';
 
 function loadTrackProgress(): Record<string, UserTrackProgress> {
   try {
     const raw = localStorage.getItem(TRACK_STORAGE_KEY);
-    if (!raw) return {};
+    if (!raw) {
+      return {
+        'python-production-engineer': {
+          userId: 'u1',
+          trackId: 'python-production-engineer',
+          enrolledAt: new Date(Date.now()),
+          completedAt: null,
+          selfAssessmentLevel: 'nothing',
+          completedMilestoneIds: [],
+          bookmarkedAt: null,
+        },
+        'cloud-devops-engineer': {
+          userId: 'u1',
+          trackId: 'cloud-devops-engineer',
+          enrolledAt: new Date(Date.now() - 1000000),
+          completedAt: null,
+          selfAssessmentLevel: 'nothing',
+          completedMilestoneIds: [],
+          bookmarkedAt: null,
+        }
+      };
+    }
     const parsed = JSON.parse(raw);
     for (const key of Object.keys(parsed)) {
       if (parsed[key].enrolledAt) parsed[key].enrolledAt = new Date(parsed[key].enrolledAt);

@@ -2,10 +2,58 @@ import React, { useState } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
-import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, CheckCircle } from 'lucide-react';
+import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, CheckCircle, X } from 'lucide-react';
 import { useTrack } from '../track-detail/useTrack';
 import { calculateCourseProgress } from '../../services/progressUtils';
 import type { CareerTrack, Course } from '../../types';
+
+const levenshtein = (a: string, b: string): number => {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  const matrix = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
+  for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+  for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + cost
+      );
+    }
+  }
+  return matrix[a.length][b.length];
+};
+
+const stem = (word: string) => word.toLowerCase().replace(/(ing|ed|s)$/i, '');
+
+const fuzzyMatch = (query: string, text: string): boolean => {
+  if (!query || !text) return false;
+  const q = query.toLowerCase();
+  const t = text.toLowerCase();
+  if (t.includes(q)) return true;
+  
+  const qWords = q.split(/\s+/).map(stem).filter(Boolean);
+  const tWords = t.split(/\W+/).map(stem).filter(Boolean);
+  
+  if (qWords.length === 0) return true;
+  
+  for (const qw of qWords) {
+    let found = false;
+    for (const tw of tWords) {
+      if (tw.includes(qw)) { found = true; break; }
+      const threshold = qw.length <= 4 ? 1 : 2;
+      if (Math.abs(qw.length - tw.length) <= threshold && levenshtein(qw, tw) <= threshold) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) return false;
+  }
+  return true;
+};
 
 interface CatalogProps {
   onNavigate: (page: string) => void;
@@ -25,6 +73,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<string>('All');
   const [selectedFormat, setSelectedFormat] = useState<string>('All');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('All');
   const [selectedTopic, setSelectedTopic] = useState<string>('All');
   const [selectedGoal, setSelectedGoal] = useState<string>('All');
   const [selectedTimeRange, setSelectedTimeRange] = useState<string>('All');
@@ -82,18 +131,20 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
     if (activeTab === 'completed' && course.progress < 100) return false;
 
     // Search query filtering
-    if (searchQuery && 
-        !course.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
-        !course.description.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !course.trainer.name.toLowerCase().includes(searchQuery.toLowerCase())
-    ) {
-      return false;
+    if (searchQuery) {
+      const matchTitle = fuzzyMatch(searchQuery, course.title);
+      const matchDesc = fuzzyMatch(searchQuery, course.description);
+      const matchTrainer = fuzzyMatch(searchQuery, course.trainer.name);
+      const matchTags = (course.tags || []).some(tag => fuzzyMatch(searchQuery, tag));
+      
+      if (!matchTitle && !matchDesc && !matchTrainer && !matchTags) return false;
     }
 
     // Filter selectors
     if (selectedLevel !== 'All' && course.level !== selectedLevel) return false;
     if (selectedFormat !== 'All' && course.format !== selectedFormat) return false;
     if (selectedTopic !== 'All' && course.topic !== selectedTopic) return false;
+    if (selectedLanguage !== 'All' && course.language !== selectedLanguage) return false;
 
     return true;
   });
@@ -113,7 +164,13 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
     if (activeTab === 'completed' && t.progress < 100) return false;
 
     // Search and Level filtering
-    if (searchQuery && !t.title.toLowerCase().includes(searchQuery.toLowerCase()) && !t.outcomeStatement.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    if (searchQuery) {
+      const matchTitle = fuzzyMatch(searchQuery, t.title);
+      const matchDesc = fuzzyMatch(searchQuery, t.outcomeStatement);
+      const matchTags = (t.tags || []).some(tag => fuzzyMatch(searchQuery, tag));
+      if (!matchTitle && !matchDesc && !matchTags) return false;
+    }
+    
     if (selectedLevel !== 'All' && t.level !== selectedLevel) return false;
     
     // REQ-TRACK-022 filters
@@ -263,6 +320,17 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
               </select>
 
               <select 
+                value={selectedLanguage}
+                onChange={(e) => { setSelectedLanguage(e.target.value); simulateLoad(); }}
+                className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
+              >
+                <option value="All">Language: All</option>
+                <option value="English">English</option>
+                <option value="German">German</option>
+                <option value="French">French</option>
+              </select>
+
+              <select 
                 value={sortBy}
                 onChange={(e) => { setSortBy(e.target.value); simulateLoad(); }}
                 className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
@@ -305,6 +373,49 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
         </div>
       </div>
 
+      {/* REQ-CATALOG-004: Active Filter Chips */}
+      {(() => {
+        const activeFilters = [];
+        if (selectedLevel !== 'All') activeFilters.push({ label: `Level: ${selectedLevel}`, clear: () => setSelectedLevel('All') });
+        if (discoveryMode === 'courses') {
+          if (selectedTopic !== 'All') activeFilters.push({ label: `Topic: ${selectedTopic}`, clear: () => setSelectedTopic('All') });
+          if (selectedFormat !== 'All') activeFilters.push({ label: `Format: ${selectedFormat}`, clear: () => setSelectedFormat('All') });
+          if (selectedLanguage !== 'All') activeFilters.push({ label: `Language: ${selectedLanguage}`, clear: () => setSelectedLanguage('All') });
+        } else {
+          if (selectedGoal !== 'All') activeFilters.push({ label: `Goal: ${selectedGoal}`, clear: () => setSelectedGoal('All') });
+          if (selectedTimeRange !== 'All') activeFilters.push({ label: `Time: ${selectedTimeRange}`, clear: () => setSelectedTimeRange('All') });
+        }
+
+        if (activeFilters.length === 0) return null;
+
+        return (
+          <div className="flex flex-wrap items-center gap-2 -mt-2 pb-4">
+            <span className="text-[10px] text-muted font-bold uppercase mr-1">Active Filters:</span>
+            {activeFilters.map((filter, i) => (
+              <span key={i} className="flex items-center space-x-1 bg-cyan/10 border border-cyan/20 text-cyan text-[11px] font-bold px-2.5 py-1 rounded-lg">
+                <span>{filter.label}</span>
+                <button onClick={() => { filter.clear(); simulateLoad(); }} className="hover:text-text cursor-pointer ml-1">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            <button 
+              onClick={() => {
+                setSelectedLevel('All');
+                setSelectedTopic('All');
+                setSelectedFormat('All');
+                setSelectedLanguage('All');
+                setSelectedGoal('All');
+                setSelectedTimeRange('All');
+                simulateLoad();
+              }} 
+              className="text-[10px] font-bold text-muted hover:text-text cursor-pointer uppercase underline underline-offset-2 ml-2"
+            >
+              Clear All
+            </button>
+          </div>
+        );
+      })()}
       {/* REQ-LOAD-004: Failed load with retry action */}
       {isError ? (
         <div className="text-center py-16 max-w-md mx-auto my-6 space-y-4">

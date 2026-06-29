@@ -12,6 +12,10 @@ interface AuthContextType {
   isOnboardingCompleted: boolean;
   onboardingAnswers: OnboardingAnswers | null;
   isOnboardingSkipped: boolean;
+  isEmailVerified: boolean;
+  setIsEmailVerified: (verified: boolean) => void;
+  is2FAEnabled: boolean;
+  setIs2FAEnabled: (enabled: boolean) => void;
   signIn: (email: string, password: string) => Promise<boolean>;
   signUp: (name: string, email: string, password: string) => Promise<boolean>;
   signOut: () => void;
@@ -23,6 +27,8 @@ interface AuthContextType {
   setActiveCourseId: (id: string | null) => void;
   activeTrackId: string | null;
   setActiveTrackId: (id: string | null) => void;
+  checkoutItem: { type: 'course' | 'track'; id: string } | null;
+  setCheckoutItem: (item: { type: 'course' | 'track'; id: string } | null) => void;
   selectedFormat: string | null;
   setSelectedFormat: (format: string | null) => void;
   skipAuth: () => void;
@@ -61,6 +67,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return localStorage.getItem('selectedFormat') || null;
   });
 
+  const [isEmailVerified, setIsEmailVerifiedState] = useState<boolean>(() => {
+    return localStorage.getItem('isEmailVerified') === 'true';
+  });
+
+  const [is2FAEnabled, setIs2FAEnabledState] = useState<boolean>(() => {
+    return localStorage.getItem('is2FAEnabled') === 'true';
+  });
+
   const setActiveCourseId = (id: string | null) => {
     setActiveCourseIdState(id);
     if (id) localStorage.setItem('activeCourseId', id);
@@ -71,6 +85,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setActiveTrackIdState(id);
     if (id) localStorage.setItem('activeTrackId', id);
     else localStorage.removeItem('activeTrackId');
+  };
+
+  const setIsEmailVerified = (verified: boolean) => {
+    setIsEmailVerifiedState(verified);
+    localStorage.setItem('isEmailVerified', String(verified));
+  };
+
+  const setIs2FAEnabled = (enabled: boolean) => {
+    setIs2FAEnabledState(enabled);
+    localStorage.setItem('is2FAEnabled', String(enabled));
+  };
+
+  const [checkoutItem, setCheckoutItemState] = useState<{ type: 'course' | 'track'; id: string } | null>(null);
+
+  const setCheckoutItem = (item: { type: 'course' | 'track'; id: string } | null) => {
+    setCheckoutItemState(item);
   };
 
   const setSelectedFormat = (format: string | null) => {
@@ -128,6 +158,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = () => {
+    setIsEmailVerifiedState(false);
+    localStorage.removeItem('isEmailVerified');
+    setIs2FAEnabledState(false);
+    localStorage.removeItem('is2FAEnabled');
     setUser(null);
     localStorage.removeItem('user');
   };
@@ -192,6 +226,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <AuthContext.Provider value={{
       user,
+      isEmailVerified,
+      setIsEmailVerified,
+      is2FAEnabled,
+      setIs2FAEnabled,
       isAuthenticated: !!user,
       isOnboardingCompleted,
       onboardingAnswers,
@@ -207,6 +245,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setActiveCourseId,
       activeTrackId,
       setActiveTrackId,
+      checkoutItem,
+      setCheckoutItem,
       selectedFormat,
       setSelectedFormat,
       skipAuth

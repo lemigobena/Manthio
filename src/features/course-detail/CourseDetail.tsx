@@ -12,10 +12,18 @@ interface CourseDetailProps {
   isPublic?: boolean;
 }
 
+const MOCK_DATES = {
+  todayStr: new Date(Date.now()).toLocaleDateString(),
+  nextWeekStr: new Date(Date.now() + 86400000 * 7).toLocaleDateString(),
+  nextTwoWeeksStr: new Date(Date.now() + 86400000 * 14).toLocaleDateString(),
+};
+
 export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic }) => {
   const { activeCourseId, activeTrackId, selectedFormat, setSelectedFormat, setActiveCourseId, setActiveTrackId } = useAuth();
   const { addToast } = useXP();
   const { getTrackPercentage, completedLessonIds } = useTrack();
+  const [visibleReviews, setVisibleReviews] = useState(3);
+  const { todayStr, nextWeekStr, nextTwoWeeksStr } = MOCK_DATES;
   
   // Decide what to show: Track or Course
   // If we came from a track click, activeTrackId will be set.
@@ -149,11 +157,15 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
               <span className="text-text">+{course?.xpReward || 1500} XP Reward</span>
             </div>
             {course && (
-              <div className="flex items-center space-x-2 text-cyan">
-                <User className="w-3.5 h-3.5" />
-                <span className="text-text">Trainer: {course?.trainer?.name}</span>
+              <div className="flex items-center space-x-2">
+                <img src={course?.trainer?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150'} alt={course?.trainer?.name || 'Trainer'} className="w-5 h-5 rounded-full border border-line object-cover" />
+                <span className="text-text">Trainer: <span className="text-cyan">{course?.trainer?.name}</span></span>
               </div>
             )}
+            <div className="flex items-center space-x-2">
+              <Globe className="w-3.5 h-3.5 text-cyan" />
+              <span className="text-text">{course?.language || 'English'}</span>
+            </div>
             {track && (
               <div className="flex items-center space-x-2 text-cyan">
                 <Clock className="w-3.5 h-3.5" />
@@ -282,10 +294,13 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                     : `Foundations of ${course?.topic} build block by block.`}
                 </p>
               </div>
-              {!track && (
-                <button className="bg-bg border border-line hover:border-cyan/50 text-text text-[10px] font-bold px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
-                  <BookOpen className="w-3.5 h-3.5 text-cyan" />
-                  <span>PREVIEW FIRST LESSON</span>
+              {!track && course?.modules && course.modules.length > 0 && (
+                <button
+                  onClick={() => onNavigate('content-player')}
+                  className="flex items-center space-x-2 bg-cyan/10 hover:bg-cyan/20 text-cyan border border-cyan/20 px-4 py-2 rounded-xl transition-all text-xs font-bold uppercase tracking-wider"
+                >
+                  <PlayCircle className="w-4 h-4" />
+                  <span>Preview 1st Lesson</span>
                 </button>
               )}
             </div>
@@ -589,35 +604,36 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
             </div>
 
             <div className="space-y-6">
-              {(course?.reviews || []).map((review: Review) => (
+              {(course?.reviews || []).slice(0, visibleReviews).map((review: Review) => (
                 <div key={review.id} className="space-y-4 pb-6 border-b border-line last:border-0 last:pb-0">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-full bg-bg border border-line flex items-center justify-center font-black text-xs text-cyan">
-                        {review.userName.charAt(0)}
-                      </div>
+                      <img src={review.userAvatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150'} alt={review.userName} className="w-10 h-10 rounded-full border border-line object-cover" />
                       <div>
-                        <div className="flex items-center space-x-2">
-                          <h4 className="text-sm font-bold text-text">{review.userName}</h4>
-                          {review.isVerified && (
-                            <div className="flex items-center space-x-1 bg-green/10 text-green px-1.5 py-0.5 rounded flex-shrink-0">
-                              <ShieldCheck className="w-3 h-3" />
-                              <span className="text-[9px] font-black uppercase">Verified Completion</span>
-                            </div>
-                          )}
-                        </div>
-                        <p className="text-[10px] text-muted">{new Date(review.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                        <h4 className="font-bold text-sm text-text">{review.userName}</h4>
+                        <p className="text-[10px] text-muted">{new Date(review.date).toLocaleDateString()} • Student</p>
                       </div>
                     </div>
-                    <div className="flex text-orange">
+                    <div className="flex">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`w-3 h-3 ${i < review.rating ? 'fill-orange' : 'opacity-20'}`} />
+                        <Star key={i} className={`w-3 h-3 ${i < review.rating ? 'text-cyan fill-cyan' : 'text-line'}`} />
                       ))}
                     </div>
                   </div>
-                  <p className="text-xs text-text leading-relaxed font-medium">"{review.comment}"</p>
+                  <p className="text-sm text-muted leading-relaxed font-medium">"{review.comment}"</p>
                 </div>
               ))}
+              
+              {course?.reviews && visibleReviews < course.reviews.length && (
+                <div className="pt-4 flex justify-center">
+                  <button 
+                    onClick={() => setVisibleReviews(prev => prev + 3)}
+                    className="text-xs font-bold uppercase tracking-widest text-cyan hover:text-cyan/80 transition-colors"
+                  >
+                    Show More Reviews
+                  </button>
+                </div>
+              )}
               {(!course?.reviews || course?.reviews?.length === 0) && (
                 <p className="text-sm text-muted text-center py-4 italic">No reviews available yet for this {track ? 'track' : 'course'}.</p>
               )}
@@ -676,11 +692,20 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
               <p className="text-muted text-xs leading-relaxed">
                 {course?.trainer?.bio || 'This career track is curated and led by multiple industry experts with over 15 years of common experience in the field.'}
               </p>
-              {course?.trainer?.linkedIn && (
-                <a href={course?.trainer?.linkedIn} target="_blank" rel="noreferrer" className="text-cyan hover:underline text-xs font-semibold block">
-                  View LinkedIn Profile
-                </a>
-              )}
+              <div className="flex items-center space-x-4 pt-2">
+                {course?.trainer?.linkedIn && (
+                  <a href={course?.trainer?.linkedIn} target="_blank" rel="noreferrer" className="flex items-center space-x-1.5 text-cyan hover:underline text-xs font-semibold">
+                    <Users className="w-3.5 h-3.5" />
+                    <span>LinkedIn</span>
+                  </a>
+                )}
+                {course?.trainer?.website && (
+                  <a href={course?.trainer?.website} target="_blank" rel="noreferrer" className="flex items-center space-x-1.5 text-cyan hover:underline text-xs font-semibold">
+                    <Globe className="w-3.5 h-3.5" />
+                    <span>Personal Site</span>
+                  </a>
+                )}
+              </div>
             </div>
 
             {/* More from this Trainer - Integrated List */}
@@ -740,15 +765,28 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
               </div>
 
               {(selectedFormat === 'flipped' || course?.format === 'flipped') && (
-                <div className="p-4 rounded-xl bg-cyan/5 border border-cyan/20 space-y-3">
+                <div className="p-4 rounded-xl bg-cyan/5 border border-cyan/20 space-y-4">
                   <div className="flex items-start space-x-3">
                     <div className="p-1.5 rounded-lg bg-cyan/10">
                       <Globe className="w-4 h-4 text-cyan" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-black text-cyan uppercase block mb-1">Workshop Venue</span>
+                      <span className="text-[10px] font-black text-cyan uppercase block mb-1">In-Person Sessions</span>
                       <p className="text-[11px] text-muted leading-relaxed">
-                        apigenio Training Centre, Muri/Bern. Physical attendance required for Capstone sessions.
+                        Location: apigenio Training Centre, Muri/Bern.<br/>
+                        Dates: {todayStr} & {nextWeekStr}<br/>
+                        Bring: Laptop and valid ID.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3 pt-3 border-t border-cyan/10">
+                    <div className="p-1.5 rounded-lg bg-cyan/10">
+                      <BookOpen className="w-4 h-4 text-cyan" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-cyan uppercase block mb-1">Self-Study Windows</span>
+                      <p className="text-[11px] text-muted leading-relaxed">
+                        Complete units 1–3 before session 1. Complete units 4–7 before final capstone.
                       </p>
                     </div>
                   </div>
@@ -756,16 +794,30 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
               )}
 
               {selectedFormat === 'cohort' && (
-                <div className="p-4 rounded-xl bg-purple/5 border border-purple/20 space-y-3">
+                <div className="p-4 rounded-xl bg-purple/5 border border-purple/20 space-y-4">
                   <div className="flex items-start space-x-3">
                     <div className="p-1.5 rounded-lg bg-purple/10">
-                      <Globe className="w-4 h-4 text-purple" />
+                      <Clock className="w-4 h-4 text-purple" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-black text-purple uppercase block mb-1">Session Platform</span>
+                      <span className="text-[10px] font-black text-purple uppercase block mb-1">Schedule & Start Date</span>
                       <p className="text-[11px] text-muted leading-relaxed">
-                        Conducted via Microsoft Teams. Direct access links will be shared in your cohort dashboard.
+                        Next cohort starts: {nextTwoWeeksStr}<br/>
+                        Live sessions: Tuesdays at 18:00 CET.
                       </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3 pt-3 border-t border-purple/10">
+                    <div className="p-1.5 rounded-lg bg-purple/10">
+                      <Award className="w-4 h-4 text-purple" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-purple uppercase block mb-1">Past Outcomes</span>
+                      <ul className="text-[11px] text-muted leading-relaxed list-disc pl-3">
+                        <li>85% promotion rate within 6 months</li>
+                        <li>Average salary increase of +18%</li>
+                        <li>High satisfaction from 100+ graduates</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
@@ -777,10 +829,24 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                     <div className="p-1.5 rounded-lg bg-amber-500/10">
                       <Sparkles className="w-4 h-4 text-amber-600" />
                     </div>
-                    <div>
-                      <span className="text-[10px] font-black text-amber-600 uppercase block mb-1">Flexible Choice</span>
-                      <p className="text-[11px] text-muted leading-relaxed">
-                        This course offers multiple pedagogy models. Choose the one that fits your learning style best.
+                    <div className="w-full">
+                      <span className="text-[10px] font-black text-amber-600 uppercase block mb-2">Delivery Comparison</span>
+                      <div className="space-y-2 text-[10px] text-muted">
+                        <div className="flex justify-between border-b border-amber-500/10 pb-1">
+                          <span className="font-bold">Self-Paced</span>
+                          <span>Lowest Price, Full AI Tutor</span>
+                        </div>
+                        <div className="flex justify-between border-b border-amber-500/10 pb-1">
+                          <span className="font-bold">Cohort</span>
+                          <span>Peer Group, Live Video</span>
+                        </div>
+                        <div className="flex justify-between pb-1">
+                          <span className="font-bold">Flipped</span>
+                          <span>In-Person + Self-Study</span>
+                        </div>
+                      </div>
+                      <p className="text-[9px] text-amber-600/70 mt-2 font-medium italic">
+                        *All formats include certificate eligibility.
                       </p>
                     </div>
                   </div>

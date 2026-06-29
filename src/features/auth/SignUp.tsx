@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { PasswordStrengthMeter } from './PasswordStrengthMeter';
+import { calculatePasswordStrength } from './passwordUtils';
 
 
 interface SignUpProps {
@@ -25,7 +27,7 @@ export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
     // Explicitly navigate without constraints
     const fullName = `${firstName || 'Alex'} ${lastName || 'Chen'}`.trim();
     await signUp(fullName, email || 'newuser@example.com', password || 'password');
-    onNavigate('onboarding');
+    onNavigate('verify-email');
   };
 
   return (
@@ -81,6 +83,8 @@ export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
+        
+        <PasswordStrengthMeter password={password} />
 
         <div className="space-y-4 pt-2">
           {/* Custom Modern Checkbox: Terms */}
@@ -139,7 +143,7 @@ export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
 
         <button 
           type="submit" 
-          disabled={isLoading || !agree}
+          disabled={isLoading || !agree || password.length < 12 || calculatePasswordStrength(password) < 5}
           className="w-full bg-cyan hover:bg-cyan2 text-bg font-bold py-[0.875rem] rounded-xl transition-all disabled:opacity-50 shadow-lg shadow-cyan/10 text-sm mt-2 active:scale-[0.98] cursor-pointer"
         >
           {isLoading ? "Creating..." : "Create account"}
