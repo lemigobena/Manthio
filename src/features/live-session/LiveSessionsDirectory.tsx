@@ -134,7 +134,7 @@ export const LiveSessionsDirectory: React.FC<LiveSessionsDirectoryProps> = ({ on
               placeholder="Search sessions..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent border-none focus:outline-none text-xs text-text w-full"
+              className="bg-transparent border-none !outline-none focus:outline-none text-xs text-text w-full"
             />
           </div>
         </div>
