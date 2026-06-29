@@ -24,9 +24,11 @@ import { ExternalLinkRenderer } from './renderers/ExternalLinkRenderer';
 interface ContentPlayerProps {
   onNavigate: (page: string) => void;
   initialTab?: string;
+  isQuickSession?: boolean;
+  onCloseQuickSession?: () => void;
 }
 
-export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initialTab }) => {
+export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initialTab, isQuickSession = false, onCloseQuickSession }) => {
   const { activeCourseId } = useAuth();
   const { addXp, addToast } = useXP();
   const { openModal } = useModal();
@@ -70,8 +72,8 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
   const isMobile = windowWidth < 768;
   const isTablet = windowWidth >= 768 && windowWidth < 1400;
   
-  const [curriculumOpen, setCurriculumOpen] = useState(!isMobile && !isTablet);
-  const [toolsOpen, setToolsOpen] = useState(!!initialTab);
+  const [curriculumOpen, setCurriculumOpen] = useState(!isMobile && !isTablet && !isQuickSession);
+  const [toolsOpen, setToolsOpen] = useState(!!initialTab && !isQuickSession);
 
   // Mutual-exclusion check on resize
   useEffect(() => {
@@ -83,14 +85,16 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
 
   // Mutual-exclusion: below 1400px only one sidebar open at a time
   const handleSetCurriculumOpen = useCallback((open: boolean) => {
+    if (isQuickSession) return;
     setCurriculumOpen(open);
     if (open && window.innerWidth < 1400) setToolsOpen(false);
-  }, []);
+  }, [isQuickSession]);
 
   const handleSetToolsOpen = useCallback((open: boolean) => {
+    if (isQuickSession) return;
     setToolsOpen(open);
     if (open && window.innerWidth < 1400) setCurriculumOpen(false);
-  }, []);
+  }, [isQuickSession]);
 
   // Flatten lessons to find previous/next easily
   const allLessons = course.modules.flatMap(m => m.lessons);
@@ -225,7 +229,11 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
   };
 
   return (
-    <div className="h-[calc(100dvh-64px)] flex flex-col -mx-3 md:-mx-[44px] -my-6 bg-bg overflow-hidden relative border-y border-line">
+    <div className={`flex flex-col bg-bg overflow-hidden relative ${
+      isQuickSession 
+        ? 'w-full h-full' 
+        : 'h-[calc(100dvh-64px)] -mx-3 md:-mx-[44px] -my-6 border-y border-line'
+    }`}>
       <PlayerTopBar 
         course={course}
         currentLesson={currentLesson}
@@ -234,17 +242,21 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
         curriculumOpen={curriculumOpen}
         setCurriculumOpen={handleSetCurriculumOpen}
         onNavigate={onNavigate}
+        isQuickSession={isQuickSession}
+        onCloseQuickSession={onCloseQuickSession}
       />
 
       {/* Main Workspace */}
       <div className="flex-1 flex overflow-hidden relative">
-        <CurriculumPane 
-          course={course} 
-          currentLesson={currentLesson} 
-          onSelectLesson={setCurrentLesson} 
-          isOpen={curriculumOpen}
-          setIsOpen={handleSetCurriculumOpen}
-        />
+        {!isQuickSession && (
+          <CurriculumPane 
+            course={course} 
+            currentLesson={currentLesson} 
+            onSelectLesson={setCurrentLesson} 
+            isOpen={curriculumOpen}
+            setIsOpen={handleSetCurriculumOpen}
+          />
+        )}
 
         <div className={`flex-1 bg-bg flex flex-col items-center ${
           ['PDF', 'Code', 'H5P'].includes(currentLesson.type) 
@@ -256,22 +268,26 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
           </div>
         </div>
 
-        <ToolsPane 
-          currentLesson={currentLesson} 
-          isOpen={toolsOpen} 
-          initialTab={initialTab} 
-          setIsOpen={handleSetToolsOpen} 
-        />
+        {!isQuickSession && (
+          <ToolsPane 
+            currentLesson={currentLesson} 
+            isOpen={toolsOpen} 
+            initialTab={initialTab} 
+            setIsOpen={handleSetToolsOpen} 
+          />
+        )}
       </div>
 
-      <PlayerBottomBar 
-        currentLesson={currentLesson}
-        hasPrevious={hasPrevious}
-        hasNext={hasNext}
-        onPrevious={handlePrevious}
-        onNext={handleNext}
-        onMarkComplete={markLessonComplete}
-      />
+      {!isQuickSession && (
+        <PlayerBottomBar 
+          currentLesson={currentLesson}
+          hasPrevious={hasPrevious}
+          hasNext={hasNext}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+          onMarkComplete={markLessonComplete}
+        />
+      )}
     </div>
   );
 };
