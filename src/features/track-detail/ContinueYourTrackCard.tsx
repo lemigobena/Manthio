@@ -14,7 +14,7 @@ interface ContinueYourTrackCardProps {
 const TrackItem: React.FC<{ 
   activeEntry: UserTrackProgress; 
   onNavigate: (path: string) => void; 
-  setActiveTrackId: (id: string | null) => void; 
+  setActiveTrackId: (id: string) => void; 
 }> = ({ activeEntry, onNavigate, setActiveTrackId }) => {
   const activeTrack = TRACKS.find(t => t.id === activeEntry.trackId);
   if (!activeTrack) return null;
