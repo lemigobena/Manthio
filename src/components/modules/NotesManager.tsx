@@ -203,7 +203,7 @@ export const NotesManager: React.FC<NotesManagerProps> = ({
             placeholder="Neural search..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-bg border border-line rounded-xl pl-9 pr-4 py-2 text-xs text-text focus:outline-none focus:border-cyan transition-all placeholder:text-muted/50"
+            className="w-full bg-bg border border-line rounded-xl pl-9 pr-4 py-2 text-xs text-text !outline-none focus:outline-none focus:border-cyan transition-all placeholder:text-muted/50"
           />
         </div>
 
@@ -228,21 +228,21 @@ export const NotesManager: React.FC<NotesManagerProps> = ({
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {editingNoteId ? (
-          <div className="space-y-4 animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between">
+      {editingNoteId ? (
+        <div className="flex-1 flex flex-col p-4 space-y-4 overflow-hidden border-b border-line">
+          <div className="space-y-4 flex flex-col h-full animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between shrink-0">
                <button 
                 onClick={() => { handleSaveNote(); setEditingNoteId(null); }}
-                className="text-[10px] font-bold text-muted hover:text-cyan flex items-center space-x-1"
+                className="text-[10px] font-bold text-muted hover:text-cyan flex items-center space-x-1 cursor-pointer"
                >
                  <ChevronRight className="w-3.5 h-3.5 rotate-180" />
                  <span>Back to Vault</span>
                </button>
-               <div className="flex space-x-1.5">
+               <div className="flex space-x-1.5 shrink-0">
                   <button 
                     onClick={() => { handleSaveNote(); setEditingNoteId(null); addToast('success', 'Neural pattern committed to memory.'); }}
-                    className="p-2 rounded-lg bg-cyan/10 border border-cyan/30 text-cyan hover:bg-cyan hover:text-bg transition-all flex items-center space-x-2"
+                    className="p-2 rounded-lg bg-cyan/10 border border-cyan/30 text-cyan hover:bg-cyan hover:text-bg transition-all flex items-center space-x-2 cursor-pointer"
                     title="Manual Commit & Close"
                   >
                     <Save className="w-3.5 h-3.5" />
@@ -250,14 +250,14 @@ export const NotesManager: React.FC<NotesManagerProps> = ({
                   </button>
                   <button 
                     onClick={() => setIsPreview(!isPreview)}
-                    className={`p-2 rounded-lg border transition-all ${isPreview ? 'bg-panel border-cyan text-cyan' : 'bg-bg border-line text-muted'}`}
+                    className={`p-2 rounded-lg border transition-all cursor-pointer ${isPreview ? 'bg-panel border-cyan text-cyan' : 'bg-bg border-line text-muted'}`}
                     title="Toggle Preview"
                   >
                     <Eye className="w-3.5 h-3.5" />
                   </button>
                   <button 
                     onClick={() => handleExport(notes.find(n => n.id === editingNoteId))}
-                    className="p-2 rounded-lg bg-bg border border-line text-muted hover:text-cyan transition-all"
+                    className="p-2 rounded-lg bg-bg border border-line text-muted hover:text-cyan transition-all cursor-pointer"
                     title="Export as Markdown"
                   >
                     <Download className="w-3.5 h-3.5" />
@@ -269,23 +269,23 @@ export const NotesManager: React.FC<NotesManagerProps> = ({
               type="text" 
               value={noteTitle}
               onChange={(e) => setNoteTitle(e.target.value)}
-              className="w-full bg-transparent border-b border-line py-2 text-sm font-bold text-text focus:outline-none focus:border-cyan placeholder:text-muted/30"
+              className="w-full bg-transparent border-b border-line py-2 text-sm font-bold text-text !outline-none focus:outline-none focus:border-cyan placeholder:text-muted/30 shrink-0"
               placeholder="Insight Designation..."
             />
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 shrink-0">
               <Tag className="w-3.5 h-3.5 text-muted" />
               <input 
                 type="text"
                 placeholder="Add tags (comma separated)..."
                 value={noteTags.join(', ')}
                 onChange={(e) => setNoteTags(e.target.value.split(',').map(t => t.trim()).filter(t => t))}
-                className="bg-transparent text-[10px] font-bold text-cyan uppercase placeholder:text-muted/30 focus:outline-none"
+                className="bg-transparent text-[10px] font-bold text-cyan uppercase placeholder:text-muted/30 focus:outline-none !outline-none"
               />
             </div>
 
             {isPreview ? (
-              <div className="bg-bg/50 border border-line rounded-2xl p-4 min-h-[300px] prose-invert">
+              <div className="bg-bg/50 border border-line rounded-2xl p-4 flex-1 overflow-y-auto prose-invert">
                 {renderMarkdown(noteContent)}
               </div>
             ) : (
@@ -294,111 +294,115 @@ export const NotesManager: React.FC<NotesManagerProps> = ({
                 onChange={(e) => setNoteContent(e.target.value)}
                 autoFocus
                 placeholder="Capture your thoughts... Use # for headings and ``` for code."
-                className="w-full bg-bg border border-line rounded-2xl p-4 text-[11px] text-text min-h-[350px] focus:outline-none focus:border-cyan transition-all resize-none shadow-inner"
+                className="flex-1 w-full bg-bg border border-line rounded-2xl p-4 text-[11px] text-text focus:outline-none focus:border-cyan transition-all resize-none shadow-inner overflow-y-auto overscroll-contain !outline-none"
               />
             )}
           </div>
-        ) : activeTab === 'notes' ? (
-          <div className="space-y-3">
-            {filteredNotes.map(note => (
-              <div 
-                key={note.id}
-                onClick={() => {
-                  setEditingNoteId(note.id);
-                  setNoteTitle(note.title);
-                  setNoteContent(note.content);
-                  setNoteTags(note.tags);
-                  setIsPreview(false);
-                }}
-                className="group p-4 bg-bg border border-line rounded-2xl hover:border-cyan/40 transition-all cursor-pointer relative overflow-hidden"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <FileText className="w-3.5 h-3.5 text-cyan" />
-                    <h4 className="text-xs font-bold text-text max-w-[150px] truncate">{note.title || 'Untitled'}</h4>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-4">
+          {activeTab === 'notes' ? (
+            <div className="space-y-3">
+              {filteredNotes.map(note => (
+                <div 
+                  key={note.id}
+                  onClick={() => {
+                    setEditingNoteId(note.id);
+                    setNoteTitle(note.title);
+                    setNoteContent(note.content);
+                    setNoteTags(note.tags);
+                    setIsPreview(false);
+                  }}
+                  className="group p-4 bg-bg border border-line rounded-2xl hover:border-cyan/40 transition-all cursor-pointer relative overflow-hidden"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <FileText className="w-3.5 h-3.5 text-cyan" />
+                      <h4 className="text-xs font-bold text-text max-w-[150px] truncate">{note.title || 'Untitled'}</h4>
+                    </div>
+                    <button 
+                      onClick={(e) => handleDeleteNote(note.id, e)}
+                      className="opacity-0 group-hover:opacity-100 p-1.5 text-muted hover:text-red transition-all"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <button 
-                    onClick={(e) => handleDeleteNote(note.id, e)}
-                    className="opacity-0 group-hover:opacity-100 p-1.5 text-muted hover:text-red transition-all"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                
-                <p className="text-[11px] text-muted line-clamp-2 mb-3 leading-relaxed">
-                  {note.content || 'Zero data recorded...'}
-                </p>
+                  
+                  <p className="text-[11px] text-muted line-clamp-2 mb-3 leading-relaxed">
+                    {note.content || 'Zero data recorded...'}
+                  </p>
 
-                <div className="flex items-center justify-between text-[9px] text-muted/60 font-bold">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-3 h-3" />
-                    <span>{new Date(note.updatedAt).toLocaleDateString()}</span>
+                  <div className="flex items-center justify-between text-[9px] text-muted/60 font-bold">
+                    <div className="flex items-center space-x-2">
+                      <Clock className="w-3 h-3" />
+                      <span>{new Date(note.updatedAt).toLocaleDateString()}</span>
+                    </div>
+                    {note.anchor && (
+                       <div className="flex items-center space-x-1 text-cyan/70">
+                          <ExternalLink className="w-3 h-3" />
+                          <span className="uppercase tracking-tighter">{note.anchor.type} {note.anchor.value}</span>
+                       </div>
+                    )}
                   </div>
-                  {note.anchor && (
-                     <div className="flex items-center space-x-1 text-cyan/70">
-                        <ExternalLink className="w-3 h-3" />
-                        <span className="uppercase tracking-tighter">{note.anchor.type} {note.anchor.value}</span>
-                     </div>
+                  
+                  {note.tags.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      {note.tags.map((tag, idx) => (
+                        <span key={idx} className="bg-cyan/10 text-cyan text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest">{tag}</span>
+                      ))}
+                    </div>
                   )}
                 </div>
-                
-                {note.tags.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {note.tags.map((tag, idx) => (
-                      <span key={idx} className="bg-cyan/10 text-cyan text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest">{tag}</span>
-                    ))}
+              ))}
+              {filteredNotes.length === 0 && (
+                <div className="py-20 text-center space-y-4 opacity-40">
+                  <div className="w-16 h-16 bg-line rounded-full flex items-center justify-center mx-auto">
+                     <Clock className="w-8 h-8 text-muted" />
                   </div>
-                )}
-              </div>
-            ))}
-            {filteredNotes.length === 0 && (
-              <div className="py-20 text-center space-y-4 opacity-40">
-                <div className="w-16 h-16 bg-line rounded-full flex items-center justify-center mx-auto">
-                   <Clock className="w-8 h-8 text-muted" />
+                  <div className="space-y-1">
+                    <p className="font-bold text-xs uppercase tracking-widest text-text">No matching insights</p>
+                    <p className="text-[10px] text-muted">Your neural vault is sparse in this sector.</p>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="font-bold text-xs uppercase tracking-widest text-text">No matching insights</p>
-                  <p className="text-[10px] text-muted">Your neural vault is sparse in this sector.</p>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+               {filteredBookmarks.map(bookmark => (
+                  <div 
+                    key={bookmark.id}
+                    onClick={() => onJumpToAnchor?.(bookmark.anchor)}
+                    className="group p-4 bg-bg border border-line rounded-2xl hover:border-cyan/40 transition-all cursor-pointer flex items-center space-x-4"
+                  >
+                     <div className="w-10 h-10 rounded-xl bg-panel border border-line flex items-center justify-center text-cyan group-hover:bg-cyan group-hover:text-bg transition-colors">
+                        <Bookmark className="w-4 h-4" />
+                     </div>
+                     <div className="flex-1 min-w-0 pr-2">
+                        <h4 className="text-xs font-bold text-text truncate mb-1">{bookmark.title}</h4>
+                        <div className="flex items-center space-x-2 text-[9px] text-muted font-bold uppercase tracking-widest">
+                           <span className="text-cyan">{bookmark.anchor.type}</span>
+                           <div className="w-1 h-1 rounded-full bg-line" />
+                           <span>{bookmark.anchor.value || 'Generic'}</span>
+                        </div>
+                     </div>
+                     <ChevronRight className="w-4 h-4 text-muted opacity-30 group-hover:opacity-100 transition-opacity" />
+                  </div>
+               ))}
+               {filteredBookmarks.length === 0 && (
+                <div className="py-20 text-center space-y-4 opacity-40">
+                  <div className="w-16 h-16 bg-line rounded-full flex items-center justify-center mx-auto text-muted">
+                     <Bookmark className="w-8 h-8" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-bold text-xs uppercase tracking-widest text-text">No active markers</p>
+                    <p className="text-[10px] text-muted">Place markers to jump between neural clusters.</p>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3">
-             {filteredBookmarks.map(bookmark => (
-                <div 
-                  key={bookmark.id}
-                  onClick={() => onJumpToAnchor?.(bookmark.anchor)}
-                  className="group p-4 bg-bg border border-line rounded-2xl hover:border-cyan/40 transition-all cursor-pointer flex items-center space-x-4"
-                >
-                   <div className="w-10 h-10 rounded-xl bg-panel border border-line flex items-center justify-center text-cyan group-hover:bg-cyan group-hover:text-bg transition-colors">
-                      <Bookmark className="w-4 h-4" />
-                   </div>
-                   <div className="flex-1 min-w-0 pr-2">
-                      <h4 className="text-xs font-bold text-text truncate mb-1">{bookmark.title}</h4>
-                      <div className="flex items-center space-x-2 text-[9px] text-muted font-bold uppercase tracking-widest">
-                         <span className="text-cyan">{bookmark.anchor.type}</span>
-                         <div className="w-1 h-1 rounded-full bg-line" />
-                         <span>{bookmark.anchor.value || 'Generic'}</span>
-                      </div>
-                   </div>
-                   <ChevronRight className="w-4 h-4 text-muted opacity-30 group-hover:opacity-100 transition-opacity" />
-                </div>
-             ))}
-             {filteredBookmarks.length === 0 && (
-              <div className="py-20 text-center space-y-4 opacity-40">
-                <div className="w-16 h-16 bg-line rounded-full flex items-center justify-center mx-auto text-muted">
-                   <Bookmark className="w-8 h-8" />
-                </div>
-                <div className="space-y-1">
-                  <p className="font-bold text-xs uppercase tracking-widest text-text">No active markers</p>
-                  <p className="text-[10px] text-muted">Place markers to jump between neural clusters.</p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Footer Info */}
       {!editingNoteId && (

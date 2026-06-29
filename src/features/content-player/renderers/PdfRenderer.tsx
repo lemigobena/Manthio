@@ -114,9 +114,9 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson, onClose }) => 
   return (
     <div ref={containerRef} className="flex flex-col h-full w-full overflow-hidden bg-bg relative font-sans text-text">
       {/* Top Navigation Bar */}
-      <div className="h-14 sm:h-16 bg-panel/80 backdrop-blur-md border-b border-line px-4 sm:px-6 flex items-center justify-between z-30 shrink-0">
+      <div className="h-11 sm:h-12 bg-panel/80 backdrop-blur-md border-b border-line px-4 sm:px-6 flex items-center justify-between z-30 shrink-0">
         <div className="flex items-center space-x-3 min-w-0">
-          <div className="hidden sm:flex p-2 bg-cyan/10 rounded-lg shrink-0">
+          <div className="hidden sm:flex p-1.5 bg-cyan/10 rounded-lg shrink-0">
             <FileText className="w-4 h-4 text-cyan" />
           </div>
           <div className="flex flex-col min-w-0 flex-1">
@@ -126,7 +126,7 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson, onClose }) => 
         </div>
 
         <div className="flex items-center space-x-2 sm:space-x-4">
-          <div className="hidden md:flex items-center bg-bg/50 border border-line rounded-full px-3 h-9 group focus-within:border-cyan/50 transition-all w-48 lg:w-64">
+          <div className="hidden md:flex items-center bg-bg/50 border border-line rounded-full px-3 h-8 group focus-within:border-cyan/50 transition-all w-48 lg:w-64">
             <Search className="w-3.5 h-3.5 text-muted group-focus-within:text-cyan" />
             <input 
               type="text" 
@@ -178,7 +178,6 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson, onClose }) => 
       <div 
         ref={viewportRef} 
         className="flex-1 flex overflow-hidden relative"
-        onClick={() => { if (isNotesOpen) setIsNotesOpen(false); }}
       >
         {/* PDF Viewport */}
         <div 
@@ -189,7 +188,7 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson, onClose }) => 
               setIsNotesOpen(false);
             }
           }}
-          className="flex-1 overflow-y-auto scrollbar-hide bg-bg/60 backdrop-blur-sm pt-6 sm:pt-10 pb-32 flex flex-col items-center"
+          className="flex-1 overflow-y-auto scrollbar-hide bg-bg/60 backdrop-blur-sm pt-4 sm:pt-6 pb-24 flex flex-col items-center"
         >
           {error && (
             <div className="flex-1 flex items-center justify-center px-6">

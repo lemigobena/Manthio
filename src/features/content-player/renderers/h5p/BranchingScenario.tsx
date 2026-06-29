@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { H5PBranchingScenarioNode } from '../../../../types';
 import { ArrowRight, RotateCcw } from 'lucide-react';
 
@@ -9,6 +9,20 @@ interface BranchingScenarioProps {
 }
 
 export const BranchingScenario: React.FC<BranchingScenarioProps> = ({ nodes, startNodeId, onComplete }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState<number>(1000);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      if (entries[0]) {
+        setContainerWidth(entries[0].contentRect.width);
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   const [currentNodeId, setCurrentNodeId] = useState<string>(startNodeId);
 
   const currentNode = nodes.find(n => n.id === currentNodeId);
@@ -33,21 +47,29 @@ export const BranchingScenario: React.FC<BranchingScenarioProps> = ({ nodes, sta
   const isEndNode = currentNode.choices.length === 0;
 
   return (
-    <div className="w-full h-full flex flex-col bg-bg border border-line rounded-xl overflow-hidden shadow-xl">
-      <div className="bg-panel px-6 py-4 border-b border-line flex justify-between items-center shrink-0">
-        <h2 className="text-xl font-bold">{currentNode.title}</h2>
+    <div ref={containerRef} className="w-full h-full flex flex-col bg-bg border border-line rounded-xl overflow-hidden shadow-xl">
+      <div className={`bg-panel px-6 py-4 border-b border-line flex shrink-0 ${
+        containerWidth < 640 ? 'flex-col gap-3 items-stretch' : 'justify-between items-center'
+      }`}>
+        <h2 className="text-xl font-bold truncate" title={currentNode.title}>{currentNode.title}</h2>
         <button 
           onClick={handleRestart}
-          className="text-muted hover:text-text transition-colors flex items-center space-x-2 text-sm font-bold"
+          className={`text-muted hover:text-text transition-colors flex items-center space-x-2 text-sm font-bold shrink-0 ${
+            containerWidth < 640 ? 'justify-center w-full border border-cyan text-cyan py-2 rounded-lg' : ''
+          }`}
         >
-          <RotateCcw className="w-4 h-4" />
-          <span>Restart Scenario</span>
+          <RotateCcw className="w-4 h-4 text-cyan" />
+          <span className='text-cyan'>Restart Scenario</span>
         </button>
       </div>
 
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+      <div className={`flex-1 flex overflow-hidden relative ${
+        containerWidth < 850 ? 'flex-col' : 'flex-row'
+      }`}>
         {/* Media / Content Area */}
-        <div className="flex-1 p-8 overflow-y-auto flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-line">
+        <div className={`flex-1 p-8 overflow-y-auto flex flex-col items-center justify-center border-line ${
+          containerWidth < 850 ? 'border-b' : 'border-r'
+        }`}>
           {currentNode.mediaUrl && (
             <img 
               src={currentNode.mediaUrl} 
@@ -61,7 +83,9 @@ export const BranchingScenario: React.FC<BranchingScenarioProps> = ({ nodes, sta
         </div>
 
         {/* Choices Area */}
-        <div className="w-full md:w-96 bg-panel p-6 flex flex-col shrink-0 overflow-y-auto">
+        <div className={`bg-panel p-6 flex flex-col shrink-0 overflow-y-auto ${
+          containerWidth < 850 ? 'w-full max-h-[250px]' : 'w-96'
+        }`}>
           <h3 className="text-sm font-bold text-muted uppercase tracking-wider mb-6">
             {isEndNode ? 'Conclusion' : 'What will you do?'}
           </h3>

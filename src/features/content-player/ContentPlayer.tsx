@@ -57,11 +57,40 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
   }, [currentLesson.id]);
 
   // Responsive layout defaults (simple width check)
-  const isMobile = window.innerWidth < 768;
-  const isTablet = window.innerWidth >= 768 && window.innerWidth < 1200;
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth < 1400;
   
   const [curriculumOpen, setCurriculumOpen] = useState(!isMobile && !isTablet);
   const [toolsOpen, setToolsOpen] = useState(!!initialTab);
+
+  // Mutual-exclusion check on resize
+  useEffect(() => {
+    if (windowWidth < 1400 && curriculumOpen && toolsOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setToolsOpen(false);
+    }
+  }, [windowWidth, curriculumOpen, toolsOpen]);
+
+  // Mutual-exclusion: below 1400px only one sidebar open at a time
+  const handleSetCurriculumOpen = useCallback((open: boolean) => {
+    setCurriculumOpen(open);
+    if (open && window.innerWidth < 1400) setToolsOpen(false);
+  }, []);
+
+  const handleSetToolsOpen = useCallback((open: boolean) => {
+    setToolsOpen(open);
+    if (open && window.innerWidth < 1400) setCurriculumOpen(false);
+  }, []);
 
   // Flatten lessons to find previous/next easily
   const allLessons = course.modules.flatMap(m => m.lessons);
@@ -150,7 +179,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
         case 'K':
           if (e.metaKey || e.ctrlKey) {
             e.preventDefault();
-            setToolsOpen(true);
+            handleSetToolsOpen(true);
             setTimeout(() => document.getElementById('ai-tutor-input')?.focus(), 100);
           }
           break;
@@ -162,15 +191,15 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handlePrevious, handleNext, addToast]);
+  }, [handlePrevious, handleNext, addToast, handleSetToolsOpen]);
 
   useEffect(() => {
     const handleSandboxSubmit = () => {
-      setToolsOpen(true);
+      handleSetToolsOpen(true);
     };
     window.addEventListener('sandbox_submit', handleSandboxSubmit);
     return () => window.removeEventListener('sandbox_submit', handleSandboxSubmit);
-  }, []);
+  }, [handleSetToolsOpen]);
 
   const renderCenterContent = () => {
     switch (currentLesson.type) {
@@ -201,9 +230,9 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
         course={course}
         currentLesson={currentLesson}
         toolsOpen={toolsOpen}
-        setToolsOpen={setToolsOpen}
+        setToolsOpen={handleSetToolsOpen}
         curriculumOpen={curriculumOpen}
-        setCurriculumOpen={setCurriculumOpen}
+        setCurriculumOpen={handleSetCurriculumOpen}
         onNavigate={onNavigate}
       />
 
@@ -214,11 +243,15 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
           currentLesson={currentLesson} 
           onSelectLesson={setCurrentLesson} 
           isOpen={curriculumOpen}
-          setIsOpen={setCurriculumOpen}
+          setIsOpen={handleSetCurriculumOpen}
         />
 
-        <div className="flex-1 bg-bg flex flex-col overflow-y-auto p-4 md:p-6 items-center">
-          <div className={`w-full ${(!curriculumOpen && !toolsOpen) ? 'max-w-[1400px]' : 'max-w-4xl'} transition-all duration-500 ease-in-out flex-1 flex flex-col items-center`}>
+        <div className={`flex-1 bg-bg flex flex-col items-center ${
+          ['PDF', 'Code', 'H5P'].includes(currentLesson.type) 
+            ? 'p-2 md:py-3 md:px-4 overflow-hidden' 
+            : 'p-4 md:p-6 overflow-y-auto'
+        }`}>
+          <div className={`w-full ${((!curriculumOpen && !toolsOpen) || ['PDF', 'Code', 'H5P'].includes(currentLesson.type)) ? 'max-w-[1400px]' : 'max-w-4xl'} transition-all duration-500 ease-in-out flex-1 flex flex-col items-center min-h-0`}>
             {renderCenterContent()}
           </div>
         </div>

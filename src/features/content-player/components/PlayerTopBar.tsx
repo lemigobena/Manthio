@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Bookmark } from 'lucide-react';
+import { ChevronLeft, Bookmark, PanelLeft, PanelLeftClose, PanelRight, PanelRightClose } from 'lucide-react';
 import { useXP } from '../../../context/XPContext';
 import type { Course, Lesson } from '../../../types';
 
@@ -48,37 +48,33 @@ export const PlayerTopBar: React.FC<PlayerTopBarProps> = ({
   });
 
   return (
-    <div className="bg-panel border-b border-line px-4 md:px-6 py-3 flex items-center justify-between z-20 shrink-0">
+    <div className="bg-panel border-b border-line px-4 md:px-6 flex items-center justify-between z-20 shrink-0 h-[44px]">
       <div className="flex items-center space-x-3">
         <button 
           onClick={() => onNavigate('learning-path')}
-          className="p-1.5 rounded-lg bg-bg border border-line text-muted hover:text-text cursor-pointer transition-colors"
+          className="p-1 rounded-lg bg-bg border border-line text-muted hover:text-text cursor-pointer transition-colors"
           title="Back to Learning Path"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="w-3.5 h-3.5" />
         </button>
         
-        <div className="hidden sm:block">
-          <span className="text-[10px] text-muted font-semibold uppercase block truncate max-w-[200px] md:max-w-md">{course.title}</span>
-          <h1 className="text-sm font-bold text-text truncate max-w-[200px] md:max-w-md">{currentLesson.title}</h1>
+        <div className="hidden sm:flex items-center space-x-2">
+          <span className="text-[10px] text-muted font-bold uppercase truncate max-w-[150px] md:max-w-[250px]">{course.title}</span>
+          <span className="text-line text-xs font-bold">•</span>
+          <h1 className="text-xs font-bold text-text truncate max-w-[150px] md:max-w-[250px]">{currentLesson.title}</h1>
         </div>
       </div>
 
       <div className="flex items-center space-x-4">
-        <div className="hidden md:flex flex-col items-end w-40">
-          <div className="flex justify-between items-center w-full mb-1.5">
-            <span className="text-[10px] font-bold text-muted uppercase tracking-wider">Module Progress</span>
-            <span className="text-[10px] font-bold text-cyan">{moduleProgress}%</span>
-          </div>
-          <div className="w-full h-2 bg-bg rounded-full overflow-hidden border border-line/50 relative shadow-inner">
+        <div className="hidden md:flex items-center space-x-3 text-[10px] font-bold">
+          <span className="text-muted uppercase tracking-wider">Module Progress: {moduleProgress}%</span>
+          <div className="w-24 h-1.5 bg-bg rounded-full overflow-hidden border border-line/50 relative shadow-inner">
             <div 
               className="absolute top-0 left-0 h-full bg-gradient-to-r from-cyan/50 to-cyan rounded-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(0,255,255,0.4)]" 
               style={{ width: `${moduleProgress}%` }} 
-            >
-              <div className="absolute top-0 right-0 w-2 h-full bg-white/40 blur-[1px]" />
-            </div>
+            />
           </div>
-          <span className="text-[9px] text-muted/70 mt-1.5 font-medium">{lessonCurrent} of {lessonTotal} lessons completed</span>
+          <span className="text-muted/70 font-medium">{lessonCurrent}/{lessonTotal} Completed</span>
         </div>
 
         <div className="flex items-center space-x-2">
@@ -92,33 +88,19 @@ export const PlayerTopBar: React.FC<PlayerTopBarProps> = ({
           <div className="w-px h-4 bg-line mx-1 hidden md:block"></div>
           
           <button 
-            onClick={() => {
-              setCurriculumOpen(!curriculumOpen);
-              if (!curriculumOpen && window.innerWidth < 1200) setToolsOpen(false);
-            }}
-            className={`p-2 rounded-lg transition-colors cursor-pointer block min-[1200px]:hidden ${curriculumOpen ? 'bg-cyan/15 text-cyan' : 'bg-transparent text-muted hover:bg-line/50 hover:text-text'}`}
+            onClick={() => setCurriculumOpen(!curriculumOpen)}
+            className={`p-1.5 rounded-lg transition-colors cursor-pointer block min-[1024px]:hidden text-muted hover:text-cyan ${curriculumOpen ? 'text-cyan' : ''}`}
             title="Toggle Curriculum"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-              <line x1="9" x2="9" y1="3" y2="21"/>
-              {curriculumOpen && <path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4z" fill="currentColor" stroke="none" />}
-            </svg>
+            {curriculumOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeft className="w-5 h-5" />}
           </button>
 
           <button 
-            onClick={() => {
-              setToolsOpen(!toolsOpen);
-              if (!toolsOpen && window.innerWidth < 1200) setCurriculumOpen(false);
-            }}
-            className={`p-2 rounded-lg transition-colors cursor-pointer ${toolsOpen ? 'bg-cyan/15 text-cyan' : 'bg-transparent text-muted hover:bg-line/50 hover:text-text'}`}
+            onClick={() => setToolsOpen(!toolsOpen)}
+            className={`p-1.5 rounded-lg transition-colors cursor-pointer text-muted hover:text-cyan ${toolsOpen ? 'text-cyan' : ''}`}
             title="Toggle AI Tutor & Tools"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-              <line x1="15" x2="15" y1="3" y2="21"/>
-              {toolsOpen && <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4z" fill="currentColor" stroke="none" />}
-            </svg>
+            {toolsOpen ? <PanelRightClose className="w-5 h-5" /> : <PanelRight className="w-5 h-5" />}
           </button>
         </div>
       </div>

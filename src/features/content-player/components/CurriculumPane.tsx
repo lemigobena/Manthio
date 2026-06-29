@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Lock, Search, ChevronDown, ChevronRight, Menu } from 'lucide-react';
+import { Check, Lock, Search, ChevronDown, ChevronRight, PanelLeft, PanelLeftClose } from 'lucide-react';
 import type { Course, Lesson } from '../../../types';
 
 interface CurriculumPaneProps {
@@ -32,32 +32,38 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
       {/* Backdrop overlay for tablet/mobile when drawer is open */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-30 min-[1200px]:hidden" 
+          className="fixed inset-0 bg-transparent z-30 min-[1024px]:hidden" 
           onClick={() => setIsOpen(false)} 
         />
       )}
       
-      <div className={`bg-panel border-r border-line flex flex-col overflow-hidden shrink-0 transition-all absolute min-[1200px]:relative z-40 h-full ${
+      <div className={`bg-panel border-r border-line flex flex-col overflow-hidden shrink-0 transition-all absolute min-[1024px]:relative z-40 h-full ${
         isOpen 
-          ? 'w-full md:w-[280px] opacity-100 pointer-events-auto shadow-2xl min-[1200px]:shadow-none' 
-          : 'w-0 opacity-0 pointer-events-none min-[1200px]:w-16 min-[1200px]:opacity-100 min-[1200px]:pointer-events-auto'
+          ? 'w-full md:w-[280px] opacity-100 pointer-events-auto shadow-2xl min-[1024px]:shadow-none' 
+          : 'w-0 opacity-0 pointer-events-none min-[1024px]:w-16 min-[1024px]:opacity-100 min-[1024px]:pointer-events-auto'
       }`}>
-        <div className="p-4 border-b border-line flex items-center justify-between shrink-0 h-[53px]">
+        <div className="px-4 border-b border-line flex items-center justify-between shrink-0 h-[44px]">
           {isOpen ? (
-            <h3 
-              className="font-bold text-xs uppercase text-muted tracking-wider cursor-pointer hover:text-text transition-colors"
-              onClick={() => setIsOpen(false)}
-              title="Collapse Curriculum"
-            >
-              Curriculum
-            </h3>
+            <>
+              <h3 className="font-bold text-xs uppercase text-muted tracking-wider">
+                Curriculum
+              </h3>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-1 rounded-md text-muted hover:text-cyan transition-colors cursor-pointer hidden min-[1024px]:block"
+                title="Collapse Curriculum"
+              >
+                <PanelLeftClose className="w-5 h-5 shrink-0" />
+              </button>
+            </>
           ) : (
-            <span title="Expand Curriculum">
-              <Menu 
-                className="w-5 h-5 text-muted mx-auto cursor-pointer hover:text-cyan transition-colors" 
-                onClick={() => setIsOpen(true)}
-              />
-            </span>
+            <button
+              onClick={() => setIsOpen(true)}
+              className="w-full flex justify-center p-1 text-muted hover:text-cyan transition-colors cursor-pointer"
+              title="Expand Curriculum"
+            >
+              <PanelLeft className="w-5 h-5 shrink-0" />
+            </button>
           )}
         </div>
         

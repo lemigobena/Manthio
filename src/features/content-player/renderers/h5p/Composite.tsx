@@ -38,32 +38,32 @@ export const Composite: React.FC<CompositeProps> = ({ data, onComplete }) => {
   };
 
   return (
-    <div className="w-full space-y-16 pb-16">
+    <div className="w-full space-y-6 pb-6">
       {data.items.map((item, idx) => {
         const isCompleted = completedItems.has(idx);
         
         return (
-          <div key={idx} className="relative bg-bg rounded-3xl border border-line p-6 md:p-10 shadow-lg hover:shadow-xl transition-shadow">
+          <div key={idx} className="relative bg-bg rounded-2xl border border-line p-4 md:p-6 shadow-md hover:shadow-lg transition-shadow">
             {/* Section Header */}
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-line">
-              <div className="flex items-center space-x-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold ${
+            <div className="flex items-center justify-between mb-5 pb-3 border-b border-line">
+              <div className="flex items-center space-x-3">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
                   isCompleted ? 'bg-green/10 text-green' : 'bg-cyan/10 text-cyan'
                 }`}>
                   {idx + 1}
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-text uppercase tracking-wide">
+                  <h2 className="text-base font-bold text-text uppercase tracking-wide leading-tight">
                     Section {idx + 1}
                   </h2>
-                  <p className="text-muted text-sm font-medium">
+                  <p className="text-muted text-xs font-medium mt-0.5">
                     {item.type.replace(/([A-Z])/g, ' $1').trim()} Challenge
                   </p>
                 </div>
               </div>
               {isCompleted && (
-                <div className="bg-green/10 text-green px-4 py-2 rounded-xl font-bold text-sm flex items-center shadow-[0_0_15px_rgba(45,212,191,0.2)]">
-                  Completed
+                <div className="bg-green/10 text-green px-3 py-1 rounded-lg font-bold text-xs flex items-center shrink-0">
+                  ✓ Completed
                 </div>
               )}
             </div>

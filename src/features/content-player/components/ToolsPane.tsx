@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { useXP } from '../../../context/XPContext';
 import type { Lesson, ChatMessage } from '../../../types';
 import { AITutorChat } from '../../ai-tutor/components/AITutorChat';
@@ -20,29 +19,7 @@ export const ToolsPane: React.FC<ToolsPaneProps> = ({ currentLesson, isOpen, ini
     (initialTab as 'ai' | 'notes' | 'bookmarks' | 'resources') || (isComplex ? 'ai' : 'notes')
   );
 
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const checkScroll = () => {
-    if (scrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 1);
-    }
-  };
-
-  useEffect(() => {
-    checkScroll();
-    window.addEventListener('resize', checkScroll);
-    return () => window.removeEventListener('resize', checkScroll);
-  }, []);
-
-  const scrollTabs = (direction: 'left' | 'right') => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: direction === 'right' ? 150 : -150, behavior: 'smooth' });
-    }
-  };
 
   // AI chat states
   const [chatInput, setChatInput] = useState('');
@@ -163,57 +140,28 @@ export const ToolsPane: React.FC<ToolsPaneProps> = ({ currentLesson, isOpen, ini
   };
 
   return (
-    <div className={`bg-panel border-l border-line flex flex-col overflow-hidden shrink-0 transition-all absolute right-0 md:relative z-40 h-full ${
+    <div className={`bg-panel border-l border-line flex flex-col overflow-hidden shrink-0 transition-all absolute right-0 min-[1024px]:relative z-40 h-full ${
       isOpen 
-        ? 'w-full md:w-[360px] opacity-100 pointer-events-auto' 
-        : 'w-0 opacity-0 pointer-events-none md:w-0'
+        ? 'w-full md:w-[320px] opacity-100 pointer-events-auto shadow-2xl min-[1024px]:shadow-none' 
+        : 'w-0 opacity-0 pointer-events-none min-[1024px]:w-0'
     }`}>
       {/* Header Tabs */}
-      <div className="relative border-b border-line bg-bg/40 flex items-center shrink-0">
-        
-        {canScrollLeft && (
-          <div className="absolute left-0 top-0 bottom-0 w-12 hidden md:flex justify-start items-center bg-gradient-to-r from-[#1a1d21] to-transparent pointer-events-none p-1.5 z-10">
-            <span title="Scroll Left" className="pointer-events-auto">
-              <button 
-                onClick={() => scrollTabs('left')}
-                className="p-1.5 rounded-lg bg-panel border border-line shadow-sm text-muted hover:text-cyan cursor-pointer"
-              >
-                <ChevronLeft className="w-3.5 h-3.5" />
-              </button>
-            </span>
-          </div>
-        )}
-
-        <div 
-          ref={scrollRef} 
-          onScroll={checkScroll}
-          className="flex overflow-x-auto scrollbar-hide p-1.5 gap-4 flex-1 scroll-smooth px-2"
-        >
+      <div className="border-b border-line bg-bg/40 flex items-center shrink-0 w-full px-2 h-[44px]">
+        <div className="grid grid-cols-4 gap-1 w-full">
           {(['ai', 'notes', 'bookmarks', 'resources'] as const).map(tab => (
             <button 
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`whitespace-nowrap px-4 py-2 text-[10px] font-bold rounded-lg uppercase transition-colors min-w-[80px] shrink-0 ${
-                activeTab === tab ? 'bg-panel text-cyan border border-line shadow-sm' : 'bg-transparent text-muted hover:bg-bg/50 hover:text-text cursor-pointer'
+              className={`whitespace-nowrap px-1 py-2 text-[10px] font-bold rounded-lg uppercase transition-colors w-full shrink-0 text-center ${
+                activeTab === tab 
+                  ? 'bg-cyan/10 text-cyan border border-cyan/30 shadow-sm' 
+                  : 'bg-transparent text-muted hover:bg-cyan/5 hover:text-cyan cursor-pointer'
               }`}
             >
               {tab}
             </button>
           ))}
         </div>
-        
-        {canScrollRight && (
-          <div className="absolute right-0 top-0 bottom-0 w-12 hidden md:flex justify-end items-center bg-gradient-to-l from-[#1a1d21] to-transparent pointer-events-none p-1.5 z-10">
-            <span title="Scroll Right" className="pointer-events-auto">
-              <button 
-                onClick={() => scrollTabs('right')}
-                className="p-1.5 rounded-lg bg-panel border border-line shadow-sm text-muted hover:text-cyan cursor-pointer"
-              >
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </span>
-          </div>
-        )}
       </div>
 
       {/* Tab Contents */}

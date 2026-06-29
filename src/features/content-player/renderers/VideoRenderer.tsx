@@ -304,10 +304,16 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
         <p className="text-sm text-muted leading-relaxed max-w-3xl">
           In this video, we'll dive into the fundamental concepts of this topic. You'll learn how to approach the theoretical foundations and apply them practically in your own projects. Pay close attention to the architectural diagrams.
         </p>
-        <div className="flex items-center space-x-3 mt-4">
-          <span className="bg-panel border border-line px-2.5 py-1 rounded text-xs font-semibold text-text uppercase tracking-wider">Video</span>
-          <span className="bg-panel border border-line px-2.5 py-1 rounded text-xs font-semibold text-text uppercase tracking-wider">{lesson.duration}</span>
-          <span className="bg-panel border border-line px-2.5 py-1 rounded text-xs font-semibold text-text uppercase tracking-wider">Level {lesson.difficulty || 1}</span>
+        <div className="flex items-center space-x-2 mt-4 text-cyan">
+          <button className="px-3 py-1 bg-bg border border-cyan rounded-lg text-[10px] font-bold uppercase tracking-wider cursor-default select-none pointer-events-none">
+            Video
+          </button>
+          <button className="px-3 py-1 bg-bg border border-cyan rounded-lg text-[10px] font-bold uppercase tracking-wider cursor-default select-none pointer-events-none">
+            {lesson.duration}
+          </button>
+          <button className="px-3 py-1 bg-bg border border-cyan rounded-lg text-[10px] font-bold uppercase tracking-wider cursor-default select-none pointer-events-none">
+            Level {lesson.difficulty || 1}
+          </button>
         </div>
       </div>
 
