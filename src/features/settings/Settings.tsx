@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -43,6 +43,32 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account', onNa
   // Privacy state
   const [dataAnonymisation, setDataAnonymisation] = useState(true);
   const [aiMemory, setAiMemory] = useState(true);
+
+  // Auto-select tab when widening to desktop
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    const handleResize = (e: MediaQueryListEvent | MediaQueryList) => {
+      if (e.matches) {
+        setActiveTab(prev => prev === null ? 'account' : prev);
+      }
+    };
+
+    handleResize(mediaQuery);
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleResize);
+    } else {
+      mediaQuery.addListener(handleResize);
+    }
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleResize);
+      } else {
+        mediaQuery.removeListener(handleResize);
+      }
+    };
+  }, []);
   const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [analyticsOptIn, setAnalyticsOptIn] = useState(true);
 
@@ -106,11 +132,11 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account', onNa
           {tabs.map(tab => {
             const isActive = activeTab === tab.id;
             return (
-              <div key={tab.id} className="lg:contents">
+              <div key={tab.id} className="block lg:contents bg-panel lg:bg-transparent border border-line lg:border-none rounded-2xl lg:rounded-none overflow-hidden mb-4 lg:mb-0">
                 {/* Mobile Accordion Header */}
                 <button
                   onClick={() => setActiveTab(isActive ? null : tab.id)}
-                  className={`lg:hidden w-full flex items-center justify-between p-4 bg-panel border rounded-xl transition-colors ${isActive ? 'border-cyan' : 'border-line'}`}
+                  className={`lg:hidden w-full flex items-center justify-between p-4 transition-colors ${isActive ? 'bg-cyan/5 border-b border-line' : ''}`}
                 >
                   <div className={`flex items-center space-x-3 ${isActive ? 'text-cyan' : 'text-text'}`}>
                     <tab.icon className="w-5 h-5" />
@@ -120,7 +146,7 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account', onNa
                 </button>
 
                 {/* Content Pane */}
-                <div className={`lg:bg-panel lg:border lg:border-line lg:rounded-2xl pt-2 lg:p-8 mt-2.5 lg:mt-0 ${isActive ? 'block' : 'hidden'}`}>
+                <div className={`lg:bg-panel lg:border lg:border-line lg:rounded-2xl p-4 sm:p-6 lg:p-8 bg-bg/20 ${isActive ? 'block' : 'hidden'}`}>
                   {isActive && tab.id === 'account' && (
                     <AccountTab 
                       user={user!} 
@@ -542,6 +568,23 @@ interface PreferencesTabProps {
   setAiMode: (v: string) => void;
 }
 
+const USFlag = () => (
+  <span className="relative w-4 h-3 inline-flex flex-col justify-between bg-white rounded-[2px] overflow-hidden border border-line mr-2 shrink-0">
+    <span className="h-[2px] bg-red-500 w-full" />
+    <span className="h-[2px] bg-red-500 w-full" />
+    <span className="h-[2px] bg-red-500 w-full" />
+    <span className="absolute top-0 left-0 w-2 h-1.5 bg-blue-600" />
+  </span>
+);
+
+const DEFlag = () => (
+  <span className="w-4 h-3 inline-flex flex-col rounded-[2px] overflow-hidden border border-line mr-2 shrink-0">
+    <span className="h-[4px] bg-black w-full" />
+    <span className="h-[4px] bg-red-500 w-full" />
+    <span className="h-[4px] bg-yellow-500 w-full" />
+  </span>
+);
+
 const PreferencesTab: React.FC<PreferencesTabProps> = ({ themeMode, setThemeMode, language, setLanguage, preferences, updatePreferences, reducedMotion, setReducedMotion, soundEnabled, setSoundEnabled, videoSpeed, setVideoSpeed, aiMode, setAiMode }) => (
   <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
     <div>
@@ -553,7 +596,7 @@ const PreferencesTab: React.FC<PreferencesTabProps> = ({ themeMode, setThemeMode
       {/* UI & Language */}
       <div className="space-y-4">
         <h3 className="font-bold text-text text-sm uppercase tracking-wider text-muted">Display & Language</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
           <div className="p-4 bg-bg border border-line rounded-xl flex items-center justify-between">
             <div>
               <div className="font-bold text-sm text-text">Theme</div>
@@ -576,8 +619,24 @@ const PreferencesTab: React.FC<PreferencesTabProps> = ({ themeMode, setThemeMode
               value={language} 
               onChange={setLanguage} 
               options={[
-                { label: 'English', value: 'EN' },
-                { label: 'Deutsch', value: 'DE' }
+                { 
+                  label: (
+                    <span className="flex items-center">
+                      <USFlag />
+                      <span>English</span>
+                    </span>
+                  ), 
+                  value: 'EN' 
+                },
+                { 
+                  label: (
+                    <span className="flex items-center">
+                      <DEFlag />
+                      <span>Deutsch</span>
+                    </span>
+                  ), 
+                  value: 'DE' 
+                }
               ]} 
             />
           </div>
@@ -614,28 +673,37 @@ const PreferencesTab: React.FC<PreferencesTabProps> = ({ themeMode, setThemeMode
                       <div className="text-[10px] text-muted">{type.desc}</div>
                     </td>
                     <td className="py-3 text-center">
-                      <input 
-                        type="checkbox" 
-                        checked={preferences[k].inApp} 
-                        onChange={(e) => updatePreferences({ [k]: { ...preferences[k], inApp: e.target.checked } })}
-                        className="w-4 h-4 rounded bg-bg border border-line text-cyan focus:ring-cyan cursor-pointer"
-                      />
+                      <div className="flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() => updatePreferences({ [k]: { ...preferences[k], inApp: !preferences[k].inApp } })}
+                          className={`w-8 h-5 rounded-full flex items-center px-0.5 transition-colors cursor-pointer ${preferences[k].inApp ? 'bg-cyan' : 'bg-line'}`}
+                        >
+                          <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${preferences[k].inApp ? 'translate-x-3.5' : 'translate-x-0'}`} />
+                        </button>
+                      </div>
                     </td>
                     <td className="py-3 text-center">
-                      <input 
-                        type="checkbox" 
-                        checked={preferences[k].email} 
-                        onChange={(e) => updatePreferences({ [k]: { ...preferences[k], email: e.target.checked } })}
-                        className="w-4 h-4 rounded bg-bg border border-line text-cyan focus:ring-cyan cursor-pointer"
-                      />
+                      <div className="flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() => updatePreferences({ [k]: { ...preferences[k], email: !preferences[k].email } })}
+                          className={`w-8 h-5 rounded-full flex items-center px-0.5 transition-colors cursor-pointer ${preferences[k].email ? 'bg-cyan' : 'bg-line'}`}
+                        >
+                          <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${preferences[k].email ? 'translate-x-3.5' : 'translate-x-0'}`} />
+                        </button>
+                      </div>
                     </td>
                     <td className="py-3 text-center">
-                      <input 
-                        type="checkbox" 
-                        checked={preferences[k].push} 
-                        onChange={(e) => updatePreferences({ [k]: { ...preferences[k], push: e.target.checked } })}
-                        className="w-4 h-4 rounded bg-bg border border-line text-cyan focus:ring-cyan cursor-pointer"
-                      />
+                      <div className="flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() => updatePreferences({ [k]: { ...preferences[k], push: !preferences[k].push } })}
+                          className={`w-8 h-5 rounded-full flex items-center px-0.5 transition-colors cursor-pointer ${preferences[k].push ? 'bg-cyan' : 'bg-line'}`}
+                        >
+                          <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${preferences[k].push ? 'translate-x-3.5' : 'translate-x-0'}`} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -863,7 +931,7 @@ const TypedConfirmModal: React.FC<TypedConfirmModalProps> = ({ target, onClose, 
   );
 };
 
-const CustomDropdown = ({ value, options, onChange }: { value: string, options: {label: string, value: string}[], onChange: (v: string) => void }) => {
+const CustomDropdown = ({ value, options, onChange }: { value: string, options: {label: React.ReactNode, value: string}[], onChange: (v: string) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectedLabel = options.find(o => o.value === value)?.label || value;
 
