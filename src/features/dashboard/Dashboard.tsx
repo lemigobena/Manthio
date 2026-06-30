@@ -908,9 +908,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                     }
 
                     return (
-                      <div key={course.id} className="flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-lg bg-panel border border-line hover:bg-panel2 transition-all">
+                      <div key={course.id} className="course-card flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-lg bg-panel border border-line hover:bg-panel2 transition-all">
                         {/* Left colored block */}
-                        <div className={`relative w-full md:w-36 lg:w-44 flex flex-col items-center justify-center py-6 md:py-0 bg-${color} flex-shrink-0 overflow-hidden`}>
+                        <div className={`course-card-left relative w-full md:w-36 lg:w-44 flex flex-col items-center justify-center py-6 md:py-0 bg-${color} flex-shrink-0 overflow-hidden`}>
                           <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-transparent mix-blend-overlay" />
                           <div className="relative z-10 flex flex-col items-center space-y-3">
                             {getCourseIcon(course.title)}
@@ -957,7 +957,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                         </div>
 
                         {/* Right Stats Section */}
-                        <div className="w-full md:w-52 lg:w-60 p-5 md:p-6 border-t md:border-t-0 md:border-l border-line bg-panel2/30 flex flex-col justify-center shrink-0">
+                        <div className="course-card-right w-full md:w-52 lg:w-60 p-5 md:p-6 border-t md:border-t-0 md:border-l border-line bg-panel2/30 flex flex-col justify-center shrink-0">
                           {rightSection}
                         </div>
                       </div>

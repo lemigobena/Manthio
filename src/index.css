@@ -229,3 +229,30 @@ code, pre {
 [data-theme='light'] .logo-invert {
   filter: none;
 }
+
+/* ── Course cards: smooth width transitions + fix squeezed layout at 1024–1300 px ── */
+.course-card-left,
+.course-card-right {
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              min-width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.course-card-left svg {
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 1024px) and (max-width: 1300px) {
+  .course-card-left {
+    width: 5rem !important;   /* 80px — tighter icon block */
+    min-width: 5rem !important;
+  }
+  .course-card-left svg {
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+  }
+  .course-card-right {
+    width: 11rem !important;  /* 176px — down from 240px */
+    min-width: 11rem !important;
+  }
+}
+
