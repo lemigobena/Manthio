@@ -134,7 +134,6 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
     if (currentLesson.status !== 'completed') {
       // Award specified XP (default 50) per lesson completion
       addXp(xpAmount, `Lesson "${currentLesson.title}" completed`);
-      addToast('success', `+${xpAmount} XP — Lesson completed!`);
       
       // Update local state to show it's completed (mocking backend)
       setCourse(prev => {
@@ -149,7 +148,6 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
             if (allCompleted && mod.status !== 'Completed') {
               mod.status = 'Completed';
               addXp(200, `Module "${mod.title}" completed`);
-              addToast('success', '🎉 Module Completed! +200 XP Bonus!');
               
               // Unlock next module
               const modIndex = newCourse.modules.findIndex(m => m.id === mod.id);
@@ -161,7 +159,6 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
               } else {
                 // Course completion (REQ-PLAYER-061)
                 addXp(1000, `Course "${newCourse.title}" completed`);
-                addToast('success', '🏆 Course Completed! +1000 XP! Certificate available.');
                 openModal('celebration', {
                   title: 'Congratulations!',
                   description: `You have finished the course successfully.`,
@@ -178,7 +175,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
       // Update current lesson ref so UI re-renders status
       setCurrentLesson(prev => ({ ...prev, status: 'completed' }));
     }
-  }, [currentLesson, addXp, addToast, openModal]);
+  }, [currentLesson, addXp, openModal]);
 
   // Keyboard Shortcuts (REQ-PLAYER-040 - 045)
   useEffect(() => {
