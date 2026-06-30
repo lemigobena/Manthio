@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Play, Pause, FileText, Subtitles, PictureInPicture, Maximize, RotateCcw, RotateCw, Volume2, VolumeX, Bookmark, Settings, Check, Trash2, Loader2 } from 'lucide-react';
+import { Play, Pause, FileText, Subtitles, PictureInPicture, Maximize, RotateCcw, RotateCw, Volume2, VolumeX, Bookmark, Settings, Check, Loader2 } from 'lucide-react';
 import type { Lesson } from '../../../types';
 import { QuizEngine } from '../../../components/modules/QuizEngine';
+import { TranscriptTab } from '../components/TranscriptTab';
 import Hls from 'hls.js';
 
 interface VideoRendererProps {
@@ -233,6 +234,9 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
     if (videoRef.current) {
       const time = videoRef.current.currentTime;
       setCurrentTime(time);
+      // Dispatch custom event for TranscriptTab synchronization
+      window.dispatchEvent(new CustomEvent('video_time_update', { detail: { time } }));
+      
       // REQ-VIDEO-001: Remember position
       localStorage.setItem(`video-pos-${lesson.id}`, time.toString());
       
@@ -245,6 +249,16 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
       }
     }
   };
+
+  useEffect(() => {
+    const handleVideoJump = (e: Event) => {
+      const customEvent = e as CustomEvent<{time: number}>;
+      // eslint-disable-next-line react-hooks/immutability
+      jumpToTime(customEvent.detail.time);
+    };
+    window.addEventListener('video_jump', handleVideoJump);
+    return () => window.removeEventListener('video_jump', handleVideoJump);
+  }, []);
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
@@ -266,13 +280,7 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
     const updated = [...bookmarks, newBm].sort((a,b) => a.time - b.time);
     setBookmarks(updated);
     localStorage.setItem(`video-bookmarks-${lesson.id}`, JSON.stringify(updated));
-  };
-
-  const deleteBookmark = (e: React.MouseEvent, time: number) => {
-    e.stopPropagation();
-    const updated = bookmarks.filter(bm => bm.time !== time);
-    setBookmarks(updated);
-    localStorage.setItem(`video-bookmarks-${lesson.id}`, JSON.stringify(updated));
+    window.dispatchEvent(new Event('video_bookmarks_updated'));
   };
 
   const jumpToTime = (time: number) => {
@@ -355,22 +363,25 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
         )}
         
         {/* Play overlay button */}
-        <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${controlsVisible && !isPlaying ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${controlsVisible ? 'opacity-100' : 'opacity-0'}`}>
            <div className="bg-black/50 p-4 md:p-6 rounded-full pointer-events-auto cursor-pointer hover:bg-cyan/90 transition-colors" onClick={(e) => { e.stopPropagation(); togglePlay(); }}>
-             <Play className="w-12 h-12 md:w-16 md:h-16 text-white" fill="currentColor" />
+             {isPlaying ? (
+               <Pause className="w-12 h-12 md:w-16 md:h-16 text-white" fill="currentColor" />
+             ) : (
+               <Play className="w-12 h-12 md:w-16 md:h-16 text-white" fill="currentColor" />
+             )}
            </div>
         </div>
         
         {/* Video Controls Overlay */}
         <div 
-          onClick={(e) => e.stopPropagation()}
-          className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 md:p-6 flex flex-col justify-end h-40 transition-opacity duration-300 ${controlsVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+          className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 md:p-6 flex flex-col justify-end h-32 md:h-40 transition-opacity duration-300 pointer-events-none ${controlsVisible ? 'opacity-100' : 'opacity-0'}`}
         >
           {/* Progress Bar with Chapters */}
           <div 
             ref={progressRef}
-            onClick={handleProgressClick}
-            className="w-full h-1.5 md:h-2 bg-white/30 rounded-full mb-4 cursor-pointer relative group/progress hover:h-2 md:hover:h-3 transition-all"
+            onClick={(e) => { e.stopPropagation(); handleProgressClick(e); }}
+            className="w-full h-1.5 md:h-2 bg-white/30 rounded-full mb-4 cursor-pointer relative group/progress hover:h-2 md:hover:h-3 transition-all pointer-events-auto"
           >
             {chapters.map(pt => (
                <div key={pt} className="absolute top-0 bottom-0 w-1 bg-black/80 z-10 hover:w-1.5 transition-all" style={{left: `${pt * 100}%`}} />
@@ -383,25 +394,25 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
             />
           </div>
           
-          <div className="flex items-center justify-between text-[11px] md:text-sm text-white font-semibold">
+          <div className="flex items-center justify-between text-[11px] md:text-sm text-white font-semibold pointer-events-auto" onClick={e => e.stopPropagation()}>
             {/* Left Controls */}
             <div className="flex items-center space-x-3 md:space-x-5">
               <button onClick={togglePlay} className="hover:text-cyan transition-colors">
-                {isPlaying ? <Pause className="w-5 h-5 md:w-6 md:h-6" fill="currentColor" /> : <Play className="w-5 h-5 md:w-6 md:h-6" fill="currentColor" />}
+                {isPlaying ? <Pause className="w-4 h-4 md:w-6 md:h-6" fill="currentColor" /> : <Play className="w-4 h-4 md:w-6 md:h-6" fill="currentColor" />}
               </button>
               
-              <button onClick={(e) => {e.stopPropagation(); skip(-10)}} className="hover:text-cyan transition-colors hidden sm:block relative w-5 h-5" title="Skip backward 10s">
-                <RotateCcw className="w-5 h-5 absolute inset-0" />
+              <button onClick={(e) => {e.stopPropagation(); skip(-10)}} className="hover:text-cyan transition-colors hidden sm:block relative w-4 h-4 md:w-5 md:h-5" title="Skip backward 10s">
+                <RotateCcw className="w-4 h-4 md:w-5 md:h-5 absolute inset-0" />
                 <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold font-mono mt-[1px]">10</span>
               </button>
-              <button onClick={(e) => {e.stopPropagation(); skip(10)}} className="hover:text-cyan transition-colors hidden sm:block relative w-5 h-5" title="Skip forward 10s">
-                <RotateCw className="w-5 h-5 absolute inset-0" />
+              <button onClick={(e) => {e.stopPropagation(); skip(10)}} className="hover:text-cyan transition-colors hidden sm:block relative w-4 h-4 md:w-5 md:h-5" title="Skip forward 10s">
+                <RotateCw className="w-4 h-4 md:w-5 md:h-5 absolute inset-0" />
                 <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold font-mono mt-[1px]">10</span>
               </button>
               
               <div className="flex items-center space-x-2 group/vol">
                 <button onClick={() => setIsMuted(!isMuted)} className="hover:text-cyan transition-colors">
-                  {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  {isMuted || volume === 0 ? <VolumeX className="w-4 h-4 md:w-5 md:h-5" /> : <Volume2 className="w-4 h-4 md:w-5 md:h-5" />}
                 </button>
                 <input 
                   type="range" min="0" max="1" step="0.05" 
@@ -422,7 +433,7 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
             {/* Right Controls */}
             <div className="flex items-center space-x-3 md:space-x-5 text-white/90 relative h-6">
               <button onClick={addBookmark} className="hover:text-cyan transition-colors flex items-center justify-center h-full" title="Add Bookmark">
-                <Bookmark className="w-5 h-5 md:w-5 md:h-5" />
+                <Bookmark className="w-4 h-4 md:w-5 md:h-5" />
               </button>
               
               {/* Settings Menu */}
@@ -432,7 +443,7 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
                   className="hover:text-cyan transition-colors flex items-center justify-center" 
                   title="Settings"
                 >
-                  <Settings className="w-5 h-5 md:w-5 md:h-5" />
+                  <Settings className="w-4 h-4 md:w-5 md:h-5" />
                 </button>
                 {showQualityMenu && (
                   <div className="absolute bottom-full right-0 mb-4 flex flex-col bg-panel border border-line rounded-lg p-2 text-xs md:text-sm whitespace-nowrap z-50 shadow-2xl min-w-[160px]">
@@ -485,7 +496,7 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
                   className={`hover:text-cyan transition-colors flex items-center justify-center ${ccLanguage !== 'off' ? 'text-cyan' : ''}`}
                   title="Closed Captions"
                 >
-                  <Subtitles className="w-5 h-5 md:w-5 md:h-5" />
+                  <Subtitles className="w-4 h-4 md:w-5 md:h-5" />
                 </button>
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 hidden group-hover/cc:flex flex-col bg-panel border border-line rounded-lg p-2 text-xs md:text-sm whitespace-nowrap z-50 shadow-2xl">
                   <div className="text-muted font-bold px-3 py-1 border-b border-line mb-1 uppercase tracking-wider text-[10px]">Captions</div>
@@ -505,10 +516,10 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
               </div>
 
               <button onClick={(e) => {e.stopPropagation(); togglePiP()}} className="hover:text-cyan transition-colors hidden sm:flex items-center justify-center h-full" title="Picture in Picture">
-                <PictureInPicture className="w-5 h-5 md:w-5 md:h-5" />
+                <PictureInPicture className="w-4 h-4 md:w-5 md:h-5" />
               </button>
               <button onClick={(e) => {e.stopPropagation(); toggleFullscreen()}} className="hover:text-cyan transition-colors flex items-center justify-center h-full" title="Fullscreen">
-                <Maximize className="w-5 h-5 md:w-5 md:h-5" />
+                <Maximize className="w-4 h-4 md:w-5 md:h-5" />
               </button>
             </div>
           </div>
@@ -526,64 +537,17 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Transcript (REQ-VIDEO-004) */}
-        <div className="bg-panel border border-line rounded-2xl p-6 space-y-4 lg:col-span-2">
-          <div className="flex items-center space-x-2 border-b border-line pb-4">
+        <div className="bg-panel border border-line rounded-2xl p-6 space-y-4 min-[1024px]:hidden flex flex-col h-[350px]">
+          <div className="flex items-center space-x-2 border-b border-line pb-4 shrink-0">
             <FileText className="w-5 h-5 text-cyan" />
             <h3 className="font-bold text-sm uppercase tracking-wider text-text">Transcript</h3>
           </div>
           
-          <div className="space-y-4 text-sm text-muted leading-relaxed">
-            {[
-              { t: 0, text: "Welcome back everyone. In today's session, we are going to explore the core architecture that drives modern applications. We've spent the last few lessons discussing the theory, but now it's time to see it in action." },
-              { t: 10, text: "If you look at the diagram on screen, you'll notice that the pipeline is split into three distinct phases. The ingestion phase, the processing phase, and finally the delivery phase. Each of these requires careful consideration." },
-              { t: 25, text: "Now, a common mistake here is tightly coupling the processing phase to the ingestion phase. When you do that, your system loses scalability. Remember the principle of single responsibility we covered earlier?" }
-            ].map(line => (
-              <div 
-                key={line.t}
-                className={`flex space-x-4 p-3 rounded-lg transition-colors cursor-pointer group ${currentTime >= line.t && currentTime < line.t + 10 ? 'bg-cyan/10 border border-cyan/20' : 'hover:bg-line/20 border border-transparent'}`} 
-                onClick={() => jumpToTime(line.t)}
-              >
-                <span className="text-cyan font-mono text-xs pt-1 shrink-0 group-hover:text-cyan/80">
-                  {formatTime(line.t)}
-                </span>
-                <p className={currentTime >= line.t && currentTime < line.t + 10 ? 'text-text font-medium' : ''}>{line.text}</p>
-              </div>
-            ))}
+          <div className="flex-1 overflow-hidden">
+            <TranscriptTab />
           </div>
-        </div>
-
-        {/* Bookmarks (REQ-VIDEO-007) */}
-        <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
-          <div className="flex items-center space-x-2 border-b border-line pb-4">
-            <Bookmark className="w-5 h-5 text-yellow" />
-            <h3 className="font-bold text-sm uppercase tracking-wider text-text">Bookmarks</h3>
-          </div>
-          
-          {bookmarks.length === 0 ? (
-            <div className="text-sm text-muted italic flex items-center justify-center h-24">
-              No bookmarks yet. Click the bookmark icon in the player to save a timestamp.
-            </div>
-          ) : (
-            <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-              {bookmarks.map((bm, i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-line hover:border-yellow/50 hover:bg-yellow/5 transition-colors cursor-pointer group" onClick={() => jumpToTime(bm.time)}>
-                  <div className="flex flex-col space-y-1 overflow-hidden">
-                    <span className="text-yellow font-mono text-xs font-bold">{formatTime(bm.time)}</span>
-                    <p className="text-sm text-text truncate">{bm.text}</p>
-                  </div>
-                  <button 
-                    onClick={(e) => deleteBookmark(e, bm.time)} 
-                    className="p-1.5 text-muted hover:text-red-500 transition-colors"
-                    title="Delete bookmark"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 
