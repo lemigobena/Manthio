@@ -177,7 +177,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide p-3 md:p-6 space-y-8 pb-32 scroll-smooth" ref={scrollRef}>
+      <div className="flex-1 overflow-y-auto scrollbar-hide p-3 md:p-6 space-y-8 pb-4 scroll-smooth" ref={scrollRef}>
         {messages.map((msg, idx) => (
           <div 
             key={idx} 

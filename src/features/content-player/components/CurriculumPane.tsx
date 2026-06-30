@@ -39,7 +39,7 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
       
       <div className={`bg-panel border-r border-line flex flex-col overflow-hidden shrink-0 transition-all absolute min-[1024px]:relative z-40 h-full ${
         isOpen 
-          ? 'w-full md:w-[280px] opacity-100 pointer-events-auto shadow-2xl min-[1024px]:shadow-none' 
+          ? 'w-[280px] max-w-[85vw] opacity-100 pointer-events-auto shadow-2xl min-[1024px]:shadow-none' 
           : 'w-0 opacity-0 pointer-events-none min-[1024px]:w-16 min-[1024px]:opacity-100 min-[1024px]:pointer-events-auto'
       }`}>
         <div className="px-4 border-b border-line flex items-center justify-between shrink-0 h-[44px]">
