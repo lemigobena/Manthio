@@ -9,6 +9,7 @@ interface PlayerBottomBarProps {
   onPrevious: () => void;
   onNext: () => void;
   onMarkComplete: () => void;
+  criteriaMet?: boolean;
 }
 
 export const PlayerBottomBar: React.FC<PlayerBottomBarProps> = ({
@@ -17,7 +18,8 @@ export const PlayerBottomBar: React.FC<PlayerBottomBarProps> = ({
   hasNext,
   onPrevious,
   onNext,
-  onMarkComplete
+  onMarkComplete,
+  criteriaMet = true,
 }) => {
   // If the system can automatically detect completion (like a Quiz passing, or Video watching),
   // we might want to hide manual mark complete. For now, following REQ-PLAYER-063:
@@ -42,9 +44,15 @@ export const PlayerBottomBar: React.FC<PlayerBottomBarProps> = ({
         {!isCompleted ? (
           <button 
             onClick={onMarkComplete}
-            className="bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-6 py-2.5 rounded-xl flex items-center space-x-2 transition-all cursor-pointer shadow-lg shadow-cyan/20"
+            disabled={!criteriaMet}
+            title={!criteriaMet ? 'Keep scrolling to unlock completion' : undefined}
+            className={`text-xs font-bold px-6 py-2.5 rounded-xl flex items-center space-x-2 transition-all ${
+              criteriaMet
+                ? 'bg-cyan hover:bg-cyan2 text-bg cursor-pointer shadow-lg shadow-cyan/20'
+                : 'bg-bg border border-line text-muted cursor-not-allowed opacity-60'
+            }`}
           >
-            <span>MARK AS DONE (+50 XP)</span>
+            <span>{criteriaMet ? 'MARK AS DONE (+50 XP)' : 'SCROLL TO FINISH'}</span>
           </button>
         ) : (
           <button 

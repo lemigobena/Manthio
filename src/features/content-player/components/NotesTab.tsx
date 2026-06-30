@@ -126,14 +126,14 @@ export const NotesTab: React.FC<NotesTabProps> = ({ currentLesson }) => {
             <X size={14} /> <span>Close Search</span>
           </button>
         </div>
-        <div className="bg-bg border border-line rounded-xl px-3 py-2 flex items-center space-x-2">
+        <div className="bg-bg border border-line rounded-xl px-3 py-2 flex items-center space-x-2 focus-within:border-cyan">
           <Search size={14} className="text-muted" />
           <input 
             type="text" 
             placeholder="Search all notes..."
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="bg-transparent border-none focus:outline-none text-xs text-text flex-1"
+            className="bg-transparent !outline-none border-none focus:outline-none text-xs text-text flex-1"
             autoFocus
           />
         </div>
@@ -155,34 +155,34 @@ export const NotesTab: React.FC<NotesTabProps> = ({ currentLesson }) => {
   return (
     <div className="space-y-4 flex flex-col h-full relative" id="notes-print-area">
       {/* Header Actions */}
-      <div className="flex items-center justify-between shrink-0">
-        <div className="flex items-center space-x-2">
+      <div className="flex items-center justify-between shrink-0 overflow-hidden gap-1">
+        <div className="flex items-center space-x-1 shrink-0">
           <button 
             onClick={() => setIsEditing(true)}
-            className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${isEditing ? 'bg-cyan text-bg' : 'bg-bg text-muted hover:text-text border border-line'}`}
+            className={`flex items-center space-x-1 px-2 py-1.5 rounded-lg text-xs font-bold transition-colors ${isEditing ? 'bg-cyan text-bg' : 'bg-bg text-muted hover:text-text border border-line'}`}
           >
             <Edit3 size={12} />
             <span>Write</span>
           </button>
           <button 
             onClick={() => setIsEditing(false)}
-            className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${!isEditing ? 'bg-cyan text-bg' : 'bg-bg text-muted hover:text-text border border-line'}`}
+            className={`flex items-center space-x-1 px-2 py-1.5 rounded-lg text-xs font-bold transition-colors ${!isEditing ? 'bg-cyan text-bg' : 'bg-bg text-muted hover:text-text border border-line'}`}
           >
             <Eye size={12} />
             <span>Preview</span>
           </button>
         </div>
         
-        <div className="flex items-center space-x-2">
-          <span className="text-[10px] text-muted font-medium w-16 text-right">{saveStatus}</span>
-          <button onClick={() => setIsSearching(true)} className="p-1.5 text-muted hover:text-cyan rounded-lg hover:bg-bg transition-colors" title="Search all notes">
-            <Search size={14} />
+        <div className="flex items-center space-x-1 shrink-0">
+          {saveStatus && <span className="text-[10px] text-muted font-medium">{saveStatus}</span>}
+          <button onClick={() => setIsSearching(true)} className="p-1 text-muted hover:text-cyan rounded-lg hover:bg-bg transition-colors" title="Search all notes">
+            <Search size={13} />
           </button>
-          <button onClick={exportMarkdown} className="p-1.5 text-muted hover:text-cyan rounded-lg hover:bg-bg transition-colors" title="Export Markdown">
-            <Download size={14} />
+          <button onClick={exportMarkdown} className="p-1 text-muted hover:text-cyan rounded-lg hover:bg-bg transition-colors" title="Export Markdown">
+            <Download size={13} />
           </button>
-          <button onClick={exportPDF} className="p-1.5 text-muted hover:text-cyan rounded-lg hover:bg-bg transition-colors" title="Print to PDF">
-            <FileText size={14} />
+          <button onClick={exportPDF} className="p-1 text-muted hover:text-cyan rounded-lg hover:bg-bg transition-colors" title="Print to PDF">
+            <FileText size={13} />
           </button>
         </div>
       </div>
@@ -196,14 +196,14 @@ export const NotesTab: React.FC<NotesTabProps> = ({ currentLesson }) => {
             <X size={10} className="cursor-pointer hover:text-white" onClick={() => handleRemoveTag(tag)} />
           </span>
         ))}
-        <div className="flex items-center space-x-1 bg-bg border border-line rounded-full px-2 py-0.5">
+        <div className="flex items-center space-x-1 bg-bg border border-line rounded-full px-2 py-0.5 focus-within:border-cyan">
           <input 
             type="text" 
             placeholder="Add tag..." 
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
-            className="bg-transparent border-none focus:outline-none text-[10px] text-text w-16"
+            className="bg-transparent !outline-none border-none focus:outline-none text-[10px] text-text w-16"
           />
           <Plus size={10} className="text-cyan cursor-pointer" onClick={handleAddTag} />
         </div>
@@ -216,7 +216,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ currentLesson }) => {
             value={noteText}
             onChange={(e) => setNoteText(e.target.value)}
             placeholder="Write important notes here. Markdown is supported. Auto-saves."
-            className="flex-1 w-full p-4 bg-bg border border-line rounded-xl text-xs text-text focus:outline-none focus:border-cyan resize-none font-mono leading-relaxed"
+            className="flex-1 w-full p-4 bg-bg border border-line rounded-xl text-xs text-text focus:outline-none focus:border-cyan resize-none font-mono leading-relaxed !outline-none"
           />
           {currentLesson.type === 'Video' && (
             <button 
@@ -228,7 +228,7 @@ export const NotesTab: React.FC<NotesTabProps> = ({ currentLesson }) => {
           )}
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto bg-bg border border-line rounded-xl p-4 scrollbar-hide">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden bg-bg border border-line rounded-xl p-4 scrollbar-hide">
           {noteText ? (
              <MarkdownWithCodeBlocks content={noteText} />
           ) : (

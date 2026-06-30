@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Mail, ArrowRight, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -12,6 +12,9 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({ onNavigate
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'error' | 'success'>('idle');
   const [resendStatus, setResendStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
+  const firstInputRef = useRef<HTMLInputElement>(null);
+
+  const focusFirst = () => setTimeout(() => firstInputRef.current?.focus(), 50);
 
   const handleVerify = () => {
     setIsLoading(true);
@@ -23,6 +26,12 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({ onNavigate
       setIsLoading(false);
       if (fullCode === '111111') {
         setStatus('error');
+        
+        setTimeout(() => {
+          setCode(['', '', '', '', '', '']);
+          setStatus('idle');
+          focusFirst();
+        }, 500);
       } else {
         setStatus('success');
         setTimeout(() => {
@@ -35,8 +44,10 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({ onNavigate
 
   const handleResend = () => {
     setResendStatus('sending');
+    setCode(['', '', '', '', '', '']);
     setTimeout(() => {
       setResendStatus('sent');
+      focusFirst();
       setTimeout(() => setResendStatus('idle'), 3000);
     }, 1000);
   };
@@ -66,9 +77,10 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({ onNavigate
             return (
               <input
                 key={i}
+                ref={i === 0 ? firstInputRef : undefined}
                 type="text"
                 maxLength={1}
-                className={`w-12 h-14 bg-panel border-2 rounded-xl text-center text-xl font-bold transition-colors outline-none ${borderClass} ${status === 'idle' ? 'text-text' : ''}`}
+                className={`w-12 h-14 bg-panel border-2 rounded-xl text-center text-xl font-bold transition-colors !outline-none ${borderClass} ${status === 'idle' ? 'text-text' : ''}`}
                 value={digit}
                 onPaste={(e) => {
                   e.preventDefault();
