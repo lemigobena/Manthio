@@ -291,7 +291,12 @@ export const TopBar: React.FC<TopBarProps> = ({
                   profileOpen ? 'border-cyan ring-1 ring-cyan' : 'border-line hover:border-cyan'
                 }`}
               >
-                <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
+                <div className="relative w-8 h-8">
+                  <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
+                  {/* Online indicator */}
+                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green border-2 border-panel shadow-[0_0_6px_rgba(43,222,126,0.7)] animate-pulse" />
+                </div>
+
               </button>
 
               {/* Profile Dropdown Menu */}
