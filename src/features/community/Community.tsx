@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FORUM_CHANNELS, COURSES } from '../../services/mockData';
 import { useXP } from '../../context/XPContext';
 import { useAuth } from '../../context/AuthContext';
-import { MessageSquare, ArrowUp, ArrowDown, Check, Sparkles, Send, Hash, X, MessageCircle, ChevronRight, PanelLeft, Code, Image as ImageIcon, ArrowLeft, Bell, BellOff } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
+import { MessageSquare, ArrowUp, ArrowDown, Check, Sparkles, Send, Hash, X, MessageCircle, ChevronRight, PanelLeft, PanelLeftClose, PanelRightClose, Code, Image as ImageIcon, ArrowLeft, Bell, BellOff } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { ForumChannel, ChannelMessage, ForumReply } from '../../types';
 
 interface CommunityProps {
@@ -17,12 +18,14 @@ const generateId = () => {
 };
 
 export const Community: React.FC<CommunityProps> = () => {
+  const { resolvedTheme } = useTheme();
   const { addXp, addToast } = useXP();
   const { user } = useAuth();
   const [channels, setChannels] = useState<ForumChannel[]>(FORUM_CHANNELS);
   const [activeChannelId, setActiveChannelId] = useState<string>('general');
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [mutedChannels, setMutedChannels] = useState<Set<string>>(new Set());
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   
   const [newThreadTitle, setNewThreadTitle] = useState('');
   const [newThreadBody, setNewThreadBody] = useState('');
@@ -77,6 +80,7 @@ export const Community: React.FC<CommunityProps> = () => {
   const renderBody = (body: string) => {
     // Split by code blocks first
     const codeSegments = body.split(/(```[\s\S]*?```)/g);
+    const isDark = resolvedTheme === 'dark';
     
     return codeSegments.map((segment, idx) => {
       if (segment.startsWith('```') && segment.endsWith('```')) {
@@ -86,13 +90,13 @@ export const Community: React.FC<CommunityProps> = () => {
         
         return (
           <div key={idx} className="my-3 rounded-xl overflow-hidden border border-line/50 shadow-sm">
-            <div className="bg-[#1E1E1E] px-4 py-1.5 text-[10px] text-muted font-mono uppercase tracking-wider border-b border-line/20 flex items-center justify-between">
+            <div className="px-4 py-1.5 text-[10px] font-mono uppercase tracking-wider border-b border-line/20 flex items-center justify-between" style={{ backgroundColor: isDark ? '#1E1E1E' : '#F5F5F5', color: isDark ? '#7A8FA0' : '#6E6650' }}>
               <span>{language}</span>
             </div>
             <SyntaxHighlighter
               language={language}
-              style={vscDarkPlus}
-              customStyle={{ margin: 0, padding: '1rem', background: '#1E1E1E', fontSize: '13px' }}
+              style={isDark ? vscDarkPlus : vs}
+              customStyle={{ margin: 0, padding: '1rem', background: isDark ? '#1E1E1E' : '#F5F5F5', fontSize: '13px' }}
               wrapLines={true}
               wrapLongLines={true}
             >
@@ -345,13 +349,13 @@ export const Community: React.FC<CommunityProps> = () => {
     <div className="relative flex h-[calc(100dvh-64px)] -mx-3 md:-mx-[44px] -my-6 border-y border-line overflow-hidden bg-bg">
       {/* 1. Sidebar (Channels) */}
       <div className={`
-        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        md:translate-x-0 absolute md:relative z-20 w-64 h-full bg-panel border-r border-line flex flex-col transition-transform duration-300
+        ${isSidebarOpen ? 'translate-x-0' : `-translate-x-full ${activeThreadId ? 'min-[1400px]:translate-x-0' : 'md:translate-x-0'}`}
+        absolute ${activeThreadId ? 'min-[1400px]:relative' : 'md:relative'} z-20 w-64 h-full bg-panel border-r border-line flex flex-col transition-transform duration-300
       `}>
         <div className="p-4 border-b border-line flex items-center justify-between">
           <h2 className="font-bold text-text">Workspace</h2>
-          <button className="md:hidden text-muted hover:text-text" onClick={() => setIsSidebarOpen(false)}>
-            <X size={20} />
+          <button className={`${activeThreadId ? 'min-[1400px]:hidden' : 'md:hidden'} text-muted hover:text-text`} onClick={() => setIsSidebarOpen(false)}>
+            <PanelLeftClose size={20} />
           </button>
         </div>
         <div className="flex-1 overflow-y-auto py-4">
@@ -363,7 +367,7 @@ export const Community: React.FC<CommunityProps> = () => {
               return (
                 <button
                   key={channel.id}
-                  onClick={() => { setActiveChannelId(channel.id); setActiveThreadId(null); setIsSidebarOpen(false); }}
+                  onClick={() => { setActiveChannelId(channel.id); setActiveThreadId(null); setSelectedTag(null); setIsSidebarOpen(false); }}
                   className={`w-full text-left px-3 py-1.5 rounded-lg flex items-center space-x-3 text-sm transition-colors ${
                     activeChannelId === channel.id ? 'bg-cyan/10 text-cyan font-bold' : 'text-muted hover:text-cyan'
                   }`}
@@ -379,24 +383,37 @@ export const Community: React.FC<CommunityProps> = () => {
 
       {/* Mobile overlay */}
       {isSidebarOpen && (
-        <div className="md:hidden fixed inset-0 z-10 bg-bg/80 backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
+        <div className={`${activeThreadId ? 'min-[1400px]:hidden' : 'md:hidden'} fixed inset-0 z-10 bg-bg/80 backdrop-blur-sm`} onClick={() => setIsSidebarOpen(false)} />
       )}
 
       {/* 2. Main Feed (Channel Messages) */}
       <div className={`flex-1 flex flex-col min-w-0 ${activeThreadId ? 'hidden lg:flex' : 'flex'}`}>
         {/* Header */}
-        <div className="h-14 border-b border-line flex items-center px-4 justify-between bg-bg/50 backdrop-blur-md shrink-0 relative">
-          <div className="flex items-center space-x-3">
-            <button className="md:hidden text-muted hover:text-text" onClick={() => setIsSidebarOpen(true)}>
+        <div className="h-14 border-b border-line flex items-center px-4 justify-between bg-bg/50 backdrop-blur-md shrink-0 relative gap-4">
+          <div className="flex items-center space-x-3 min-w-0 shrink-0">
+            <button className={`${activeThreadId ? 'min-[1400px]:hidden' : 'md:hidden'} text-muted hover:text-text shrink-0`} onClick={() => setIsSidebarOpen(true)}>
               <PanelLeft size={20} />
             </button>
-            <div className="font-bold text-text flex items-center space-x-1">
-              <Hash size={18} className="text-muted" />
-              <span>{activeChannel?.name}</span>
+            <div className="font-bold text-text flex items-center gap-2 whitespace-nowrap">
+              <div className="flex items-center space-x-1">
+                <Hash size={18} className="text-muted shrink-0" />
+                <span>{activeChannel?.name}</span>
+              </div>
+              {selectedTag && (
+                <div className="flex items-center space-x-1 px-2 py-0.5 text-xs bg-cyan/10 border border-cyan/30 text-cyan rounded-md shrink-0">
+                  <span>#{selectedTag}</span>
+                  <button 
+                    onClick={() => setSelectedTag(null)}
+                    className="hover:text-white transition-colors cursor-pointer"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="text-xs text-muted max-w-[200px] sm:max-w-xs truncate hidden sm:block">
+          <div className="flex items-center space-x-4 min-w-0 flex-1 justify-end">
+            <div className="text-xs text-muted truncate hidden sm:block text-right flex-1 min-w-0">
               {activeChannel?.description}
             </div>
             {activeChannel && (
@@ -418,92 +435,114 @@ export const Community: React.FC<CommunityProps> = () => {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-6" ref={feedScrollRef}>
-          {activeChannel?.messages.map((msg, index) => {
-            const currentDate = getDateGroup(msg.timestamp);
-            const prevMessage = activeChannel.messages[index - 1];
-            const showDateHeader = index === 0 || getDateGroup(prevMessage.timestamp) !== currentDate;
+          {activeChannel?.messages
+            .filter(msg => !selectedTag || msg.tags?.includes(selectedTag))
+            .map((msg, index) => {
+              const currentDate = getDateGroup(msg.timestamp);
+              const prevMessage = activeChannel.messages[index - 1];
+              const showDateHeader = index === 0 || getDateGroup(prevMessage.timestamp) !== currentDate;
 
-            return (
-              <React.Fragment key={msg.id}>
-                {showDateHeader && (
-                  <div className="flex items-center space-x-4 my-6">
-                    <div className="h-px bg-line flex-1" />
-                    <span className="text-[10px] font-bold text-cyan capitalize tracking-wider">{currentDate}</span>
-                    <div className="h-px bg-line flex-1" />
-                  </div>
-                )}
-                <div className="flex space-x-3 group">
-                  <div className="w-10 h-10 rounded-xl bg-purple/20 flex items-center justify-center shrink-0 text-purple font-bold">
-                {msg.author.charAt(0)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-baseline space-x-2">
-                  <span className="font-bold text-text text-sm">{msg.author}</span>
-                  <span className="text-[10px] text-muted">{msg.timestamp}</span>
-                </div>
-                <div className="mt-1">
-                  <h4 className="font-bold text-text text-base">{msg.title}</h4>
-                  <div className="text-text/90 text-sm mt-1 whitespace-pre-wrap">{renderBody(msg.body)}</div>
-                </div>
-                
-                {msg.tags && msg.tags.length > 0 && (
-                  <div className="flex items-center space-x-2 mt-2">
-                    {msg.tags.map(tag => (
-                      <span key={tag} className="text-[10px] bg-panel border border-line px-2 py-0.5 rounded text-muted">#{tag}</span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex items-center space-x-3 mt-3">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-muted text-sm font-bold min-w-[20px] text-center">{msg.upvotes}</span>
-                    <div className="flex items-center space-x-2 rounded-lg p-0.5">
-                      <button 
-                        onClick={(e) => handleUpvoteThread(msg.id, e)}
-                        className="bg-line/20 p-1.5 text-muted hover:text-cyan hover:bg-cyan/10 rounded-md transition-colors"
-                        title="Helpful"
-                      >
-                        <ArrowUp size={18} />
-                      </button>
-                      <button 
-                        onClick={(e) => handleDownvoteThread(msg.id, e)}
-                        className="bg-line/20 p-1.5 text-muted hover:text-red hover:bg-red/10 rounded-md transition-colors"
-                        title="Not Helpful"
-                      >
-                        <ArrowDown size={18} />
-                      </button>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => setActiveThreadId(msg.id)}
-                    className="flex items-center space-x-1 text-muted hover:text-purple text-xs font-semibold px-2 py-1 rounded hover:bg-purple/10 transition-colors"
-                  >
-                    <MessageSquare size={14} />
-                    <span>{msg.replies.length} replies</span>
-                  </button>
-                  {msg.hasAcceptedAnswer && (
-                    <div className="flex items-center space-x-1 text-green text-[10px] font-bold px-2 py-1 rounded bg-green/10 border border-green/20">
-                      <Check size={12} strokeWidth={3} />
-                      <span>Solved</span>
+              return (
+                <React.Fragment key={msg.id}>
+                  {showDateHeader && (
+                    <div className="flex items-center space-x-4 my-6">
+                      <div className="h-px bg-line flex-1" />
+                      <span className="text-[10px] font-bold text-cyan capitalize tracking-wider">{currentDate}</span>
+                      <div className="h-px bg-line flex-1" />
                     </div>
                   )}
-                </div>
-                
-                {/* Inline reply preview if it has replies but thread is closed */}
-                {msg.replies.length > 0 && activeThreadId !== msg.id && (
                   <div 
                     onClick={() => setActiveThreadId(msg.id)}
-                    className="mt-2 flex items-center space-x-2 text-xs text-cyan cursor-pointer group"
+                    className={`flex space-x-3 group cursor-pointer p-3 -mx-3 rounded-xl transition-all duration-200 ${
+                      activeThreadId === msg.id 
+                        ? 'bg-cyan/5 border border-cyan/20 shadow-sm' 
+                        : 'hover:bg-panel/40 border border-transparent hover:shadow-sm'
+                    }`}
                   >
-                    <div className="w-6 h-6 rounded-md bg-cyan/20 flex items-center justify-center text-cyan shrink-0">
-                      <MessageCircle size={12} />
+                    <div className="w-10 h-10 rounded-xl bg-purple/20 flex items-center justify-center shrink-0 text-purple font-bold">
+                      {msg.author.charAt(0)}
                     </div>
-                    <span className="font-semibold hidden sm:inline">{msg.replies.length} replies</span>
-                    <span className="text-muted group-hover:underline decoration-cyan">Last reply from {msg.replies[msg.replies.length - 1].author}</span>
-                    <ChevronRight size={14} className="text-muted" />
-                  </div>
-                )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline space-x-2">
+                        <span className="font-bold text-text text-sm">{msg.author}</span>
+                        <span className="text-[10px] text-muted">{msg.timestamp}</span>
+                      </div>
+                      <div className="mt-1">
+                        <h4 className="font-bold text-text text-base">{msg.title}</h4>
+                        <div className="text-text/90 text-sm mt-1 whitespace-pre-wrap">{renderBody(msg.body)}</div>
+                      </div>
+                      
+                      {msg.tags && msg.tags.length > 0 && (
+                        <div className="flex items-center flex-wrap gap-1.5 mt-2">
+                          {msg.tags.map(tag => (
+                            <button 
+                              key={tag} 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedTag(tag === selectedTag ? null : tag);
+                              }}
+                              className={`text-[10px] bg-transparent border transition-colors cursor-pointer px-2 py-0.5 rounded-md ${
+                                selectedTag === tag 
+                                  ? 'border-cyan bg-cyan/10 text-cyan font-semibold' 
+                                  : 'border-cyan/30 text-cyan hover:border-cyan hover:bg-cyan/5'
+                              }`}
+                            >
+                              #{tag}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      <div className="flex items-center space-x-3 mt-3">
+                        <div className="flex items-center space-x-3">
+                          <span className="text-muted text-sm font-bold min-w-[20px] text-center">{msg.upvotes}</span>
+                          <div className="flex items-center space-x-2 rounded-lg p-0.5">
+                            <button 
+                              onClick={(e) => handleUpvoteThread(msg.id, e)}
+                              className="bg-line/20 p-1.5 text-muted hover:text-cyan hover:bg-cyan/10 rounded-md transition-colors cursor-pointer"
+                              title="Helpful"
+                            >
+                              <ArrowUp size={18} />
+                            </button>
+                            <button 
+                              onClick={(e) => handleDownvoteThread(msg.id, e)}
+                              className="bg-line/20 p-1.5 text-muted hover:text-red hover:bg-red/10 rounded-md transition-colors cursor-pointer"
+                              title="Not Helpful"
+                            >
+                              <ArrowDown size={18} />
+                            </button>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setActiveThreadId(msg.id); }}
+                          className="flex items-center space-x-1 text-muted hover:text-purple text-xs font-semibold px-2 py-1 rounded hover:bg-purple/10 transition-colors cursor-pointer"
+                        >
+                          <MessageSquare size={14} />
+                          <span>{msg.replies.length} replies</span>
+                        </button>
+                        {msg.hasAcceptedAnswer && (
+                          <div className="flex items-center space-x-1 text-green text-[10px] font-bold px-2 py-1 rounded bg-green/10 border border-green/20">
+                            <Check size={12} strokeWidth={3} />
+                            <span>Solved</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Inline reply preview if it has replies but thread is closed */}
+                      {msg.replies.length > 0 && activeThreadId !== msg.id && (
+                        <div 
+                          onClick={(e) => { e.stopPropagation(); setActiveThreadId(msg.id); }}
+                          className="mt-2 flex items-center space-x-2 text-xs text-cyan cursor-pointer group"
+                        >
+                          <div className="w-6 h-6 rounded-md bg-cyan/20 flex items-center justify-center text-cyan shrink-0">
+                            <MessageCircle size={12} />
+                          </div>
+                          <span className="font-semibold hidden sm:inline">{msg.replies.length} replies</span>
+                          <span className="text-muted group-hover:underline decoration-cyan">Last reply from {msg.replies[msg.replies.length - 1].author}</span>
+                          <ChevronRight size={14} className="text-muted" />
+                        </div>
+                      )}
               </div>
             </div>
             {index < activeChannel.messages.length - 1 && (
@@ -587,7 +626,7 @@ export const Community: React.FC<CommunityProps> = () => {
               <span className="text-xs font-normal text-muted bg-line px-2 py-0.5 rounded">#{activeChannel?.name}</span>
             </div>
             <button className="hidden lg:block p-2 text-muted hover:text-text rounded-lg hover:bg-line transition-colors" onClick={() => setActiveThreadId(null)}>
-              <X size={20} />
+              <PanelRightClose size={20} />
             </button>
           </div>
 
@@ -605,6 +644,29 @@ export const Community: React.FC<CommunityProps> = () => {
                   </div>
                   <h4 className="font-bold text-text text-base mt-1">{activeThread.title}</h4>
                   <div className="text-text/90 text-sm mt-2 whitespace-pre-wrap">{renderBody(activeThread.body)}</div>
+                  {activeThread.tags && activeThread.tags.length > 0 && (
+                    <div className="flex items-center flex-wrap gap-1.5 mt-3">
+                      {activeThread.tags.map(tag => (
+                        <button
+                          key={tag}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTag(tag === selectedTag ? null : tag);
+                            if (window.innerWidth < 1024) {
+                              setActiveThreadId(null);
+                            }
+                          }}
+                          className={`text-[10px] bg-transparent border px-2 py-0.5 rounded-md transition-colors cursor-pointer ${
+                            selectedTag === tag 
+                              ? 'border-cyan bg-cyan/10 text-cyan font-semibold' 
+                              : 'border-cyan/30 text-cyan hover:border-cyan hover:bg-cyan/5'
+                          }`}
+                        >
+                          #{tag}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex items-center space-x-3 mt-4 ml-13">
