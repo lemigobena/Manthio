@@ -161,7 +161,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
       // Update current lesson ref so UI re-renders status
       setCurrentLesson(prev => ({ ...prev, status: 'completed' }));
     }
-  }, [currentLesson, addXp, addToast, openModal]);
+  }, [currentLesson, addXp, openModal]);
 
   // Keyboard Shortcuts (REQ-PLAYER-040 - 045)
   useEffect(() => {
