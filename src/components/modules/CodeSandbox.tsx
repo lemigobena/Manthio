@@ -37,7 +37,6 @@ export const CodeSandbox: React.FC<CodeSandboxProps> = ({
   const handleSubmit = () => {
     if (testsPassed) {
       addXp(75, 'Code exercise solved');
-      addToast('success', '+75 XP — Exercise submitted!');
       if (onSuccess) onSuccess();
     } else {
       addToast('error', 'Please run the code and pass all tests first.');

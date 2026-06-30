@@ -213,7 +213,6 @@ export const Community: React.FC<CommunityProps> = () => {
     setNewThreadTitle('');
     setNewThreadBody('');
     addXp(25, 'Community thread created');
-    addToast('success', '+25 XP — Community thread created!');
   };
 
   const handlePostReply = () => {
@@ -239,7 +238,6 @@ export const Community: React.FC<CommunityProps> = () => {
     
     setReplyInput('');
     addXp(10, 'Forum reply posted');
-    addToast('success', '+10 XP — Reply posted!');
   };
 
   const handleUpvoteThread = (threadId: string, e: React.MouseEvent) => {
@@ -327,7 +325,6 @@ export const Community: React.FC<CommunityProps> = () => {
       };
     }));
     addXp(15, 'Accepted answer marked');
-    addToast('success', 'Answer accepted! +15 XP');
   };
 
   const toggleMuteChannel = (channelId: string) => {

@@ -242,7 +242,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
     }
     completeOnboarding({ reason: reason || 'Curiosity', timePerWeek: timeCommitment || '2-5 Hrs' });
     addXp(150, 'Completed first-time onboarding (+150 XP)');
-    addToast('success', `Enrolled in ${courseToStart?.title || 'Course'}! Welcome to Manthio.`);
     onNavigate('dashboard');
   };
 

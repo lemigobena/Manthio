@@ -32,7 +32,6 @@ export const AssignmentRenderer: React.FC<AssignmentRendererProps> = ({ lesson, 
     }
     setSubmitted(true);
     addXp(100, 'Assignment submitted');
-    addToast('success', '+100 XP — Assignment submitted successfully!');
     onComplete();
   };
 

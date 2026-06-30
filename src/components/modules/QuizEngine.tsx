@@ -135,7 +135,6 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete, timeLimit = 
 
     if (isCorrect) {
       addXp(25, 'Quiz question answered correctly');
-      addToast('success', '+25 XP — Correct!');
       setScore(prev => prev + 1);
     } else {
       addToast('error', 'Incorrect. Review the explanation.');
