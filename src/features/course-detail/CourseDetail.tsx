@@ -257,16 +257,406 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
         )}
       </div>
 
+      {/* Multi-mode Comparison View - Full Width Original Design */}
+      {course?.availableFormats && (
+        <div className="bg-panel border border-line rounded-2xl p-6 space-y-6 mt-8">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-text">Choose your learning experience</h2>
+            <span className="text-[10px] font-bold text-cyan bg-cyan/10 px-3 py-1 rounded-full uppercase tracking-wider">Multi-Format Available</span>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-line/50">
+                  <th className="py-4 text-[10px] font-black uppercase text-muted tracking-widest w-1/3">Feature</th>
+                  {course?.availableFormats?.map(f => (
+                    <th key={f.format} className="py-4 px-4 text-center">
+                      <div className={`text-[10px] font-black uppercase tracking-widest mb-1 ${selectedFormat === f.format ? 'text-cyan' : 'text-muted'}`}>
+                        {f.format === 'flipped' ? 'Flipped' : f.format === 'cohort' ? 'Cohort' : 'Self-Paced'}
+                      </div>
+                      <div className="text-sm font-bold text-text">{f.price}</div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                    <tr className="border-b border-line/30">
+                      <td className="py-4 pr-4">
+                        <div className="text-xs font-bold text-text">AI Tutor Allowance</div>
+                        <div className="text-[10px] text-muted">24/7 personalized support</div>
+                      </td>
+                      {course?.availableFormats?.map(f => (
+                        <td key={f.format} className="py-4 px-4 text-center">
+                          {f.features.aiTutor ? <CheckCircle className="w-4 h-4 text-green mx-auto" /> : <span className="text-muted opacity-20">—</span>}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr className="border-b border-line/30">
+                      <td className="py-4 pr-4">
+                        <div className="text-xs font-bold text-text">Peer Cohort Access</div>
+                        <div className="text-[10px] text-muted">Learn with a community</div>
+                      </td>
+                      {course?.availableFormats?.map(f => (
+                        <td key={f.format} className="py-4 px-4 text-center">
+                          {f.features.peerCohort ? <CheckCircle className="w-4 h-4 text-green mx-auto" /> : <span className="text-muted opacity-20">—</span>}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr className="border-b border-line/30">
+                      <td className="py-4 pr-4">
+                        <div className="text-xs font-bold text-text">In-Person Component</div>
+                        <div className="text-[10px] text-muted">Expert-led workshops</div>
+                      </td>
+                      {course?.availableFormats?.map(f => (
+                        <td key={f.format} className="py-4 px-4 text-center">
+                          {f.features.inPerson ? <CheckCircle className="w-4 h-4 text-green mx-auto" /> : <span className="text-muted opacity-20">—</span>}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr className="border-b border-line/30">
+                      <td className="py-4 pr-4">
+                        <div className="text-xs font-bold text-text">Certificate Eligibility</div>
+                        <div className="text-[10px] text-muted">Verified skill credentials</div>
+                      </td>
+                      {course?.availableFormats?.map(f => (
+                        <td key={f.format} className="py-4 px-4 text-center">
+                          {f.features.certificate ? <CheckCircle className="w-4 h-4 text-green mx-auto" /> : <span className="text-muted opacity-20">—</span>}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr className="border-b border-line/30">
+                      <td className="py-4 pr-4">
+                        <div className="text-xs font-bold text-text">Platform Access Bundle</div>
+                        <div className="text-[10px] text-muted">Premium subscription included</div>
+                      </td>
+                      {course?.availableFormats?.map(f => (
+                        <td key={f.format} className="py-4 px-4 text-center">
+                          {f.bundledSubscription ? (
+                            <div className="flex flex-col items-center">
+                              <span className="text-xs font-black text-cyan">+{f.bundledSubscription.durationMonths}m</span>
+                              <span className="text-[8px] text-muted font-bold uppercase truncate max-w-[80px]">worth {f.bundledSubscription.valueAmount}</span>
+                            </div>
+                          ) : <span className="text-muted opacity-20">—</span>}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <td className="py-6"></td>
+                      {course?.availableFormats?.map(f => (
+                        <td key={f.format} className="py-6 px-4 text-center">
+                          <button
+                            onClick={() => {
+                              setSelectedFormat(f.format);
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className={`w-full py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                              selectedFormat === f.format 
+                                ? 'bg-cyan text-bg shadow-[0_4px_15px_rgba(45,212,191,0.3)]' 
+                                : 'bg-bg border border-line text-text hover:border-cyan/50'
+                            }`}
+                          >
+                            {selectedFormat === f.format ? 'Selected' : 'Select'}
+                          </button>
+                        </td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+      )}
+
       {/* Main Column Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left Column (Details) */}
         <div className="lg:col-span-2 space-y-8">
           
+          {/* Format & Delivery Section */}
+          <div className="py-6 border-b border-line space-y-5">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-xl bg-orange/10">
+                <Sparkles className="w-5 h-5 text-orange" />
+              </div>
+              <h2 className="text-xl font-bold text-text">Format & Delivery</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* DESCRIPTION BLOCK (Left Column, spans 2 rows) */}
+              {(selectedFormat === 'flipped' || course?.format === 'flipped') ? (
+                <div className="p-5 rounded-2xl bg-cyan/5 border border-cyan/20 shadow-sm hover:border-cyan/40 transition-all space-y-4 md:row-span-2 h-full flex flex-col justify-center">
+                  <div className="flex items-start space-x-3">
+                    <div className="p-2 rounded-xl bg-cyan/10">
+                      <Globe className="w-4 h-4 text-cyan" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-cyan uppercase tracking-widest block mb-1">In-Person Sessions</span>
+                      <p className="text-xs text-cyan/70 leading-relaxed font-medium">
+                        Location: apigenio Training Centre, Muri/Bern.<br/>
+                        Dates: {todayStr} & {nextWeekStr}<br/>
+                        Bring: Laptop and valid ID.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3 pt-4 border-t border-cyan/10">
+                    <div className="p-2 rounded-xl bg-cyan/10">
+                      <BookOpen className="w-4 h-4 text-cyan" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-cyan uppercase tracking-widest block mb-1">Self-Study Windows</span>
+                      <p className="text-xs text-cyan/70 leading-relaxed font-medium">
+                        Complete units 1–3 before session 1. Complete units 4–7 before final capstone.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : selectedFormat === 'cohort' ? (
+                <div className="p-5 rounded-2xl bg-purple/5 border border-purple/20 shadow-sm hover:border-purple/40 transition-all space-y-4 md:row-span-2 h-full flex flex-col justify-center">
+                  <div className="flex items-start space-x-3">
+                    <div className="p-2 rounded-xl bg-purple/10">
+                      <Clock className="w-4 h-4 text-purple" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-purple uppercase tracking-widest block mb-1">Schedule & Start Date</span>
+                      <p className="text-xs text-purple/70 leading-relaxed font-medium">
+                        Next cohort starts: {nextTwoWeeksStr}<br/>
+                        Live sessions: Tuesdays at 18:00 CET.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3 pt-4 border-t border-purple/10">
+                    <div className="p-2 rounded-xl bg-purple/10">
+                      <Award className="w-4 h-4 text-purple" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-purple uppercase tracking-widest block mb-1">Past Outcomes</span>
+                      <ul className="text-xs text-purple/70 leading-relaxed font-medium list-disc pl-3">
+                        <li>85% promotion rate within 6 months</li>
+                        <li>Average salary increase of +18%</li>
+                        <li>High satisfaction from 100+ graduates</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-5 rounded-2xl bg-amber-500/5 border border-amber-500/20 shadow-sm hover:border-amber-500/40 transition-all space-y-4 md:row-span-2 h-full flex flex-col justify-center">
+                  <div className="flex items-start space-x-3">
+                    <div className="p-2 rounded-xl bg-amber-500/10">
+                      <Sparkles className="w-4 h-4 text-amber-600" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest block mb-1">Self-Paced Learning</span>
+                      <p className="text-xs text-amber-600/70 leading-relaxed font-medium">
+                        Learn entirely at your own pace with unrestricted access to all materials and AI Tutor available 24/7.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3 pt-4 border-t border-amber-500/10">
+                    <div className="p-2 rounded-xl bg-amber-500/10">
+                      <BookOpen className="w-4 h-4 text-amber-600" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest block mb-1">Interactive Content</span>
+                      <p className="text-xs text-amber-600/70 leading-relaxed font-medium">
+                        Engage with interactive coding environments, quizzes, and projects to solidify your knowledge.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Time Commitment (Right Top) */}
+              <div className="group relative p-5 rounded-2xl bg-cyan/5 border border-cyan/20 shadow-sm hover:border-cyan/40 transition-all overflow-hidden h-full flex flex-col justify-center">
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10 flex items-start space-x-4">
+                  <div className="p-2.5 rounded-xl bg-cyan/10 flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5 text-cyan" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black text-cyan uppercase tracking-widest block mb-1.5">Time Commitment</span>
+                    <p className="text-xs text-cyan/70 leading-relaxed font-medium">
+                      {track ? `Estimated path duration: ${track.estimatedTime}.` : 
+                       selectedFormat === 'flipped' ? "7 self-study modules (10.5h) + 2 half-day workshops." :
+                       selectedFormat === 'cohort' ? "8-week structured journey with weekly live expert sessions." :
+                       course?.format === 'Multiple formats' ? "Flexible delivery. Select between Self-Paced, Cohort, or Flipped models below." :
+                       `Complete at your own pace. Recommended: 8-10h/week over ${course?.duration}.`}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Certificate (Right Bottom) */}
+              <div className="group relative p-5 rounded-2xl bg-gradient-to-r from-green/10 via-green/5 to-transparent border border-green/20 overflow-hidden transition-all duration-300 flex items-start sm:items-center justify-between shadow-sm hover:shadow-md hover:border-green/40 h-full flex-col sm:flex-row">
+                <div className="flex items-center space-x-4">
+                  <div className="p-2.5 rounded-xl bg-green/20 flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-5 h-5 text-green" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black text-green uppercase tracking-widest block mb-1">Verifiable Certificate Included</span>
+                    <span className="text-xs text-green/70 font-medium">Industry recognized credential upon completion</span>
+                  </div>
+                </div>
+                <div className="hidden sm:flex items-center gap-2 pr-2 mt-4 sm:mt-0">
+                  <div className="w-2 h-2 rounded-full bg-green shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Preparation & Onboarding Surface (REQ-CHECKOUT-020 & 021) - Flipped only */}
+          {selectedFormat === 'flipped' && ( (activeFormatData?.preCourseRequirements || course?.preCourseRequirements) || (activeFormatData?.preCourseTasks || course?.preCourseTasks) ) && (() => {
+            const requirements = activeFormatData?.preCourseRequirements || course?.preCourseRequirements;
+            const tasks = activeFormatData?.preCourseTasks || course?.preCourseTasks;
+            
+            return (
+              <div className="py-6 border-b border-line space-y-4">
+                <div className={`rounded-2xl border p-5 space-y-4 shadow-sm transition-all duration-500 ${enrolled ? 'bg-cyan/5 border-cyan/30' : 'bg-panel border-line'}`}>
+                  <h3 className="text-xs font-black uppercase text-text tracking-wider flex items-center gap-2">
+                    {enrolled ? <Sparkles className="w-4 h-4 text-cyan" /> : <Laptop className="w-4 h-4 text-cyan" />}
+                    {enrolled ? 'Get Ready Path' : 'Pre-Course Preparation'}
+                  </h3>
+                  
+                  {!enrolled && requirements && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-500">
+                      {requirements.hardware && (
+                        <div className="space-y-1.5">
+                          <span className="text-[9px] font-black text-muted uppercase tracking-tight">Hardware</span>
+                          <ul className="space-y-1">
+                            {requirements.hardware.map((item, i) => (
+                              <li key={i} className="text-[10px] text-text font-medium flex items-start gap-2 leading-snug">
+                                <span className="w-1.5 h-1.5 rounded-full bg-cyan mt-1.5 shrink-0" />
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {requirements.software && (
+                        <div className="space-y-1.5">
+                          <span className="text-[9px] font-black text-muted uppercase tracking-tight">Software Setup</span>
+                          <ul className="space-y-1">
+                            {requirements.software.map((item, i) => (
+                              <li key={i} className="text-[10px] text-text font-medium flex items-start gap-2 leading-snug">
+                                <CheckCircle className="w-3.5 h-3.5 text-cyan mt-0.5 shrink-0" />
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {enrolled && tasks && (
+                    <div className="space-y-3 animate-in fade-in zoom-in duration-500">
+                      <p className="text-[10px] text-muted font-medium italic leading-relaxed">
+                        Welcome aboard! Complete these tasks to ensure a smooth start to your session.
+                      </p>
+                      <div className="space-y-2">
+                        {tasks.map((task) => (
+                          <div key={task.id} className="flex items-center gap-3 p-3 rounded-xl bg-bg border border-line/50 hover:border-cyan/30 transition-colors group cursor-pointer">
+                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${task.status === 'completed' ? 'bg-green/10 text-green' : 'bg-bg border border-line text-muted'}`}>
+                              {task.type === 'video' ? <PlayCircle className="w-3.5 h-3.5" /> : 
+                               task.type === 'setup' ? <Laptop className="w-3.5 h-3.5" /> : 
+                               <CheckCircle className="w-3.5 h-3.5" />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-[10px] font-bold text-text truncate">{task.title}</h4>
+                              <p className="text-[8px] text-muted font-medium truncate">{task.description}</p>
+                            </div>
+                            <ArrowRight className="w-3 h-3 text-muted group-hover:text-cyan transition-colors" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Preparation & Readiness (REQ-CHECKOUT-020) */}
+          {((course && course.preCourseRequirements) || (track && track.level === 'Advanced')) && (
+            <div className="py-8 border-b border-line space-y-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-xl bg-cyan/10">
+                  <Zap className="w-5 h-5 text-cyan" />
+                </div>
+                <h2 className="text-xl font-bold text-text">Preparation & Readiness</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+                <div className="space-y-4">
+                  {(course?.preCourseRequirements?.hardware || track) && (
+                    <div className="space-y-3">
+                      <span className="text-[10px] font-black uppercase text-muted tracking-widest pl-1 border-l-2 border-cyan/30 ml-1">Included Hardware</span>
+                      <ul className="space-y-2">
+                        {(course?.preCourseRequirements?.hardware || ['High-performance laptop', 'Reliable internet connection']).map((item, id) => (
+                          <li key={id} className="flex items-start space-x-3 text-xs text-text font-medium bg-bg/40 p-3 rounded-xl border border-line/30">
+                            <CheckCircle className="w-4 h-4 text-green mt-0.5 shrink-0" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {(course?.preCourseRequirements?.software || track) && (
+                    <div className="space-y-3">
+                      <span className="text-[10px] font-black uppercase text-muted tracking-widest pl-1 border-l-2 border-cyan/30 ml-1">Software Stack</span>
+                      <ul className="space-y-2">
+                        {(course?.preCourseRequirements?.software || ['Local Development Environment', 'Docker Desktop', 'Git Vendor Account']).map((item, id) => (
+                          <li key={id} className="flex items-start space-x-3 text-xs text-text font-medium bg-bg/40 p-3 rounded-xl border border-line/30">
+                            <CheckCircle className="w-4 h-4 text-cyan mt-0.5 shrink-0" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-6">
+                  {(course?.preCourseRequirements?.knowledge || track) && (
+                    <div className="bg-bg/60 border border-line rounded-2xl p-5 space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <User className="w-4 h-4 text-orange" />
+                        <span className="text-[10px] font-black uppercase text-text tracking-widest">Entry Knowledge Check</span>
+                      </div>
+                      <p className="text-[11px] text-muted leading-relaxed font-medium">
+                        To ensure the best learning experience, we recommend having familiarized yourself with:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {(course?.preCourseRequirements?.knowledge || ['Programming Fundamentals', 'Basic CLI usage', 'Logical Reasoning']).map((item, id) => (
+                          <span key={id} className="bg-panel border border-line text-[10px] text-text px-3 py-1.5 rounded-lg font-bold shadow-sm">
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="pt-2">
+                        <div className="text-[9px] text-muted-foreground uppercase font-black tracking-tighter opacity-50 flex items-center space-x-2">
+                          <HelpCircle className="w-3 h-3" />
+                          <span>Not sure if you are ready? Take the entry quiz.</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="p-5 border border-dashed border-line rounded-2xl bg-bg/20">
+                    <p className="text-[10px] text-muted leading-relaxed text-center font-bold italic">
+                      "Career tracks rely on prepared learners. Please ensure all base prerequisites are met before starting the first course."
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
           
           {/* Learning Outcomes */}
           {(course?.learningOutcomes || track?.outcomeStatement) && (
-            <div className="bg-panel border border-line rounded-2xl p-6 space-y-4">
+            <div className="py-6 border-b border-line space-y-4">
               <h2 className="text-xl font-bold text-text">{track ? 'Outcome Statement' : 'What you will learn in this course'}</h2>
               {track ? (
                 <p className="text-sm text-text leading-relaxed">{track.outcomeStatement}</p>
@@ -284,7 +674,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
           )}
 
           {/* Curriculum Preview / Career Track Path */}
-          <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
+          <div className="py-8 border-b border-line space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-bold text-text">{track ? 'Path & Milestones' : 'Curriculum & Modules'}</h2>
@@ -422,8 +812,9 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                 // Course Modules Design
                 course?.modules && course?.modules?.map((mod, idx) => {
                   const isOpen = activeModuleIndex === idx;
+                  const bgClass = isOpen ? 'bg-cyan/5 border-cyan/30 shadow-sm' : 'bg-panel/60 border-line shadow-sm hover:border-cyan/30 hover:bg-panel/90';
                   return (
-                    <div key={mod.id} className={`border ${isOpen ? 'border-cyan/30 bg-bg/30' : 'border-line bg-bg/10'} rounded-2xl transition-all overflow-hidden`}>
+                    <div key={mod.id} className={`border ${bgClass} rounded-2xl transition-all overflow-hidden`}>
                       <button 
                         onClick={() => toggleModule(idx)}
                         className="w-full flex items-center justify-between p-5 text-left"
@@ -456,9 +847,9 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                           </p>
                           <div className="space-y-2">
                             {mod.lessons.map(les => (
-                              <div key={les.id} className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-panel/30 border border-line/30 group hover:border-cyan/30 transition-all">
+                              <div key={les.id} className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-bg border border-line/40 shadow-sm group hover:border-cyan/30 hover:shadow-md transition-all">
                                 <div className="flex items-center space-x-3">
-                                  <div className="p-1.5 rounded-lg bg-bg border border-line group-hover:border-cyan/20">
+                                  <div className="p-1.5 rounded-lg bg-panel border border-line group-hover:border-cyan/20">
                                     <Zap className="w-3 h-3 text-cyan/50 group-hover:text-cyan" />
                                   </div>
                                   <span className="font-bold text-[11px] text-text opacity-90 group-hover:opacity-100 transition-opacity">{les.title}</span>
@@ -481,84 +872,9 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
             </div>
           </div>
 
-          {/* Preparation & Readiness (REQ-CHECKOUT-020) - Moved to Left Side for better visibility */}
-          {((course && course.preCourseRequirements) || (track && track.level === 'Advanced')) && (
-            <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 rounded-xl bg-cyan/10">
-                  <Zap className="w-5 h-5 text-cyan" />
-                </div>
-                <h2 className="text-xl font-bold text-text">Preparation & Readiness</h2>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
-                <div className="space-y-4">
-                  {(course?.preCourseRequirements?.hardware || track) && (
-                    <div className="space-y-3">
-                      <span className="text-[10px] font-black uppercase text-muted tracking-widest pl-1 border-l-2 border-cyan/30 ml-1">Included Hardware</span>
-                      <ul className="space-y-2">
-                        {(course?.preCourseRequirements?.hardware || ['High-performance laptop', 'Reliable internet connection']).map((item, id) => (
-                          <li key={id} className="flex items-start space-x-3 text-xs text-text font-medium bg-bg/40 p-3 rounded-xl border border-line/30">
-                            <CheckCircle className="w-4 h-4 text-green mt-0.5 shrink-0" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  {(course?.preCourseRequirements?.software || track) && (
-                    <div className="space-y-3">
-                      <span className="text-[10px] font-black uppercase text-muted tracking-widest pl-1 border-l-2 border-cyan/30 ml-1">Software Stack</span>
-                      <ul className="space-y-2">
-                        {(course?.preCourseRequirements?.software || ['Local Development Environment', 'Docker Desktop', 'Git Vendor Account']).map((item, id) => (
-                          <li key={id} className="flex items-start space-x-3 text-xs text-text font-medium bg-bg/40 p-3 rounded-xl border border-line/30">
-                            <CheckCircle className="w-4 h-4 text-cyan mt-0.5 shrink-0" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
 
-                <div className="space-y-6">
-                  {(course?.preCourseRequirements?.knowledge || track) && (
-                    <div className="bg-bg/60 border border-line rounded-2xl p-5 space-y-4">
-                      <div className="flex items-center space-x-2">
-                        <User className="w-4 h-4 text-orange" />
-                        <span className="text-[10px] font-black uppercase text-text tracking-widest">Entry Knowledge Check</span>
-                      </div>
-                      <p className="text-[11px] text-muted leading-relaxed font-medium">
-                        To ensure the best learning experience, we recommend having familiarized yourself with:
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {(course?.preCourseRequirements?.knowledge || ['Programming Fundamentals', 'Basic CLI usage', 'Logical Reasoning']).map((item, id) => (
-                          <span key={id} className="bg-panel border border-line text-[10px] text-text px-3 py-1.5 rounded-lg font-bold shadow-sm">
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="pt-2">
-                        <div className="text-[9px] text-muted-foreground uppercase font-black tracking-tighter opacity-50 flex items-center space-x-2">
-                          <HelpCircle className="w-3 h-3" />
-                          <span>Not sure if you are ready? Take the entry quiz.</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="p-5 border border-dashed border-line rounded-2xl bg-bg/20">
-                    <p className="text-[10px] text-muted leading-relaxed text-center font-bold italic">
-                      "Career tracks rely on prepared learners. Please ensure all base prerequisites are met before starting the first course."
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
           {/* Reviews and Testimonials Section (Moved Up) */}
-          <div className="bg-panel border border-line rounded-2xl p-6 space-y-8">
+          <div className="py-8 border-b border-line space-y-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="p-2 rounded-xl bg-orange/10">
@@ -641,7 +957,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
           </div>
 
           {/* FAQ Section */}
-          <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
+          <div className="py-8 space-y-6">
             <div className="flex items-center space-x-3">
               <div className="p-2 rounded-xl bg-cyan/10">
                 <HelpCircle className="w-5 h-5 text-cyan" />
@@ -678,10 +994,27 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
         </div>
 
         {/* Right Column (Sidebar Information) */}
-        <div className="space-y-6">
-          <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
-            <div className="space-y-4">
-              <h3 className="font-bold text-sm uppercase tracking-wider text-muted">Lead Trainer</h3>
+        <div className="lg:h-full relative">
+          <div className="lg:sticky lg:top-0 lg:h-[calc(100vh-4rem)] lg:flex lg:flex-col lg:justify-center">
+            <div className="space-y-6 w-full">
+          {/* Lead Trainer Card */}
+          <div className="bg-panel border border-line rounded-2xl p-4 space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-sm uppercase tracking-wider text-muted">Lead Trainer</h3>
+                <div className="flex items-center space-x-3">
+                  {course?.trainer?.linkedIn && (
+                    <a href={course?.trainer?.linkedIn} target="_blank" rel="noreferrer" className="text-muted hover:text-cyan transition-colors" title="LinkedIn">
+                      <Users className="w-4 h-4" />
+                    </a>
+                  )}
+                  {course?.trainer?.website && (
+                    <a href={course?.trainer?.website} target="_blank" rel="noreferrer" className="text-muted hover:text-cyan transition-colors" title="Personal Site">
+                      <Globe className="w-4 h-4" />
+                    </a>
+                  )}
+                </div>
+              </div>
               <div className="flex items-center space-x-3">
                 <img src={course?.trainer?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150'} alt={course?.trainer?.name || 'Lead Trainer'} className="w-12 h-12 rounded-full border border-line object-cover" />
                 <div>
@@ -689,28 +1022,14 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                   <p className="text-muted text-xs">{course?.trainer?.title || 'Industry Experts'}</p>
                 </div>
               </div>
-              <p className="text-muted text-xs leading-relaxed">
+              <p className="text-muted text-xs leading-relaxed line-clamp-3">
                 {course?.trainer?.bio || 'This career track is curated and led by multiple industry experts with over 15 years of common experience in the field.'}
               </p>
-              <div className="flex items-center space-x-4 pt-2">
-                {course?.trainer?.linkedIn && (
-                  <a href={course?.trainer?.linkedIn} target="_blank" rel="noreferrer" className="flex items-center space-x-1.5 text-cyan hover:underline text-xs font-semibold">
-                    <Users className="w-3.5 h-3.5" />
-                    <span>LinkedIn</span>
-                  </a>
-                )}
-                {course?.trainer?.website && (
-                  <a href={course?.trainer?.website} target="_blank" rel="noreferrer" className="flex items-center space-x-1.5 text-cyan hover:underline text-xs font-semibold">
-                    <Globe className="w-3.5 h-3.5" />
-                    <span>Personal Site</span>
-                  </a>
-                )}
-              </div>
             </div>
 
             {/* More from this Trainer - Integrated List */}
             {trainerCourses.length > 0 && (
-              <div className="pt-5 border-t border-line space-y-3">
+              <div className="pt-4 border-t border-line space-y-2">
                 <h4 className="text-[10px] font-black uppercase tracking-widest text-muted">More from this expert</h4>
                 <div className="space-y-2">
                   {trainerCourses.map(tc => (
@@ -736,208 +1055,11 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
             )}
           </div>
 
-          {/* Format Details Widget */}
-          <div className="bg-panel border border-line rounded-2xl p-6 space-y-5">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 rounded-xl bg-orange/10">
-                <Sparkles className="w-5 h-5 text-orange" />
-              </div>
-              <h3 className="font-bold text-sm uppercase tracking-wider text-text">Format & Delivery</h3>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-bg/50 border border-line space-y-3">
-                <div className="flex items-start space-x-3">
-                  <div className="p-1.5 rounded-lg bg-cyan/10">
-                    <Clock className="w-4 h-4 text-cyan" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-black text-text uppercase block mb-1">Time Commitment</span>
-                    <p className="text-[11px] text-muted leading-relaxed">
-                      {track ? `Estimated path duration: ${track.estimatedTime}.` : 
-                       selectedFormat === 'flipped' ? "7 self-study modules (10.5h) + 2 half-day workshops." :
-                       selectedFormat === 'cohort' ? "8-week structured journey with weekly live expert sessions." :
-                       course?.format === 'Multiple formats' ? "Flexible delivery. Select between Self-Paced, Cohort, or Flipped models below." :
-                       `Complete at your own pace. Recommended: 8-10h/week over ${course?.duration}.`}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {(selectedFormat === 'flipped' || course?.format === 'flipped') && (
-                <div className="p-4 rounded-xl bg-cyan/5 border border-cyan/20 space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="p-1.5 rounded-lg bg-cyan/10">
-                      <Globe className="w-4 h-4 text-cyan" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-black text-cyan uppercase block mb-1">In-Person Sessions</span>
-                      <p className="text-[11px] text-muted leading-relaxed">
-                        Location: apigenio Training Centre, Muri/Bern.<br/>
-                        Dates: {todayStr} & {nextWeekStr}<br/>
-                        Bring: Laptop and valid ID.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3 pt-3 border-t border-cyan/10">
-                    <div className="p-1.5 rounded-lg bg-cyan/10">
-                      <BookOpen className="w-4 h-4 text-cyan" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-black text-cyan uppercase block mb-1">Self-Study Windows</span>
-                      <p className="text-[11px] text-muted leading-relaxed">
-                        Complete units 1–3 before session 1. Complete units 4–7 before final capstone.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {selectedFormat === 'cohort' && (
-                <div className="p-4 rounded-xl bg-purple/5 border border-purple/20 space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="p-1.5 rounded-lg bg-purple/10">
-                      <Clock className="w-4 h-4 text-purple" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-black text-purple uppercase block mb-1">Schedule & Start Date</span>
-                      <p className="text-[11px] text-muted leading-relaxed">
-                        Next cohort starts: {nextTwoWeeksStr}<br/>
-                        Live sessions: Tuesdays at 18:00 CET.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3 pt-3 border-t border-purple/10">
-                    <div className="p-1.5 rounded-lg bg-purple/10">
-                      <Award className="w-4 h-4 text-purple" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-black text-purple uppercase block mb-1">Past Outcomes</span>
-                      <ul className="text-[11px] text-muted leading-relaxed list-disc pl-3">
-                        <li>85% promotion rate within 6 months</li>
-                        <li>Average salary increase of +18%</li>
-                        <li>High satisfaction from 100+ graduates</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {course?.format === 'Multiple formats' && (
-                <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="p-1.5 rounded-lg bg-amber-500/10">
-                      <Sparkles className="w-4 h-4 text-amber-600" />
-                    </div>
-                    <div className="w-full">
-                      <span className="text-[10px] font-black text-amber-600 uppercase block mb-2">Delivery Comparison</span>
-                      <div className="space-y-2 text-[10px] text-muted">
-                        <div className="flex justify-between border-b border-amber-500/10 pb-1">
-                          <span className="font-bold">Self-Paced</span>
-                          <span>Lowest Price, Full AI Tutor</span>
-                        </div>
-                        <div className="flex justify-between border-b border-amber-500/10 pb-1">
-                          <span className="font-bold">Cohort</span>
-                          <span>Peer Group, Live Video</span>
-                        </div>
-                        <div className="flex justify-between pb-1">
-                          <span className="font-bold">Flipped</span>
-                          <span>In-Person + Self-Study</span>
-                        </div>
-                      </div>
-                      <p className="text-[9px] text-amber-600/70 mt-2 font-medium italic">
-                        *All formats include certificate eligibility.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between p-3 border border-line rounded-xl bg-bg/20">
-                <div className="flex items-center space-x-2">
-                  <ShieldCheck className="w-4 h-4 text-green" />
-                  <span className="text-[10px] font-bold text-text uppercase">Verifiable Certificate</span>
-                </div>
-                <div className="w-2 h-2 rounded-full bg-green animate-pulse" />
-              </div>
-            </div>
-          </div>
-
-          {/* Preparation & Onboarding Surface (REQ-CHECKOUT-020 & 021) - Flipped only */}
-          {selectedFormat === 'flipped' && ( (activeFormatData?.preCourseRequirements || course?.preCourseRequirements) || (activeFormatData?.preCourseTasks || course?.preCourseTasks) ) && (() => {
-            const requirements = activeFormatData?.preCourseRequirements || course?.preCourseRequirements;
-            const tasks = activeFormatData?.preCourseTasks || course?.preCourseTasks;
-            
-            return (
-              <div className={`rounded-2xl border p-5 space-y-4 shadow-sm transition-all duration-500 ${enrolled ? 'bg-cyan/5 border-cyan/30' : 'bg-panel border-line'}`}>
-                <h3 className="text-xs font-black uppercase text-text tracking-wider flex items-center gap-2">
-                  {enrolled ? <Sparkles className="w-4 h-4 text-cyan" /> : <Laptop className="w-4 h-4 text-cyan" />}
-                  {enrolled ? 'Get Ready Path' : 'Pre-Course Preparation'}
-                </h3>
-                
-                {!enrolled && requirements && (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-500">
-                    {requirements.hardware && (
-                      <div className="space-y-1.5">
-                        <span className="text-[9px] font-black text-muted uppercase tracking-tight">Hardware</span>
-                        <ul className="space-y-1">
-                          {requirements.hardware.map((item, i) => (
-                            <li key={i} className="text-[10px] text-text font-medium flex items-start gap-2 leading-snug">
-                              <span className="w-1.5 h-1.5 rounded-full bg-cyan mt-1.5 shrink-0" />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {requirements.software && (
-                      <div className="space-y-1.5">
-                        <span className="text-[9px] font-black text-muted uppercase tracking-tight">Software Setup</span>
-                        <ul className="space-y-1">
-                          {requirements.software.map((item, i) => (
-                            <li key={i} className="text-[10px] text-text font-medium flex items-start gap-2 leading-snug">
-                              <CheckCircle className="w-3.5 h-3.5 text-cyan mt-0.5 shrink-0" />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {enrolled && tasks && (
-                  <div className="space-y-3 animate-in fade-in zoom-in duration-500">
-                    <p className="text-[10px] text-muted font-medium italic leading-relaxed">
-                      Welcome aboard! Complete these tasks to ensure a smooth start to your session.
-                    </p>
-                    <div className="space-y-2">
-                      {tasks.map((task) => (
-                        <div key={task.id} className="flex items-center gap-3 p-3 rounded-xl bg-bg border border-line/50 hover:border-cyan/30 transition-colors group cursor-pointer">
-                          <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ${task.status === 'completed' ? 'bg-green/10 text-green' : 'bg-bg border border-line text-muted'}`}>
-                            {task.type === 'video' ? <PlayCircle className="w-3.5 h-3.5" /> : 
-                             task.type === 'setup' ? <Laptop className="w-3.5 h-3.5" /> : 
-                             <CheckCircle className="w-3.5 h-3.5" />}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-[10px] font-bold text-text truncate">{task.title}</h4>
-                            <p className="text-[8px] text-muted font-medium truncate">{task.description}</p>
-                          </div>
-                          <ArrowRight className="w-3 h-3 text-muted group-hover:text-cyan transition-colors" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-
 
           {/* Pricing Info (Exclusive for non-enrolled) */}
           {!enrolled && (
             <div className="bg-panel border border-line rounded-2xl overflow-hidden shadow-lg flex flex-col">
-              <div className="p-6 space-y-4">
+              <div className="p-4 space-y-3">
                 {course!.priceStatus === 'paid' || !course!.priceStatus ? (
                   <>
                     <div className="flex items-center justify-between">
@@ -967,16 +1089,16 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                     )}
                   </>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div className="flex items-center space-x-3 text-cyan">
                       <ShieldCheck className="w-6 h-6" />
                       <h3 className="font-bold text-sm uppercase tracking-wider">Access Covered</h3>
                     </div>
-                    <div className="p-4 rounded-xl bg-cyan/5 border border-cyan/20">
+                    <div className="p-3 rounded-xl bg-cyan/5 border border-cyan/20">
                       <p className="text-xs text-muted leading-relaxed font-medium">
                         {course!.priceStatus === 'included' 
-                          ? "This course is fully included in your active subscription plan. No additional payment is required to start your journey."
-                          : "This course is provided by your employer as part of your professional development. Your access is fully sponsored."}
+                          ? "Included in your active subscription plan."
+                          : "Access fully sponsored by your employer."}
                       </p>
                     </div>
                   </div>
@@ -1004,7 +1126,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                   </div>
                 )}
 
-                <div className="space-y-3 pt-2">
+                <div className="space-y-2 pt-2">
                   <div className="flex items-center space-x-2 text-xs text-muted">
                     <CheckCircle className="w-4 h-4 text-green" />
                     <span>30-day money-back guarantee</span>
@@ -1026,118 +1148,10 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
               </div>
             </div>
           )}
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Multi-mode Comparison View - Full Width Original Design */}
-      {course?.availableFormats && (
-        <div className="bg-panel border border-line rounded-2xl p-6 space-y-6 mt-8">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-text">Choose your learning experience</h2>
-            <span className="text-[10px] font-bold text-cyan bg-cyan/10 px-3 py-1 rounded-full uppercase tracking-wider">Multi-Format Available</span>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-line/50">
-                  <th className="py-4 text-[10px] font-black uppercase text-muted tracking-widest w-1/3">Feature</th>
-                  {course?.availableFormats?.map(f => (
-                    <th key={f.format} className="py-4 px-4 text-center">
-                      <div className={`text-[10px] font-black uppercase tracking-widest mb-1 ${selectedFormat === f.format ? 'text-cyan' : 'text-muted'}`}>
-                        {f.format === 'flipped' ? 'Flipped' : f.format === 'cohort' ? 'Cohort' : 'Self-Paced'}
-                      </div>
-                      <div className="text-sm font-bold text-text">{f.price}</div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                    <tr className="border-b border-line/30">
-                      <td className="py-4 pr-4">
-                        <div className="text-xs font-bold text-text">AI Tutor Allowance</div>
-                        <div className="text-[10px] text-muted">24/7 personalized support</div>
-                      </td>
-                      {course?.availableFormats?.map(f => (
-                        <td key={f.format} className="py-4 px-4 text-center">
-                          {f.features.aiTutor ? <CheckCircle className="w-4 h-4 text-green mx-auto" /> : <span className="text-muted opacity-20">—</span>}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr className="border-b border-line/30">
-                      <td className="py-4 pr-4">
-                        <div className="text-xs font-bold text-text">Peer Cohort Access</div>
-                        <div className="text-[10px] text-muted">Learn with a community</div>
-                      </td>
-                      {course?.availableFormats?.map(f => (
-                        <td key={f.format} className="py-4 px-4 text-center">
-                          {f.features.peerCohort ? <CheckCircle className="w-4 h-4 text-green mx-auto" /> : <span className="text-muted opacity-20">—</span>}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr className="border-b border-line/30">
-                      <td className="py-4 pr-4">
-                        <div className="text-xs font-bold text-text">In-Person Component</div>
-                        <div className="text-[10px] text-muted">Expert-led workshops</div>
-                      </td>
-                      {course?.availableFormats?.map(f => (
-                        <td key={f.format} className="py-4 px-4 text-center">
-                          {f.features.inPerson ? <CheckCircle className="w-4 h-4 text-green mx-auto" /> : <span className="text-muted opacity-20">—</span>}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr className="border-b border-line/30">
-                      <td className="py-4 pr-4">
-                        <div className="text-xs font-bold text-text">Certificate Eligibility</div>
-                        <div className="text-[10px] text-muted">Verified skill credentials</div>
-                      </td>
-                      {course?.availableFormats?.map(f => (
-                        <td key={f.format} className="py-4 px-4 text-center">
-                          {f.features.certificate ? <CheckCircle className="w-4 h-4 text-green mx-auto" /> : <span className="text-muted opacity-20">—</span>}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr className="border-b border-line/30">
-                      <td className="py-4 pr-4">
-                        <div className="text-xs font-bold text-text">Platform Access Bundle</div>
-                        <div className="text-[10px] text-muted">Premium subscription included</div>
-                      </td>
-                      {course?.availableFormats?.map(f => (
-                        <td key={f.format} className="py-4 px-4 text-center">
-                          {f.bundledSubscription ? (
-                            <div className="flex flex-col items-center">
-                              <span className="text-xs font-black text-cyan">+{f.bundledSubscription.durationMonths}m</span>
-                              <span className="text-[8px] text-muted font-bold uppercase truncate max-w-[80px]">worth {f.bundledSubscription.valueAmount}</span>
-                            </div>
-                          ) : <span className="text-muted opacity-20">—</span>}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr>
-                      <td className="py-6"></td>
-                      {course?.availableFormats?.map(f => (
-                        <td key={f.format} className="py-6 px-4 text-center">
-                          <button
-                            onClick={() => {
-                              setSelectedFormat(f.format);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }}
-                            className={`w-full py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-                              selectedFormat === f.format 
-                                ? 'bg-cyan text-bg shadow-[0_4px_15px_rgba(45,212,191,0.3)]' 
-                                : 'bg-bg border border-line text-text hover:border-cyan/50'
-                            }`}
-                          >
-                            {selectedFormat === f.format ? 'Selected' : 'Select'}
-                          </button>
-                        </td>
-                      ))}
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
 
       {/* Related Courses */}
       <div className="space-y-6 pt-8">
@@ -1190,6 +1204,6 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
 
       </div>
     </div>
-    </div>
+      </div>
   );
 };
