@@ -20,7 +20,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   setIsMobileOpen,
   isPublicView
 }) => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAuthenticated } = useAuth();
   const { streak } = useXP();
   const { resolvedTheme, toggleTheme } = useTheme();
   const { notifications, unreadCount, markAllAsRead, markAsRead } = useNotifications();
@@ -112,12 +112,20 @@ export const TopBar: React.FC<TopBarProps> = ({
             <button onClick={toggleTheme} className="p-2 rounded-xl text-muted hover:text-text hover:bg-bg/50 transition-colors">
               {resolvedTheme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
-            <button onClick={() => { signOut(); onNavigate('signin'); }} className="bg-transparent border border-cyan text-cyan hover:bg-cyan/10 text-sm font-bold px-4 py-2 rounded-xl transition-colors">
-              Login
-            </button>
-            <button onClick={() => { onNavigate('signup'); }} className="bg-cyan hover:bg-cyan2 text-bg text-sm font-bold px-4 py-2 rounded-xl transition-colors">
-              Sign Up
-            </button>
+            {isAuthenticated ? (
+              <button onClick={() => onNavigate('dashboard')} className="bg-cyan hover:bg-cyan2 text-bg text-sm font-bold px-4 py-2 rounded-xl transition-colors">
+                Go to Dashboard
+              </button>
+            ) : (
+              <>
+                <button onClick={() => { signOut(); onNavigate('signin'); }} className="bg-transparent border border-cyan text-cyan hover:bg-cyan/10 text-sm font-bold px-4 py-2 rounded-xl transition-colors">
+                  Login
+                </button>
+                <button onClick={() => { onNavigate('signup'); }} className="bg-cyan hover:bg-cyan2 text-bg text-sm font-bold px-4 py-2 rounded-xl transition-colors">
+                  Sign Up
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
