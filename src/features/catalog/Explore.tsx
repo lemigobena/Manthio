@@ -1,9 +1,117 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
-import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, Sparkles, Star, Play, Zap, ArrowRight, Code, Command, Cloud, Database, Hexagon, Box, Users, Bot, CheckCircle2, BarChart } from 'lucide-react';
+import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, Sparkles, Star, Play, Zap, ArrowRight, Code, Command, Cloud, Database, Hexagon, Box, Bot, CheckCircle2, ChevronDown, Check, X } from 'lucide-react';
 import heroImage from '../../assets/hero-student.png';
 import { ParticleNetwork } from '../../components/ui/ParticleNetwork';
+
+interface ExploreDropdownOption { label: string; value: string; }
+interface ExploreDropdownProps {
+  label: string;
+  value: string;
+  options: ExploreDropdownOption[];
+  onChange: (v: string) => void;
+}
+
+const ExploreDropdown: React.FC<ExploreDropdownProps> = ({ label, value, options, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selectedLabel = options.find(o => o.value === value)?.label ?? value;
+  const isFiltered = value !== 'All' && value !== options[0]?.value;
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+          isFiltered
+            ? 'bg-cyan/15 border-cyan text-cyan shadow-[0_0_10px_rgba(0,255,242,0.15)]'
+            : 'bg-panel border-line text-muted hover:border-cyan/50 hover:text-text'
+        } ${open ? 'border-cyan/60' : ''}`}
+      >
+        <span>{isFiltered ? `${label}: ${selectedLabel}` : label}</span>
+        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div className="absolute top-full mt-2 left-0 z-50 min-w-[150px] bg-panel/95 backdrop-blur-xl border border-line/80 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="p-1.5 space-y-0.5">
+            {options.map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => { onChange(opt.value); setOpen(false); }}
+                className={`w-full flex items-center justify-between gap-3 px-3 py-2 rounded-xl text-[11px] font-medium transition-all duration-150 text-left cursor-pointer ${
+                  opt.value === value
+                    ? 'bg-cyan/15 text-cyan'
+                    : 'text-muted hover:bg-line/50 hover:text-text'
+                }`}
+              >
+                <span>{opt.label}</span>
+                {opt.value === value && <Check className="w-3 h-3 shrink-0" />}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const levenshtein = (a: string, b: string): number => {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  const matrix = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
+  for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+  for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + cost
+      );
+    }
+  }
+  return matrix[a.length][b.length];
+};
+
+const stem = (word: string) => word.toLowerCase().replace(/(ing|ed|s)$/i, '');
+
+const fuzzyMatch = (query: string, text: string): boolean => {
+  if (!query || !text) return false;
+  const q = query.toLowerCase();
+  const t = text.toLowerCase();
+  if (t.includes(q)) return true;
+  
+  const qWords = q.split(/\s+/).map(stem).filter(Boolean);
+  const tWords = t.split(/\W+/).map(stem).filter(Boolean);
+  
+  if (qWords.length === 0) return true;
+  
+  for (const qw of qWords) {
+    let found = false;
+    for (const tw of tWords) {
+      if (tw.includes(qw)) { found = true; break; }
+      const threshold = qw.length <= 4 ? 1 : 2;
+      if (Math.abs(qw.length - tw.length) <= threshold && levenshtein(qw, tw) <= threshold) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) return false;
+  }
+  return true;
+};
 
 interface ExploreProps {
   onNavigate: (page: string) => void;
@@ -11,11 +119,14 @@ interface ExploreProps {
 
 export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
   const { setActiveCourseId, setActiveTrackId, isAuthenticated } = useAuth();
-  const [discoveryMode, setDiscoveryMode] = useState<'courses' | 'tracks'>('courses');
+  const [discoveryMode, setDiscoveryMode] = useState<'courses' | 'tracks'>('tracks');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<string>('All');
   const [selectedFormat, setSelectedFormat] = useState<string>('All');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('All');
   const [selectedTopic, setSelectedTopic] = useState<string>('All');
+  const [selectedGoal, setSelectedGoal] = useState<string>('All');
+  const [selectedTimeRange, setSelectedTimeRange] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('Recommended');
 
   // Loading & Error States (REQ-LOAD-002, REQ-LOAD-004)
@@ -74,24 +185,26 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
   };
 
   // Unique values for filters
-  const topics = Array.from(new Set(COURSES.map(c => c.topic))).filter(Boolean);
+  const topics = Array.from(new Set(COURSES.map(c => c.topic))).filter(Boolean) as string[];
 
   // Filter courses
   const filteredCourses = (discoveryMode === 'courses' ? COURSES : []).filter(course => {
 
     // Search query filtering
-    if (searchQuery && 
-        !course.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
-        !course.description.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !course.trainer.name.toLowerCase().includes(searchQuery.toLowerCase())
-    ) {
-      return false;
+    if (searchQuery) {
+      const matchTitle = fuzzyMatch(searchQuery, course.title);
+      const matchDesc = fuzzyMatch(searchQuery, course.description);
+      const matchTrainer = fuzzyMatch(searchQuery, course.trainer.name);
+      const matchTags = (course.tags || []).some(tag => fuzzyMatch(searchQuery, tag));
+      
+      if (!matchTitle && !matchDesc && !matchTrainer && !matchTags) return false;
     }
 
     // Filter selectors
     if (selectedLevel !== 'All' && course.level !== selectedLevel) return false;
     if (selectedFormat !== 'All' && course.format !== selectedFormat) return false;
     if (selectedTopic !== 'All' && course.topic !== selectedTopic) return false;
+    if (selectedLanguage !== 'All' && course.language !== selectedLanguage) return false;
 
     return true;
   });
@@ -106,8 +219,29 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
   });
 
   const tracksToShow = discoveryMode === 'tracks' ? TRACKS.filter(t => {
-    if (searchQuery && !t.title.toLowerCase().includes(searchQuery.toLowerCase()) && !t.outcomeStatement.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    // Search and Level filtering
+    if (searchQuery) {
+      const matchTitle = fuzzyMatch(searchQuery, t.title);
+      const matchDesc = fuzzyMatch(searchQuery, t.outcomeStatement);
+      const matchTags = (t.tags || []).some(tag => fuzzyMatch(searchQuery, tag));
+      if (!matchTitle && !matchDesc && !matchTags) return false;
+    }
+    
     if (selectedLevel !== 'All' && t.level !== selectedLevel) return false;
+    
+    // Tracks filters
+    if (selectedGoal !== 'All') {
+      const goalType = t.id.includes('cloud') ? 'Role' : t.id.includes('data') ? 'Certification' : 'Role';
+      if (goalType !== selectedGoal) return false;
+    }
+    
+    if (selectedTimeRange !== 'All') {
+      const hours = parseInt(t.estimatedTime.split(' ')[0]);
+      if (selectedTimeRange === '<20' && hours >= 20) return false;
+      if (selectedTimeRange === '20-40' && (hours < 20 || hours > 40)) return false;
+      if (selectedTimeRange === '40+' && hours <= 40) return false;
+    }
+
     return true;
   }) : [];
 
@@ -401,23 +535,23 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                 </ul>
                 <div className="pt-4">
                   {/* Desktop button only; mobile variant placed after the card */}
-                  <button className="hidden md:flex items-center space-x-2 text-cyan font-bold hover:text-cyan2 transition-colors">
+                  <button onClick={() => onNavigate('signin')} className="hidden md:flex items-center space-x-2 text-cyan font-bold hover:text-cyan2 transition-colors cursor-pointer">
                     <span>See Doc</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
               <div className="md:w-1/2 w-full h-[400px] bg-bg border border-line rounded-3xl overflow-hidden relative group">
-                 <div className="absolute inset-0 bg-gradient-to-tr from-purple/10 to-cyan/10 opacity-50 group-hover:opacity-100 transition-opacity" />
-                 <div className="absolute inset-4 bg-panel border border-line rounded-2xl shadow-xl p-6 transform group-hover:scale-[1.02] transition-transform duration-500">
-                    <div className="w-full h-full border border-line/50 rounded-xl bg-bg flex items-center justify-center">
-                       <BarChart className="w-16 h-16 text-muted opacity-50" />
-                    </div>
-                 </div>
+                 <img 
+                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80" 
+                    alt="Management Dashboard" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-tr from-cyan/20 to-purple/20 mix-blend-overlay group-hover:opacity-50 transition-opacity" />
               </div>
               {/* Mobile-only button placed after the card so it appears below the card on phones */}
               <div className="w-full md:hidden flex justify-center">
-                <button className="flex items-center space-x-2 text-cyan font-bold hover:text-cyan2 transition-colors py-3">
+                <button onClick={() => onNavigate('signin')} className="flex items-center space-x-2 text-cyan font-bold hover:text-cyan2 transition-colors py-3 cursor-pointer">
                   <span>See Doc</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
@@ -438,23 +572,23 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                 </ul>
                 <div className="pt-4">
                   {/* Desktop-only button; mobile copy below the card */}
-                  <button className="hidden md:flex items-center space-x-2 text-purple font-bold hover:text-purple/80 transition-colors">
+                  <button onClick={() => onNavigate('signin')} className="hidden md:flex items-center space-x-2 text-purple font-bold hover:text-purple/80 transition-colors cursor-pointer">
                     <span>Learn More</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
               <div className="md:w-1/2 w-full h-[400px] bg-bg border border-line rounded-3xl overflow-hidden relative group">
-                 <div className="absolute inset-0 bg-gradient-to-tl from-cyan/10 to-purple/10 opacity-50 group-hover:opacity-100 transition-opacity" />
-                 <div className="absolute inset-4 bg-panel border border-line rounded-2xl shadow-xl p-6 transform group-hover:scale-[1.02] transition-transform duration-500">
-                    <div className="w-full h-full border border-line/50 rounded-xl bg-bg flex items-center justify-center">
-                       <Users className="w-16 h-16 text-muted opacity-50" />
-                    </div>
-                 </div>
+                 <img 
+                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80" 
+                    alt="Team Collaboration" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-tl from-purple/20 to-cyan/20 mix-blend-overlay group-hover:opacity-50 transition-opacity" />
               </div>
               {/* Mobile-only button placed after the card so it appears below the card on phones */}
               <div className="w-full md:hidden flex justify-center">
-                <button className="flex items-center space-x-2 text-purple font-bold hover:text-purple/80 transition-colors py-3">
+                <button onClick={() => onNavigate('signin')} className="flex items-center space-x-2 text-purple font-bold hover:text-purple/80 transition-colors py-3 cursor-pointer">
                   <span>Learn More</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
@@ -502,7 +636,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
             placeholder={discoveryMode === 'tracks' ? "Search tracks..." : "Search for courses or topics..."} 
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); simulateLoad(); }}
-            className="w-full bg-panel border border-line rounded-xl pl-10 pr-4 py-2 text-sm text-text focus:border-cyan focus:outline-none transition-colors shadow-sm"
+            className="w-full bg-panel border border-line rounded-xl pl-10 pr-4 py-2 text-sm text-text focus:border-cyan focus:outline-none !outline-none transition-colors shadow-sm"
           />
           <Search className="absolute left-3 top-2.5 w-4.5 h-4.5 text-muted" />
         </div>
@@ -517,57 +651,143 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
         </div>
 
         {/* Dropdown Filters */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <SlidersHorizontal className="w-4 h-4 text-muted hidden sm:block" />
-          
-          <select 
+
+          <ExploreDropdown
+            label="Level"
             value={selectedLevel}
-            onChange={(e) => { setSelectedLevel(e.target.value); simulateLoad(); }}
-            className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
-          >
-            <option value="All">Level: All</option>
-            <option value="Foundation">Foundation</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Advanced">Advanced</option>
-          </select>
+            onChange={(v) => { setSelectedLevel(v); simulateLoad(); }}
+            options={[
+              { label: 'All Levels', value: 'All' },
+              { label: 'Foundation', value: 'Foundation' },
+              { label: 'Intermediate', value: 'Intermediate' },
+              { label: 'Advanced', value: 'Advanced' },
+            ]}
+          />
 
           {discoveryMode === 'courses' && (
             <>
-              <select 
+              <ExploreDropdown
+                label="Topic"
                 value={selectedTopic}
-                onChange={(e) => { setSelectedTopic(e.target.value); simulateLoad(); }}
-                className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
-              >
-                <option value="All">Topic: All</option>
-                {topics.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
+                onChange={(v) => { setSelectedTopic(v); simulateLoad(); }}
+                options={[{ label: 'All Topics', value: 'All' }, ...topics.map((t): ExploreDropdownOption => ({ label: t, value: t }))]}
+              />
 
-              <select 
+              <ExploreDropdown
+                label="Format"
                 value={selectedFormat}
-                onChange={(e) => { setSelectedFormat(e.target.value); simulateLoad(); }}
-                className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
-              >
-                <option value="All">Format: All</option>
-                <option value="flipped">Flipped</option>
-                <option value="self-paced">Self-paced</option>
-                <option value="cohort">Cohort</option>
-              </select>
+                onChange={(v) => { setSelectedFormat(v); simulateLoad(); }}
+                options={[
+                  { label: 'All Formats', value: 'All' },
+                  { label: 'Flipped', value: 'flipped' },
+                  { label: 'Self-paced', value: 'self-paced' },
+                  { label: 'Cohort', value: 'cohort' },
+                ]}
+              />
 
-              <select 
+              <ExploreDropdown
+                label="Language"
+                value={selectedLanguage}
+                onChange={(v) => { setSelectedLanguage(v); simulateLoad(); }}
+                options={[
+                  { label: 'All Languages', value: 'All' },
+                  { label: 'English', value: 'English' },
+                  { label: 'German', value: 'German' },
+                  { label: 'French', value: 'French' },
+                ]}
+              />
+
+              <ExploreDropdown
+                label="Sort"
                 value={sortBy}
-                onChange={(e) => { setSortBy(e.target.value); simulateLoad(); }}
-                className="bg-panel border border-line text-[11px] rounded-lg px-2.5 py-1.5 text-text focus:outline-none focus:border-cyan cursor-pointer"
-              >
-                <option value="Recommended">Sort: Recommended</option>
-                <option value="Newest">Newest</option>
-                <option value="Most popular">Most popular</option>
-                <option value="Highest rated">Highest rated</option>
-                <option value="Alphabetical">A-Z</option>
-              </select>
+                onChange={(v) => { setSortBy(v); simulateLoad(); }}
+                options={[
+                  { label: 'Recommended', value: 'Recommended' },
+                  { label: 'Newest', value: 'Newest' },
+                  { label: 'Most popular', value: 'Most popular' },
+                  { label: 'Highest rated', value: 'Highest rated' },
+                  { label: 'A–Z', value: 'Alphabetical' },
+                ]}
+              />
+            </>
+          )}
+
+          {discoveryMode === 'tracks' && (
+            <>
+              <ExploreDropdown
+                label="Goal"
+                value={selectedGoal}
+                onChange={(v) => { setSelectedGoal(v); simulateLoad(); }}
+                options={[
+                  { label: 'All Goals', value: 'All' },
+                  { label: 'Certification', value: 'Certification' },
+                  { label: 'Role', value: 'Role' },
+                  { label: 'Project', value: 'Project' },
+                  { label: 'Topic', value: 'Topic' },
+                ]}
+              />
+
+              <ExploreDropdown
+                label="Duration"
+                value={selectedTimeRange}
+                onChange={(v) => { setSelectedTimeRange(v); simulateLoad(); }}
+                options={[
+                  { label: 'Any Duration', value: 'All' },
+                  { label: 'Under 20h', value: '<20' },
+                  { label: '20–40h', value: '20-40' },
+                  { label: '40h+', value: '40+' },
+                ]}
+              />
             </>
           )}
         </div>
       </div>
+
+      {/* REQ-CATALOG-004: Active Filter Chips */}
+      {(() => {
+        const activeFilters = [];
+        if (selectedLevel !== 'All') activeFilters.push({ label: `Level: ${selectedLevel}`, clear: () => setSelectedLevel('All') });
+        if (discoveryMode === 'courses') {
+          if (selectedTopic !== 'All') activeFilters.push({ label: `Topic: ${selectedTopic}`, clear: () => setSelectedTopic('All') });
+          if (selectedFormat !== 'All') activeFilters.push({ label: `Format: ${selectedFormat}`, clear: () => setSelectedFormat('All') });
+          if (selectedLanguage !== 'All') activeFilters.push({ label: `Language: ${selectedLanguage}`, clear: () => setSelectedLanguage('All') });
+        } else {
+          if (selectedGoal !== 'All') activeFilters.push({ label: `Goal: ${selectedGoal}`, clear: () => setSelectedGoal('All') });
+          if (selectedTimeRange !== 'All') activeFilters.push({ label: `Time: ${selectedTimeRange}`, clear: () => setSelectedTimeRange('All') });
+        }
+
+        if (activeFilters.length === 0) return null;
+
+        return (
+          <div className="flex flex-wrap items-center gap-2 -mt-2 pb-4">
+            <span className="text-[10px] text-muted font-bold uppercase mr-1">Active Filters:</span>
+            {activeFilters.map((filter, i) => (
+              <span key={i} className="flex items-center space-x-1 bg-cyan/10 border border-cyan/20 text-cyan text-[11px] font-bold px-2.5 py-1 rounded-lg">
+                <span>{filter.label}</span>
+                <button onClick={() => { filter.clear(); simulateLoad(); }} className="hover:text-text cursor-pointer ml-1">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            <button 
+              onClick={() => {
+                setSelectedLevel('All');
+                setSelectedTopic('All');
+                setSelectedFormat('All');
+                setSelectedLanguage('All');
+                setSelectedGoal('All');
+                setSelectedTimeRange('All');
+                simulateLoad();
+              }} 
+              className="text-[10px] font-bold text-muted hover:text-text cursor-pointer uppercase underline underline-offset-2 ml-2"
+            >
+              Clear All
+            </button>
+          </div>
+        );
+      })()}
 
       {/* REQ-LOAD-004: Failed load with retry action */}
       {isError ? (
@@ -745,7 +965,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                 {/* Header Image */}
                 <div className="h-44 relative bg-bg overflow-hidden border-b border-line">
                   <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover opacity-85 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg/60 via-transparent to-transparent opacity-60" />
+                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                   <div className="absolute top-3 left-3 flex flex-wrap gap-2">
                     <span className="bg-bg/40 backdrop-blur-md border border-white/20 text-[10px] px-2.5 py-1 rounded font-bold uppercase text-white shadow-sm">
                       {course.level}
@@ -822,7 +1042,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                 {/* Header Image */}
                 <div className="h-44 relative bg-bg overflow-hidden border-b border-line">
                   <img src={track.imageUrl} alt={track.title} className="w-full h-full object-cover opacity-85 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-bg/60 via-transparent to-transparent opacity-60" />
+                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                   <div className="absolute top-3 left-3 flex flex-wrap gap-2">
                     <span className="bg-bg/40 backdrop-blur-md border border-white/20 text-[10px] px-2.5 py-1 rounded font-bold uppercase text-white shadow-sm">
                       {track.level}
@@ -868,7 +1088,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                 <button 
                   onClick={() => {
                     setActiveTrackId(track.id);
-                    onNavigate('course-detail');
+                    onNavigate('track-detail');
                   }}
                   className="relative overflow-hidden group/btn bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer"
                 >
@@ -886,41 +1106,44 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
             <div className="bg-bg/50 border border-line rounded-[2.5rem] p-6 md:p-8 shadow-xl backdrop-blur-sm">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Section 1 */}
-                <div className="bento-card relative bg-panel border border-line rounded-3xl p-8 flex flex-col items-center text-center justify-between min-h-[300px] group cursor-pointer overflow-hidden hover:border-cyan transition-colors">
-                  <div className="absolute inset-0 bg-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                  <div className="relative z-10">
-                    <h6 className="text-xl font-bold text-text mb-2 group-hover:text-cyan transition-colors">Interactive</h6>
-                    <p className="text-muted text-sm">Write code directly in your browser with instant feedback.</p>
+                <div className="relative border border-line rounded-3xl flex flex-col items-center text-center justify-between min-h-[300px] group cursor-pointer overflow-hidden hover:border-cyan transition-colors">
+                  <div className="absolute inset-0">
+                    <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=800&q=80" alt="Interactive" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 dark:opacity-50 dark:group-hover:opacity-70 group-hover:scale-110 transition-all duration-700" />
+                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent dark:from-bg/70 dark:via-bg/10" />
                   </div>
-                  <div className="mt-8 w-full h-32 bg-bg rounded-xl border border-line flex items-center justify-center overflow-hidden relative z-10">
-                     <div className="absolute inset-0 bg-gradient-to-t from-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                     <Code className="w-12 h-12 text-cyan opacity-50 group-hover:opacity-100 group-hover:scale-110 transition-all" />
+                  <div className="absolute inset-0 bg-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                  
+                  <div className="relative z-10 w-full h-full flex flex-col items-center justify-end p-8">
+                    <h6 className="text-xl font-bold text-white mb-2 group-hover:text-cyan transition-colors drop-shadow-md">Interactive</h6>
+                    <p className="text-white/80 text-sm drop-shadow-md">Write code directly in your browser with instant feedback.</p>
                   </div>
                 </div>
 
                 {/* Section 2 */}
-                <div className="bento-card relative bg-panel border border-line rounded-3xl p-8 flex flex-col items-center text-center justify-between min-h-[300px] group cursor-pointer overflow-hidden hover:border-purple transition-colors">
-                  <div className="absolute inset-0 bg-purple/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                  <div className="relative z-10">
-                    <h6 className="text-xl font-bold text-text mb-2 group-hover:text-purple transition-colors">Users</h6>
-                    <p className="text-muted text-sm">Join a global community of passionate learners.</p>
+                <div className="relative border border-line rounded-3xl flex flex-col items-center text-center justify-between min-h-[300px] group cursor-pointer overflow-hidden hover:border-purple transition-colors">
+                  <div className="absolute inset-0">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Users" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 dark:opacity-50 dark:group-hover:opacity-70 group-hover:scale-110 transition-all duration-700" />
+                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent dark:from-bg/70 dark:via-bg/10" />
                   </div>
-                  <div className="mt-8 w-full h-32 bg-bg rounded-xl border border-line flex items-center justify-center overflow-hidden relative z-10">
-                     <div className="absolute inset-0 bg-gradient-to-t from-purple/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                     <Users className="w-12 h-12 text-purple opacity-50 group-hover:opacity-100 group-hover:scale-110 transition-all" />
+                  <div className="absolute inset-0 bg-purple/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                  
+                  <div className="relative z-10 w-full h-full flex flex-col items-center justify-end p-8">
+                    <h6 className="text-xl font-bold text-white mb-2 group-hover:text-purple transition-colors drop-shadow-md">Community</h6>
+                    <p className="text-white/80 text-sm drop-shadow-md">Join a global community of passionate learners.</p>
                   </div>
                 </div>
 
                 {/* Section 3 */}
-                <div className="bento-card relative bg-panel border border-line rounded-3xl p-8 flex flex-col items-center text-center justify-between min-h-[300px] group cursor-pointer overflow-hidden hover:border-yellow transition-colors">
-                  <div className="absolute inset-0 bg-yellow/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                  <div className="mb-8 w-full h-32 bg-bg rounded-xl border border-line flex items-center justify-center overflow-hidden relative z-10">
-                     <div className="absolute inset-0 bg-gradient-to-b from-yellow/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                     <Sparkles className="w-12 h-12 text-yellow opacity-50 group-hover:opacity-100 group-hover:scale-110 transition-all" />
+                <div className="relative border border-line rounded-3xl flex flex-col items-center text-center justify-between min-h-[300px] group cursor-pointer overflow-hidden hover:border-yellow transition-colors">
+                  <div className="absolute inset-0">
+                    <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80" alt="Create" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 dark:opacity-50 dark:group-hover:opacity-70 group-hover:scale-110 transition-all duration-700" />
+                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent dark:from-bg/70 dark:via-bg/10" />
                   </div>
-                  <div className="relative z-10">
-                    <h6 className="text-xl font-bold text-text mb-2 group-hover:text-yellow transition-colors">Create</h6>
-                    <p className="text-muted text-sm">Build real-world projects to add to your portfolio.</p>
+                  <div className="absolute inset-0 bg-yellow/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                  
+                  <div className="relative z-10 w-full h-full flex flex-col items-center justify-end p-8">
+                    <h6 className="text-xl font-bold text-white mb-2 group-hover:text-yellow transition-colors drop-shadow-md">Create</h6>
+                    <p className="text-white/80 text-sm drop-shadow-md">Build real-world projects to add to your portfolio.</p>
                   </div>
                 </div>
               </div>

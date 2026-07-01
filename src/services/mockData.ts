@@ -21,6 +21,250 @@ export const TRAINERS: Record<string, Trainer> = {
 };
 
 export const COURSES: Course[] = [
+
+  {
+    id: 'git-version-control',
+    title: 'Git Version Control',
+    description: 'Master Git branches, rebasing, and collaborative workflows.',
+    longDescription: 'Comprehensive guide to Git.',
+    level: 'Foundation',
+    format: 'self-paced',
+    topic: 'Version Control',
+    duration: '2 Hours',
+    language: 'English',
+    priceStatus: 'included',
+    xpReward: 150,
+    price: 'CHF 50.00',
+    rating: 4.8,
+    ratingCount: 120,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1556075798-4825dfaaf498?auto=format&fit=crop&w=800&q=80',
+    trainer: Object.values(TRAINERS)[0],
+    learningOutcomes: [],
+    modules: []
+  },
+  {
+    id: 'linux-administration',
+    title: 'Linux Administration',
+    description: 'Deep dive into Linux system administration and OS fundamentals.',
+    longDescription: 'Linux OS internals, permissions, and process management.',
+    level: 'Intermediate',
+    format: 'self-paced',
+    topic: 'OS',
+    duration: '4 Hours',
+    language: 'English',
+    priceStatus: 'included',
+    xpReward: 200,
+    price: 'CHF 80.00',
+    rating: 4.6,
+    ratingCount: 85,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?auto=format&fit=crop&w=800&q=80',
+    trainer: Object.values(TRAINERS)[0],
+    learningOutcomes: [],
+    modules: []
+  },
+  {
+    id: 'networking-fundamentals',
+    title: 'Networking Fundamentals',
+    description: 'Understand TCP/IP, DNS, routing, and load balancing.',
+    longDescription: 'Network concepts for cloud engineers.',
+    level: 'Foundation',
+    format: 'self-paced',
+    topic: 'Networking',
+    duration: '3 Hours',
+    language: 'English',
+    priceStatus: 'included',
+    xpReward: 180,
+    price: 'CHF 60.00',
+    rating: 4.7,
+    ratingCount: 92,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
+    trainer: Object.values(TRAINERS)[0],
+    learningOutcomes: [],
+    modules: []
+  },
+  {
+    id: 'kubernetes-for-beginners',
+    title: 'Kubernetes for Beginners',
+    description: 'Introduction to Pods, Deployments, and Services.',
+    longDescription: 'Start your Kubernetes journey.',
+    level: 'Intermediate',
+    format: 'self-paced',
+    topic: 'Kubernetes',
+    duration: '5 Hours',
+    language: 'English',
+    priceStatus: 'included',
+    xpReward: 250,
+    price: 'CHF 100.00',
+    rating: 4.9,
+    ratingCount: 210,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?auto=format&fit=crop&w=800&q=80',
+    trainer: Object.values(TRAINERS)[0],
+    learningOutcomes: [],
+    modules: []
+  },
+  {
+    id: 'kubernetes-advanced',
+    title: 'Kubernetes Advanced',
+    description: 'Ingress, Network Policies, and StatefulSets.',
+    longDescription: 'Advanced Kubernetes topics.',
+    level: 'Advanced',
+    format: 'self-paced',
+    topic: 'Kubernetes',
+    duration: '6 Hours',
+    language: 'English',
+    priceStatus: 'included',
+    xpReward: 300,
+    price: 'CHF 120.00',
+    rating: 4.8,
+    ratingCount: 150,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?auto=format&fit=crop&w=800&q=80',
+    trainer: Object.values(TRAINERS)[0],
+    learningOutcomes: [],
+    modules: []
+  },
+  {
+    id: 'ansible-configuration',
+    title: 'Ansible Configuration',
+    description: 'Automate server configuration with Ansible.',
+    longDescription: 'Ansible playbooks and roles.',
+    level: 'Intermediate',
+    format: 'self-paced',
+    topic: 'Automation',
+    duration: '4 Hours',
+    language: 'English',
+    priceStatus: 'included',
+    xpReward: 220,
+    price: 'CHF 90.00',
+    rating: 4.7,
+    ratingCount: 88,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&w=800&q=80',
+    trainer: Object.values(TRAINERS)[0],
+    learningOutcomes: [],
+    modules: []
+  },
+  {
+    id: 'monitoring-prometheus',
+    title: 'Monitoring with Prometheus',
+    description: 'Set up metrics and alerts with Prometheus and Grafana.',
+    longDescription: 'Observability stack.',
+    level: 'Intermediate',
+    format: 'self-paced',
+    topic: 'Monitoring',
+    duration: '3.5 Hours',
+    language: 'English',
+    priceStatus: 'included',
+    xpReward: 200,
+    price: 'CHF 85.00',
+    rating: 4.8,
+    ratingCount: 95,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+    trainer: Object.values(TRAINERS)[0],
+    learningOutcomes: [],
+    modules: []
+  },
+  {
+    id: 'advanced-python',
+    title: 'Advanced Python',
+    description: 'Metaclasses, concurrency, and decorators.',
+    longDescription: 'Deep Python concepts.',
+    level: 'Advanced',
+    format: 'self-paced',
+    topic: 'Python',
+    duration: '5 Hours',
+    language: 'English',
+    priceStatus: 'included',
+    xpReward: 250,
+    price: 'CHF 90.00',
+    rating: 4.8,
+    ratingCount: 110,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&w=800&q=80',
+    trainer: Object.values(TRAINERS)[0],
+    learningOutcomes: [],
+    modules: []
+  },
+  {
+    id: 'fastapi-backend',
+    title: 'FastAPI Backend',
+    description: 'Build fast APIs with Python and FastAPI.',
+    longDescription: 'Modern API development.',
+    level: 'Intermediate',
+    format: 'self-paced',
+    topic: 'Python',
+    duration: '4 Hours',
+    language: 'English',
+    priceStatus: 'included',
+    xpReward: 220,
+    price: 'CHF 85.00',
+    rating: 4.9,
+    ratingCount: 130,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=800&q=80',
+    trainer: Object.values(TRAINERS)[0],
+    learningOutcomes: [],
+    modules: []
+  },
+  {
+    id: 'apache-spark-basics',
+    title: 'Apache Spark Basics',
+    description: 'Big data processing with PySpark.',
+    longDescription: 'Distributed data pipelines.',
+    level: 'Intermediate',
+    format: 'self-paced',
+    topic: 'Data',
+    duration: '5 Hours',
+    language: 'English',
+    priceStatus: 'included',
+    xpReward: 240,
+    price: 'CHF 95.00',
+    rating: 4.7,
+    ratingCount: 75,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+    trainer: Object.values(TRAINERS)[0],
+    learningOutcomes: [],
+    modules: []
+  },
+  {
+    id: 'snowflake-data-warehouse',
+    title: 'Snowflake Data Warehouse',
+    description: 'Cloud data warehousing with Snowflake.',
+    longDescription: 'Modern data stack.',
+    level: 'Intermediate',
+    format: 'self-paced',
+    topic: 'Data',
+    duration: '4 Hours',
+    language: 'English',
+    priceStatus: 'included',
+    xpReward: 210,
+    price: 'CHF 90.00',
+    rating: 4.8,
+    ratingCount: 88,
+    enrolled: false,
+    progress: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+    trainer: Object.values(TRAINERS)[0],
+    learningOutcomes: [],
+    modules: []
+  },
+
   {
     id: 'test-course',
     title: 'Testing Course',
@@ -1497,40 +1741,17 @@ export const TRACKS: CareerTrack[] = [
     tags: ['Career Track', 'Top Rated'],
     outcomeStatement: 'Master Python from base syntax to production-grade services, testing structures, database integrations, and automated pipelines.',
     estimatedTime: '36 hours + 2 in-person sessions',
-    coursesCount: 3,
+    coursesCount: 6,
     progress: 38,
     enrolled: true,
     selfAssessmentOptions: ['I Know Nothing', 'I Know Basics', 'I Have Experience'],
     milestones: [
-      { 
-        id: 'mile-1', 
-        title: 'Start with Basics', 
-        description: 'Complete Python Bootcamp to gain foundational syntax skills.', 
-        courses: [
-          { id: 'python-bootcamp' },
-          { id: 'git-essentials', isOptional: true }
-        ], 
-        status: 'active' 
-      },
-      { 
-        id: 'mile-2', 
-        title: 'Object-Oriented Programming', 
-        description: 'Dive into intermediate OOP and design patterns.', 
-        courses: [
-          { id: 'advanced-python' }
-        ], 
-        status: 'locked' 
-      },
-      { 
-        id: 'mile-3', 
-        title: 'Production & APIs', 
-        description: 'Build REST APIs and deploy with Docker.', 
-        courses: [
-          { id: 'docker-containers' },
-          { id: 'api-design-fastapi', isOptional: true }
-        ], 
-        status: 'locked' 
-      }
+      { id: 'py-mile-1', title: 'Python Basics', description: 'Core syntax.', courses: [{ id: 'python-bootcamp' }], status: 'active' },
+      { id: 'py-mile-2', title: 'Version Control', description: 'Git essentials.', courses: [{ id: 'git-version-control' }], status: 'locked' },
+      { id: 'py-mile-3', title: 'Advanced Python', description: 'Metaprogramming.', courses: [{ id: 'advanced-python' }], status: 'locked' },
+      { id: 'py-mile-4', title: 'FastAPI Backend', description: 'Web APIs.', courses: [{ id: 'fastapi-backend' }], status: 'locked' },
+      { id: 'py-mile-5', title: 'Containerization', description: 'Dockerizing apps.', courses: [{ id: 'docker-containers' }], status: 'locked' },
+      { id: 'py-mile-6', title: 'CI/CD for Python', description: 'GitHub Actions.', courses: [{ id: 'github-actions-automation' }], status: 'locked' }
     ]
   },
   {
@@ -1542,47 +1763,22 @@ export const TRACKS: CareerTrack[] = [
     tags: ['Career Track', 'New'],
     outcomeStatement: 'Design and operate cloud-native infrastructure pipelines using Docker, Kubernetes, Terraform, and GitHub Actions on AWS or Azure.',
     estimatedTime: '42 hours + 3 in-person sessions',
-    coursesCount: 4,
+    coursesCount: 11,
     enrolled: false,
     progress: 0,
     selfAssessmentOptions: ['Pure Beginner', 'Some IT Background', 'Junior Dev'],
     milestones: [
-      { 
-        id: 'devops-mile-1', 
-        title: 'Linux & Networking Fundamentals', 
-        description: 'Bash scripting, networking basics, SSH, and process management.', 
-        courses: [
-          { id: 'command-line-basics' }
-        ], 
-        status: 'active' 
-      },
-      { 
-        id: 'devops-mile-2', 
-        title: 'Docker & Container Orchestration', 
-        description: 'Build, ship, and run containers with Docker Compose and Kubernetes.', 
-        courses: [
-          { id: 'docker-containers' }
-        ], 
-        status: 'locked' 
-      },
-      { 
-        id: 'devops-mile-3', 
-        title: 'CI/CD Pipelines', 
-        description: 'Automate build, test, and deploy workflows with GitHub Actions.', 
-        courses: [
-          { id: 'github-actions-automation' }
-        ], 
-        status: 'locked' 
-      },
-      { 
-        id: 'devops-mile-4', 
-        title: 'Cloud Infrastructure with Terraform', 
-        description: 'Provision and manage AWS or Azure resources as code.', 
-        courses: [
-          { id: 'terraform-iac-fundamentals' }
-        ], 
-        status: 'locked' 
-      }
+      { id: 'devops-mile-1', title: 'Prerequisites: Command Line', description: 'Bash scripting and terminal usage.', courses: [{ id: 'command-line-basics' }], status: 'active' },
+      { id: 'devops-mile-2', title: 'Prerequisites: Version Control', description: 'Source code management.', courses: [{ id: 'git-version-control' }], status: 'locked' },
+      { id: 'devops-mile-3', title: 'Linux Administration', description: 'System administration basics.', courses: [{ id: 'linux-administration' }], status: 'locked' },
+      { id: 'devops-mile-4', title: 'Networking', description: 'TCP/IP and routing.', courses: [{ id: 'networking-fundamentals' }], status: 'locked' },
+      { id: 'devops-mile-5', title: 'Containerization', description: 'Docker basics.', courses: [{ id: 'docker-containers' }], status: 'locked' },
+      { id: 'devops-mile-6', title: 'Kubernetes Foundations', description: 'Intro to K8s.', courses: [{ id: 'kubernetes-for-beginners' }], status: 'locked' },
+      { id: 'devops-mile-7', title: 'Advanced Kubernetes', description: 'Deep dive into K8s.', courses: [{ id: 'kubernetes-advanced' }], status: 'locked' },
+      { id: 'devops-mile-8', title: 'CI/CD Automation', description: 'Automating builds.', courses: [{ id: 'github-actions-automation' }], status: 'locked' },
+      { id: 'devops-mile-9', title: 'Infrastructure as Code', description: 'Terraform fundamentals.', courses: [{ id: 'terraform-iac-fundamentals' }], status: 'locked' },
+      { id: 'devops-mile-10', title: 'Configuration Management', description: 'Ansible.', courses: [{ id: 'ansible-configuration' }], status: 'locked' },
+      { id: 'devops-mile-11', title: 'Monitoring & Observability', description: 'Prometheus & Grafana.', courses: [{ id: 'monitoring-prometheus' }], status: 'locked' }
     ]
   },
   {
@@ -1594,38 +1790,16 @@ export const TRACKS: CareerTrack[] = [
     tags: ['Career Track', 'Intensive'],
     outcomeStatement: 'Design ETL pipelines, model relational data warehouses, and deliver analytics-ready datasets using Python, SQL, dbt, and Apache Airflow.',
     estimatedTime: '38 hours + 2 in-person sessions',
-    coursesCount: 3,
+    coursesCount: 6,
     progress: 0,
     enrolled: false,
     selfAssessmentOptions: ['New to Data', 'SQL User', 'Python Programmer'],
     milestones: [
-      { 
-        id: 'data-mile-1', 
-        title: 'SQL Mastery', 
-        description: 'Write advanced queries, CTEs, window functions, and optimise query plans.', 
-        courses: [
-          { id: 'sql-databases' }
-        ], 
-        status: 'active' 
-      },
-      { 
-        id: 'data-mile-2', 
-        title: 'Python for Data', 
-        description: 'Work with Pandas, data cleaning, transformation, and file I/O pipelines.', 
-        courses: [
-          { id: 'python-data-processing' }
-        ], 
-        status: 'locked' 
-      },
-      { 
-        id: 'data-mile-3', 
-        title: 'Data Pipelines & Orchestration', 
-        description: 'Build Airflow DAGs and schedule end-to-end ETL workflows.', 
-        courses: [
-          { id: 'airflow-etl-automation' }
-        ], 
-        status: 'locked' 
-      }
+      { id: 'data-mile-1', title: 'SQL & Databases', description: 'Relational data.', courses: [{ id: 'sql-databases' }], status: 'active' },
+      { id: 'data-mile-2', title: 'Python for Data', description: 'Pandas & processing.', courses: [{ id: 'python-data-processing' }], status: 'locked' },
+      { id: 'data-mile-3', title: 'Big Data Processing', description: 'Spark and Hadoop.', courses: [{ id: 'apache-spark-basics' }], status: 'locked' },
+      { id: 'data-mile-4', title: 'Cloud Data Warehouse', description: 'Snowflake.', courses: [{ id: 'snowflake-data-warehouse' }], status: 'locked' },
+      { id: 'data-mile-5', title: 'ETL Orchestration', description: 'Airflow basics.', courses: [{ id: 'airflow-etl-automation' }], status: 'locked' }
     ]
   }
 ];

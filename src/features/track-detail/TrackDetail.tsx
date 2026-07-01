@@ -38,7 +38,7 @@ const DIFFICULTY_COLORS: Record<string, string> = {
 };
 
 export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
-  const { activeTrackId, user, setActiveCourseId, setActiveTrackId, setCheckoutItem } = useAuth();
+  const { activeTrackId, user, setActiveCourseId, setActiveTrackId, setCheckoutItem, isAuthenticated } = useAuth();
   const { addNotification } = useNotifications();
   const {
     bookmarkTrack, setSelfAssessment, getProgress,
@@ -50,6 +50,7 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
 
   const progress = getProgress(track.id);
   const isEnrolled = !!(progress?.enrolledAt);
+  const displayAsEnrolled = !isAuthenticated ? true : isEnrolled;
   const isBookmarked = !!(progress?.bookmarkedAt);
   const selfLevel = progress?.selfAssessmentLevel ?? 'nothing';
   const completedMilestoneIds = progress?.completedMilestoneIds ?? [];
@@ -88,7 +89,7 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
   const progressPct = calculateTrackProgress(track as unknown as CareerTrack, COURSES as unknown as Course[], completedLessonIds);
 
   const [showEnrollConfirm, setShowEnrollConfirm] = useState(false);
-  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
 
   useEffect(() => {
@@ -103,6 +104,10 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
   };
 
   const handleBookmark = () => {
+    if (!isAuthenticated) {
+      onNavigate('signin');
+      return;
+    }
     bookmarkTrack(track.id);
     addNotification({
       category: 'course',
@@ -113,6 +118,10 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
   };
 
   const handleNavigateToCourse = (courseId: string, targetPage: 'course-detail' | 'learning-path' = 'course-detail') => {
+    if (!isAuthenticated) {
+      onNavigate('signin');
+      return;
+    }
     setActiveTrackId(null);
     setActiveCourseId(courseId);
     onNavigate(targetPage);
@@ -146,21 +155,23 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
     <div className="relative -mx-3 md:-mx-[44px] -my-6 bg-bg border-y border-line px-3 md:px-[44px] py-6">
       <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
 
-        {/* Back breadcrumb */}
-        <button
-          onClick={() => onNavigate('catalog')}
-          className="flex items-center gap-2 text-muted hover:text-cyan text-xs font-bold transition-colors uppercase tracking-wider"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          All Tracks
-        </button>
+        {/* Back breadcrumb - Only show for authenticated users */}
+        {isAuthenticated && (
+          <button
+            onClick={() => onNavigate('catalog')}
+            className="flex items-center gap-2 text-muted hover:text-cyan text-xs font-bold transition-colors uppercase tracking-wider"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            All Tracks
+          </button>
+        )}
 
         {/* ── Hero Header ── */}
         <div className="relative bg-panel border border-line rounded-2xl overflow-hidden">
           {/* Banner image */}
           <div className="h-64 md:h-80 relative overflow-hidden">
             <img src={track.imageUrl} alt={track.title} className="w-full h-full object-cover opacity-90 block" />
-            <div className="absolute inset-0 bg-gradient-to-t from-panel via-panel/5 to-transparent/10" />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
             {/* Goal type chip */}
             <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
               <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-full border ${GOAL_TYPE_COLORS[goalType]}`}>
@@ -170,18 +181,20 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
                 {difficulty}
               </span>
             </div>
-            {/* Bookmark (works without enrollment / auth) */}
-            <button
-              onClick={handleBookmark}
-              className={`absolute top-4 right-4 p-2.5 rounded-xl backdrop-blur-sm transition-all border ${
-                isBookmarked
-                  ? 'bg-cyan/20 border-cyan/40 text-cyan'
-                  : 'bg-bg/60 border-line text-muted hover:text-cyan hover:border-cyan/30'
-              }`}
-              title={isBookmarked ? 'Remove bookmark' : 'Bookmark this track'}
-            >
-              {isBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
-            </button>
+            {/* Bookmark - Only show for authenticated users */}
+            {isAuthenticated && (
+              <button
+                onClick={handleBookmark}
+                className={`absolute top-4 right-4 p-2.5 rounded-xl backdrop-blur-sm transition-all border ${
+                  isBookmarked
+                    ? 'bg-cyan/20 border-cyan/40 text-cyan'
+                    : 'bg-bg/60 border-line text-muted hover:text-cyan hover:border-cyan/30'
+                }`}
+                title={isBookmarked ? 'Remove bookmark' : 'Bookmark this track'}
+              >
+                {isBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+              </button>
+            )}
           </div>
 
           <div className="p-6 md:p-8 space-y-4">
@@ -212,8 +225,8 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
               </span>
             </div>
 
-            {/* Progress bar (enrolled only) */}
-            {isEnrolled && (
+            {/* Progress bar (enrolled only AND authenticated) */}
+            {(displayAsEnrolled && isAuthenticated) && (
               <div className="space-y-1.5 max-w-sm">
                 <div className="flex items-center justify-between text-[10px] font-black uppercase text-muted">
                   <span>Track Progress</span>
@@ -233,9 +246,13 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
 
             {/* CTA row */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              {isEnrolled ? (
+              {displayAsEnrolled ? (
                 <button
                   onClick={() => {
+                    if (!isAuthenticated) {
+                      onNavigate('signin');
+                      return;
+                    }
                     // Navigate to first uncompleted milestone's course
                     const next = mappedMilestones.find(m => !completedMilestoneIds.includes(m.id) && m.courseId);
                     if (next?.courseId) handleNavigateToCourse(next.courseId, 'learning-path');
@@ -256,7 +273,7 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
                   <div className="absolute inset-0 bg-white/15 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
                 </button>
               )}
-              {!isEnrolled && (
+              {!displayAsEnrolled && (
                 <p className="self-center text-[11px] text-muted font-medium italic">
                   Browse the full path below without enrolling.
                 </p>
@@ -294,8 +311,14 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
         {/* ── Self-Assessment Strip ── */}
         <SelfAssessmentStrip
           currentLevel={selfLevel}
-          onChange={(level) => setSelfAssessment(track.id, level)}
-          isEnrolled={isEnrolled}
+          onChange={(level) => {
+            if (!isAuthenticated) {
+              onNavigate('signin');
+              return;
+            }
+            setSelfAssessment(track.id, level);
+          }}
+          isEnrolled={displayAsEnrolled}
         />
 
         {/* ── Visual Path (REQ-TRACK-001) ── */}
@@ -306,7 +329,7 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
             </div>
             <h2 className="text-3xl md:text-4xl font-black text-text">Learning Path</h2>
             <p className="text-sm text-muted max-w-2xl">
-              {isEnrolled
+              {displayAsEnrolled
                 ? 'Your milestone-by-milestone journey through this track.'
                 : 'Browse the full track structure — enroll to start tracking progress.'}
             </p>
@@ -331,7 +354,7 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
             milestones={mappedMilestones}
             completedMilestoneIds={completedMilestoneIds}
             selfAssessmentLevel={selfLevel}
-            isEnrolled={isEnrolled}
+            isEnrolled={displayAsEnrolled}
             completedLessonIds={completedLessonIds}
             onNavigateToCourse={(id, target) => handleNavigateToCourse(id, target)}
           />

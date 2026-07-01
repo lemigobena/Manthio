@@ -202,8 +202,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     }
   }, [activePage]);
   
-  const footerPages = ['help-center', 'privacy', 'terms', 'cookies', 'imprint'];
-  const isPublicView = activePage === 'explore' || (!isAuthenticated && (activePage === 'course-detail' || footerPages.includes(activePage)));
+  const isPublicView = !isAuthenticated || activePage === 'explore';
   
   return (
     <div className="flex h-[100dvh] overflow-hidden bg-bg text-text relative">
