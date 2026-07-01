@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useXP } from '../../context/XPContext';
 import { useAuth } from '../../context/AuthContext';
-import { BookOpen, Search, MessageSquare, Share2, PanelLeftClose, PanelLeft, PanelRightClose, PanelRight, Plus } from 'lucide-react';
+import { Search, MessageSquare, Share2, PanelLeftClose, PanelLeft, PanelRightClose, PanelRight, Plus } from 'lucide-react';
 import type { ChatMessage } from '../../types';
 import { analyticsService } from '../../services/analyticsService';
 import { AITutorChat } from './components/AITutorChat';
@@ -595,9 +595,8 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab, onNavigate
               <PanelRightClose size={18} className="shrink-0" />
             </button>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <h4 className="font-bold text-[10px] uppercase text-muted tracking-wider truncate">Context</h4>
+              <h4 className="font-bold text-xs uppercase text-muted tracking-wider truncate">Context</h4>
             </div>
-            <BookOpen size={16} className="text-cyan shrink-0 z-10" />
           </div>
 
           <div className="p-4 space-y-6 overflow-y-auto flex-1">
