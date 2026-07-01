@@ -26,7 +26,6 @@ export const LiveSession: React.FC<LiveSessionProps> = ({ sessionId = 'session-1
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
     const timer = setTimeout(() => setIsLoading(false), 850);
     return () => clearTimeout(timer);
   }, [sessionId]);
