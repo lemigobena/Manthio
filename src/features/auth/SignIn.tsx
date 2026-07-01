@@ -24,6 +24,8 @@ export const SignIn: React.FC<SignInProps> = ({ onNavigate }) => {
     setIsLoading(true);
     // Explicitly navigate without constraints
     const success = await signIn(email || 'demo@example.com', password || 'password');
+    // Add artificial delay for loading state
+    await new Promise(resolve => setTimeout(resolve, 800));
     setIsLoading(false);
     
     if (success) {
@@ -117,7 +119,7 @@ export const SignIn: React.FC<SignInProps> = ({ onNavigate }) => {
 
         <div className="flex justify-between pt-1 items-center">
           <label className="flex items-center gap-3.5 group cursor-pointer">
-            <div className="relative">
+            <div className="relative ml-[2px]">
               <input 
                 type="checkbox" 
                 className="peer sr-only"
