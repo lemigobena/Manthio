@@ -5,6 +5,7 @@ import {
   LayoutDashboard, BookOpen, Compass, BrainCircuit, PieChart, 
   Folder, MessagesSquare, Settings, ChevronLeft, X, Video
 } from 'lucide-react';
+import croppedLogo from '../../assets/logo_7_prio_1_variation-cropped.png';
 
 function useAnimatedValue(endValue: number, duration: number = 1000) {
   const [displayValue, setDisplayValue] = useState(endValue);
@@ -153,9 +154,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           <div className="overflow-hidden w-full flex justify-center py-2">
             <img 
-              src="/Branding/primary/logo_7_prio_1_variation.png" 
+              src={(collapsed && !isMobileOpen) ? croppedLogo : "/Branding/primary/logo_7_prio_1_variation.png"}
               alt="Logo" 
-              className={`transition-all duration-300 mb-[-20px] ${(collapsed && !isMobileOpen) ? 'w-full h-16 scale-[2.2] translate-x-[-2px]' : 'w-[90%] h-auto max-h-32'} object-contain`}
+              className={`transition-all duration-300 ${(collapsed && !isMobileOpen) ? 'w-10 h-10 object-contain my-2' : 'mb-[-20px] w-[90%] h-auto max-h-32 object-contain'}`}
             />
           </div>
           {(!collapsed || isMobileOpen) && (
