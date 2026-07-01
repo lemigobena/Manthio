@@ -205,7 +205,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const isPublicView = !isAuthenticated || activePage === 'explore';
   
   return (
-    <div className="flex h-[100dvh] overflow-hidden bg-bg text-text relative">
+    <div className={`group/layout flex h-[100dvh] overflow-hidden bg-bg text-text relative ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
       {/* Global Mouse Spotlight Effect removed */}
       {/* Sidebar Navigation */}
       {!isPublicView && (

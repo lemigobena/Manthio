@@ -23,6 +23,13 @@ export const LiveSession: React.FC<LiveSessionProps> = ({ sessionId = 'session-1
 
   const [sessionState, setSessionState] = useState<SessionState>(sessionData.state || 'pre');
   const [showTrainerDirect, setShowTrainerDirect] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => setIsLoading(false), 850);
+    return () => clearTimeout(timer);
+  }, [sessionId]);
 
   if (showTrainerDirect) {
     return (
@@ -53,25 +60,40 @@ export const LiveSession: React.FC<LiveSessionProps> = ({ sessionId = 'session-1
         </div>
       </div>
 
-      {sessionState === 'pre' && (
-        <PreSessionView
-          data={sessionData}
-          onJoin={() => setSessionState('live')}
-          onContactTrainer={() => setShowTrainerDirect(true)}
-        />
-      )}
-      {sessionState === 'live' && (
-        <ActiveSessionView
-          data={sessionData}
-          onLeave={() => setSessionState('post')}
-          onNavigate={onNavigate}
-        />
-      )}
-      {sessionState === 'post' && (
-        <PostSessionView
-          data={sessionData}
-          onContactTrainer={() => setShowTrainerDirect(true)}
-        />
+      {isLoading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="h-64 md:h-[400px] bg-panel/50 border border-line rounded-2xl animate-pulse" />
+            <div className="h-48 bg-panel/50 border border-line rounded-2xl animate-pulse" />
+          </div>
+          <div className="space-y-6">
+            <div className="h-64 bg-panel/50 border border-line rounded-2xl animate-pulse" />
+            <div className="h-48 bg-panel/50 border border-line rounded-2xl animate-pulse" />
+          </div>
+        </div>
+      ) : (
+        <>
+          {sessionState === 'pre' && (
+            <PreSessionView
+              data={sessionData}
+              onJoin={() => setSessionState('live')}
+              onContactTrainer={() => setShowTrainerDirect(true)}
+            />
+          )}
+          {sessionState === 'live' && (
+            <ActiveSessionView
+              data={sessionData}
+              onLeave={() => setSessionState('post')}
+              onNavigate={onNavigate}
+            />
+          )}
+          {sessionState === 'post' && (
+            <PostSessionView
+              data={sessionData}
+              onContactTrainer={() => setShowTrainerDirect(true)}
+            />
+          )}
+        </>
       )}
     </div>
   );

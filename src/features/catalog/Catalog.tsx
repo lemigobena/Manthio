@@ -511,7 +511,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
         </div>
       ) : isLoading ? (
         /* REQ-LOAD-002: Skeleton loader mimicking layout shape */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:max-[1200px]:group-[.sidebar-expanded]/layout:grid-cols-2 gap-6">
           {[1, 2, 3].map(i => (
             <div 
               key={i} 
@@ -626,7 +626,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeIn_0.3s_ease-out]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:max-[1200px]:group-[.sidebar-expanded]/layout:grid-cols-2 gap-6 animate-[fadeIn_0.3s_ease-out]">
           {discoveryMode === 'courses' ? sortedCourses.map(course => (
             <div 
               key={course.id} 

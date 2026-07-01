@@ -158,7 +158,7 @@ export const LiveSessionsDirectory: React.FC<LiveSessionsDirectoryProps> = ({ on
             <div className="w-2 h-2 rounded-full bg-red animate-pulse" />
             <span>Live Now</span>
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
             {liveSessions.map(session => (
               <SessionCard key={session.id} session={session} isLive />
             ))}
@@ -173,7 +173,7 @@ export const LiveSessionsDirectory: React.FC<LiveSessionsDirectoryProps> = ({ on
           <Calendar size={18} className="text-cyan" />
           <span>Upcoming Sessions</span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
           {upcomingSessions.map(session => (
             <SessionCard key={session.id} session={session} />
           ))}
@@ -194,7 +194,7 @@ export const LiveSessionsDirectory: React.FC<LiveSessionsDirectoryProps> = ({ on
           <Play size={18} className="text-purple" />
           <span>Past Sessions Library</span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
           {pastSessions.map(session => (
             <SessionCard key={session.id} session={session} isPast />
           ))}
