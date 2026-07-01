@@ -429,7 +429,7 @@ export const Resources: React.FC<ResourcesProps> = () => {
         </div>
 
         {/* Files Table (REQ-RES-001) */}
-        <div className={`bg-panel border border-line rounded-2xl overflow-hidden ${layout === 'grid' ? 'hidden' : 'hidden md:block'}`}>
+        <div className={`@container bg-panel border border-line rounded-2xl overflow-x-auto ${layout === 'grid' ? 'hidden' : 'hidden md:block'}`}>
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-bg/40 border-b border-line text-muted font-bold uppercase tracking-wider text-[10px]">
@@ -442,11 +442,11 @@ export const Resources: React.FC<ResourcesProps> = () => {
                 <th className="p-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-line">
+            <tbody className="">
               {isLoading ? (
                 /* REQ-LOAD-002: Skeleton loader mimicking the table structure */
                 [1, 2, 3, 4, 5].map(i => (
-                  <tr key={i} className="animate-pulse">
+                  <tr key={i} className="animate-pulse border-b border-line last:border-b-0">
                     <td className="p-4 flex items-center space-x-2">
                       <div className="w-4 h-4 bg-line rounded shrink-0" />
                       <div className="h-3.5 bg-line rounded w-36" />
@@ -487,27 +487,29 @@ export const Resources: React.FC<ResourcesProps> = () => {
                   </td>
                 </tr>
               ) : (
-                filteredFiles.map(file => (
-                  <tr key={file.id} className="hover:bg-bg/20 transition-colors group">
-                    <td className="p-4 font-semibold text-text flex items-center space-x-2">
-                      {getFileIcon(file.type)}
-                      <span className="truncate max-w-[200px]">{file.name}</span>
+                filteredFiles.map((file, index) => (
+                  <tr key={file.id} className={`border-b border-line last:border-b-0 transition-colors group ${index % 2 === 0 ? 'bg-text/5' : ''} hover:bg-text/10`}>
+                    <td className="p-4 font-semibold text-text max-w-[100px] @3xl:max-w-[200px]">
+                      <div className="flex items-center space-x-2 w-full">
+                        <div className="shrink-0">{getFileIcon(file.type)}</div>
+                        <span className="truncate flex-1 min-w-0">{file.name}</span>
+                      </div>
                     </td>
                     <td className="p-4 text-muted uppercase font-bold text-[9px]">{file.type}</td>
-                    <td className="p-4 text-muted">{file.courseName}</td>
+                    <td className="p-4 text-muted whitespace-normal break-words max-w-[150px]">{file.courseName}</td>
                     <td className="p-4 text-muted hidden min-[1225px]:table-cell">{file.uploadDate}</td>
-                    <td className="p-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] border ${
-                        file.accessLevel === 'All Learners' ? 'bg-green/10 text-green border-green/20' : 
-                        file.accessLevel === 'Cohort Only' ? 'bg-cyan/10 text-cyan border-cyan/20' : 
-                        'bg-yellow/10 text-yellow border-yellow/20'
+                    <td className="p-4 align-middle">
+                      <span className={`inline-block px-2 py-0.5 rounded text-[10px] whitespace-normal break-words max-w-[100px] text-center ${
+                        file.accessLevel === 'All Learners' ? 'text-green ' : 
+                        file.accessLevel === 'Cohort Only' ? 'text-cyan' : 
+                        'text-yellow'
                       }`}>
                         {file.accessLevel}
                       </span>
                     </td>
                     <td className="p-4 text-muted font-medium">{file.size}</td>
                     <td className="p-4 text-right">
-                      <div className="flex items-center justify-end space-x-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center justify-end space-x-1.5 transition-opacity">
                         {file.type !== 'archive' && (
                           <button 
                             onClick={() => setPreviewFile({ ...file, url: normalizeUrl(file.url) })}
