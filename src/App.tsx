@@ -48,6 +48,7 @@ import { TrackProvider } from './features/track-detail/TrackContext';
 
 const MainApp: React.FC = () => {
   const { isAuthenticated, isOnboardingCompleted } = useAuth();
+  const { activeModal } = useModal();
   const [currentPage, setCurrentPage] = useState<string>(() => {
     if (!isAuthenticated) return 'explore';
     return isOnboardingCompleted ? 'dashboard' : 'onboarding';
@@ -180,8 +181,6 @@ const MainApp: React.FC = () => {
     return <Onboarding onNavigate={handleNavigate} />;
   }
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { activeModal } = useModal();
 
   return (
     <>

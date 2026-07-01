@@ -27,6 +27,9 @@ export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
     // Explicitly navigate without constraints
     const fullName = `${firstName || 'Alex'} ${lastName || 'Chen'}`.trim();
     await signUp(fullName, email || 'newuser@example.com', password || 'password');
+    // Add artificial delay for loading state
+    await new Promise(resolve => setTimeout(resolve, 800));
+    setIsLoading(false);
     onNavigate('verify-email');
   };
 
@@ -89,7 +92,7 @@ export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
         <div className="space-y-4 pt-2">
           {/* Custom Modern Checkbox: Terms */}
           <label className="flex items-center gap-3.5 group cursor-pointer">
-            <div className="relative">
+            <div className="relative ml-[2px]">
               <input 
                 type="checkbox" 
                 className="peer sr-only"
@@ -116,7 +119,7 @@ export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
 
           {/* Custom Modern Checkbox: Marketing */}
           <label className="flex items-center gap-3.5 group cursor-pointer">
-            <div className="relative">
+            <div className="relative ml-[2px]">
               <input 
                 type="checkbox" 
                 className="peer sr-only"
@@ -146,7 +149,7 @@ export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
           disabled={isLoading || !agree || password.length < 12 || calculatePasswordStrength(password) < 5}
           className="w-full bg-cyan hover:bg-cyan2 text-bg font-bold py-[0.875rem] rounded-xl transition-all disabled:opacity-50 shadow-lg shadow-cyan/10 text-sm mt-2 active:scale-[0.98] cursor-pointer"
         >
-          {isLoading ? "Creating..." : "Create account"}
+          {isLoading ? "Signing up..." : "Create account"}
         </button>
       </form>
 

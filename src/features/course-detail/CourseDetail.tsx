@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronDown, ChevronUp, Star, Award, CheckCircle, Clock, Sparkles, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, Layers, ChevronRight, Users, ArrowRight, Laptop, PlayCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star, Award, CheckCircle, Clock, Sparkles, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, Layers, ChevronRight, Users, ArrowRight, Laptop, PlayCircle, Box } from 'lucide-react';
 import { useXP } from '../../context/XPContext';
 import { useTrack } from '../track-detail/useTrack';
 import { calculateCourseProgress } from '../../services/progressUtils';
@@ -376,8 +376,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
           {/* Format & Delivery Section */}
           <div className="py-6 border-b border-line space-y-5">
             <div className="flex items-center space-x-3">
-              <div className="p-2 rounded-xl bg-orange/10">
-                <Sparkles className="w-5 h-5 text-orange" />
+              <div className="p-2 rounded-xl bg-panel border border-line">
+                <Box className="w-4 h-4 text-cyan" />
               </div>
               <h2 className="text-xl font-bold text-text">Format & Delivery</h2>
             </div>
@@ -385,53 +385,53 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* DESCRIPTION BLOCK (Left Column, spans 2 rows) */}
               {(selectedFormat === 'flipped' || course?.format === 'flipped') ? (
-                <div className="p-5 rounded-2xl bg-cyan/5 border border-cyan/20 shadow-sm hover:border-cyan/40 transition-all space-y-4 md:row-span-2 h-full flex flex-col justify-center">
+                <div className="p-5 rounded-2xl bg-panel border border-line shadow-sm space-y-4 md:row-span-2 h-full flex flex-col justify-center">
                   <div className="flex items-start space-x-3">
-                    <div className="p-2 rounded-xl bg-cyan/10">
+                    <div className="p-2 rounded-xl bg-bg border border-line">
                       <Globe className="w-4 h-4 text-cyan" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-black text-cyan uppercase tracking-widest block mb-1">In-Person Sessions</span>
-                      <p className="text-xs text-cyan/70 leading-relaxed font-medium">
+                      <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">In-Person Sessions</span>
+                      <p className="text-xs text-muted leading-relaxed font-medium">
                         Location: apigenio Training Centre, Muri/Bern.<br/>
                         Dates: {todayStr} & {nextWeekStr}<br/>
                         Bring: Laptop and valid ID.
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-3 pt-4 border-t border-cyan/10">
-                    <div className="p-2 rounded-xl bg-cyan/10">
+                  <div className="flex items-start space-x-3 pt-4 border-t border-line/50">
+                    <div className="p-2 rounded-xl bg-bg border border-line">
                       <BookOpen className="w-4 h-4 text-cyan" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-black text-cyan uppercase tracking-widest block mb-1">Self-Study Windows</span>
-                      <p className="text-xs text-cyan/70 leading-relaxed font-medium">
+                      <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Self-Study Windows</span>
+                      <p className="text-xs text-muted leading-relaxed font-medium">
                         Complete units 1–3 before session 1. Complete units 4–7 before final capstone.
                       </p>
                     </div>
                   </div>
                 </div>
               ) : selectedFormat === 'cohort' ? (
-                <div className="p-5 rounded-2xl bg-purple/5 border border-purple/20 shadow-sm hover:border-purple/40 transition-all space-y-4 md:row-span-2 h-full flex flex-col justify-center">
+                <div className="p-5 rounded-2xl bg-panel border border-line shadow-sm space-y-4 md:row-span-2 h-full flex flex-col justify-center">
                   <div className="flex items-start space-x-3">
-                    <div className="p-2 rounded-xl bg-purple/10">
-                      <Clock className="w-4 h-4 text-purple" />
+                    <div className="p-2 rounded-xl bg-bg border border-line">
+                      <Clock className="w-4 h-4 text-cyan" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-black text-purple uppercase tracking-widest block mb-1">Schedule & Start Date</span>
-                      <p className="text-xs text-purple/70 leading-relaxed font-medium">
+                      <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Schedule & Start Date</span>
+                      <p className="text-xs text-muted leading-relaxed font-medium">
                         Next cohort starts: {nextTwoWeeksStr}<br/>
                         Live sessions: Tuesdays at 18:00 CET.
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-3 pt-4 border-t border-purple/10">
-                    <div className="p-2 rounded-xl bg-purple/10">
-                      <Award className="w-4 h-4 text-purple" />
+                  <div className="flex items-start space-x-3 pt-4 border-t border-line/50">
+                    <div className="p-2 rounded-xl bg-bg border border-line">
+                      <Award className="w-4 h-4 text-cyan" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-black text-purple uppercase tracking-widest block mb-1">Past Outcomes</span>
-                      <ul className="text-xs text-purple/70 leading-relaxed font-medium list-disc pl-3">
+                      <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Past Outcomes</span>
+                      <ul className="text-xs text-muted leading-relaxed font-medium list-disc pl-3">
                         <li>85% promotion rate within 6 months</li>
                         <li>Average salary increase of +18%</li>
                         <li>High satisfaction from 100+ graduates</li>
@@ -440,25 +440,25 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                   </div>
                 </div>
               ) : (
-                <div className="p-5 rounded-2xl bg-amber-500/5 border border-amber-500/20 shadow-sm hover:border-amber-500/40 transition-all space-y-4 md:row-span-2 h-full flex flex-col justify-center">
+                <div className="p-5 rounded-2xl bg-panel border border-line shadow-sm space-y-4 md:row-span-2 h-full flex flex-col justify-center">
                   <div className="flex items-start space-x-3">
-                    <div className="p-2 rounded-xl bg-amber-500/10">
-                      <Sparkles className="w-4 h-4 text-amber-600" />
+                    <div className="p-2 rounded-xl bg-bg border border-line">
+                      <Sparkles className="w-4 h-4 text-cyan" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest block mb-1">Self-Paced Learning</span>
-                      <p className="text-xs text-amber-600/70 leading-relaxed font-medium">
+                      <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Self-Paced Learning</span>
+                      <p className="text-xs text-muted leading-relaxed font-medium">
                         Learn entirely at your own pace with unrestricted access to all materials and AI Tutor available 24/7.
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-3 pt-4 border-t border-amber-500/10">
-                    <div className="p-2 rounded-xl bg-amber-500/10">
-                      <BookOpen className="w-4 h-4 text-amber-600" />
+                  <div className="flex items-start space-x-3 pt-4 border-t border-line/50">
+                    <div className="p-2 rounded-xl bg-bg border border-line">
+                      <BookOpen className="w-4 h-4 text-cyan" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest block mb-1">Interactive Content</span>
-                      <p className="text-xs text-amber-600/70 leading-relaxed font-medium">
+                      <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Interactive Content</span>
+                      <p className="text-xs text-muted leading-relaxed font-medium">
                         Engage with interactive coding environments, quizzes, and projects to solidify your knowledge.
                       </p>
                     </div>
@@ -467,15 +467,14 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
               )}
 
               {/* Time Commitment (Right Top) */}
-              <div className="group relative p-5 rounded-2xl bg-cyan/5 border border-cyan/20 shadow-sm hover:border-cyan/40 transition-all overflow-hidden h-full flex flex-col justify-center">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative z-10 flex items-start space-x-4">
-                  <div className="p-2.5 rounded-xl bg-cyan/10 flex items-center justify-center shrink-0">
-                    <Clock className="w-5 h-5 text-cyan" />
+              <div className="p-5 rounded-2xl bg-panel border border-line shadow-sm h-full flex flex-col justify-center">
+                <div className="flex items-start space-x-4">
+                  <div className="p-2 rounded-xl bg-bg border border-line shrink-0">
+                    <Clock className="w-4 h-4 text-cyan" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-black text-cyan uppercase tracking-widest block mb-1.5">Time Commitment</span>
-                    <p className="text-xs text-cyan/70 leading-relaxed font-medium">
+                    <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1.5">Time Commitment</span>
+                    <p className="text-xs text-muted leading-relaxed font-medium">
                       {track ? `Estimated path duration: ${track.estimatedTime}.` : 
                        selectedFormat === 'flipped' ? "7 self-study modules (10.5h) + 2 half-day workshops." :
                        selectedFormat === 'cohort' ? "8-week structured journey with weekly live expert sessions." :
@@ -487,18 +486,18 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
               </div>
 
               {/* Certificate (Right Bottom) */}
-              <div className="group relative p-5 rounded-2xl bg-gradient-to-r from-green/10 via-green/5 to-transparent border border-green/20 overflow-hidden transition-all duration-300 flex items-start sm:items-center justify-between shadow-sm hover:shadow-md hover:border-green/40 h-full flex-col sm:flex-row">
+              <div className="p-5 rounded-2xl bg-panel border border-line shadow-sm flex items-start sm:items-center justify-between h-full flex-col sm:flex-row">
                 <div className="flex items-center space-x-4">
-                  <div className="p-2.5 rounded-xl bg-green/20 flex items-center justify-center shrink-0">
-                    <ShieldCheck className="w-5 h-5 text-green" />
+                  <div className="p-2 rounded-xl bg-bg border border-line shrink-0">
+                    <ShieldCheck className="w-4 h-4 text-cyan" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-black text-green uppercase tracking-widest block mb-1">Verifiable Certificate Included</span>
-                    <span className="text-xs text-green/70 font-medium">Industry recognized credential upon completion</span>
+                    <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Verifiable Certificate Included</span>
+                    <span className="text-xs text-muted font-medium">Industry recognized credential upon completion</span>
                   </div>
                 </div>
                 <div className="hidden sm:flex items-center gap-2 pr-2 mt-4 sm:mt-0">
-                  <div className="w-2 h-2 rounded-full bg-green shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse" />
+                  <div className="w-2 h-2 rounded-full bg-cyan animate-pulse" />
                 </div>
               </div>
             </div>

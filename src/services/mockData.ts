@@ -41,8 +41,59 @@ export const COURSES: Course[] = [
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1556075798-4825dfaaf498?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
-    learningOutcomes: [],
-    modules: []
+    learningOutcomes: [
+      'Understand the core concepts and principles.',
+      'Apply best practices in real-world scenarios.',
+      'Build and deploy scalable solutions.'
+    ],
+    modules: [
+      {
+        id: 'mod-1',
+        number: 1,
+        title: 'Introduction',
+        description: 'Get started with the basics.',
+        duration: '1h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-1', title: 'Welcome', type: 'Video', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'les-2', title: 'Core Concepts', type: 'Article', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Understand' }
+        ]
+      },
+      {
+        id: 'mod-2',
+        number: 2,
+        title: 'Advanced Topics',
+        description: 'Deep dive into advanced concepts.',
+        duration: '2h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-3', title: 'Advanced Theory', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'les-4', title: 'Practical Exercise', type: 'Code', duration: '1h', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-auto-1',
+        userName: 'Alice M.',
+        rating: 5,
+        comment: 'Great course! Very informative and well structured.',
+        date: '2026-06-15',
+        isVerified: true,
+        helpfulCount: 10
+      },
+      {
+        id: 'rev-auto-2',
+        userName: 'Bob S.',
+        rating: 4,
+        comment: 'Good content, but I wish it went a bit deeper into some topics.',
+        date: '2026-05-20',
+        isVerified: true,
+        helpfulCount: 5
+      }
+    ]
   },
   {
     id: 'linux-administration',
@@ -63,8 +114,59 @@ export const COURSES: Course[] = [
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
-    learningOutcomes: [],
-    modules: []
+    learningOutcomes: [
+      'Understand the core concepts and principles.',
+      'Apply best practices in real-world scenarios.',
+      'Build and deploy scalable solutions.'
+    ],
+    modules: [
+      {
+        id: 'mod-1',
+        number: 1,
+        title: 'Introduction',
+        description: 'Get started with the basics.',
+        duration: '1h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-1', title: 'Welcome', type: 'Video', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'les-2', title: 'Core Concepts', type: 'Article', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Understand' }
+        ]
+      },
+      {
+        id: 'mod-2',
+        number: 2,
+        title: 'Advanced Topics',
+        description: 'Deep dive into advanced concepts.',
+        duration: '2h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-3', title: 'Advanced Theory', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'les-4', title: 'Practical Exercise', type: 'Code', duration: '1h', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-auto-1',
+        userName: 'Alice M.',
+        rating: 5,
+        comment: 'Great course! Very informative and well structured.',
+        date: '2026-06-15',
+        isVerified: true,
+        helpfulCount: 10
+      },
+      {
+        id: 'rev-auto-2',
+        userName: 'Bob S.',
+        rating: 4,
+        comment: 'Good content, but I wish it went a bit deeper into some topics.',
+        date: '2026-05-20',
+        isVerified: true,
+        helpfulCount: 5
+      }
+    ]
   },
   {
     id: 'networking-fundamentals',
@@ -85,8 +187,59 @@ export const COURSES: Course[] = [
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
-    learningOutcomes: [],
-    modules: []
+    learningOutcomes: [
+      'Understand the core concepts and principles.',
+      'Apply best practices in real-world scenarios.',
+      'Build and deploy scalable solutions.'
+    ],
+    modules: [
+      {
+        id: 'mod-1',
+        number: 1,
+        title: 'Introduction',
+        description: 'Get started with the basics.',
+        duration: '1h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-1', title: 'Welcome', type: 'Video', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'les-2', title: 'Core Concepts', type: 'Article', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Understand' }
+        ]
+      },
+      {
+        id: 'mod-2',
+        number: 2,
+        title: 'Advanced Topics',
+        description: 'Deep dive into advanced concepts.',
+        duration: '2h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-3', title: 'Advanced Theory', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'les-4', title: 'Practical Exercise', type: 'Code', duration: '1h', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-auto-1',
+        userName: 'Alice M.',
+        rating: 5,
+        comment: 'Great course! Very informative and well structured.',
+        date: '2026-06-15',
+        isVerified: true,
+        helpfulCount: 10
+      },
+      {
+        id: 'rev-auto-2',
+        userName: 'Bob S.',
+        rating: 4,
+        comment: 'Good content, but I wish it went a bit deeper into some topics.',
+        date: '2026-05-20',
+        isVerified: true,
+        helpfulCount: 5
+      }
+    ]
   },
   {
     id: 'kubernetes-for-beginners',
@@ -107,8 +260,59 @@ export const COURSES: Course[] = [
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
-    learningOutcomes: [],
-    modules: []
+    learningOutcomes: [
+      'Understand the core concepts and principles.',
+      'Apply best practices in real-world scenarios.',
+      'Build and deploy scalable solutions.'
+    ],
+    modules: [
+      {
+        id: 'mod-1',
+        number: 1,
+        title: 'Introduction',
+        description: 'Get started with the basics.',
+        duration: '1h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-1', title: 'Welcome', type: 'Video', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'les-2', title: 'Core Concepts', type: 'Article', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Understand' }
+        ]
+      },
+      {
+        id: 'mod-2',
+        number: 2,
+        title: 'Advanced Topics',
+        description: 'Deep dive into advanced concepts.',
+        duration: '2h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-3', title: 'Advanced Theory', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'les-4', title: 'Practical Exercise', type: 'Code', duration: '1h', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-auto-1',
+        userName: 'Alice M.',
+        rating: 5,
+        comment: 'Great course! Very informative and well structured.',
+        date: '2026-06-15',
+        isVerified: true,
+        helpfulCount: 10
+      },
+      {
+        id: 'rev-auto-2',
+        userName: 'Bob S.',
+        rating: 4,
+        comment: 'Good content, but I wish it went a bit deeper into some topics.',
+        date: '2026-05-20',
+        isVerified: true,
+        helpfulCount: 5
+      }
+    ]
   },
   {
     id: 'kubernetes-advanced',
@@ -129,8 +333,59 @@ export const COURSES: Course[] = [
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
-    learningOutcomes: [],
-    modules: []
+    learningOutcomes: [
+      'Understand the core concepts and principles.',
+      'Apply best practices in real-world scenarios.',
+      'Build and deploy scalable solutions.'
+    ],
+    modules: [
+      {
+        id: 'mod-1',
+        number: 1,
+        title: 'Introduction',
+        description: 'Get started with the basics.',
+        duration: '1h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-1', title: 'Welcome', type: 'Video', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'les-2', title: 'Core Concepts', type: 'Article', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Understand' }
+        ]
+      },
+      {
+        id: 'mod-2',
+        number: 2,
+        title: 'Advanced Topics',
+        description: 'Deep dive into advanced concepts.',
+        duration: '2h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-3', title: 'Advanced Theory', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'les-4', title: 'Practical Exercise', type: 'Code', duration: '1h', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-auto-1',
+        userName: 'Alice M.',
+        rating: 5,
+        comment: 'Great course! Very informative and well structured.',
+        date: '2026-06-15',
+        isVerified: true,
+        helpfulCount: 10
+      },
+      {
+        id: 'rev-auto-2',
+        userName: 'Bob S.',
+        rating: 4,
+        comment: 'Good content, but I wish it went a bit deeper into some topics.',
+        date: '2026-05-20',
+        isVerified: true,
+        helpfulCount: 5
+      }
+    ]
   },
   {
     id: 'ansible-configuration',
@@ -151,8 +406,59 @@ export const COURSES: Course[] = [
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
-    learningOutcomes: [],
-    modules: []
+    learningOutcomes: [
+      'Understand the core concepts and principles.',
+      'Apply best practices in real-world scenarios.',
+      'Build and deploy scalable solutions.'
+    ],
+    modules: [
+      {
+        id: 'mod-1',
+        number: 1,
+        title: 'Introduction',
+        description: 'Get started with the basics.',
+        duration: '1h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-1', title: 'Welcome', type: 'Video', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'les-2', title: 'Core Concepts', type: 'Article', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Understand' }
+        ]
+      },
+      {
+        id: 'mod-2',
+        number: 2,
+        title: 'Advanced Topics',
+        description: 'Deep dive into advanced concepts.',
+        duration: '2h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-3', title: 'Advanced Theory', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'les-4', title: 'Practical Exercise', type: 'Code', duration: '1h', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-auto-1',
+        userName: 'Alice M.',
+        rating: 5,
+        comment: 'Great course! Very informative and well structured.',
+        date: '2026-06-15',
+        isVerified: true,
+        helpfulCount: 10
+      },
+      {
+        id: 'rev-auto-2',
+        userName: 'Bob S.',
+        rating: 4,
+        comment: 'Good content, but I wish it went a bit deeper into some topics.',
+        date: '2026-05-20',
+        isVerified: true,
+        helpfulCount: 5
+      }
+    ]
   },
   {
     id: 'monitoring-prometheus',
@@ -173,8 +479,59 @@ export const COURSES: Course[] = [
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
-    learningOutcomes: [],
-    modules: []
+    learningOutcomes: [
+      'Understand the core concepts and principles.',
+      'Apply best practices in real-world scenarios.',
+      'Build and deploy scalable solutions.'
+    ],
+    modules: [
+      {
+        id: 'mod-1',
+        number: 1,
+        title: 'Introduction',
+        description: 'Get started with the basics.',
+        duration: '1h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-1', title: 'Welcome', type: 'Video', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'les-2', title: 'Core Concepts', type: 'Article', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Understand' }
+        ]
+      },
+      {
+        id: 'mod-2',
+        number: 2,
+        title: 'Advanced Topics',
+        description: 'Deep dive into advanced concepts.',
+        duration: '2h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-3', title: 'Advanced Theory', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'les-4', title: 'Practical Exercise', type: 'Code', duration: '1h', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-auto-1',
+        userName: 'Alice M.',
+        rating: 5,
+        comment: 'Great course! Very informative and well structured.',
+        date: '2026-06-15',
+        isVerified: true,
+        helpfulCount: 10
+      },
+      {
+        id: 'rev-auto-2',
+        userName: 'Bob S.',
+        rating: 4,
+        comment: 'Good content, but I wish it went a bit deeper into some topics.',
+        date: '2026-05-20',
+        isVerified: true,
+        helpfulCount: 5
+      }
+    ]
   },
   {
     id: 'advanced-python',
@@ -195,8 +552,59 @@ export const COURSES: Course[] = [
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
-    learningOutcomes: [],
-    modules: []
+    learningOutcomes: [
+      'Understand the core concepts and principles.',
+      'Apply best practices in real-world scenarios.',
+      'Build and deploy scalable solutions.'
+    ],
+    modules: [
+      {
+        id: 'mod-1',
+        number: 1,
+        title: 'Introduction',
+        description: 'Get started with the basics.',
+        duration: '1h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-1', title: 'Welcome', type: 'Video', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'les-2', title: 'Core Concepts', type: 'Article', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Understand' }
+        ]
+      },
+      {
+        id: 'mod-2',
+        number: 2,
+        title: 'Advanced Topics',
+        description: 'Deep dive into advanced concepts.',
+        duration: '2h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-3', title: 'Advanced Theory', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'les-4', title: 'Practical Exercise', type: 'Code', duration: '1h', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-auto-1',
+        userName: 'Alice M.',
+        rating: 5,
+        comment: 'Great course! Very informative and well structured.',
+        date: '2026-06-15',
+        isVerified: true,
+        helpfulCount: 10
+      },
+      {
+        id: 'rev-auto-2',
+        userName: 'Bob S.',
+        rating: 4,
+        comment: 'Good content, but I wish it went a bit deeper into some topics.',
+        date: '2026-05-20',
+        isVerified: true,
+        helpfulCount: 5
+      }
+    ]
   },
   {
     id: 'fastapi-backend',
@@ -217,8 +625,59 @@ export const COURSES: Course[] = [
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
-    learningOutcomes: [],
-    modules: []
+    learningOutcomes: [
+      'Understand the core concepts and principles.',
+      'Apply best practices in real-world scenarios.',
+      'Build and deploy scalable solutions.'
+    ],
+    modules: [
+      {
+        id: 'mod-1',
+        number: 1,
+        title: 'Introduction',
+        description: 'Get started with the basics.',
+        duration: '1h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-1', title: 'Welcome', type: 'Video', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'les-2', title: 'Core Concepts', type: 'Article', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Understand' }
+        ]
+      },
+      {
+        id: 'mod-2',
+        number: 2,
+        title: 'Advanced Topics',
+        description: 'Deep dive into advanced concepts.',
+        duration: '2h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-3', title: 'Advanced Theory', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'les-4', title: 'Practical Exercise', type: 'Code', duration: '1h', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-auto-1',
+        userName: 'Alice M.',
+        rating: 5,
+        comment: 'Great course! Very informative and well structured.',
+        date: '2026-06-15',
+        isVerified: true,
+        helpfulCount: 10
+      },
+      {
+        id: 'rev-auto-2',
+        userName: 'Bob S.',
+        rating: 4,
+        comment: 'Good content, but I wish it went a bit deeper into some topics.',
+        date: '2026-05-20',
+        isVerified: true,
+        helpfulCount: 5
+      }
+    ]
   },
   {
     id: 'apache-spark-basics',
@@ -239,8 +698,59 @@ export const COURSES: Course[] = [
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
-    learningOutcomes: [],
-    modules: []
+    learningOutcomes: [
+      'Understand the core concepts and principles.',
+      'Apply best practices in real-world scenarios.',
+      'Build and deploy scalable solutions.'
+    ],
+    modules: [
+      {
+        id: 'mod-1',
+        number: 1,
+        title: 'Introduction',
+        description: 'Get started with the basics.',
+        duration: '1h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-1', title: 'Welcome', type: 'Video', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'les-2', title: 'Core Concepts', type: 'Article', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Understand' }
+        ]
+      },
+      {
+        id: 'mod-2',
+        number: 2,
+        title: 'Advanced Topics',
+        description: 'Deep dive into advanced concepts.',
+        duration: '2h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-3', title: 'Advanced Theory', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'les-4', title: 'Practical Exercise', type: 'Code', duration: '1h', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-auto-1',
+        userName: 'Alice M.',
+        rating: 5,
+        comment: 'Great course! Very informative and well structured.',
+        date: '2026-06-15',
+        isVerified: true,
+        helpfulCount: 10
+      },
+      {
+        id: 'rev-auto-2',
+        userName: 'Bob S.',
+        rating: 4,
+        comment: 'Good content, but I wish it went a bit deeper into some topics.',
+        date: '2026-05-20',
+        isVerified: true,
+        helpfulCount: 5
+      }
+    ]
   },
   {
     id: 'snowflake-data-warehouse',
@@ -261,8 +771,59 @@ export const COURSES: Course[] = [
     progress: 0,
     imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
-    learningOutcomes: [],
-    modules: []
+    learningOutcomes: [
+      'Understand the core concepts and principles.',
+      'Apply best practices in real-world scenarios.',
+      'Build and deploy scalable solutions.'
+    ],
+    modules: [
+      {
+        id: 'mod-1',
+        number: 1,
+        title: 'Introduction',
+        description: 'Get started with the basics.',
+        duration: '1h',
+        status: 'Open',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-1', title: 'Welcome', type: 'Video', duration: '10min', status: 'not_started', required: true, bloomLevel: 'Remember' },
+          { id: 'les-2', title: 'Core Concepts', type: 'Article', duration: '20min', status: 'not_started', required: true, bloomLevel: 'Understand' }
+        ]
+      },
+      {
+        id: 'mod-2',
+        number: 2,
+        title: 'Advanced Topics',
+        description: 'Deep dive into advanced concepts.',
+        duration: '2h',
+        status: 'Locked',
+        type: 'Self-study',
+        lessons: [
+          { id: 'les-3', title: 'Advanced Theory', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
+          { id: 'les-4', title: 'Practical Exercise', type: 'Code', duration: '1h', status: 'locked', required: true, bloomLevel: 'Apply' }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-auto-1',
+        userName: 'Alice M.',
+        rating: 5,
+        comment: 'Great course! Very informative and well structured.',
+        date: '2026-06-15',
+        isVerified: true,
+        helpfulCount: 10
+      },
+      {
+        id: 'rev-auto-2',
+        userName: 'Bob S.',
+        rating: 4,
+        comment: 'Good content, but I wish it went a bit deeper into some topics.',
+        date: '2026-05-20',
+        isVerified: true,
+        helpfulCount: 5
+      }
+    ]
   },
 
   {
@@ -683,7 +1244,7 @@ export const COURSES: Course[] = [
     ]
   },
   {
-    id: 'advanced-python',
+    id: 'advanced-python-engineering',
     title: 'Advanced Python Engineering',
     description: 'Master advanced Python paradigms, async programming, and system design. Ideal for developers moving towards senior roles.',
     longDescription: 'This intensive flipped bootcamp focuses on enterprise-grade Python. You will dive deep into asynchronous programming, decorators, context managers, and advanced system architecture. Learn to build high-performance, scalable applications with direct coaching from senior IT architects.',

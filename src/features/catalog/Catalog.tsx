@@ -127,9 +127,15 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
     const lastUsed = localStorage.getItem('catalogDiscoveryMode');
     return (lastUsed as 'courses' | 'tracks') || (COURSES.some(c => c.enrolled) ? 'courses' : 'tracks');
   });
-  const [activeTab, setActiveTab] = useState<'all' | 'enrolled' | 'completed'>(() => {
-    return COURSES.some(c => c.enrolled) ? 'enrolled' : 'all';
+  const [activeCourseTab, setActiveCourseTab] = useState<'all' | 'enrolled' | 'completed'>(() => {
+    const lastUsed = localStorage.getItem('catalogCourseTab');
+    return (lastUsed as 'all' | 'enrolled' | 'completed') || 'enrolled';
   });
+  const [activeTrackTab, setActiveTrackTab] = useState<'all' | 'enrolled' | 'completed'>(() => {
+    const lastUsed = localStorage.getItem('catalogTrackTab');
+    return (lastUsed as 'all' | 'enrolled' | 'completed') || 'enrolled';
+  });
+  const activeTab = discoveryMode === 'courses' ? activeCourseTab : activeTrackTab;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<string>('All');
   const [selectedFormat, setSelectedFormat] = useState<string>('All');
@@ -168,8 +174,14 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
     simulateLoad();
   };
 
-  const handleTabChange = (tab: typeof activeTab) => {
-    setActiveTab(tab);
+  const handleTabChange = (tab: 'all' | 'enrolled' | 'completed') => {
+    if (discoveryMode === 'courses') {
+      setActiveCourseTab(tab);
+      localStorage.setItem('catalogCourseTab', tab);
+    } else {
+      setActiveTrackTab(tab);
+      localStorage.setItem('catalogTrackTab', tab);
+    }
     simulateLoad();
   };
 
@@ -746,6 +758,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
             <div 
               key={track.id} 
               onClick={() => {
+                setActiveCourseId(null);
                 setActiveTrackId(track.id);
                 onNavigate('track-detail');
               }}
@@ -832,6 +845,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                 <button 
                   onClick={(e) => {
                     e.stopPropagation();
+                    setActiveCourseId(null);
                     setActiveTrackId(track.id);
                     onNavigate('track-detail');
                   }}

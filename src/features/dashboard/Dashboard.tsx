@@ -294,8 +294,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
       }
     }
     // Fallback: first incomplete or first lesson
-    const currentModule = courseObj.modules.find(m => m.status === 'In progress') || courseObj.modules[0];
-    const les = currentModule.lessons.find(l => l.status === 'in_progress') || currentModule.lessons[0];
+    const currentModule = courseObj.modules?.find(m => m.status === 'In progress') || courseObj.modules?.[0];
+    if (!currentModule) {
+      return { lesson: null, module: null, course: courseObj };
+    }
+    const les = currentModule.lessons?.find(l => l.status === 'in_progress') || currentModule.lessons?.[0];
     return { lesson: les, module: currentModule, course: courseObj };
   })();
 
@@ -601,24 +604,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                 </div>
               )}
 
-              <div 
-                onClick={() => setShowQuickSession(true)}
-                className="mt-3 p-4 bg-cyan/5 hover:bg-cyan/10 border border-cyan/30 hover:border-cyan/50 rounded-2xl text-xs text-muted flex items-start space-x-3 max-w-2xl cursor-pointer transition-all duration-300 active:scale-[0.99] group/quick"
-              >
-                <div className="p-2.5 rounded-xl bg-cyan/10 text-cyan shrink-0 group-hover/quick:scale-110 transition-transform duration-300 flex items-center justify-center">
-                  <PlayCircle className="w-5 h-5 fill-current" />
+              {lastViewedLesson.lesson && (
+                <div 
+                  onClick={() => setShowQuickSession(true)}
+                  className="mt-3 p-4 bg-cyan/5 hover:bg-cyan/10 border border-cyan/30 hover:border-cyan/50 rounded-2xl text-xs text-muted flex items-start space-x-3 max-w-2xl cursor-pointer transition-all duration-300 active:scale-[0.99] group/quick"
+                >
+                  <div className="p-2.5 rounded-xl bg-cyan/10 text-cyan shrink-0 group-hover/quick:scale-110 transition-transform duration-300 flex items-center justify-center">
+                    <PlayCircle className="w-5 h-5 fill-current" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[10px] font-black uppercase tracking-wider text-cyan mb-1">Quick Session (Resume learning)</div>
+                    <p className="text-text font-bold text-sm truncate">
+                      Last viewed: {lastViewedLesson.lesson.title}
+                    </p>
+                    <p className="text-[11px] text-muted truncate mt-0.5">
+                      Module: {lastViewedLesson.module?.title} • {lastViewedLesson.lesson.duration}
+                    </p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted/50 self-center group-hover/quick:translate-x-1 transition-transform" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[10px] font-black uppercase tracking-wider text-cyan mb-1">Quick Session (Resume learning)</div>
-                  <p className="text-text font-bold text-sm truncate">
-                    Last viewed: {lastViewedLesson.lesson.title}
-                  </p>
-                  <p className="text-[11px] text-muted truncate mt-0.5">
-                    Module: {lastViewedLesson.module?.title} • {lastViewedLesson.lesson.duration}
-                  </p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-muted/50 self-center group-hover/quick:translate-x-1 transition-transform" />
-              </div>
+              )}
             </div>
           </div>
 
