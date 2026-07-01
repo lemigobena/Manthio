@@ -160,8 +160,8 @@ const MainApp: React.FC = () => {
     );
   }
 
-  // If public page but not signed in, we might still want the layout (except for signin/signup/onboarding)
-  const needsAuthLayout = !isAuthenticated && ['signin', 'signup', 'verify-email', 'forgot-password', 'reset-password'].includes(page);
+  // Render authentication-related pages inside the AuthLayout
+  const needsAuthLayout = ['signin', 'signup', 'verify-email', 'forgot-password', 'reset-password'].includes(page);
   const needsNoLayout = page === 'onboarding';
 
   if (needsAuthLayout) {
