@@ -74,7 +74,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, onNavigate }) 
             <div className="flex justify-end items-start w-full">
               <button 
                 onClick={() => onNavigate('explore')}
-                className="px-5 py-2 bg-white/20 border border-white/20 rounded-full text-white text-[11px] font-bold flex items-center gap-2 hover:bg-white/30 transition-all uppercase tracking-wider"
+                className="px-5 py-2 bg-white/20 border border-white/20 rounded-md text-white text-[11px] font-bold flex items-center gap-2 hover:bg-white/30 transition-all uppercase tracking-wider"
               >
                 Back to website
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
