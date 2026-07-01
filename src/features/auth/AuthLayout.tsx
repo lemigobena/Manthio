@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 import { Sun, Moon } from 'lucide-react';
 
 interface AuthLayoutProps {
@@ -25,6 +26,7 @@ const CAROUSEL_DATA = [
 export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, onNavigate }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const { resolvedTheme, toggleTheme } = useTheme();
+  const { signOut } = useAuth();
   const isDark = resolvedTheme === 'dark';
 
   useEffect(() => {
@@ -73,8 +75,11 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, onNavigate }) 
 
             <div className="flex justify-end items-start w-full">
               <button 
-                onClick={() => onNavigate('explore')}
-                className="px-5 py-2 bg-white/20 border border-white/20 rounded-md text-white text-[11px] font-bold flex items-center gap-2 hover:bg-white/30 transition-all uppercase tracking-wider"
+                onClick={() => {
+                  signOut();
+                  onNavigate('explore');
+                }}
+                className="px-5 py-2 bg-white/20 border border-white/20 rounded-md text-white text-[11px] font-bold flex items-center gap-2 hover:bg-white/30 transition-all uppercase tracking-wider cursor-pointer"
               >
                 Back to website
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
