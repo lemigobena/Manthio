@@ -112,7 +112,7 @@ export const COURSES: Course[] = [
     ratingCount: 85,
     enrolled: false,
     progress: 0,
-    imageUrl: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1544256718-3bcf237f3974?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
     learningOutcomes: [
       'Understand the core concepts and principles.',
@@ -258,7 +258,7 @@ export const COURSES: Course[] = [
     ratingCount: 210,
     enrolled: false,
     progress: 0,
-    imageUrl: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1667372459510-55b5e2087cd0?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
     learningOutcomes: [
       'Understand the core concepts and principles.',
@@ -477,7 +477,7 @@ export const COURSES: Course[] = [
     ratingCount: 95,
     enrolled: false,
     progress: 0,
-    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
     learningOutcomes: [
       'Understand the core concepts and principles.',
@@ -769,7 +769,7 @@ export const COURSES: Course[] = [
     ratingCount: 88,
     enrolled: false,
     progress: 0,
-    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?auto=format&fit=crop&w=800&q=80',
     trainer: Object.values(TRAINERS)[0],
     learningOutcomes: [
       'Understand the core concepts and principles.',
@@ -2055,7 +2055,7 @@ export const COURSES: Course[] = [
     ratingCount: 37,
     enrolled: true,
     progress: 26,
-    imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1573496773905-f5b17e717f05?auto=format&fit=crop&w=800&q=80',
     trainer: TRAINERS['david-pinezich'],
     learningOutcomes: [
       'Design horizontally scalable architectures.',
@@ -2238,7 +2238,7 @@ export const COURSES: Course[] = [
     ratingCount: 62,
     enrolled: false,
     progress: 0,
-    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1642775196125-38a9eb496568?auto=format&fit=crop&w=800&q=80',
     trainer: TRAINERS['david-pinezich'],
     learningOutcomes: ['Pandas optimization', 'Data cleaning at scale'],
     modules: [
@@ -2271,7 +2271,7 @@ export const COURSES: Course[] = [
     ratingCount: 45,
     enrolled: false,
     progress: 0,
-    imageUrl: 'https://images.unsplash.com/photo-1518433278993-2a2ec217c79f?auto=format&fit=crop&w=800&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1666875753105-c63a6f3bdc86?auto=format&fit=crop&w=800&q=80',
     trainer: TRAINERS['marc-kaufmann'],
     learningOutcomes: ['Write Airflow DAGs', 'Manage Task Groups', 'Scale with Executors'],
     modules: [
