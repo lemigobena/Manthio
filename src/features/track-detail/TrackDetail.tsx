@@ -65,6 +65,8 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
           label: cIdx === 0 ? ms.title : `${ms.title} — Extra`,
           courseId: courseEntry.id,
           isOptional: courseEntry.isOptional,
+          isSubCourse: cIdx > 0,
+          primaryIndex: msIdx,
           prerequisiteMilestoneIds: msIdx === 0 ? [] : [
             `${track.milestones[msIdx - 1].id}-${track.milestones[msIdx - 1].courses[0]?.id}`
           ],
@@ -75,6 +77,8 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
           label: ms.title,
           courseId: '',
           isOptional: false,
+          isSubCourse: false,
+          primaryIndex: msIdx,
           prerequisiteMilestoneIds: msIdx === 0 ? [] : [
             `${track.milestones[msIdx - 1].id}-${track.milestones[msIdx - 1].courses[0]?.id}`
           ],

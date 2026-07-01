@@ -1746,12 +1746,12 @@ export const TRACKS: CareerTrack[] = [
     enrolled: true,
     selfAssessmentOptions: ['I Know Nothing', 'I Know Basics', 'I Have Experience'],
     milestones: [
-      { id: 'py-mile-1', title: 'Python Basics', description: 'Core syntax.', courses: [{ id: 'python-bootcamp' }], status: 'active' },
-      { id: 'py-mile-2', title: 'Version Control', description: 'Git essentials.', courses: [{ id: 'git-version-control' }], status: 'locked' },
-      { id: 'py-mile-3', title: 'Advanced Python', description: 'Metaprogramming.', courses: [{ id: 'advanced-python' }], status: 'locked' },
-      { id: 'py-mile-4', title: 'FastAPI Backend', description: 'Web APIs.', courses: [{ id: 'fastapi-backend' }], status: 'locked' },
-      { id: 'py-mile-5', title: 'Containerization', description: 'Dockerizing apps.', courses: [{ id: 'docker-containers' }], status: 'locked' },
-      { id: 'py-mile-6', title: 'CI/CD for Python', description: 'GitHub Actions.', courses: [{ id: 'github-actions-automation' }], status: 'locked' }
+      { id: 'py-mile-1', title: 'Python Basics', description: 'Core syntax.', courses: [{ id: 'python-bootcamp' }, { id: 'test-course', isOptional: true }], status: 'active' },
+      { id: 'py-mile-2', title: 'Version Control', description: 'Git essentials.', courses: [{ id: 'git-version-control' }, { id: 'git-essentials' }], status: 'locked' },
+      { id: 'py-mile-3', title: 'Advanced Python', description: 'Metaprogramming.', courses: [{ id: 'advanced-python' }, { id: 'fastapi-backend' }, { id: 'apache-spark-basics' }], status: 'locked' },
+      { id: 'py-mile-4', title: 'Data Stack', description: 'Web APIs & DBs.', courses: [{ id: 'snowflake-data-warehouse' }], status: 'locked' },
+      { id: 'py-mile-5', title: 'Containerization', description: 'Dockerizing apps.', courses: [{ id: 'linux-administration' }, { id: 'kubernetes-for-beginners' }], status: 'locked' },
+      { id: 'py-mile-6', title: 'CI/CD for Python', description: 'GitHub Actions.', courses: [{ id: 'ansible-configuration' }, { id: 'monitoring-prometheus' }, { id: 'kubernetes-advanced', isOptional: true }], status: 'locked' }
     ]
   },
   {
@@ -1768,11 +1768,11 @@ export const TRACKS: CareerTrack[] = [
     progress: 0,
     selfAssessmentOptions: ['Pure Beginner', 'Some IT Background', 'Junior Dev'],
     milestones: [
-      { id: 'devops-mile-1', title: 'Prerequisites: Command Line', description: 'Bash scripting and terminal usage.', courses: [{ id: 'command-line-basics' }], status: 'active' },
+      { id: 'devops-mile-1', title: 'Prerequisites: Command Line', description: 'Bash scripting and terminal usage.', courses: [{ id: 'command-line-basics' }, { id: 'git-essentials', isOptional: true }], status: 'active' },
       { id: 'devops-mile-2', title: 'Prerequisites: Version Control', description: 'Source code management.', courses: [{ id: 'git-version-control' }], status: 'locked' },
-      { id: 'devops-mile-3', title: 'Linux Administration', description: 'System administration basics.', courses: [{ id: 'linux-administration' }], status: 'locked' },
+      { id: 'devops-mile-3', title: 'Linux Administration', description: 'System administration basics.', courses: [{ id: 'linux-administration' }, { id: 'apache-spark-basics', isOptional: true }], status: 'locked' },
       { id: 'devops-mile-4', title: 'Networking', description: 'TCP/IP and routing.', courses: [{ id: 'networking-fundamentals' }], status: 'locked' },
-      { id: 'devops-mile-5', title: 'Containerization', description: 'Docker basics.', courses: [{ id: 'docker-containers' }], status: 'locked' },
+      { id: 'devops-mile-5', title: 'Containerization', description: 'Docker basics.', courses: [{ id: 'docker-containers' }, { id: 'kubernetes-for-beginners', isOptional: true }], status: 'locked' },
       { id: 'devops-mile-6', title: 'Kubernetes Foundations', description: 'Intro to K8s.', courses: [{ id: 'kubernetes-for-beginners' }], status: 'locked' },
       { id: 'devops-mile-7', title: 'Advanced Kubernetes', description: 'Deep dive into K8s.', courses: [{ id: 'kubernetes-advanced' }], status: 'locked' },
       { id: 'devops-mile-8', title: 'CI/CD Automation', description: 'Automating builds.', courses: [{ id: 'github-actions-automation' }], status: 'locked' },
