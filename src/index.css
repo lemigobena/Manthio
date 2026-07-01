@@ -256,3 +256,22 @@ code, pre {
   }
 }
 
+/* Override default browser autofill styles for Dark Mode to use a dark-cyan indicator that fits the theme */
+:root:not([data-theme='light']) input:-webkit-autofill,
+:root:not([data-theme='light']) input:-webkit-autofill:hover, 
+:root:not([data-theme='light']) input:-webkit-autofill:focus, 
+:root:not([data-theme='light']) input:-webkit-autofill:active,
+:root:not([data-theme='light']) textarea:-webkit-autofill,
+:root:not([data-theme='light']) textarea:-webkit-autofill:hover,
+:root:not([data-theme='light']) textarea:-webkit-autofill:focus,
+:root:not([data-theme='light']) textarea:-webkit-autofill:active,
+:root:not([data-theme='light']) select:-webkit-autofill,
+:root:not([data-theme='light']) select:-webkit-autofill:hover,
+:root:not([data-theme='light']) select:-webkit-autofill:focus,
+:root:not([data-theme='light']) select:-webkit-autofill:active {
+  -webkit-text-fill-color: #EDF2F6 !important;
+  transition: background-color 999999s ease-in-out 0s;
+  box-shadow: inset 0 0 0 9999px #0A2627 !important; /* Dark cyan brand-matching autofill indicator */
+}
+
+

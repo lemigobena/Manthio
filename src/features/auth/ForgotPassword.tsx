@@ -9,14 +9,20 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onNavigate }) =>
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
     // Simulate API request
     setTimeout(() => {
       setIsLoading(false);
-      setIsSent(true);
+      if (email.trim().toLowerCase() === 'none@gmail.com') {
+        setError('Email address not found');
+      } else {
+        setIsSent(true);
+      }
     }, 1200);
   };
 
@@ -33,9 +39,11 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onNavigate }) =>
         <h1 className="text-[2.75rem] font-bold text-text tracking-tight leading-tight mb-3 transition-colors duration-500">
           Reset password
         </h1>
-        <p className="text-sm text-muted transition-colors duration-500 max-w-sm">
-          Enter your email address and we'll send you a link to reset your password.
-        </p>
+        {!isSent && (
+          <p className="text-sm text-muted transition-colors duration-500 max-w-sm">
+            Enter your email address and we'll send you a link to reset your password.
+          </p>
+        )}
       </header>
 
       {isSent ? (
@@ -51,7 +59,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onNavigate }) =>
           </div>
           <button 
             onClick={() => onNavigate('reset-password')}
-            className="w-full bg-panel hover:bg-line text-text font-bold py-[0.875rem] rounded-xl transition-all shadow-sm text-sm border border-line"
+            className="w-full bg-cyan hover:bg-cyan2 text-bg font-bold py-[0.875rem] rounded-xl transition-all shadow-lg shadow-cyan/10 text-sm active:scale-[0.98] cursor-pointer"
           >
             Simulate clicking link
           </button>
@@ -62,15 +70,23 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onNavigate }) =>
             type="email" 
             placeholder="Email"
             required
-            className="w-full bg-panel border border-line rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 !outline-none focus:border-cyan transition-all text-sm"
+            className={`w-full bg-panel border rounded-xl px-5 py-[0.875rem] text-text placeholder:text-muted/50 !outline-none transition-all text-sm ${
+              error ? 'border-red-500/50 focus:border-red-500' : 'border-line focus:border-cyan'
+            }`}
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (error) setError('');
+            }}
           />
+          {error && (
+            <p className="text-xs text-red-500 font-medium transition-colors">{error}</p>
+          )}
 
           <button 
             type="submit" 
             disabled={isLoading || !email}
-            className="w-full bg-cyan hover:bg-cyan2 text-bg font-bold py-[0.875rem] rounded-xl transition-all disabled:opacity-50 shadow-lg shadow-cyan/10 text-sm active:scale-[0.98] cursor-pointer"
+            className="w-full bg-cyan hover:bg-cyan2 text-bg font-bold py-[0.875rem] rounded-xl transition-all disabled:opacity-50 shadow-lg shadow-cyan/10 text-sm active:scale-[0.98] cursor-pointer mt-2"
           >
             {isLoading ? "Sending..." : "Send reset link"}
           </button>
