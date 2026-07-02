@@ -111,8 +111,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string): Promise<boolean> => {
     void password;
+    // Derive a display name from the email (e.g. "john.doe@..." → "John Doe")
+    const emailPrefix = email.split('@')[0] || 'alex.chen';
+    const derivedName = emailPrefix
+      .split(/[._-]/)
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+    const fullName = derivedName.includes(' ') ? derivedName : `${derivedName} Chen`;
     const mockUser: UserProfile = {
-      name: 'Alex Chen',
+      name: fullName,
       email: email,
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150',
       bio: 'Software Developer & Python Enthusiast. Enrolled in Python Bootcamp by Apigenio.',

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useModal } from '../../context/ModalContext';
 import { Sparkles, AlertCircle, BookOpen, Award, Bell, ArrowRight, ArrowLeft, ArrowDownToLine, X } from 'lucide-react';
 import { FileUpload } from '../../components/modules/FileUpload';
+import { Certificate } from '../../components/ui/Certificate';
+import { toPng } from 'html-to-image';
 
 interface DemoCenterProps {
   onNavigate: (page: string) => void;
@@ -279,6 +281,7 @@ export const DemoCenter: React.FC<DemoCenterProps> = ({ onNavigate }) => {
           </div>
         )}
       </div>
+
       {/* E-Commerce UI Showcase */}
       <div className="bg-panel border border-line rounded-2xl p-8 space-y-6 mt-8">
         <div className="flex items-center space-x-2">
@@ -318,6 +321,167 @@ export const DemoCenter: React.FC<DemoCenterProps> = ({ onNavigate }) => {
         </div>
       </div>
 
+      {/* Course Completion Certificate Preview */}
+      <div className="bg-panel border border-line rounded-2xl p-8 space-y-6 mt-8">
+        <div className="flex items-center space-x-2">
+          <Award className="w-6 h-6 text-yellow" />
+          <h2 className="text-xl font-bold font-display">Course Completion Certificate (Static Image Render)</h2>
+        </div>
+        <p className="text-muted text-sm">
+          This preview uses the installed <code>html-to-image</code> package to capture the React component structure and render it as a static PNG image.
+        </p>
+
+        <CertificateImageWrapper
+          recipientName="Adam Davidson"
+          courseName="Advanced React Web Architecture"
+          completionDate="July 2, 2026"
+          platformName="Manthio e-Learning"
+          instructorName="Dr. Sarah Jenkins"
+          certificateId="CERT-8902-REACT"
+        />
+      </div>
+
+    </div>
+  );
+};
+
+// Helper component that converts React Certificate to static PNG Image using html-to-image
+const CertificateImageWrapper: React.FC<{
+  recipientName: string;
+  courseName: string;
+  completionDate: string;
+  platformName: string;
+  instructorName: string;
+  certificateId: string;
+}> = (props) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pngUrl, setPngUrl] = useState<string | null>(null);
+  const [base64Logo, setBase64Logo] = useState<string>('');
+  const [status, setStatus] = useState<'loading' | 'converting' | 'success' | 'error'>('loading');
+
+  // Pre-convert the platform logo to Base64 in standard fetch requests
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const logoPath = "/src/assets/logo_7_prio_1_variation.png";
+        const response = await fetch(logoPath);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setBase64Logo(reader.result as string);
+        };
+        reader.readAsDataURL(blob);
+      } catch (err) {
+        console.error("Failed to load/convert logo to base64:", err);
+      }
+    };
+    fetchLogo();
+  }, []);
+
+  useEffect(() => {
+    if (!base64Logo) return;
+
+    const convert = async () => {
+      try {
+        // Wait for fonts and styles to settle in browser DOM
+        await document.fonts.ready;
+        await new Promise((r) => requestAnimationFrame(r));
+        
+        const node = containerRef.current;
+        if (!node) return;
+
+        setStatus('converting');
+        
+        // Render element to PNG using html-to-image - Capturing 990x700 (1120x700 cropped by 65px left and right)
+        const dataUrl = await toPng(node, {
+          width: 990,
+          height: 700,
+          style: {
+            width: '990px',
+            height: '700px',
+            transform: 'scale(1)',
+            transformOrigin: 'top left',
+          },
+          pixelRatio: 2,
+          cacheBust: true,
+          backgroundColor: '#ffffff',
+          fontEmbedCSS: '', // Bypass parser crash on undefined font declarations
+        });
+
+        setPngUrl(dataUrl);
+        setStatus('success');
+      } catch (err) {
+        console.error('html-to-image failed:', err);
+        setStatus('error');
+      }
+    };
+
+    convert();
+  }, [base64Logo, props.recipientName, props.courseName, props.completionDate]);
+
+  return (
+    <div className="relative w-full flex flex-col items-center justify-center">
+      {status === 'loading' && (
+        <div className="text-sm text-muted animate-pulse py-12">Loading certificate assets...</div>
+      )}
+      {status === 'converting' && (
+        <div className="text-sm text-muted animate-pulse py-12">Generating static PNG...</div>
+      )}
+      {status === 'error' && (
+        <div className="text-sm text-red-500 py-12">Failed to render static image. Showing live interactive view instead.</div>
+      )}
+
+      {/* Off-screen renderer - Rendered in a 0x0 container to hide it visually while maintaining normal layout flow */}
+      <div style={{ width: 0, height: 0, overflow: 'hidden', position: 'relative' }}>
+        <div 
+          ref={containerRef} 
+          style={{ 
+            width: '990px', 
+            height: '700px', 
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            overflow: 'hidden',
+            backgroundColor: '#ffffff'
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              left: '-67px',
+              top: 0,
+              width: '1120px',
+              height: '700px'
+            }}
+          >
+            <Certificate 
+              {...props} 
+              logoUrl={base64Logo}
+              isCaptureTemplate={true}
+              className="w-full h-full rounded-none shadow-none border-none" 
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Rendered image or fallback */}
+      <div className="bg-bg/40 border border-line/50 rounded-2xl p-6 w-full flex justify-center items-center overflow-x-auto">
+        {status === 'success' && pngUrl ? (
+          <img
+            src={pngUrl}
+            alt="Course Completion Certificate"
+            className="w-full min-w-[700px] max-w-[900px] shadow-2xl rounded-2xl border border-line/10 select-none pointer-events-none"
+          />
+        ) : (
+          status !== 'loading' && status !== 'converting' && (
+            <Certificate
+              {...props}
+              logoUrl={base64Logo || undefined}
+              className="w-full min-w-[700px] max-w-[900px]"
+            />
+          )
+        )}
+      </div>
     </div>
   );
 };

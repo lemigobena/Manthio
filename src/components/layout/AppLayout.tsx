@@ -236,7 +236,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             {children}
           </div>
           
-          {activePage !== 'checkout' && activePage !== 'community' && activePage !== 'ai-tutor' && (
+          {activePage !== 'checkout' && activePage !== 'community' && activePage !== 'ai-tutor' && activePage !== 'completed-course' && (
             <div className="mt-auto pt-6">
               <Footer onNavigate={onNavigate} />
             </div>

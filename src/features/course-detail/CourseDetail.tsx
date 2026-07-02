@@ -226,7 +226,14 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                   </div>
                 </div>
               )
-            ) : null /* No primary CTA if finished */}
+            ) : (
+              <button 
+                onClick={() => onNavigate('completed-course:' + (track ? track.id : course?.id))}
+                className="bg-cyan hover:bg-cyan/90 text-bg font-black px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(45,212,191,0.2)] hover:translate-y-[-2px] cursor-pointer w-full sm:w-auto text-center uppercase tracking-wider text-xs"
+              >
+                Review Course
+              </button>
+            )}
           </div>
         </div>
         
