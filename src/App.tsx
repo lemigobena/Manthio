@@ -20,6 +20,7 @@ import { DashboardEmptyTemplate } from './features/demo/DashboardEmptyTemplate';
 import { LiveSessionsEmptyTemplate } from './features/demo/LiveSessionsEmptyTemplate';
 import { Catalog } from './features/catalog/Catalog';
 import { CourseDetail } from './features/course-detail/CourseDetail';
+import { CompletedCoursePage } from './features/course-detail/CompletedCoursePage';
 import { LearningPath } from './features/learning-path/LearningPath';
 import { ModuleDetail } from './features/learning-path/ModuleDetail';
 import { ContentPlayer } from './features/content-player/ContentPlayer';
@@ -91,6 +92,8 @@ const MainApp: React.FC = () => {
         return <Explore onNavigate={handleNavigate} />;
       case 'course-detail':
         return <CourseDetail onNavigate={handleNavigate} />;
+      case 'completed-course':
+        return <CompletedCoursePage courseId={tab} onNavigate={handleNavigate} />;
       case 'learning-path':
         return <LearningPath onNavigate={handleNavigate} />;
       case 'module-detail':

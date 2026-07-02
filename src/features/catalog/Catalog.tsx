@@ -4,8 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, CheckCircle, X, ChevronDown, Check } from 'lucide-react';
 import { useTrack } from '../track-detail/useTrack';
-import { calculateCourseProgress } from '../../services/progressUtils';
-import type { CareerTrack, Course } from '../../types';
+import type { CareerTrack } from '../../types';
 
 interface CatalogDropdownOption { label: string; value: string; }
 interface CatalogDropdownProps {
@@ -122,7 +121,7 @@ interface CatalogProps {
 export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
   const { setActiveCourseId, setActiveTrackId } = useAuth();
   const { addToast } = useXP();
-  const { getTrackPercentage, completedLessonIds } = useTrack();
+  const { getTrackPercentage } = useTrack();
   const [discoveryMode, setDiscoveryMode] = useState<'courses' | 'tracks'>(() => {
     const lastUsed = localStorage.getItem('catalogDiscoveryMode');
     return (lastUsed as 'courses' | 'tracks') || (COURSES.some(c => c.enrolled) ? 'courses' : 'tracks');
@@ -733,9 +732,8 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                     e.stopPropagation(); // Avoid triggering card click
                     setActiveTrackId(null);
                     setActiveCourseId(course.id);
-                    const cProg = calculateCourseProgress(course as unknown as Course, completedLessonIds);
-                    if (cProg === 100) {
-                      onNavigate('course-detail');
+                    if (course.progress === 100) {
+                      onNavigate('completed-course:' + course.id);
                     } else if (course.enrolled) {
                       onNavigate('learning-path');
                     } else if (course.priceStatus === 'included' || course.priceStatus === 'employer') {
@@ -748,7 +746,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                   className={`relative overflow-hidden group/btn bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer`}
                 >
                   <span className="relative z-10">
-                    {calculateCourseProgress(course as unknown as Course, completedLessonIds) === 100 ? 'Review' : course.enrolled ? 'Continue' : 'Enrol Now'}
+                    {course.progress === 100 ? 'Review' : course.enrolled ? 'Continue' : 'Enrol Now'}
                   </span>
                   <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
                 </button>
