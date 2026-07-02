@@ -279,7 +279,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
     }
   };
 
-  const renderSearchResults = (containerRef: React.RefObject<HTMLDivElement>) => (
+  const renderSearchResults = (containerRef: React.RefObject<HTMLDivElement | null>) => (
     <>
       {/* Dynamic Content Body */}
       <div 
