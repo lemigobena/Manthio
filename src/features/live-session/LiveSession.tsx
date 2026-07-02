@@ -416,10 +416,10 @@ const ActiveSessionView: React.FC<{
         {/* Mobile Only: Functional Bar (Below Video, No Overlay) */}
         <div className="flex lg:hidden flex-col bg-panel border-t border-line">
           {/* Section 1: Session Info & Zoom */}
-          <div className="p-4 border-b border-line/50 hidden lg:flex items-center justify-between">
+          <div className="p-4 border-b border-line/50 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 rounded-full bg-red animate-pulse" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-text truncate max-w-[200px]">{data.title}</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-text">Live</span>
             </div>
             <button className="bg-cyan/10 text-cyan border border-cyan/20 p-2 px-4 rounded-full text-[10px] font-bold flex items-center space-x-1">
               <ExternalLink size={12} />
@@ -452,7 +452,7 @@ const ActiveSessionView: React.FC<{
         <div className="hidden lg:flex p-4 bg-panel border-t border-line items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-2 h-2 rounded-full bg-red animate-pulse" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-text">Live: {data.title}</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-text">Live</span>
           </div>
           <button className="text-[10px] font-bold text-muted hover:text-cyan transition-colors flex items-center space-x-1">
             <ExternalLink size={12} />
