@@ -27,38 +27,12 @@ export const TopBar: React.FC<TopBarProps> = ({
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [overlayCoords, setOverlayCoords] = useState<{ top: number; left: number } | null>(null);
 
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
-  const searchButtonRef = useRef<HTMLButtonElement>(null);
-
-  const updateCoords = useCallback(() => {
-    if (searchButtonRef.current) {
-      const rect = searchButtonRef.current.getBoundingClientRect();
-      setOverlayCoords({
-        top: rect.bottom + 10,
-        left: rect.left
-      });
-    }
-  }, []);
-
   const handleOpenSearch = useCallback(() => {
     setSearchOpen(true);
-    setTimeout(updateCoords, 0);
-  }, [updateCoords]);
-
-  useEffect(() => {
-    if (searchOpen) {
-      updateCoords();
-      window.addEventListener('resize', updateCoords);
-      window.addEventListener('scroll', updateCoords, true);
-      return () => {
-        window.removeEventListener('resize', updateCoords);
-        window.removeEventListener('scroll', updateCoords, true);
-      };
-    }
-  }, [searchOpen, updateCoords]);
+  }, []);
 
   // Keyboard shortcut listener (Cmd/Ctrl + K) - REQ-TOPBAR-001
   useEffect(() => {
@@ -144,19 +118,14 @@ export const TopBar: React.FC<TopBarProps> = ({
           {isMobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-6 h-6" />}
         </button>
 
-        {/* Global Search Button Trigger (Interactive Command Palette) */}
-        <div className="relative flex-1 max-w-xl hidden md:block">
-          <button 
-            ref={searchButtonRef}
-            onClick={handleOpenSearch}
-            className="w-full bg-bg border border-line rounded-2xl pl-10 pr-4 py-2 text-sm text-muted/60 hover:text-muted hover:border-cyan hover:ring-1 hover:ring-cyan transition-all text-left flex items-center justify-between cursor-text focus:outline-none"
-          >
-            <span className="text-xs">Search... (Cmd+K)</span>
-            <kbd className="hidden md:inline-flex items-center gap-0.5 text-[10px] bg-panel border border-line px-1.5 py-0.5 rounded font-bold text-muted font-mono select-none">
-              <span>⌘</span>K
-            </kbd>
-          </button>
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" />
+        {/* Global Search Component (Handles both Desktop Input and full overlay) */}
+        <div className={`relative flex-1 hidden md:block z-[65] transition-all duration-300 ease-out ${searchOpen ? 'max-w-[1000px]' : 'max-w-xl'}`}>
+          <SearchOverlay 
+            isOpen={searchOpen} 
+            onClose={() => setSearchOpen(false)} 
+            onOpen={() => setSearchOpen(true)}
+            onNavigate={onNavigate} 
+          />
         </div>
 
         <div className="flex items-center space-x-4 ml-auto shrink-0">
@@ -360,12 +329,15 @@ export const TopBar: React.FC<TopBarProps> = ({
         </div>
       </div>
       
-      <SearchOverlay 
-        isOpen={searchOpen} 
-        onClose={() => setSearchOpen(false)} 
-        onNavigate={onNavigate} 
-        coords={overlayCoords}
-      />
+      {/* Mobile Search Overlay Wrapper */}
+      <div className="md:hidden">
+        <SearchOverlay 
+          isOpen={searchOpen} 
+          onClose={() => setSearchOpen(false)} 
+          onOpen={() => setSearchOpen(true)}
+          onNavigate={onNavigate} 
+        />
+      </div>
     </div>
   );
 };

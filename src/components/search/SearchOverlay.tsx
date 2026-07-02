@@ -12,8 +12,8 @@ import Fuse from 'fuse.js';
 interface SearchOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpen?: () => void;
   onNavigate: (page: string) => void;
-  coords: { top: number; left: number } | null;
 }
 
 interface FlattenedLesson extends Lesson {
@@ -46,13 +46,14 @@ type FlatResultItem =
 
 const allMessages = FORUM_CHANNELS.flatMap(ch => ch.messages);
 
-export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, onNavigate, coords }) => {
+export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, onOpen, onNavigate }) => {
   const { setActiveCourseId, user } = useAuth();
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const resultsContainerRef = useRef<HTMLDivElement>(null);
+  const desktopResultsRef = useRef<HTMLDivElement>(null);
+  const mobileResultsRef = useRef<HTMLDivElement>(null);
 
   // Persistence of recent searches in localStorage
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
@@ -177,10 +178,12 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
 
   // Scroll active item into view
   useEffect(() => {
-    if (flatResults.length > 0) {
-      const activeEl = resultsContainerRef.current?.querySelector(`[data-index="${selectedIndex}"]`);
-      if (activeEl) {
-        activeEl.scrollIntoView({ block: 'nearest' });
+    const isDesktop = window.innerWidth >= 768;
+    const container = isDesktop ? desktopResultsRef.current : mobileResultsRef.current;
+    if (container && selectedIndex >= 0) {
+      const selectedEl = container.querySelector(`[data-index="${selectedIndex}"]`);
+      if (selectedEl) {
+        selectedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       }
     }
   }, [selectedIndex, flatResults.length]);
@@ -276,54 +279,13 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
     }
   };
 
-  return (
-    <div 
-      className={`fixed inset-0 z-50 bg-bg/35 backdrop-blur-[2px] transition-all duration-300 ${
-        isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-      }`}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) handleClose();
-      }}
-    >
+  const renderSearchResults = (containerRef: React.RefObject<HTMLDivElement | null>) => (
+    <>
+      {/* Dynamic Content Body */}
       <div 
-        className={`bg-panel shadow-2xl flex flex-col overflow-hidden fixed transition-all duration-300 transform ${
-          isOpen ? 'translate-y-0 scale-100 opacity-100' : '-translate-y-4 scale-95 opacity-0'
-        } top-0 left-0 w-full h-[100dvh] rounded-none border-0 md:border md:border-line md:rounded-3xl md:max-h-[80vh] md:h-auto md:top-[var(--desktop-top,10vh)] md:left-[var(--desktop-left,40px)] md:w-[var(--desktop-width,calc(100vw-80px))] md:max-w-[1360px]`}
-        style={coords ? {
-          '--desktop-top': `${coords.top}px`,
-          '--desktop-left': `${coords.left}px`,
-          '--desktop-width': `calc(100vw - ${coords.left}px - 26px)`,
-        } as React.CSSProperties : undefined}
+        ref={containerRef}
+        className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth"
       >
-        {/* Header Search Box */}
-        <div className="flex items-center px-4 py-3 border-b border-line gap-3 relative shrink-0">
-          <Search className="w-5 h-5 text-muted shrink-0" />
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder="Search courses, lessons, resources, or forum posts..."
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setSelectedIndex(0);
-            }}
-            onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent border-none outline-none text-text text-sm sm:text-base placeholder:text-muted/50 py-1 search-overlay-input"
-          />
-          <button 
-            onClick={handleClearOrClose} 
-            className="p-1.5 hover:bg-bg rounded-lg text-muted hover:text-text transition-colors cursor-pointer flex items-center shrink-0"
-            title={query ? "Clear search text" : "Close search"}
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Dynamic Content Body */}
-        <div 
-          ref={resultsContainerRef}
-          className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth"
-        >
           {/* Default state when query is empty */}
           {!query.trim() ? (
             <div className="space-y-6">
@@ -677,7 +639,88 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
             </div>
           </div>
         )}
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop Search Input & Dropdown */}
+      <div className="relative w-full hidden md:block z-[70]">
+        <Search className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors ${isOpen ? 'text-cyan' : 'text-muted'}`} />
+        <input
+          ref={inputRef}
+          type="text"
+          placeholder="Search courses, lessons, resources..."
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setSelectedIndex(0);
+          }}
+          onFocus={onOpen}
+          onKeyDown={handleKeyDown}
+          className={`w-full bg-bg border pl-10 pr-4 py-2 text-sm text-text focus:outline-none transition-all search-overlay-input ${
+            isOpen ? 'bg-panel border-line rounded-t-2xl rounded-b-none border-b-0 relative z-[65]' : 'rounded-2xl border-line hover:border-line/80'
+          }`}
+        />
+        {!isOpen && (
+          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-[10px] bg-panel border border-line px-1.5 py-0.5 rounded font-bold text-muted font-mono select-none pointer-events-none">
+            <span>⌘</span>K
+          </kbd>
+        )}
+        {isOpen && query && (
+          <button 
+            onClick={handleClearOrClose} 
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-line/50 rounded-lg text-muted hover:text-text transition-colors z-[65]"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* Desktop Dropdown */}
+        <div 
+          className={`absolute top-full left-0 w-full bg-panel flex flex-col overflow-hidden transition-all duration-300 transform origin-top border border-line rounded-b-2xl border-t-0 shadow-2xl ${
+            isOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0 pointer-events-none'
+          } max-h-[80vh] z-[64]`}
+        >
+          {renderSearchResults(desktopResultsRef)}
+        </div>
       </div>
-    </div>
+
+      {/* Desktop Backdrop */}
+      <div 
+        className={`hidden md:block fixed inset-0 z-[60] bg-bg/40 backdrop-blur-[2px] transition-all duration-300 ${
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={handleClose}
+      />
+
+      {/* Mobile Overlay */}
+      <div className={`md:hidden fixed inset-0 z-[80] bg-panel flex flex-col transition-all duration-300 ${
+        isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+      }`}>
+        <div className="flex items-center px-4 py-3 border-b border-line gap-3 relative shrink-0">
+          <Search className="w-5 h-5 text-muted shrink-0" />
+          <input
+            type="text"
+            placeholder="Search..."
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelectedIndex(0);
+            }}
+            onKeyDown={handleKeyDown}
+            className="flex-1 bg-transparent border-none outline-none text-text text-sm sm:text-base placeholder:text-muted/50 py-1"
+          />
+          <button 
+            onClick={handleClearOrClose} 
+            className="p-1.5 hover:bg-bg rounded-lg text-muted hover:text-text transition-colors cursor-pointer flex items-center shrink-0"
+            title={query ? "Clear search text" : "Close search"}
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        {renderSearchResults(mobileResultsRef)}
+      </div>
+    </>
   );
 };
