@@ -53,9 +53,9 @@ const NeuralInsightCard: React.FC<{
   }[color];
 
   return (
-    <div className={`bg-bg/40 border border-line ${accentColor} border-l-4 rounded-lg p-4 space-y-2 transition-all hover:bg-bg/60`}>
-      <span className={`text-[10px] font-bold uppercase tracking-widest ${labelColor}`}>{category}</span>
-      <p className="text-xs text-text font-medium leading-relaxed italic">
+    <div className={`bg-bg/40 border border-line ${accentColor} border-l-4 rounded-lg p-4 lg:p-3 xl:p-4 space-y-2 lg:space-y-1.5 xl:space-y-2 transition-all hover:bg-bg/60`}>
+      <span className={`text-[10px] lg:text-[8px] xl:text-[10px] font-bold uppercase tracking-widest ${labelColor}`}>{category}</span>
+      <p className="text-xs lg:text-[10px] xl:text-xs text-text font-medium leading-relaxed italic">
         "{text}"
       </p>
     </div>
@@ -220,14 +220,16 @@ const NeuralActivityChart: React.FC<{ heroState?: string }> = ({ heroState }) =>
 
   return (
     // Give the chart a clear minimum height so bars can breathe
-    <div className="bg-panel border border-line rounded-2xl p-5 flex flex-col flex-1 min-h-50 relative">
+    <div className="bg-panel border border-line rounded-2xl p-5 lg:p-3 xl:p-5 flex flex-col flex-1 min-h-50 relative">
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-3">
-          <div className="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse shadow-[0_0_6px_rgba(0,255,242,0.6)]" />
-          <h3 className="text-[11px] font-semibold text-text/50 uppercase tracking-[0.3em]">Neural Velocity</h3>
+      <div className="flex items-center justify-between mb-5 lg:mb-4 xl:mb-5">
+        <div className="flex items-center gap-3 lg:gap-2 xl:gap-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse shadow-[0_0_6px_rgba(0,255,242,0.6)] shrink-0" />
+          <h3 className="text-[11px] lg:text-[8px] xl:text-[11px] font-semibold text-text/50 uppercase tracking-[0.3em] lg:tracking-[0.1em] xl:tracking-[0.3em] truncate">
+            <span className="lg:hidden xl:inline">Neural </span>Velocity
+          </h3>
         </div>
-        <span className="text-[10px] font-bold text-cyan/70 tabular-nums">
+        <span className="text-[10px] lg:text-[8px] xl:text-[10px] font-bold text-cyan/70 tabular-nums whitespace-nowrap ml-2">
           {data.reduce((s, d) => s + d.mins, 0)} <span className="opacity-50">min / wk</span>
         </span>
       </div>
@@ -683,7 +685,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                         <span className="bg-orange/20 text-orange border border-orange/30 text-xs px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider">
                           Active Course
                         </span>
-                        <h2 className="text-xl font-bold mt-2">{activeCourse.title}</h2>
+                        <h2 className="text-xl lg:text-lg xl:text-xl font-bold mt-2">{activeCourse.title}</h2>
                       </div>
                       <div className="shrink-0">
                         {/* Mobile: Circular Progress */}
@@ -735,7 +737,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                         <span className="bg-purple/20 text-purple border border-purple/30 text-xs px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider">
                           Recommended Course
                         </span>
-                        <h2 className="text-xl font-bold mt-2">Advanced System Architecture</h2>
+                        <h2 className="text-xl lg:text-lg xl:text-xl font-bold mt-2">Advanced System Architecture</h2>
                       </div>
                     </div>
                     <p className="text-muted text-sm leading-relaxed">
@@ -821,7 +823,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                             <div className="text-base font-black text-text">Well done!</div>
                             <div className="text-xs text-muted">Course completed</div>
                           </div>
-                          <button onClick={() => { setActiveCourseId(course.id); onNavigate('learning-path'); }} className={`w-full flex items-center justify-center space-x-2 border-2 border-yellow text-yellow hover:bg-yellow hover:text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-all mt-3`}>
+                          <button onClick={() => { onNavigate('completed-course:' + course.id); }} className={`w-full flex items-center justify-center space-x-2 border-2 border-yellow text-yellow hover:bg-yellow hover:text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-all mt-3`}>
                             <span>Review</span>
                           </button>
                         </div>
@@ -915,7 +917,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                     return (
                       <div key={course.id} className="course-card flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-lg bg-panel border border-line hover:bg-panel2 transition-all">
                         {/* Left colored block */}
-                        <div className={`course-card-left relative w-full md:w-36 lg:w-44 flex flex-col items-center justify-center py-6 md:py-0 bg-${color} flex-shrink-0 overflow-hidden`}>
+                        <div className={`course-card-left relative w-full md:w-36 lg:hidden xl:flex xl:w-44 flex-col items-center justify-center py-6 md:py-0 bg-${color} flex-shrink-0 overflow-hidden ${'flex'}`}>
                           <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-transparent mix-blend-overlay" />
                           <div className="relative z-10 flex flex-col items-center space-y-3">
                             {getCourseIcon(course.title)}
@@ -979,89 +981,89 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
               <NeuralActivityChart heroState={heroState} />
               
               {/* REQ-DASH-010: Upcoming Events */}
-              <div className="bg-panel border border-line rounded-2xl p-6 space-y-5">
+              <div className="bg-panel border border-line rounded-2xl p-6 lg:p-4 xl:p-6 space-y-5 lg:space-y-4 xl:space-y-5">
                 <div className="flex justify-between items-center mb-2">
                   <div className="flex items-center space-x-2">
                     <Calendar className="w-4 h-4 text-orange" />
-                    <h3 className="font-bold text-base text-text">Upcoming Events</h3>
+                    <h3 className="font-bold text-base lg:text-sm xl:text-base text-text">Upcoming Events</h3>
                   </div>
                   <button 
                     onClick={() => onNavigate('live-sessions')}
-                    className="text-cyan hover:text-cyan2 text-[10px] uppercase tracking-wider font-bold transition-colors"
+                    className="text-cyan hover:text-cyan2 text-[10px] lg:text-[9px] xl:text-[10px] uppercase tracking-wider font-bold transition-colors"
                   >
                     View All
                   </button>
                 </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-4 lg:space-y-3 xl:space-y-4">
                   {/* Event 1 - Live Session */}
-                  <div className="flex gap-4 group">
-                    <div className="flex flex-col items-center mt-0.5 shrink-0 w-12">
-                      <div className="text-[10px] font-bold text-muted uppercase">Today</div>
-                      <div className="text-lg font-black text-text leading-none mt-1">18:00</div>
+                  <div className="flex gap-4 lg:gap-3 xl:gap-4 group">
+                    <div className="flex flex-col items-center mt-0.5 shrink-0 w-12 lg:w-10 xl:w-12">
+                      <div className="text-[10px] lg:text-[8px] xl:text-[10px] font-bold text-muted uppercase">Today</div>
+                      <div className="text-lg lg:text-base xl:text-lg font-black text-text leading-none mt-1">18:00</div>
                     </div>
                     <div className="w-0.5 bg-purple/30 group-hover:bg-purple transition-colors rounded-full" />
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="bg-purple/20 text-purple text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Live Session</span>
-                        <span className="text-[9px] text-muted font-bold flex items-center gap-1"><MapPin className="w-2.5 h-2.5"/> Zürich Lab</span>
+                        <span className="bg-purple/20 text-purple text-[8px] lg:text-[7px] xl:text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Live Session</span>
+                        <span className="text-[9px] lg:text-[8px] xl:text-[9px] text-muted font-bold flex items-center gap-1"><MapPin className="w-2.5 h-2.5 lg:w-2 lg:h-2 xl:w-2.5 xl:h-2.5"/> Zürich Lab</span>
                       </div>
-                      <h4 className="font-bold text-sm text-text leading-snug">Flipped Session A</h4>
-                      <p className="text-xs text-muted mb-2">Python Basics Review & Group Exercise</p>
+                      <h4 className="font-bold text-sm lg:text-xs xl:text-sm text-text leading-snug">Flipped Session A</h4>
+                      <p className="text-xs lg:text-[10px] xl:text-xs text-muted mb-2">Python Basics Review & Group Exercise</p>
                       <button 
                         onClick={() => onNavigate('live-session')}
-                        className="text-cyan hover:text-cyan2 text-xs font-semibold flex items-center space-x-1 transition-colors"
+                        className="text-cyan hover:text-cyan2 text-xs lg:text-[10px] xl:text-xs font-semibold flex items-center space-x-1 transition-colors"
                       >
                         <span>Join Session</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <ArrowRight className="w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-3.5 xl:h-3.5" />
                       </button>
                     </div>
                   </div>
 
                   {/* Event 2 - Assignment Deadline */}
-                  <div className="flex gap-4 group">
-                    <div className="flex flex-col items-center mt-0.5 shrink-0 w-12">
-                      <div className="text-[10px] font-bold text-muted uppercase">Tmrw</div>
-                      <div className="text-lg font-black text-text leading-none mt-1">23:59</div>
+                  <div className="flex gap-4 lg:gap-3 xl:gap-4 group">
+                    <div className="flex flex-col items-center mt-0.5 shrink-0 w-12 lg:w-10 xl:w-12">
+                      <div className="text-[10px] lg:text-[8px] xl:text-[10px] font-bold text-muted uppercase">Tmrw</div>
+                      <div className="text-lg lg:text-base xl:text-lg font-black text-text leading-none mt-1">23:59</div>
                     </div>
                     <div className="w-0.5 bg-yellow/30 group-hover:bg-yellow transition-colors rounded-full" />
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="bg-yellow/20 text-yellow text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Deadline</span>
+                        <span className="bg-yellow/20 text-yellow text-[8px] lg:text-[7px] xl:text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Deadline</span>
                       </div>
-                      <h4 className="font-bold text-sm text-text leading-snug">Capstone Draft</h4>
-                      <p className="text-xs text-muted">Submit initial project architecture.</p>
+                      <h4 className="font-bold text-sm lg:text-xs xl:text-sm text-text leading-snug">Capstone Draft</h4>
+                      <p className="text-xs lg:text-[10px] xl:text-xs text-muted">Submit initial project architecture.</p>
                     </div>
                   </div>
 
                   {/* Event 3 - Cohort Milestone */}
-                  <div className="flex gap-4 group">
-                    <div className="flex flex-col items-center mt-0.5 shrink-0 w-12">
-                      <div className="text-[10px] font-bold text-muted uppercase">Oct 12</div>
-                      <div className="text-lg font-black text-text leading-none mt-1">09:00</div>
+                  <div className="flex gap-4 lg:gap-3 xl:gap-4 group">
+                    <div className="flex flex-col items-center mt-0.5 shrink-0 w-12 lg:w-10 xl:w-12">
+                      <div className="text-[10px] lg:text-[8px] xl:text-[10px] font-bold text-muted uppercase">Oct 12</div>
+                      <div className="text-lg lg:text-base xl:text-lg font-black text-text leading-none mt-1">09:00</div>
                     </div>
                     <div className="w-0.5 bg-cyan/30 group-hover:bg-cyan transition-colors rounded-full" />
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="bg-cyan/20 text-cyan text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Milestone</span>
+                        <span className="bg-cyan/20 text-cyan text-[8px] lg:text-[7px] xl:text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Milestone</span>
                       </div>
-                      <h4 className="font-bold text-sm text-text leading-snug">Module 1 Unlock</h4>
-                      <p className="text-xs text-muted">Next phase of Python engineering.</p>
+                      <h4 className="font-bold text-sm lg:text-xs xl:text-sm text-text leading-snug">Module 1 Unlock</h4>
+                      <p className="text-xs lg:text-[10px] xl:text-xs text-muted">Next phase of Python engineering.</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Neural Insights Section (High Fidelity Design) */}
-              <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
+              <div className="bg-panel border border-line rounded-2xl p-6 lg:p-4 xl:p-6 space-y-6 lg:space-y-4 xl:space-y-6">
                 <div className="flex items-center space-x-3">
                   <div className="p-2 bg-cyan/10 border border-cyan/20 rounded-xl text-cyan">
-                    <Cpu className="w-5 h-5" />
+                    <Cpu className="w-5 h-5 lg:w-4 lg:h-4 xl:w-5 xl:h-5" />
                   </div>
-                  <h3 className="text-lg font-bold text-text">Neural Insights</h3>
+                  <h3 className="text-lg lg:text-base xl:text-lg font-bold text-text">Neural Insights</h3>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 lg:space-y-3 xl:space-y-4">
                   <NeuralInsightCard 
                     category="Recommendation" 
                     text="Based on your 92% Focus, I suggest moving to the **Practical Lab: GPU Cluster Optimization**." 
@@ -1081,9 +1083,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
 
                 <button 
                   onClick={() => onNavigate('ai-tutor')}
-                  className="w-full bg-transparent hover:bg-cyan/5 border border-cyan/30 text-cyan text-xs font-bold py-3 rounded-lg transition-all uppercase tracking-widest flex items-center justify-center space-x-2"
+                  className="w-full bg-transparent hover:bg-cyan/5 border border-cyan/30 text-cyan text-xs lg:text-[10px] xl:text-xs font-bold py-3 lg:py-2.5 xl:py-3 rounded-lg transition-all uppercase tracking-widest flex items-center justify-center space-x-2 lg:space-x-1.5 xl:space-x-2"
                 >
-                  <MessageSquare className="w-4 h-4" />
+                  <MessageSquare className="w-4 h-4 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4" />
                   <span>Chat with Neural Tutor</span>
                 </button>
               </div>

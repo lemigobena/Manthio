@@ -55,7 +55,7 @@ const TrackItem: React.FC<{
             <span className="bg-cyan/20 text-cyan border border-cyan/30 text-xs px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider">
               Active Track
             </span>
-            <h2 className="text-xl font-bold mt-2">{activeTrack.title}</h2>
+            <h2 className="text-xl lg:text-lg xl:text-xl font-bold mt-2">{activeTrack.title}</h2>
           </div>
           <div className="shrink-0">
             <div className="md:hidden">
