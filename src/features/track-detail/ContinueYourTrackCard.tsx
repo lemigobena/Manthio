@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ArrowRight, MapPin, Play, ChevronDown, ChevronUp } from 'lucide-react';
+import React from 'react';
+import { ArrowRight, MapPin, Play } from 'lucide-react';
 import { PillProgress, RingProgress } from '../dashboard/Dashboard';
 import { TRACKS } from '../../services/mockData';
 import { useTrack } from './useTrack';
