@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, Lock, Clock, User, Zap, Layers } from 'lucide-react';
+import { CheckCircle, Lock, Clock, User, Zap, Layers, Eye } from 'lucide-react';
 import { COURSES } from '../../services/mockData';
 import type { Course, SelfAssessmentLevel } from '../../types';
 import { calculateCourseProgress } from '../../services/progressUtils';
@@ -26,8 +26,8 @@ interface MilestoneNodeProps {
   completedLessonIds: string[];
   onNavigateToCourse: (courseId: string, target: 'course-detail' | 'learning-path') => void;
   index: number;
-  zIndex: number;
   nextState?: MilestoneState;
+  isNextSubCourse?: boolean;
 }
 
 const MilestoneNode: React.FC<MilestoneNodeProps> = ({
@@ -39,8 +39,8 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
   completedLessonIds,
   onNavigateToCourse,
   index,
-  zIndex,
   nextState,
+  isNextSubCourse,
 }) => {
   const course = COURSES.find(c => c.id === milestone.courseId);
   const isEven = (milestone.primaryIndex ?? index) % 2 === 0;
@@ -49,20 +49,20 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
   const nodeColors: Record<MilestoneState, string> = {
     completed: 'border-green bg-green shadow-[0_0_14px_rgba(43,222,126,0.35)]',
     current:   'border-cyan bg-cyan ring-4 ring-cyan/20 animate-pulse shadow-[0_0_18px_rgba(0,245,228,0.4)]',
-    available: 'border-white/40 bg-bg',
-    locked:    'border-white/10 bg-bg/40',
+    available: 'border-text/30 bg-bg',
+    locked:    'border-line bg-bg/40',
   };
 
-  const borderColor = state === 'completed' ? 'border-green' : state === 'current' ? 'border-cyan' : 'border-cyan/40';
+  const borderColor = 'border-cyan/40';
 
   return (
-    <div className="relative w-full flex flex-col items-center" style={{ zIndex }}>
+    <div className="relative w-full flex flex-col items-center">
       {/* ── Central Spine Segment ── */}
       {!isLast && (
         <div 
-          className={`absolute top-[30px] bottom-[-40px] w-0.75 left-1/2 -translate-x-1/2 z-0 hidden min-[1200px]:block ${
+          className={`absolute top-[30px] bottom-[-40px] w-[3px] left-1/2 -translate-x-1/2 z-0 hidden min-[1200px]:block ${
             nextState === 'locked' 
-              ? 'border-l-[3px] border-dashed border-line/40 bg-transparent' 
+              ? 'border-l-[3px] border-dashed border-cyan/40 bg-transparent' 
               : state === 'completed' ? 'bg-green' : 'bg-cyan/40'
           }`}
         />
@@ -74,13 +74,13 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
         <div 
           className={`absolute top-[30px] bottom-[-40px] w-[3px] left-[32px] z-0 min-[1200px]:hidden ${
             nextState === 'locked' 
-              ? 'border-l-[3px] border-dashed border-line/40 bg-transparent' 
+              ? 'border-l-[3px] border-dashed border-cyan/40 bg-transparent' 
               : state === 'completed' ? 'bg-green' : 'bg-cyan/40'
           }`}
         />
       )}
       
-      <div className={`min-[1200px]:hidden relative z-10 flex flex-col items-start w-full px-4 ${isSubCourse ? 'pb-4 pt-0' : 'pb-8 pt-4'}`}>
+      <div className={`min-[1200px]:hidden relative z-10 flex flex-col items-start w-full px-4 ${isSubCourse ? 'pt-0' : 'pt-4'} ${isNextSubCourse ? 'pb-8' : 'pb-20'}`}>
         {!isSubCourse ? (
           <div className="relative w-full">
             {/* Title Box (Centered on spine) */}
@@ -102,15 +102,20 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
               {/* Straight Horizontal branch connector */}
               <div className="w-full relative">
                 <div className={`absolute top-[20px] left-[-24px] right-[50%] h-[3px] border-t-[3px] ${borderColor} z-[-1]`} />
+                {(!isSubCourse && isNextSubCourse) && (
+                  <div className={`absolute top-[20px] bottom-[-40px] left-1/2 w-[3px] border-l-[3px] ${borderColor} z-[-1] -translate-x-1/2`} />
+                )}
                 {course && <CourseCard course={course} state={state} isSkippable={isSkippable} isOptional={isOptional} onNavigate={onNavigateToCourse} fullWidth completedLessonIds={completedLessonIds} />}
               </div>
             </div>
           </div>
         ) : (
           <div className="relative w-full pl-[56px]">
-             {/* Vertical connector from the card above */}
+             {/* Sub-course card with downward connector if followed by another subcourse */}
              <div className="w-full mt-2 relative">
-               <div className={`absolute -top-[120px] h-[120px] left-1/2 w-[3px] border-l-[3px] ${borderColor} z-[-1] -translate-x-1/2`} />
+               {isSubCourse && (
+                 <div className={`absolute top-[0px] ${isNextSubCourse ? 'bottom-[-40px]' : 'bottom-[50%]'} left-1/2 w-[3px] border-l-[3px] ${borderColor} z-[-1] -translate-x-1/2`} />
+               )}
                {course && <CourseCard course={course} state={state} isSkippable={isSkippable} isOptional={isOptional} onNavigate={onNavigateToCourse} fullWidth completedLessonIds={completedLessonIds} />}
              </div>
           </div>
@@ -118,17 +123,23 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
       </div>
 
       {/* ── Desktop View: Unified Grid ── */}
-      <div className={`hidden min-[1200px]:grid grid-cols-[1fr_120px_1fr] w-full max-w-6xl gap-8 relative items-start ${isSubCourse ? 'pb-8 pt-0' : 'pb-20 pt-4'}`}>
+      <div className={`hidden min-[1200px]:grid grid-cols-[1fr_120px_1fr] w-full max-w-6xl gap-8 relative items-start ${isSubCourse ? 'pt-0' : 'pt-4'} ${isNextSubCourse ? 'pb-8' : 'pb-20'}`}>
         
         {/* Left Column (Card) */}
         <div className={`flex flex-col items-end ${isSubCourse ? 'pt-0' : 'pt-[54px]'} relative`}>
            {isEven && course && (
              <>
                 {/* Connector from title center to card center */}
-                {!isSubCourse ? (
+                {!isSubCourse && (
                   <div className={`absolute top-[14px] left-1/2 right-[-76px] h-[40px] border-t-[3px] border-l-[3px] rounded-tl-[20px] ${borderColor} z-[-1]`} />
-                ) : (
-                  <div className={`absolute -top-[220px] h-[220px] left-1/2 w-[3px] border-l-[3px] ${borderColor} z-0`} />
+                )}
+                
+                {/* Vertical downward rod for same branch */}
+                {(!isSubCourse && isNextSubCourse) && (
+                  <div className={`absolute top-[54px] bottom-[-32px] left-1/2 w-[3px] border-l-[3px] ${borderColor} z-[-1]`} />
+                )}
+                {(isSubCourse) && (
+                  <div className={`absolute top-[0px] ${isNextSubCourse ? 'bottom-[-32px]' : 'bottom-[50%]'} left-1/2 w-[3px] border-l-[3px] ${borderColor} z-[-1]`} />
                 )}
                 <CourseCard course={course} state={state} isSkippable={isSkippable} isOptional={isOptional} onNavigate={onNavigateToCourse} completedLessonIds={completedLessonIds} />
              </>
@@ -159,10 +170,16 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
            {!isEven && course && (
              <>
                 {/* Connector from title center to card center */}
-                {!isSubCourse ? (
+                {!isSubCourse && (
                   <div className={`absolute top-[14px] right-1/2 left-[-76px] h-[40px] border-t-[3px] border-r-[3px] rounded-tr-[20px] ${borderColor} z-[-1]`} />
-                ) : (
-                  <div className={`absolute -top-[220px] h-[220px] left-1/2 w-[3px] border-l-[3px] ${borderColor} z-0`} />
+                )}
+
+                {/* Vertical downward rod for same branch */}
+                {(!isSubCourse && isNextSubCourse) && (
+                  <div className={`absolute top-[54px] bottom-[-32px] right-1/2 w-[3px] border-r-[3px] ${borderColor} z-[-1]`} />
+                )}
+                {(isSubCourse) && (
+                  <div className={`absolute top-[0px] ${isNextSubCourse ? 'bottom-[-32px]' : 'bottom-[50%]'} right-1/2 w-[3px] border-r-[3px] ${borderColor} z-[-1]`} />
                 )}
                 <CourseCard course={course} state={state} isSkippable={isSkippable} isOptional={isOptional} onNavigate={onNavigateToCourse} completedLessonIds={completedLessonIds} />
              </>
@@ -182,20 +199,20 @@ const CourseCard: React.FC<{
   onNavigate: (id: string, target: 'course-detail' | 'learning-path') => void; 
   fullWidth?: boolean 
 }> = ({
-  course, state, isSkippable, isOptional, completedLessonIds, onNavigate, fullWidth
+  course, state, isOptional, completedLessonIds, onNavigate, fullWidth
 }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
 
   // REQ-TRACK-001: Increase visibility (reduced blur shading)
-  const cardOpacity = isSkippable ? 'opacity-60' : state === 'locked' ? 'opacity-80' : 'opacity-100';
+  const cardOpacity = 'opacity-100';
   const cardBorder  = state === 'current' ? 'border-cyan/40 shadow-xl shadow-cyan/10 ring-1 ring-cyan/20' : 'border-line';
 
   // Calculate dynamic progress
   const progress = calculateCourseProgress(course, completedLessonIds);
 
   return (
-    <div className={`w-full ${fullWidth ? 'max-w-3xl' : 'max-w-[520px]'} mx-auto relative z-10 bg-[#13141a] rounded-2xl transition-all duration-300`}>
-      <div className={`bg-[#13141a] border ${cardBorder} rounded-2xl overflow-hidden group hover:border-cyan/40 transition-all flex flex-col relative ${cardOpacity}`}>
+    <div className={`w-full ${fullWidth ? 'max-w-3xl' : 'max-w-[520px]'} mx-auto relative z-10 isolate bg-panel rounded-2xl transition-all duration-300 shadow-md`}>
+      <div className={`bg-panel border ${cardBorder} rounded-2xl overflow-hidden group hover:border-cyan/40 transition-all flex flex-col relative ${cardOpacity}`}>
         {isOptional && (
           <div className="absolute top-0 right-0 origin-top-right scale-[0.8] lg:scale-100 z-20 pointer-events-none">
             <div className="absolute top-[20px] -right-[32px] w-[130px] bg-gradient-to-r from-purple to-cyan text-bg text-[9px] font-black uppercase tracking-widest text-center py-1.5 rotate-45 shadow-xl">
@@ -205,7 +222,7 @@ const CourseCard: React.FC<{
         )}
         <div className="flex h-40">
         {/* Thumbnail (Fixed Width) */}
-        <div className="relative w-40 shrink-0 overflow-hidden bg-bg border-r border-line/50">
+        <div className="relative hidden min-[450px]:block w-28 min-[530px]:w-40 shrink-0 overflow-hidden bg-bg border-r border-line/50 transition-all duration-300">
           <img 
             src={course.imageUrl} 
             className={`w-full h-full object-cover transition-all duration-700 ${state === 'locked' ? 'opacity-60 grayscale-[0.2]' : 'group-hover:scale-110'}`} 
@@ -241,9 +258,15 @@ const CourseCard: React.FC<{
             <div className="flex gap-2">
                <button 
                 onClick={() => onNavigate(course.id, state === 'locked' ? 'course-detail' : 'learning-path')} 
-                className="flex-1 bg-cyan hover:bg-cyan2 text-bg text-[10px] font-black py-1.5 rounded-lg transition-all flex items-center justify-center gap-1 uppercase tracking-tight"
+                className={`flex-1 text-[10px] font-black py-1.5 rounded-lg transition-all flex items-center justify-center gap-1 uppercase tracking-tight ${
+                  state === 'locked' 
+                    ? 'bg-transparent border-2 border-cyan text-cyan hover:bg-cyan/10' 
+                    : (progress === 100 || state === 'completed')
+                      ? 'bg-text/10 border border-text/15 text-text/70 hover:bg-text/15 hover:text-text'
+                      : 'bg-cyan hover:bg-cyan2 text-bg'
+                }`}
                >
-                 <Zap className="w-3 h-3 fill-current" /> {state === 'locked' ? 'View' : 'Start'}
+                 {state === 'locked' ? <Eye className="w-3 h-3" /> : (progress === 100 || state === 'completed') ? <CheckCircle className="w-3 h-3" /> : <Zap className="w-3 h-3 fill-current" />} {progress === 100 || state === 'completed' ? 'Review' : state === 'locked' ? 'View' : 'Start'}
                </button>
                <button 
                 onClick={() => onNavigate(course.id, 'course-detail')} 
@@ -314,15 +337,36 @@ export const TrackVisualPath: React.FC<{
     experience: ['python-bootcamp', 'git-essentials', 'command-line-basics']
   };
 
+  // Filter optional/recommended courses based on self-assessment level
+  const filteredMilestones = React.useMemo(() => {
+    if (selfAssessmentLevel === 'experience') {
+      // Hide ALL optional/recommended courses
+      return milestones.filter(ms => !(ms.isOptional));
+    }
+    if (selfAssessmentLevel === 'basics') {
+      // Keep only every other optional course (reduce recommendations)
+      let optionalCount = 0;
+      return milestones.filter(ms => {
+        if (ms.isOptional) {
+          optionalCount++;
+          return optionalCount % 2 === 1; // keep 1st, skip 2nd, keep 3rd, etc.
+        }
+        return true;
+      });
+    }
+    // 'nothing' → show everything
+    return milestones;
+  }, [milestones, selfAssessmentLevel]);
+
   return (
-    <div className="flex flex-col items-center pt-8 pb-20">
-      {milestones.map((ms, idx) => {
+    <div className="flex flex-col items-center pt-8 pb-20 relative z-0">
+      {filteredMilestones.map((ms, idx) => {
         const isCompleted = completedMilestoneIds.includes(ms.id);
         const skippable = isEnrolled && (SKIPPABLE[selfAssessmentLevel as keyof typeof SKIPPABLE]?.includes(ms.courseId) || false);
 
         // REQ-TRACK-001: Skippable milestones don't block the path.
         const isPrevDoneOrSkippable = idx === 0 || (() => {
-          const prevMs = milestones[idx - 1];
+          const prevMs = filteredMilestones[idx - 1];
           const prevIsCompleted = completedMilestoneIds.includes(prevMs.id);
           const prevIsSkippable = isEnrolled && (SKIPPABLE[selfAssessmentLevel as keyof typeof SKIPPABLE]?.includes(prevMs.courseId) || false);
           return prevIsCompleted || prevIsSkippable;
@@ -333,10 +377,11 @@ export const TrackVisualPath: React.FC<{
         // REQ-TRACK-001: Clicking a tab adjusts which courses are highlighted as needed vs. optional.
         const dynamicIsOptional = ms.isOptional ?? false;
 
-        const nextMs = milestones[idx + 1];
+        const nextMs = filteredMilestones[idx + 1];
         const nextIsCompleted = nextMs ? completedMilestoneIds.includes(nextMs.id) : false;
         const nextIsPrevDone = completedMilestoneIds.includes(ms.id);
         const nextState = nextMs ? (nextIsCompleted ? 'completed' : (nextIsPrevDone ? 'current' : 'locked')) : undefined;
+        const isNextSubCourse = nextMs ? nextMs.isSubCourse : false;
 
         return (
           <MilestoneNode
@@ -345,12 +390,12 @@ export const TrackVisualPath: React.FC<{
             milestone={ms}
             state={state}
             nextState={nextState}
+            isNextSubCourse={isNextSubCourse}
             isSkippable={skippable}
             isOptional={dynamicIsOptional}
-            isLast={idx === milestones.length - 1}
+            isLast={idx === filteredMilestones.length - 1}
             completedLessonIds={completedLessonIds}
             onNavigateToCourse={onNavigateToCourse}
-            zIndex={100 - idx}
           />
         );
       })}

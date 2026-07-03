@@ -16,6 +16,7 @@ const TrackItem: React.FC<{
   onNavigate: (path: string) => void; 
   setActiveTrackId: (id: string) => void; 
 }> = ({ activeEntry, onNavigate, setActiveTrackId }) => {
+  const { restartTrack, getTrackPercentage } = useTrack();
   const activeTrack = TRACKS.find(t => t.id === activeEntry.trackId);
   if (!activeTrack) return null;
 
@@ -41,7 +42,8 @@ const TrackItem: React.FC<{
         }]
   );
 
-  const progressPct = 53;
+  const progressPct = getTrackPercentage(activeTrack);
+  const isCompleted = activeEntry.completedAt != null || progressPct === 100;
 
   const nextMilestone = mappedMilestones.find(
     m => !activeEntry.completedMilestoneIds.includes(m.id)
@@ -76,16 +78,36 @@ const TrackItem: React.FC<{
           Next Up: <span className="text-text font-medium">{nextMilestone ? nextMilestone.label : "Complete!"}</span>
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={() => {
-              setActiveTrackId(activeTrack.id);
-              onNavigate('track-detail');
-            }}
-            className="bg-cyan hover:bg-cyan2 text-bg font-semibold px-5 py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-colors cursor-pointer"
-          >
-            <Play className="w-4 h-4 fill-current" />
-            <span>Continue track</span>
-          </button>
+          {isCompleted ? (
+            <>
+              <button
+                onClick={() => restartTrack(activeTrack.id)}
+                className="bg-bg border border-line hover:border-cyan text-text text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
+              >
+                Start Anew
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTrackId(activeTrack.id);
+                  onNavigate('track-detail');
+                }}
+                className="bg-cyan hover:bg-cyan2 text-bg font-semibold px-5 py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-colors cursor-pointer"
+              >
+                <span>Review track</span>
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => {
+                setActiveTrackId(activeTrack.id);
+                onNavigate('track-detail');
+              }}
+              className="bg-cyan hover:bg-cyan2 text-bg font-semibold px-5 py-2.5 rounded-xl flex items-center justify-center space-x-2 transition-colors cursor-pointer"
+            >
+              <Play className="w-4 h-4 fill-current" />
+              <span>Continue track</span>
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -101,7 +123,7 @@ export const ContinueYourTrackCard: React.FC<ContinueYourTrackCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const allActiveEntries = Object.values(progressMap).filter(
-    p => p.enrolledAt && !p.completedAt
+    p => p.enrolledAt
   ).sort((a, b) => {
     const aTime = a.enrolledAt ? new Date(a.enrolledAt).getTime() : 0;
     const bTime = b.enrolledAt ? new Date(b.enrolledAt).getTime() : 0;

@@ -246,7 +246,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
       {/* Compact Header */}
       <div className="flex items-center space-x-4 pb-4 border-b border-line/50 shrink-0">
         <button 
-          onClick={() => onNavigate('course-detail')}
+          onClick={() => onNavigate('back')}
           className="p-2 rounded-lg border border-line bg-panel hover:bg-bg transition-all"
         >
           <ArrowLeft className="w-4 h-4 text-text" />

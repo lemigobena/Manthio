@@ -245,7 +245,7 @@ export const DashboardEmptyTemplate: React.FC<{ onNavigate: (p: string) => void 
                     <div>
                       {/* Header Image */}
                       <div className="h-32 relative bg-bg overflow-hidden border-b border-line">
-                        <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover opacity-85 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700" />
+                        <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover opacity-100 group-hover:scale-110 transition-all duration-700" />
                         <div className="absolute inset-0 bg-gradient-to-t from-bg/60 via-transparent to-transparent opacity-60" />
                         <div className="absolute top-2 left-2 flex flex-wrap gap-1">
                           <span className="bg-bg/40 backdrop-blur-md border border-white/20 text-[9px] px-2 py-0.5 rounded font-bold uppercase text-white">
