@@ -4,8 +4,11 @@ import { isCourseCompleted, calculateTrackProgress } from '../../services/progre
 import type { Course, SelfAssessmentLevel, UserTrackProgress, CareerTrack } from '../../types';
 import { TrackContext } from './TrackContextStore';
 
-const TRACK_STORAGE_KEY = 'track_progress_v2';
-const LESSON_STORAGE_KEY = 'lesson_progress_v2';
+// Force-clean stale HMR-polluted localStorage keys
+['track_progress_v3','track_progress_v4','track_progress_v5','track_progress_v6'].forEach(k => localStorage.removeItem(k));
+
+const TRACK_STORAGE_KEY = 'track_progress_v7';
+const LESSON_STORAGE_KEY = 'lesson_progress_v3';
 
 function loadTrackProgress(): Record<string, UserTrackProgress> {
   try {
@@ -18,7 +21,15 @@ function loadTrackProgress(): Record<string, UserTrackProgress> {
           enrolledAt: new Date(Date.now()),
           completedAt: null,
           selfAssessmentLevel: 'nothing',
-          completedMilestoneIds: [],
+          completedMilestoneIds: [
+            'py-mile-1-python-bootcamp',
+            'py-mile-1-test-course',
+            'py-mile-2-git-version-control',
+            'py-mile-2-git-essentials',
+            'py-mile-3-advanced-python',
+            'py-mile-3-fastapi-backend',
+            'py-mile-3-apache-spark-basics'
+          ],
           bookmarkedAt: null,
         },
         'cloud-devops-engineer': {
@@ -28,6 +39,28 @@ function loadTrackProgress(): Record<string, UserTrackProgress> {
           completedAt: null,
           selfAssessmentLevel: 'nothing',
           completedMilestoneIds: [],
+          bookmarkedAt: null,
+        },
+        'fullstack-javascript': {
+          userId: 'u1',
+          trackId: 'fullstack-javascript',
+          enrolledAt: new Date(Date.now()),
+          completedAt: null,
+          selfAssessmentLevel: 'nothing',
+          completedMilestoneIds: ['fs-mile-1-advanced-python'],
+          bookmarkedAt: null,
+        },
+        'web-development-basics': {
+          userId: 'u1',
+          trackId: 'web-development-basics',
+          enrolledAt: new Date(Date.now() - 10000000),
+          completedAt: new Date(Date.now() - 5000000),
+          selfAssessmentLevel: 'nothing',
+          completedMilestoneIds: [
+            'web-mile-1-command-line-basics',
+            'web-mile-2-git-essentials',
+            'web-mile-3-linux-administration'
+          ],
           bookmarkedAt: null,
         }
       };
@@ -98,6 +131,14 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }));
   }, [updateTrack]);
 
+  const restartTrack = useCallback((trackId: string) => {
+    updateTrack(trackId, prev => ({
+      ...prev,
+      completedAt: null,
+      completedMilestoneIds: [],
+    }));
+  }, [updateTrack]);
+
   const setSelfAssessment = useCallback((trackId: string, level: SelfAssessmentLevel) => {
     updateTrack(trackId, prev => ({ ...prev, selfAssessmentLevel: level }));
   }, [updateTrack]);
@@ -152,6 +193,7 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [progressMap]);
 
   const getTrackPercentage = useCallback((track: CareerTrack) => {
+    if (track.progress === 100) return 100;
     return calculateTrackProgress(track as unknown as CareerTrack, COURSES as unknown as Course[], completedLessonIds);
   }, [completedLessonIds]);
 
@@ -166,6 +208,7 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       completedLessonIds,
       enrollInTrack,
       bookmarkTrack,
+      restartTrack,
       setSelfAssessment,
       completeMilestone,
       completeLesson,

@@ -54,6 +54,7 @@ const MainApp: React.FC = () => {
     if (!isAuthenticated) return 'explore';
     return isOnboardingCompleted ? 'dashboard' : 'onboarding';
   });
+  const [history, setHistory] = useState<string[]>([]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -65,6 +66,18 @@ const MainApp: React.FC = () => {
 
   const handleNavigate = (target: string) => {
     console.log("App Navigation Triggered:", target);
+    if (target === 'back') {
+      if (history.length > 0) {
+        const newHistory = [...history];
+        const previousPage = newHistory.pop()!;
+        setHistory(newHistory);
+        setCurrentPage(previousPage);
+      } else {
+        setCurrentPage(isAuthenticated ? 'dashboard' : 'explore');
+      }
+      return;
+    }
+    setHistory(prev => [...prev, currentPage]);
     setCurrentPage(target);
   };
 

@@ -964,7 +964,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               <div>
                 {/* Header Image */}
                 <div className="h-44 relative bg-bg overflow-hidden border-b border-line">
-                  <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover opacity-85 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700" />
+                  <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover opacity-100 group-hover:scale-110 transition-all duration-700" />
                   <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                   <div className="absolute top-3 left-3 flex flex-wrap gap-2">
                     <span className="bg-bg/40 backdrop-blur-md border border-white/20 text-[10px] px-2.5 py-1 rounded font-bold uppercase text-white shadow-sm">
@@ -1041,7 +1041,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               <div>
                 {/* Header Image */}
                 <div className="h-44 relative bg-bg overflow-hidden border-b border-line">
-                  <img src={track.imageUrl} alt={track.title} className="w-full h-full object-cover opacity-85 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700" />
+                  <img src={track.imageUrl} alt={track.title} className="w-full h-full object-cover opacity-100 group-hover:scale-110 transition-all duration-700" />
                   <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                   <div className="absolute top-3 left-3 flex flex-wrap gap-2">
                     <span className="bg-bg/40 backdrop-blur-md border border-white/20 text-[10px] px-2.5 py-1 rounded font-bold uppercase text-white shadow-sm">

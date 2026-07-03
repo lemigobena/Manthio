@@ -6,6 +6,7 @@ interface TrackContextType {
   completedLessonIds: string[];
   enrollInTrack: (trackId: string) => void;
   bookmarkTrack: (trackId: string) => void;
+  restartTrack: (trackId: string) => void;
   setSelfAssessment: (trackId: string, level: SelfAssessmentLevel) => void;
   completeMilestone: (trackId: string, milestoneId: string) => void;
   completeLesson: (lessonId: string) => void;

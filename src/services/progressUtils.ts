@@ -51,20 +51,22 @@ export function calculateCourseProgress(course: Course, completedLessonIds: stri
  * Calculates the progress percentage for a career track based on its constituent courses.
  * Only non-optional courses are factored into the global track percentage logic.
  */
-export function calculateTrackProgress(track: Track, allCourses: Course[], completedLessonIds: string[]): number {
-  const trackCourseIds = track.milestones.flatMap(ms => 
-    ms.courses.filter(c => !c.isOptional).map(c => c.id)
-  );
+export function calculateTrackProgress(track: any, allCourses: Course[], completedLessonIds: string[]): number {
+  const trackCourseIds = track.milestones?.flatMap((ms: any) =>
+    ms.courses.filter((c: any) => !c.isOptional).map((c: any) => c.id)
+  ) || [];
 
-  if (trackCourseIds.length === 0) return 0;
+  if (trackCourseIds.length === 0) return track.progress || 0;
 
   const relevantCourses = allCourses.filter(c => trackCourseIds.includes(c.id));
-  const allLessons = relevantCourses.flatMap(c => c.modules.flatMap(m => m.lessons));
+  const allLessons = relevantCourses.flatMap(c => c.modules?.flatMap(m => m.lessons) || []);
 
-  if (allLessons.length === 0) return 0;
+  if (allLessons.length === 0) return track.progress || 0;
 
   const completedCount = allLessons.filter(l => completedLessonIds.includes(l.id)).length;
-  return Math.round((completedCount / allLessons.length) * 100);
+  const calculated = Math.round((completedCount / allLessons.length) * 100);
+  
+  return Math.max(track.progress || 0, calculated);
 }
 
 /**

@@ -674,7 +674,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
             <div className="lg:col-span-2 space-y-6">
               
               {/* ── Continue Your Track Card (REQ-TRACK-010) ── */}
-              <ContinueYourTrackCard onNavigate={onNavigate} setActiveTrackId={setActiveTrackId} forceNoTrack={heroState === 'pre-cohort' || heroState === 'all-completed'} />
+              <ContinueYourTrackCard onNavigate={onNavigate} setActiveTrackId={setActiveTrackId} forceNoTrack={heroState === 'pre-cohort'} />
 
               {/* Active Course Card (Continue Learning CTA) */}
               {activeCourse && heroState !== 'all-completed' && (

@@ -132,7 +132,7 @@ export const SelfAssessmentStrip: React.FC<SelfAssessmentStripProps> = ({
         
         {!showQuiz && (
           <div className="text-[10px] font-bold text-muted">
-            not sure? <button onClick={() => setShowQuiz(true)} className="text-cyan hover:underline cursor-pointer">Find out here</button>
+            Not sure? <button onClick={() => setShowQuiz(true)} className="text-cyan hover:underline cursor-pointer">Find out here</button>
           </div>
         )}
       </div>

@@ -53,8 +53,6 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
   const displayAsEnrolled = !isAuthenticated ? true : isEnrolled;
   const isBookmarked = !!(progress?.bookmarkedAt);
   const selfLevel = progress?.selfAssessmentLevel ?? 'nothing';
-  const completedMilestoneIds = progress?.completedMilestoneIds ?? [];
-
   // Build the milestones in the new extended format
   // The existing CareerTrack milestones use {id, title, courses[], status}
   // We map to our visual path format
@@ -87,10 +85,19 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
   );
 
   const totalMilestones = mappedMilestones.filter(m => !m.isOptional).length;
+  const isMockCompleted = track.progress === 100;
+  const completedMilestoneIds = isMockCompleted 
+    ? mappedMilestones.map(m => m.id) 
+    : (progress?.completedMilestoneIds ?? []);
+  
+  
   const completedRequired = mappedMilestones.filter(m => !m.isOptional && completedMilestoneIds.includes(m.id)).length;
+  const isCompletedTrack = isMockCompleted || completedRequired === totalMilestones;
   
   // REQ-PROGRESS-002: Dynamic track progress based on lessons
-  const progressPct = calculateTrackProgress(track as unknown as CareerTrack, COURSES as unknown as Course[], completedLessonIds);
+  const progressPct = isCompletedTrack 
+    ? 100 
+    : calculateTrackProgress(track as unknown as CareerTrack, COURSES as unknown as Course[], completedLessonIds);
 
   const [showEnrollConfirm, setShowEnrollConfirm] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(false);
@@ -259,12 +266,16 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
                     }
                     // Navigate to first uncompleted milestone's course
                     const next = mappedMilestones.find(m => !completedMilestoneIds.includes(m.id) && m.courseId);
-                    if (next?.courseId) handleNavigateToCourse(next.courseId, 'learning-path');
+                    if (next?.courseId) {
+                      handleNavigateToCourse(next.courseId, 'learning-path');
+                    } else if (mappedMilestones[0]?.courseId) {
+                      handleNavigateToCourse(mappedMilestones[0].courseId, 'learning-path');
+                    }
                   }}
                   className="relative overflow-hidden group bg-cyan hover:bg-cyan2 text-bg font-black text-sm px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(0,245,228,0.25)] hover:shadow-[0_6px_30px_rgba(0,245,228,0.4)] hover:translate-y-[-2px] flex items-center gap-2"
                 >
                   <Zap className="w-4 h-4 fill-current" />
-                  Continue Learning
+                  {completedRequired === totalMilestones ? 'Review Track' : 'Continue Learning'}
                   <div className="absolute inset-0 bg-white/15 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
                 </button>
               ) : (
@@ -273,7 +284,7 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
                   className="relative overflow-hidden group bg-cyan hover:bg-cyan2 text-bg font-black text-sm px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(0,245,228,0.25)] hover:shadow-[0_6px_30px_rgba(0,245,228,0.4)] hover:translate-y-[-2px] flex items-center gap-2"
                 >
                   <Award className="w-4 h-4" />
-                  Start Your Journey
+                  {isCompletedTrack ? 'Start A New' : 'Start Your Journey'}
                   <div className="absolute inset-0 bg-white/15 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
                 </button>
               )}
@@ -313,17 +324,19 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
         )}
 
         {/* ── Self-Assessment Strip ── */}
-        <SelfAssessmentStrip
-          currentLevel={selfLevel}
-          onChange={(level) => {
-            if (!isAuthenticated) {
-              onNavigate('signin');
-              return;
-            }
-            setSelfAssessment(track.id, level);
-          }}
-          isEnrolled={displayAsEnrolled}
-        />
+        {!isCompletedTrack && (
+          <SelfAssessmentStrip
+            currentLevel={selfLevel}
+            onChange={(level) => {
+              if (!isAuthenticated) {
+                onNavigate('signin');
+                return;
+              }
+              setSelfAssessment(track.id, level);
+            }}
+            isEnrolled={displayAsEnrolled}
+          />
+        )}
 
         {/* ── Visual Path (REQ-TRACK-001) ── */}
         <div className="py-6 space-y-12">
@@ -385,18 +398,18 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
                     // Already on track-detail, just reload
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className="group bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/40 transition-all text-left hover:shadow-xl hover:translate-y-[-2px] duration-300"
+                  className="group flex flex-col min-h-[260px] bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/40 transition-all text-left hover:shadow-xl hover:translate-y-[-2px] duration-300"
                 >
-                  <div className="h-28 overflow-hidden relative">
-                    <img src={sibling.imageUrl} alt={sibling.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-panel via-transparent to-transparent" />
+                  <div className="h-36 w-full shrink-0 overflow-hidden relative">
+                    <img src={sibling.imageUrl} alt={sibling.title} className="w-full h-full object-cover opacity-100 group-hover:scale-105 transition-all duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-panel via-transparent to-transparent opacity-80" />
                   </div>
-                  <div className="p-4 space-y-1.5">
-                    <h4 className="font-black text-sm text-text group-hover:text-cyan transition-colors line-clamp-1">{sibling.title}</h4>
-                    <p className="text-[10px] text-muted line-clamp-2 leading-relaxed">{sibling.outcomeStatement}</p>
-                    <div className="flex items-center gap-3 text-[10px] text-muted font-bold pt-1">
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-cyan" />{sibling.estimatedTime}</span>
-                      <span className="flex items-center gap-1"><Lock className="w-3 h-3 text-cyan" />{sibling.level}</span>
+                  <div className="p-4 flex-1 flex flex-col space-y-2">
+                    <h4 className="font-black text-sm text-text group-hover:text-cyan transition-colors line-clamp-2">{sibling.title}</h4>
+                    <p className="text-[11px] text-muted line-clamp-3 leading-relaxed flex-1">{sibling.outcomeStatement}</p>
+                    <div className="flex items-center gap-3 text-[10px] text-muted font-bold pt-2 mt-auto border-t border-line/50">
+                      <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-cyan" />{sibling.estimatedTime}</span>
+                      <span className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5 text-cyan" />{sibling.level}</span>
                     </div>
                   </div>
                 </button>
