@@ -3,6 +3,7 @@ import { COURSES } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { useModal } from '../../context/ModalContext';
+import { useTrack } from '../track-detail/useTrack';
 import type { Lesson, Course } from '../../types';
 
 // Components
@@ -32,6 +33,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
   const { activeCourseId } = useAuth();
   const { addXp, addToast } = useXP();
   const { openModal } = useModal();
+  const { completeLesson } = useTrack();
   
   // Find current course and module
   const [course, setCourse] = useState<Course>(() => {
@@ -171,6 +173,8 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
         }
         return newCourse;
       });
+
+      completeLesson(currentLesson.id);
 
       // Update current lesson ref so UI re-renders status
       setCurrentLesson(prev => ({ ...prev, status: 'completed' }));

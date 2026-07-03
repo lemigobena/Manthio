@@ -119,7 +119,7 @@ interface CatalogProps {
 }
 
 export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
-  const { setActiveCourseId, setActiveTrackId } = useAuth();
+  const { setActiveCourseId, setActiveTrackId, saveEnrollments } = useAuth();
   const { addToast } = useXP();
   const { getTrackPercentage } = useTrack();
   const [discoveryMode, setDiscoveryMode] = useState<'courses' | 'tracks'>(() => {
@@ -737,6 +737,8 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                     } else if (course.enrolled) {
                       onNavigate('learning-path');
                     } else if (course.priceStatus === 'included' || course.priceStatus === 'employer') {
+                      course.enrolled = true;
+                      saveEnrollments();
                       addToast('success', `🎓 Enrolled in ${course.title} — access granted via ${course.priceStatus === 'included' ? 'your plan' : 'your employer'}.`);
                       onNavigate('learning-path');
                     } else {

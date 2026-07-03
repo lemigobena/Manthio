@@ -19,14 +19,21 @@ export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [agree, setAgree] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
-
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
-    // Explicitly navigate without constraints
-    const fullName = `${firstName || 'Alex'} ${lastName || 'Chen'}`.trim();
-    await signUp(fullName, email || 'newuser@example.com', password || 'password');
+
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
+      setError('Please fill in all fields.');
+      setIsLoading(false);
+      return;
+    }
+
+    const fullName = `${firstName.trim()} ${lastName.trim()}`;
+    await signUp(fullName, email, password);
     // Add artificial delay for loading state
     await new Promise(resolve => setTimeout(resolve, 800));
     setIsLoading(false);
@@ -88,6 +95,12 @@ export const SignUp: React.FC<SignUpProps> = ({ onNavigate }) => {
         </div>
         
         <PasswordStrengthMeter password={password} />
+
+        {error && (
+          <div className="text-red text-xs font-semibold px-1 animate-in fade-in duration-200">
+            {error}
+          </div>
+        )}
 
         <div className="space-y-4 pt-2">
           {/* Custom Modern Checkbox: Terms */}

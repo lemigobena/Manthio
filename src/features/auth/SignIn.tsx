@@ -17,13 +17,20 @@ export const SignIn: React.FC<SignInProps> = ({ onNavigate }) => {
   const [show2FA, setShow2FA] = useState(false);
   const [twoFaCode, setTwoFaCode] = useState('');
   const { is2FAEnabled } = useAuth();
-
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
-    // Explicitly navigate without constraints
-    const success = await signIn(email || 'demo@example.com', password || 'password');
+
+    if (!email.trim() || !password.trim()) {
+      setError('Please fill in all fields.');
+      setIsLoading(false);
+      return;
+    }
+
+    const success = await signIn(email, password);
     // Add artificial delay for loading state
     await new Promise(resolve => setTimeout(resolve, 800));
     setIsLoading(false);
@@ -34,6 +41,8 @@ export const SignIn: React.FC<SignInProps> = ({ onNavigate }) => {
       } else {
         onNavigate('dashboard');
       }
+    } else {
+      setError('Invalid email or password.');
     }
   };
 
@@ -117,6 +126,12 @@ export const SignIn: React.FC<SignInProps> = ({ onNavigate }) => {
           </button>
         </div>
 
+        {error && (
+          <div className="text-red text-xs font-semibold px-1 animate-in fade-in duration-200">
+            {error}
+          </div>
+        )}
+
         <div className="flex justify-between pt-1 items-center">
           <label className="flex items-center gap-3.5 group cursor-pointer">
             <div className="relative ml-[2px]">
@@ -153,7 +168,7 @@ export const SignIn: React.FC<SignInProps> = ({ onNavigate }) => {
 
         <button 
           type="submit" 
-          disabled={isLoading}
+          disabled={isLoading || (!email.trim() || !password.trim())}
           className="w-full bg-cyan hover:bg-cyan2 text-bg font-bold py-[0.875rem] rounded-xl transition-all disabled:opacity-50 mt-4 shadow-lg shadow-cyan/10 text-sm active:scale-[0.98] cursor-pointer"
         >
           {isLoading ? "Signing in..." : "Log in"}

@@ -45,22 +45,73 @@ const calculateLevelFromXp = (xpVal: number) => {
 
 let toastIdCounter = 0;
 
+import { useAuth } from './AuthContext';
+
 export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [xp, setXp] = useState(() => {
-    const val = Number(localStorage.getItem('xp'));
-    return isNaN(val) ? 42500 : val;
-  });
-  const [streak, setStreak] = useState(() => Number(localStorage.getItem('streak') || '12'));
-  const [streakFreezeAvailable, setStreakFreezeAvailable] = useState(() => localStorage.getItem('streakFreezeAvailable') !== 'false');
+  const { user } = useAuth();
+  
+  const [xp, setXp] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [streakFreezeAvailable, setStreakFreezeAvailable] = useState(true);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
   
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [celebrationActive, setCelebrationActive] = useState(false);
   const [levelUpTo, setLevelUpTo] = useState<number | null>(null);
 
+  // Synchronize loading and user profile switching
+  useEffect(() => {
+    const email = user ? user.email : 'guest';
+    if (email === currentUserEmail) return;
+
+    const xpKey = `xp_${email}`;
+    const streakKey = `streak_${email}`;
+    const freezeKey = `streakFreezeAvailable_${email}`;
+
+    let savedXp = localStorage.getItem(xpKey);
+    let savedStreak = localStorage.getItem(streakKey);
+    let savedFreeze = localStorage.getItem(freezeKey);
+
+    if (savedXp === null && user) {
+      savedXp = String(user.xp);
+      savedStreak = String(user.streak);
+      savedFreeze = String(user.streakFreezeAvailable);
+      localStorage.setItem(xpKey, savedXp);
+      localStorage.setItem(streakKey, savedStreak);
+      localStorage.setItem(freezeKey, savedFreeze);
+    }
+
+    setXp(savedXp ? Number(savedXp) : 0);
+    setStreak(savedStreak ? Number(savedStreak) : 0);
+    setStreakFreezeAvailable(savedFreeze !== 'false');
+    setCurrentUserEmail(email);
+  }, [user, currentUserEmail]);
+
+  // Persist User-Specific XP safely
+  useEffect(() => {
+    const email = user ? user.email : 'guest';
+    if (email !== currentUserEmail) return;
+    localStorage.setItem(`xp_${email}`, xp.toString());
+  }, [xp, user, currentUserEmail]);
+
+  // Persist User-Specific Streak safely
+  useEffect(() => {
+    const email = user ? user.email : 'guest';
+    if (email !== currentUserEmail) return;
+    localStorage.setItem(`streak_${email}`, streak.toString());
+  }, [streak, user, currentUserEmail]);
+
+  // Persist User-Specific Streak Freeze safely
+  useEffect(() => {
+    const email = user ? user.email : 'guest';
+    if (email !== currentUserEmail) return;
+    localStorage.setItem(`streakFreezeAvailable_${email}`, String(streakFreezeAvailable));
+  }, [streakFreezeAvailable, user, currentUserEmail]);
+
   // Derive Level and progress from XP
-  // REQ-LEVEL-002 XP required per level follows a curve: Level N requires 10,000 * (1 + 0.1 * N) XP.
   const { level, currentXpInLevel, xpNeededForNextLevel } = calculateLevelFromXp(xp);
 
+  // Maintain global keys for other parts of the app to read
   useEffect(() => {
     localStorage.setItem('level', level.toString());
     localStorage.setItem('xp', xp.toString());
@@ -85,7 +136,6 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const incrementStreak = () => {
     setStreak(prev => {
       const next = prev + 1;
-      localStorage.setItem('streak', next.toString());
       return next;
     });
   };
@@ -93,7 +143,6 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const useStreakFreeze = () => {
     if (streakFreezeAvailable) {
       setStreakFreezeAvailable(false);
-      localStorage.setItem('streakFreezeAvailable', 'false');
       addToast('info', 'Streak freeze applied for today!');
       return true;
     }

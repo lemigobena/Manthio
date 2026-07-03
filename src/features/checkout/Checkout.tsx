@@ -44,7 +44,7 @@ interface CheckoutProps {
 }
 
 export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
-  const { activeCourseId, selectedFormat, checkoutItem } = useAuth();
+  const { activeCourseId, selectedFormat, checkoutItem, saveEnrollments } = useAuth();
   const { addXp } = useXP();
   const { enrollInTrack } = useTrack();
   const [step, setStep] = useState<'checkout' | 'processing' | 'success' | 'failed' | 'get-ready'>('checkout');
@@ -86,6 +86,10 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
         enrollInTrack(track.id);
         addXp(1000, 'Career Track Enrollment');
       } else {
+        if (course) {
+          course.enrolled = true;
+          saveEnrollments();
+        }
         addXp(500, 'Course Booking Achievement');
       }
       setStep('success');

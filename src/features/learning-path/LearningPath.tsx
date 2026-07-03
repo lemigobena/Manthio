@@ -79,7 +79,7 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
   };
   
   const course = COURSES.find(c => c.id === activeCourseId) || COURSES[0];
-  const displayedProgress = course.id === 'python-bootcamp' ? 46 : calculateCourseProgress(course as Course, completedLessonIds);
+  const displayedProgress = calculateCourseProgress(course as Course, completedLessonIds);
 
   const getRemainingTime = (mod: typeof course.modules[0]) => {
     const incomplete = mod.lessons.filter(l => !completedLessonIds.includes(l.id));

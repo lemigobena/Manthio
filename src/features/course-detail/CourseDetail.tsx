@@ -19,7 +19,7 @@ const MOCK_DATES = {
 };
 
 export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic }) => {
-  const { activeCourseId, activeTrackId, selectedFormat, setSelectedFormat, setActiveCourseId, setActiveTrackId } = useAuth();
+  const { activeCourseId, activeTrackId, selectedFormat, setSelectedFormat, setActiveCourseId, setActiveTrackId, saveEnrollments } = useAuth();
   const { addToast } = useXP();
   const { getTrackPercentage, completedLessonIds } = useTrack();
   const [visibleReviews, setVisibleReviews] = useState(3);
@@ -73,6 +73,10 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
     // Direct access for included or employer sponsored courses
     if (course?.priceStatus === 'included' || course?.priceStatus === 'employer') {
       const bundleInfo = activeBundle ? ` + ${activeBundle.durationMonths}m ${activeBundle.label} activated!` : '';
+      if (course) {
+        course.enrolled = true;
+        saveEnrollments();
+      }
       addToast('success', `🎓 Enrolled in ${displayTitle}— access via ${course.priceStatus === 'included' ? 'your plan' : 'your employer'}.${bundleInfo}`);
       onNavigate('learning-path');
       return;
