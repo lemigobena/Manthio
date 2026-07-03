@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   ZoomIn, ZoomOut, Download, Search, 
-  MessageSquare, Plus, ChevronLeft, 
+Plus, ChevronLeft, 
   ChevronRight, X, FileText
 } from 'lucide-react';
 import { NotesManager } from '../../../components/modules/NotesManager';
@@ -143,7 +143,7 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson, onClose }) => 
               onClick={() => setIsNotesOpen(!isNotesOpen)}
               className={`p-2 rounded-xl transition-all relative ${isNotesOpen ? 'bg-cyan text-bg shadow-lg shadow-cyan/20' : 'bg-panel border border-line text-muted hover:text-text'}`}
             >
-              <MessageSquare className="w-4 h-4" />
+              <FileText className="w-4 h-4" />
             </button>
             <div className="h-6 w-px bg-line hidden sm:block" />
             <div className="hidden sm:flex items-center bg-panel border border-line rounded-xl p-0.5">
@@ -156,7 +156,7 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson, onClose }) => 
               <a 
                 href={lesson.contentUrl || "/Manthio_Learner_Frontend_Requirements.pdf"} 
                 download 
-                className="p-2 bg-text text-bg rounded-xl hover:scale-105 transition-all shadow-md"
+                className="p-2 bg-panel border border-line rounded-xl hover:scale-105 transition-all shadow-md"
               >
                 <Download className="w-4 h-4" />
               </a>
@@ -250,15 +250,6 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson, onClose }) => 
         {/* Integrated High-Fidelity Notes & Bookmarks Manager */}
         {isNotesOpen && (
           <div className="absolute top-0 right-0 bottom-0 w-full sm:w-80 bg-panel/95 backdrop-blur-2xl border-l border-line z-40 flex flex-col shadow-[-10px_0_50px_rgba(0,245,228,0.2)]">
-            <div className="absolute top-4 right-4 z-[50]">
-              <button 
-                onClick={() => setIsNotesOpen(false)}
-                className="p-2 hover:bg-bg rounded-lg text-muted transition-colors"
-                title="Collapse Vault"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
             <NotesManager 
               courseId={lesson.id} 
               currentAnchor={{ type: 'page', value: currentPage }} 
@@ -267,6 +258,7 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson, onClose }) => 
                   jumpToPage(anchor.value);
                 }
               }}
+              onClose={() => setIsNotesOpen(false)}
             />
           </div>
         )}

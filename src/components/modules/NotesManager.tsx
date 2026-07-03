@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
-  MessageSquare, Bookmark, Plus, Search, 
+  Bookmark, Plus, Search, 
   Trash2, ChevronRight, Clock, 
   Download, ExternalLink, Save, 
-  FileText, Tag
+  FileText, Tag, X
 } from 'lucide-react';
 import { useXP } from '../../context/XPContext';
 
@@ -36,12 +36,14 @@ interface NotesManagerProps {
   courseId: string;
   currentAnchor?: NoteAnchor;
   onJumpToAnchor?: (anchor: NoteAnchor) => void;
+  onClose?: () => void;
 }
 
 export const NotesManager: React.FC<NotesManagerProps> = ({ 
   courseId, 
   currentAnchor,
-  onJumpToAnchor 
+  onJumpToAnchor,
+  onClose
 }) => {
   const { addToast } = useXP();
   const [activeTab, setActiveTab] = useState<'notes' | 'bookmarks'>('notes');
@@ -168,29 +170,40 @@ export const NotesManager: React.FC<NotesManagerProps> = ({
   return (
     <div className="flex flex-col h-full bg-bg/80 border-l border-line shadow-2xl backdrop-blur-3xl animate-in slide-in-from-right duration-500">
       {/* Header */}
-      <div className="p-5 border-b border-line flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-cyan/10 rounded-xl">
-            <MessageSquare className="w-4 h-4 text-cyan" />
+      <div className="p-5 border-b border-line flex items-center justify-between gap-2">
+        <div className="flex items-center space-x-2 min-w-0">
+          <div className="p-1.5 bg-cyan/10 rounded-xl shrink-0">
+            <FileText className="w-4 h-4 text-cyan" />
           </div>
-          <div>
-            <h3 className="font-bold text-sm tracking-tight text-text">Cognitive Vault</h3>
-            <p className="text-[10px] text-muted uppercase font-bold tracking-widest">Ensemble Notes</p>
+          <div className="min-w-0">
+            <h3 className="font-bold text-sm tracking-tight text-text truncate">Cognitive Vault</h3>
+            <p className="text-[9px] text-muted uppercase font-bold tracking-widest truncate">Ensemble Notes</p>
           </div>
         </div>
-        <div className="flex space-x-1">
-          <button 
-            onClick={() => setActiveTab('notes')}
-            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${activeTab === 'notes' ? 'bg-cyan text-bg shadow-md shadow-cyan/20' : 'hover:bg-bg/50 text-muted'}`}
-          >
-            Insights
-          </button>
-          <button 
-            onClick={() => setActiveTab('bookmarks')}
-            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${activeTab === 'bookmarks' ? 'bg-cyan text-bg shadow-md shadow-cyan/20' : 'hover:bg-bg/50 text-muted'}`}
-          >
-            Markers
-          </button>
+        <div className="flex items-center space-x-2 shrink-0">
+          <div className="flex space-x-1">
+            <button 
+              onClick={() => setActiveTab('notes')}
+              className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all border ${activeTab === 'notes' ? 'bg-cyan text-bg border-cyan shadow-md shadow-cyan/20' : 'bg-transparent border-cyan/30 text-cyan hover:bg-cyan/10 hover:border-cyan/50'}`}
+            >
+              Insights
+            </button>
+            <button 
+              onClick={() => setActiveTab('bookmarks')}
+              className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all border ${activeTab === 'bookmarks' ? 'bg-cyan text-bg border-cyan shadow-md shadow-cyan/20' : 'bg-transparent border-cyan/30 text-cyan hover:bg-cyan/10 hover:border-cyan/50'}`}
+            >
+              Bookmarks
+            </button>
+          </div>
+          {onClose && (
+            <button 
+              onClick={onClose}
+              className="border border-red/50 p-1.5 rounded-lg text-red hover:bg-red/10 transition-all shrink-0"
+              title="Close Vault"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -222,7 +235,7 @@ export const NotesManager: React.FC<NotesManagerProps> = ({
             className="w-full py-2.5 border-2 border-dashed border-line rounded-xl text-[10px] font-bold uppercase tracking-widest text-muted hover:border-cyan/40 hover:text-cyan transition-all flex items-center justify-center space-x-2 disabled:opacity-30 disabled:pointer-events-none"
           >
             <Bookmark className="w-3.5 h-3.5" />
-            <span>Place Neural Marker</span>
+            <span>Place Bookmark</span>
           </button>
         )}
       </div>
@@ -267,20 +280,21 @@ export const NotesManager: React.FC<NotesManagerProps> = ({
 
             <input 
               type="text" 
+              autoFocus
               value={noteTitle}
               onChange={(e) => setNoteTitle(e.target.value)}
               className="w-full bg-transparent border-b border-line py-2 text-sm font-bold text-text !outline-none focus:outline-none focus:border-cyan placeholder:text-muted/30 shrink-0"
               placeholder="Insight Designation..."
             />
 
-            <div className="flex items-center space-x-2 shrink-0">
+            <div className="flex items-center space-x-2 shrink-0 border-b border-line focus-within:border-cyan transition-colors py-2">
               <Tag className="w-3.5 h-3.5 text-muted" />
-              <input 
+              <input
                 type="text"
                 placeholder="Add tags (comma separated)..."
                 value={noteTags.join(', ')}
                 onChange={(e) => setNoteTags(e.target.value.split(',').map(t => t.trim()).filter(t => t))}
-                className="bg-transparent text-[10px] font-bold text-cyan uppercase placeholder:text-muted/30 focus:outline-none !outline-none"
+                className="flex-1 bg-transparent text-[10px] font-bold text-cyan uppercase placeholder:text-muted/30 focus:outline-none !outline-none"
               />
             </div>
 
@@ -292,7 +306,6 @@ export const NotesManager: React.FC<NotesManagerProps> = ({
               <textarea 
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
-                autoFocus
                 placeholder="Capture your thoughts... Use # for headings and ``` for code."
                 className="flex-1 w-full bg-bg border border-line rounded-2xl p-4 text-[11px] text-text focus:outline-none focus:border-cyan transition-all resize-none shadow-inner overflow-y-auto overscroll-contain !outline-none"
               />
@@ -313,7 +326,7 @@ export const NotesManager: React.FC<NotesManagerProps> = ({
                     setNoteTags(note.tags);
                     setIsPreview(false);
                   }}
-                  className="group p-4 bg-bg border border-line rounded-2xl hover:border-cyan/40 transition-all cursor-pointer relative overflow-hidden"
+                  className="group p-4 bg-bg border border-line rounded-2xl hover:border-cyan/40 transition-all relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
@@ -332,26 +345,32 @@ export const NotesManager: React.FC<NotesManagerProps> = ({
                     {note.content || 'Zero data recorded...'}
                   </p>
 
-                  <div className="flex items-center justify-between text-[9px] text-muted/60 font-bold">
-                    <div className="flex items-center space-x-2">
-                      <Clock className="w-3 h-3" />
-                      <span>{new Date(note.updatedAt).toLocaleDateString()}</span>
-                    </div>
-                    {note.anchor && (
-                       <div className="flex items-center space-x-1 text-cyan/70">
-                          <ExternalLink className="w-3 h-3" />
-                          <span className="uppercase tracking-tighter">{note.anchor.type} {note.anchor.value}</span>
-                       </div>
-                    )}
-                  </div>
-                  
                   {note.tags.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-1">
+                    <div className="mb-3 flex flex-wrap gap-1">
                       {note.tags.map((tag, idx) => (
                         <span key={idx} className="bg-cyan/10 text-cyan text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest">{tag}</span>
                       ))}
                     </div>
                   )}
+
+                  <div className="flex items-center justify-between text-[9px] text-muted/60 font-bold pt-2 mt-2 border-t border-line/50">
+                    <div className="flex items-center space-x-2">
+                      <Clock className="w-3 h-3" />
+                      <span>{new Date(note.updatedAt).toLocaleDateString()}</span>
+                    </div>
+                    {note.anchor && (
+                       <div 
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           onJumpToAnchor?.(note.anchor!);
+                         }}
+                         className="text-[10px] flex items-center space-x-1 text-cyan/70 cursor-pointer hover:text-cyan transition-colors"
+                       >
+                          <span className="uppercase tracking-tighter font-bold">{note.anchor.type} {note.anchor.value}</span>
+                          <ExternalLink className="w-3 h-3" />
+                       </div>
+                    )}
+                  </div>
                 </div>
               ))}
               {filteredNotes.length === 0 && (
@@ -394,8 +413,8 @@ export const NotesManager: React.FC<NotesManagerProps> = ({
                      <Bookmark className="w-8 h-8" />
                   </div>
                   <div className="space-y-1">
-                    <p className="font-bold text-xs uppercase tracking-widest text-text">No active markers</p>
-                    <p className="text-[10px] text-muted">Place markers to jump between neural clusters.</p>
+                    <p className="font-bold text-xs uppercase tracking-widest text-text">No active bookmarks</p>
+                    <p className="text-[10px] text-muted">Place bookmarks to jump between neural clusters.</p>
                   </div>
                 </div>
               )}
