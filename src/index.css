@@ -18,6 +18,7 @@
   --red: #FF5561;
   --green: #2BDE7E;
   --orange: #FF8C42;
+  --scrollbar-hover: #243340;
   
   --font-display: 'Syne', sans-serif;
   --font-sans: 'DM Sans', sans-serif;
@@ -25,6 +26,7 @@
 }
 
 [data-theme='light'] {
+  color-scheme: light;
   /* Light Mode (sand-toned, premium direction) */
   --bg: #FAF6EE;
   --panel: #FFFFFF;
@@ -39,6 +41,7 @@
   --red: #B91C1C;
   --green: #15803D;
   --orange: #C2410C;
+  --scrollbar-hover: #9E947A;
 }
 
 @theme {
@@ -117,7 +120,7 @@
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #2C3E50;
+  background-color: var(--scrollbar-hover);
 }
 
 .scrollbar-thin::-webkit-scrollbar {
