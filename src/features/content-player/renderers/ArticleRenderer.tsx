@@ -87,7 +87,7 @@ export const ArticleRenderer: React.FC<ArticleRendererProps> = ({ lesson, onCrit
           If one gear is misaligned, the entire mechanism fails. Software engineering follows this exact paradigm.
         </p>
 
-        <div className="my-8 rounded-xl overflow-hidden border border-line bg-[#0a0d10] p-6 text-center">
+        <div className="my-8 rounded-xl overflow-hidden border border-line bg-panel p-6 text-center">
           <div className="w-full h-64 bg-panel/50 rounded-lg flex items-center justify-center border border-line/50 mb-4 overflow-hidden relative group">
             <img 
               src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80" 
@@ -112,7 +112,7 @@ export const ArticleRenderer: React.FC<ArticleRendererProps> = ({ lesson, onCrit
           avoids side effects and treats inputs as immutable.
         </p>
 
-        <pre className="bg-[#0a0d10] p-5 rounded-xl border border-line text-sm font-mono overflow-x-auto my-6 text-cyan shadow-inner">
+        <pre className="bg-panel p-5 rounded-xl border border-line text-sm font-mono overflow-x-auto my-6 text-cyan shadow-inner">
           <code>
 <span className="text-pink-500">def</span> <span className="text-blue-400">process_data_pipeline</span>(raw_data: <span className="text-yellow-300">list</span>) -&gt; <span className="text-yellow-300">list</span>:{'\n'}
 {'    '}"""{'\n'}

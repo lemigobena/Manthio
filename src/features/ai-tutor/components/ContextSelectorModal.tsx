@@ -106,7 +106,7 @@ const MobileAccordionSection = ({
     </button>
 
     {sectionOpen && (
-      <div className="border-t border-line flex-1 overflow-y-auto scrollbar-thin">
+      <div className="border-t border-line flex-1 overflow-y-auto custom-scrollbar">
         {children}
       </div>
     )}
@@ -283,7 +283,7 @@ export const ContextSelectorModal: React.FC<ContextSelectorModalProps> = ({ isOp
               <BookOpen className="w-3.5 h-3.5" />
               Courses
             </div>
-            <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
+            <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
               {COURSES.map((course) => (
                 <ItemButton
                   key={course.id}
@@ -305,7 +305,7 @@ export const ContextSelectorModal: React.FC<ContextSelectorModalProps> = ({ isOp
                 <Layers className="w-3.5 h-3.5" />
                 Modules
               </div>
-              <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
+              <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
                 {selectedCourse.modules.map((mod) => (
                   <ItemButton
                     key={mod.id}
@@ -328,7 +328,7 @@ export const ContextSelectorModal: React.FC<ContextSelectorModalProps> = ({ isOp
                 <PlayCircle className="w-3.5 h-3.5" />
                 Lessons
               </div>
-              <div className="flex-1 overflow-y-auto p-2 scrollbar-thin">
+              <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
                 {selectedModule.lessons.map((lesson) => (
                   <ItemButton
                     key={lesson.id}
