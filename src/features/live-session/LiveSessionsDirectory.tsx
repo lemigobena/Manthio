@@ -54,10 +54,10 @@ export const LiveSessionsDirectory: React.FC<LiveSessionsDirectoryProps> = ({ on
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,245,228,0.15)_0%,transparent_70%)]" />
           
           <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
-            {isPast ? <PlayCircle size={48} className="text-white/80 group-hover:text-cyan transition-colors group-hover:scale-110 duration-300" /> 
+            {isPast ? <PlayCircle size={48} className="text-text/80 group-hover:text-cyan transition-colors group-hover:scale-110 duration-300" /> 
                     : <Video size={40} className={`mb-4 ${isLive ? 'text-cyan' : 'text-muted'} group-hover:scale-110 transition-transform duration-300`} />}
             {!isPast && (
-              <h3 className="text-lg font-bold text-white mb-2 leading-tight max-w-xs">{session.title}</h3>
+              <h3 className="text-lg font-bold text-text mb-2 leading-tight max-w-xs">{session.title}</h3>
             )}
           </div>
         </div>
@@ -118,7 +118,7 @@ export const LiveSessionsDirectory: React.FC<LiveSessionsDirectoryProps> = ({ on
             <Video size={16} />
             <span className="text-[10px] font-bold uppercase tracking-widest">Directory</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-black text-text tracking-tight">
             Live <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan to-purple">Sessions</span>
           </h1>
           <p className="text-sm text-muted max-w-xl">
@@ -126,7 +126,7 @@ export const LiveSessionsDirectory: React.FC<LiveSessionsDirectoryProps> = ({ on
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 w-full md:w-auto">
           <div className="bg-panel border border-line rounded-xl px-4 py-2.5 flex items-center space-x-2 w-full md:w-64 focus-within:border-cyan transition-colors">
             <Search size={16} className="text-muted" />
             <input 
@@ -144,7 +144,7 @@ export const LiveSessionsDirectory: React.FC<LiveSessionsDirectoryProps> = ({ on
       {filteredSessions.length === 0 && (
         <div className="py-20 flex flex-col items-center justify-center border border-dashed border-line rounded-2xl bg-panel/50 mt-8">
           <Search size={48} className="text-muted/50 mb-4" />
-          <h3 className="text-lg font-bold text-white mb-2">No sessions found</h3>
+          <h3 className="text-lg font-bold text-text mb-2">No sessions found</h3>
           <p className="text-sm text-muted">We couldn't find any sessions matching "{searchQuery}".</p>
         </div>
       )}
@@ -154,11 +154,11 @@ export const LiveSessionsDirectory: React.FC<LiveSessionsDirectoryProps> = ({ on
           {/* Live Now */}
       {liveSessions.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-bold text-white flex items-center space-x-2">
+          <h2 className="text-lg font-bold text-text flex items-center space-x-2">
             <div className="w-2 h-2 rounded-full bg-red animate-pulse" />
             <span>Live Now</span>
           </h2>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
             {liveSessions.map(session => (
               <SessionCard key={session.id} session={session} isLive />
             ))}
@@ -169,11 +169,11 @@ export const LiveSessionsDirectory: React.FC<LiveSessionsDirectoryProps> = ({ on
       {/* Upcoming */}
       {(upcomingSessions.length > 0 || !searchQuery) && (
         <div className="space-y-4">
-          <h2 className="text-lg font-bold text-white flex items-center space-x-2">
+          <h2 className="text-lg font-bold text-text flex items-center space-x-2">
           <Calendar size={18} className="text-cyan" />
           <span>Upcoming Sessions</span>
         </h2>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
           {upcomingSessions.map(session => (
             <SessionCard key={session.id} session={session} />
           ))}
@@ -190,11 +190,11 @@ export const LiveSessionsDirectory: React.FC<LiveSessionsDirectoryProps> = ({ on
       {/* Past Sessions */}
       {(pastSessions.length > 0 || !searchQuery) && (
         <div className="space-y-4 pt-8 border-t border-line">
-        <h2 className="text-lg font-bold text-white flex items-center space-x-2">
+        <h2 className="text-lg font-bold text-text flex items-center space-x-2">
           <Play size={18} className="text-purple" />
           <span>Past Sessions Library</span>
         </h2>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
           {pastSessions.map(session => (
             <SessionCard key={session.id} session={session} isPast />
           ))}

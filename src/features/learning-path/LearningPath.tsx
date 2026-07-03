@@ -423,9 +423,6 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                                           Complete {prepMod.title}
                                         </span>
                                       </div>
-                                      <span className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-full ${isPrepDone ? 'bg-green/20 text-green' : 'bg-line text-muted'}`}>
-                                        {isPrepDone ? 'DONE' : 'PENDING'}
-                                      </span>
                                     </div>
                                   );
                                 })}
