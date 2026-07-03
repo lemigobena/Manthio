@@ -31,6 +31,8 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account', onNa
   const [passwordModalTarget, setPasswordModalTarget] = useState<'email' | 'password' | null>(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [confirmModalTarget, setConfirmModalTarget] = useState<'delete' | 'cancel_sub' | null>(null);
+  const [personalInfoModalOpen, setPersonalInfoModalOpen] = useState(false);
+  const [personalInfoModalTarget, setPersonalInfoModalTarget] = useState<'name' | 'phone' | 'address' | null>(null);
 
   // Preferences state
   const { preferences, updatePreferences } = useNotifications();
@@ -97,6 +99,11 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account', onNa
     setConfirmModalOpen(true);
   };
 
+  const openPersonalInfoModal = (target: 'name' | 'phone' | 'address') => {
+    setPersonalInfoModalTarget(target);
+    setPersonalInfoModalOpen(true);
+  };
+
   const tabs: { id: TabType; label: string; icon: React.ElementType }[] = [
     { id: 'account', label: 'Account & Security', icon: Shield },
     { id: 'billing', label: 'Subscription & Billing', icon: CreditCard },
@@ -154,6 +161,9 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account', onNa
                       setIs2FAEnabled={setIs2FAEnabled}
                       onEditEmail={() => openPasswordModal('email')}
                       onEditPassword={() => openPasswordModal('password')}
+                      onEditName={() => openPersonalInfoModal('name')}
+                      onEditPhone={() => openPersonalInfoModal('phone')}
+                      onEditAddress={() => openPersonalInfoModal('address')}
                       onExport={handleDataExport}
                       onDelete={() => openConfirmModal('delete')}
                       onRestartOnboarding={() => onNavigate?.('onboarding')}
@@ -214,6 +224,17 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account', onNa
           }}
         />
       )}
+
+      {personalInfoModalOpen && (
+        <PersonalInfoModal 
+          target={personalInfoModalTarget!} 
+          onClose={() => setPersonalInfoModalOpen(false)} 
+          onConfirm={() => {
+            addToast('success', `Personal information updated successfully.`);
+            setPersonalInfoModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };
@@ -226,12 +247,15 @@ interface AccountTabProps {
   setIs2FAEnabled: (enabled: boolean) => void;
   onEditEmail: () => void;
   onEditPassword: () => void;
+  onEditName: () => void;
+  onEditPhone: () => void;
+  onEditAddress: () => void;
   onExport: () => void;
   onDelete: () => void;
   onRestartOnboarding: () => void;
 }
 
-const AccountTab: React.FC<AccountTabProps> = ({ user, is2FAEnabled, setIs2FAEnabled, onEditEmail, onEditPassword, onExport, onDelete, onRestartOnboarding }) => {
+const AccountTab: React.FC<AccountTabProps> = ({ user, is2FAEnabled, setIs2FAEnabled, onEditEmail, onEditPassword, onEditName, onEditPhone, onEditAddress, onExport, onDelete, onRestartOnboarding }) => {
   const { addToast } = useXP();
   const [isSetup2FA, setIsSetup2FA] = useState(false);
   const [twoFaCode, setTwoFaCode] = useState('');
@@ -365,7 +389,7 @@ const AccountTab: React.FC<AccountTabProps> = ({ user, is2FAEnabled, setIs2FAEna
               <p className="text-xs text-muted mt-0.5">{user.name}</p>
             </div>
           </div>
-          <button onClick={() => addToast('success', 'Opening name editor...')} className="px-4 py-2 bg-panel border border-line hover:border-cyan hover:text-cyan rounded-lg text-xs font-bold transition-colors">Edit</button>
+          <button onClick={onEditName} className="px-4 py-2 bg-panel border border-line hover:border-cyan hover:text-cyan rounded-lg text-xs font-bold transition-colors">Edit</button>
         </div>
 
         {/* Phone Number */}
@@ -379,7 +403,7 @@ const AccountTab: React.FC<AccountTabProps> = ({ user, is2FAEnabled, setIs2FAEna
               <p className="text-xs text-muted mt-0.5">+41 79 123 45 67</p>
             </div>
           </div>
-          <button onClick={() => addToast('success', 'Opening phone number editor...')} className="px-4 py-2 bg-panel border border-line hover:border-purple hover:text-purple rounded-lg text-xs font-bold transition-colors">Edit</button>
+          <button onClick={onEditPhone} className="px-4 py-2 bg-panel border border-line hover:border-purple hover:text-purple rounded-lg text-xs font-bold transition-colors">Edit</button>
         </div>
 
         {/* Address */}
@@ -393,7 +417,7 @@ const AccountTab: React.FC<AccountTabProps> = ({ user, is2FAEnabled, setIs2FAEna
               <p className="text-xs text-muted mt-0.5">Musterstrasse 1, PO Box 123, 8000 Zürich, Switzerland</p>
             </div>
           </div>
-          <button onClick={() => addToast('success', 'Opening address editor...')} className="px-4 py-2 bg-panel border border-line hover:border-green hover:text-green rounded-lg text-xs font-bold transition-colors">Edit</button>
+          <button onClick={onEditAddress} className="px-4 py-2 bg-panel border border-line hover:border-green hover:text-green rounded-lg text-xs font-bold transition-colors">Edit</button>
         </div>
       </div>
     </div>
@@ -449,8 +473,10 @@ interface BillingTabProps {
 
 const BillingTab: React.FC<BillingTabProps> = ({ onCancelSub }) => {
   const { addToast } = useXP();
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   return (
-  <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+    <>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
     <div>
       <h2 className="text-xl font-bold text-text">Subscription and Billing</h2>
       <p className="text-muted text-sm mt-1">Manage your current plan and payment methods.</p>
@@ -519,12 +545,12 @@ const BillingTab: React.FC<BillingTabProps> = ({ onCancelSub }) => {
               <div className="text-[10px] text-muted">Expires 12/28</div>
             </div>
           </div>
-          <button onClick={() => addToast('success', 'Opening payment method editor...')} className="text-cyan text-xs font-bold hover:underline">Edit</button>
+          <button onClick={() => setPaymentModalOpen(true)} className="text-cyan text-xs font-bold hover:underline">Edit</button>
         </div>
       </div>
 
       <div className="space-y-4">
-        <h3 className="font-bold text-text">Invoice/receipt history with download</h3>
+        <h3 className="font-bold text-text">Invoice/receipt history</h3>
         <div className="bg-bg border border-line rounded-xl divide-y divide-line">
           {[
             { date: 'Jun 14, 2026', desc: 'Python Bootcamp Bundle', amount: 'CHF 1,000.00' },
@@ -537,7 +563,7 @@ const BillingTab: React.FC<BillingTabProps> = ({ onCancelSub }) => {
               </div>
               <div className="flex items-center space-x-3">
                 <span className="font-bold">{inv.amount}</span>
-                <button onClick={() => addToast('success', 'Downloading PDF invoice...')} className="text-cyan hover:underline">PDF</button>
+                <button onClick={() => addToast('success', 'Downloading PDF invoice...')} className="text-cyan hover:text-cyan2 transition-colors" title="Download PDF"><Download size={17} /></button>
               </div>
             </div>
           ))}
@@ -549,8 +575,21 @@ const BillingTab: React.FC<BillingTabProps> = ({ onCancelSub }) => {
       <button onClick={onCancelSub} className="text-red text-xs font-bold hover:underline">Cancel subscription</button>
     </div>
   </div>
+
+  {paymentModalOpen && (
+    <PaymentMethodModal
+      onClose={() => setPaymentModalOpen(false)}
+      onConfirm={() => {
+        addToast('success', 'Payment method updated successfully.');
+        setPaymentModalOpen(false);
+      }}
+    />
+  )}
+  </>
   );
 };
+
+
 
 interface PreferencesTabProps {
   themeMode: string;
@@ -735,7 +774,7 @@ const PreferencesTab: React.FC<PreferencesTabProps> = ({ themeMode, setThemeMode
         <h3 className="font-bold text-text text-sm uppercase tracking-wider text-muted">Accessibility & Media</h3>
         <div className="space-y-2">
           <ToggleRow label="Reduced motion" description="Minimize animations and transitions." checked={reducedMotion} onChange={setReducedMotion} />
-          <ToggleRow label="Sound effects on/off" description="Play sounds on XP gain and leveling up." checked={soundEnabled} onChange={setSoundEnabled} />
+          <ToggleRow label="Sound effects" description="Play sounds on XP gain and leveling up." checked={soundEnabled} onChange={setSoundEnabled} />
           <div className="flex items-center justify-between p-4 bg-bg border border-line rounded-xl">
             <div>
               <div className="font-bold text-sm text-text">Default video playback speed</div>
@@ -773,7 +812,7 @@ const PreferencesTab: React.FC<PreferencesTabProps> = ({ themeMode, setThemeMode
             />
           </div>
           <div className="p-3 bg-panel border border-line rounded-lg text-xs text-muted leading-relaxed">
-            <strong className="text-text block mb-1">Cost and privacy trade-offs (see §16.10, §31.5):</strong>
+            <strong className="text-text block mb-1">Cost and privacy trade-offs</strong>
             Auto-routing keeps course-specific questions strictly on our Local AI infrastructure to protect your data and reduce costs. Only complex queries are routed to Cloud LLM providers. Selecting "Course docs only" disables Cloud AI entirely.
           </div>
         </div>
@@ -874,11 +913,11 @@ const PasswordConfirmModal: React.FC<PasswordConfirmModalProps> = ({ target, onC
         <div className="space-y-4">
           <div className="space-y-1.5">
             <label className="text-[10px] font-bold text-muted uppercase">Current Password</label>
-            <input type="password" value={pass} onChange={e => setPass(e.target.value)} className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-sm outline-none focus:border-cyan" autoFocus />
+            <input type="password" value={pass} onChange={e => setPass(e.target.value)} className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-sm !outline-none focus:border-cyan" autoFocus />
           </div>
           <div className="space-y-1.5">
             <label className="text-[10px] font-bold text-muted uppercase">New {target === 'email' ? 'Email Address' : 'Password'}</label>
-            <input type={target === 'email' ? 'email' : 'password'} value={newVal} onChange={e => setNewVal(e.target.value)} className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-sm outline-none focus:border-cyan" />
+            <input type={target === 'email' ? 'email' : 'password'} value={newVal} onChange={e => setNewVal(e.target.value)} className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-sm !outline-none focus:border-cyan" />
           </div>
         </div>
 
@@ -899,7 +938,7 @@ interface TypedConfirmModalProps {
 
 const TypedConfirmModal: React.FC<TypedConfirmModalProps> = ({ target, onClose, onConfirm }) => {
   const [input, setInput] = useState('');
-  const expected = target === 'delete' ? 'DELETE ACCOUNT' : 'CANCEL SUBSCRIPTION';
+  const expected = target === 'delete' ? 'delete account' : 'CANCEL SUBSCRIPTION';
   
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg/80 backdrop-blur-sm animate-in fade-in">
@@ -919,13 +958,147 @@ const TypedConfirmModal: React.FC<TypedConfirmModalProps> = ({ target, onClose, 
           value={input} 
           onChange={e => setInput(e.target.value)} 
           placeholder={expected}
-          className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-sm outline-none focus:border-red" 
+          className="w-full bg-bg border border-line !outline-none rounded-xl px-3 py-2 text-sm outline-none focus:border-red" 
           autoFocus 
         />
 
         <div className="flex items-center space-x-3 pt-2">
           <button onClick={onClose} className="flex-1 py-2 bg-bg border border-line text-text text-sm font-bold rounded-xl hover:bg-line transition-colors">Cancel</button>
           <button onClick={onConfirm} disabled={input !== expected} className="flex-1 py-2 bg-red text-white text-sm font-bold rounded-xl hover:bg-red/90 transition-colors disabled:opacity-50">Confirm</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PaymentMethodModal: React.FC<{ onClose: () => void; onConfirm: () => void }> = ({ onClose, onConfirm }) => {
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardHolder, setCardHolder] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvv, setCvv] = useState('');
+
+  const formatCardNumber = (v: string) => v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
+  const formatExpiry = (v: string) => {
+    const d = v.replace(/\D/g, '').slice(0, 4);
+    return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+  };
+
+  const isValid = cardNumber.replace(/\s/g, '').length === 16 && cardHolder && expiry.length === 5 && cvv.length >= 3;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg/80 backdrop-blur-sm animate-in fade-in">
+      <div className="bg-panel border border-line rounded-2xl p-6 w-full max-w-sm shadow-xl space-y-5">
+        <div>
+          <h3 className="text-lg font-bold text-text">Edit Payment Method</h3>
+          <p className="text-xs text-muted mt-1">Update your card details below.</p>
+        </div>
+
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-muted uppercase">Card Number</label>
+            <input
+              type="text" inputMode="numeric" placeholder="1234 5678 9012 3456"
+              value={cardNumber} onChange={e => setCardNumber(formatCardNumber(e.target.value))}
+              className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-sm !outline-none focus:border-cyan tracking-widest font-mono" autoFocus
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-muted uppercase">Cardholder Name</label>
+            <input
+              type="text" placeholder="Jane Doe"
+              value={cardHolder} onChange={e => setCardHolder(e.target.value)}
+              className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-sm !outline-none focus:border-cyan"
+            />
+          </div>
+          <div className="flex space-x-3">
+            <div className="space-y-1.5 flex-1">
+              <label className="text-[10px] font-bold text-muted uppercase">Expiry</label>
+              <input
+                type="text" inputMode="numeric" placeholder="MM/YY"
+                value={expiry} onChange={e => setExpiry(formatExpiry(e.target.value))}
+                className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-sm !outline-none focus:border-cyan font-mono"
+              />
+            </div>
+            <div className="space-y-1.5 w-24">
+              <label className="text-[10px] font-bold text-muted uppercase">CVV</label>
+              <input
+                type="text" inputMode="numeric" placeholder="•••"
+                value={cvv} onChange={e => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-sm !outline-none focus:border-cyan font-mono"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-3 pt-1">
+          <button onClick={onClose} className="flex-1 py-2 bg-bg border border-line text-text text-sm font-bold rounded-xl hover:bg-line transition-colors">Cancel</button>
+          <button onClick={onConfirm} disabled={!isValid} className="flex-1 py-2 bg-cyan text-bg text-sm font-bold rounded-xl hover:bg-cyan2 transition-colors disabled:opacity-50">Save Card</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface PersonalInfoModalProps {
+  target: 'name' | 'phone' | 'address';
+  onClose: () => void;
+  onConfirm: (val: string) => void;
+  initialValue?: string;
+}
+
+const PersonalInfoModal: React.FC<PersonalInfoModalProps> = ({ target, onClose, onConfirm, initialValue = '' }) => {
+  const [val, setVal] = useState(initialValue);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  
+  const labels = {
+    name: 'Legal Full Name',
+    phone: 'Phone Number',
+    address: 'Billing & Mailing Address'
+  };
+
+  const isNameTarget = target === 'name';
+  const isSaveDisabled = isNameTarget ? (!firstName || !lastName) : !val;
+
+  const handleSave = () => {
+    if (isNameTarget) {
+      onConfirm(`${firstName} ${lastName}`.trim());
+    } else {
+      onConfirm(val);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg/80 backdrop-blur-sm animate-in fade-in">
+      <div className="bg-panel border border-line rounded-2xl p-6 w-full max-w-sm shadow-xl space-y-6">
+        <div>
+          <h3 className="text-lg font-bold text-text">Edit {labels[target]}</h3>
+          <p className="text-xs text-muted mt-1">Update your personal information below.</p>
+        </div>
+        
+        <div className="space-y-4">
+          {isNameTarget ? (
+            <div className="flex space-x-3">
+              <div className="space-y-1.5 flex-1">
+                <label className="text-[10px] font-bold text-muted uppercase">First Name</label>
+                <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-sm !outline-none focus:border-cyan" autoFocus />
+              </div>
+              <div className="space-y-1.5 flex-1">
+                <label className="text-[10px] font-bold text-muted uppercase">Last Name</label>
+                <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-sm !outline-none focus:border-cyan" />
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-muted uppercase">New {labels[target]}</label>
+              <input type={target === 'phone' ? 'tel' : 'text'} value={val} onChange={e => setVal(e.target.value)} className="w-full bg-bg border border-line rounded-xl px-3 py-2 text-sm !outline-none focus:border-cyan" autoFocus />
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center space-x-3 pt-2">
+          <button onClick={onClose} className="flex-1 py-2 bg-bg border border-line text-text text-sm font-bold rounded-xl hover:bg-line transition-colors">Cancel</button>
+          <button onClick={handleSave} disabled={isSaveDisabled} className="flex-1 py-2 bg-cyan text-bg text-sm font-bold rounded-xl hover:bg-cyan2 transition-colors disabled:opacity-50">Save</button>
         </div>
       </div>
     </div>
