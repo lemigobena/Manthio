@@ -398,7 +398,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
           <div className="bg-panel border border-line rounded-2xl p-6 h-36" />
           
           {/* Quick Stats Grid Skeleton */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 group-[.sidebar-expanded]/layout:min-[1024px]:max-[1155px]:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map(i => (
               <div key={i} className="bg-panel border border-line p-4 rounded-xl h-24" />
             ))}
@@ -631,7 +631,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
 
           {/* Quick Stats Grid - Sticky Note Style */}
           <div className="max-w-6xl mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-12 mt-8 md:mt-12 mb-8 md:mb-10">
+            <div className="grid grid-cols-2 md:grid-cols-4 group-[.sidebar-expanded]/layout:min-[1024px]:max-[1155px]:grid-cols-2 gap-4 sm:gap-6 md:gap-12 mt-8 md:mt-12 mb-8 md:mb-10">
               <StickyNoteStat 
                 label="Learning Level"
                 value={heroState === 'pre-cohort' ? 1 : heroState === 'all-completed' ? 50 : level}
@@ -783,7 +783,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                   </button>
                 </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-4 min-[475px]:max-[768px]:grid min-[475px]:max-[768px]:grid-cols-2 min-[475px]:max-[768px]:gap-4 min-[475px]:max-[768px]:space-y-0">
                   {displayCourses.map((course, index) => {
                     const colors = ['cyan', 'purple', 'yellow', 'green'];
                     const color = colors[index % colors.length];
@@ -915,9 +915,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                     }
 
                     return (
-                      <div key={course.id} className="course-card flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-lg bg-panel border border-line hover:bg-panel2 transition-all">
+                      <div key={course.id} className="flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-lg bg-panel border border-line hover:bg-panel2 transition-all">
                         {/* Left colored block */}
-                        <div className={`course-card-left relative w-full md:w-36 lg:hidden xl:flex xl:w-44 flex-col items-center justify-center py-6 md:py-0 bg-${color} flex-shrink-0 overflow-hidden ${'flex'}`}>
+                        <div className={`relative w-full md:w-36 lg:hidden xl:flex xl:w-44 flex-col items-center justify-center py-6 max-[768px]:py-0 max-[768px]:h-1 max-[768px]:[&>*]:hidden md:py-0 bg-${color} flex-shrink-0 overflow-hidden ${'flex'}`}>
                           <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-transparent mix-blend-overlay" />
                           <div className="relative z-10 flex flex-col items-center space-y-3">
                             {getCourseIcon(course.title)}
@@ -945,11 +945,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                             </div>
                             <div>
                               <h4 className="font-bold text-lg md:text-xl text-text">{course.title}</h4>
-                              <p className="text-muted text-xs mt-1.5 leading-relaxed max-w-sm lg:max-w-md line-clamp-2 md:line-clamp-none">{course.description}</p>
+                              <p className="text-muted text-xs mt-1.5 leading-relaxed max-w-sm lg:max-w-md max-[474px]:max-w-full line-clamp-2 md:line-clamp-none max-[474px]:line-clamp-none">{course.description}</p>
                             </div>
                           </div>
                           
-                          <div className="mt-6 w-full max-w-sm">
+                          <div className="mt-6 w-full max-w-sm max-[474px]:max-w-full">
                             <div className="flex justify-between text-[9px] font-bold uppercase tracking-wider text-muted mb-2">
                               <span>Progress</span>
                               <span className={`text-${color}`}>{course.progress}%</span>
@@ -964,7 +964,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                         </div>
 
                         {/* Right Stats Section */}
-                        <div className="course-card-right w-full md:w-52 lg:w-60 p-5 md:p-6 border-t md:border-t-0 md:border-l border-line bg-panel2/30 flex flex-col justify-center shrink-0">
+                        <div className="w-full md:w-52 lg:w-60 p-5 md:p-6 border-t md:border-t-0 md:border-l border-line bg-panel2/30 flex flex-col justify-center shrink-0">
                           {rightSection}
                         </div>
                       </div>

@@ -120,7 +120,6 @@ export const ContinueYourTrackCard: React.FC<ContinueYourTrackCardProps> = ({
   forceNoTrack,
 }) => {
   const { progressMap } = useTrack();
-  const [isExpanded, setIsExpanded] = useState(false);
 
   const allActiveEntries = Object.values(progressMap).filter(
     p => p.enrolledAt
@@ -155,7 +154,7 @@ export const ContinueYourTrackCard: React.FC<ContinueYourTrackCardProps> = ({
     );
   }
 
-  const visibleEntries = isExpanded ? allActiveEntries : allActiveEntries.slice(0, 1);
+  const visibleEntries = allActiveEntries.slice(0, 1);
 
   return (
     <div className="space-y-4">
@@ -171,14 +170,14 @@ export const ContinueYourTrackCard: React.FC<ContinueYourTrackCardProps> = ({
       {allActiveEntries.length > 1 && (
         <div className="flex justify-center">
           <button
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={() => {
+              localStorage.setItem('catalogDiscoveryMode', 'tracks');
+              localStorage.setItem('catalogTrackTab', 'enrolled');
+              onNavigate('catalog');
+            }}
             className="flex items-center gap-2 text-xs font-semibold text-muted hover:text-cyan transition-colors"
           >
-            {isExpanded ? (
-              <>Hide additional tracks <ChevronUp className="w-4 h-4" /></>
-            ) : (
-              <>Show {allActiveEntries.length - 1} other active track{allActiveEntries.length > 2 ? 's' : ''} <ChevronDown className="w-4 h-4" /></>
-            )}
+            Show {allActiveEntries.length - 1} other active track{allActiveEntries.length > 2 ? 's' : ''} <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       )}
