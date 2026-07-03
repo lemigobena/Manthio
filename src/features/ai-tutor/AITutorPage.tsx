@@ -5,6 +5,8 @@ import { Search, MessageSquare, Share2, PanelLeftClose, PanelLeft, PanelRightClo
 import type { ChatMessage } from '../../types';
 import { analyticsService } from '../../services/analyticsService';
 import { AITutorChat } from './components/AITutorChat';
+import { ContextSelectorModal } from './components/ContextSelectorModal';
+import type { Course, Module, Lesson } from '../../types';
 
 interface AITutorPageProps {
   onNavigate?: (page: string) => void;
@@ -245,6 +247,7 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab, onNavigate
   const [leftCollapsed, setLeftCollapsed] = useState(() => window.innerWidth < 768); 
   const [rightCollapsed, setRightCollapsed] = useState(() => window.innerWidth < 768); 
   const [isSwitching, setIsSwitching] = useState(false);
+  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 850);
@@ -253,11 +256,13 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab, onNavigate
 
 
   const remediationSessions = Object.values(sessions).filter(s => s.id.startsWith('remediation-'));
+  const newSessions = Object.values(sessions).filter(s => !['chat-1', 'chat-2', 'chat-3', 'chat-4', 'chat-5'].includes(s.id) && !s.id.startsWith('remediation-'));
 
   const historyGroups = [
     { 
       label: 'Today', 
       items: [
+        ...newSessions.map(s => ({ id: s.id, title: s.title, date: 'Now' })),
         ...remediationSessions.map(s => ({ id: s.id, title: s.title, date: 'Now' })),
         { id: 'chat-1', title: 'Contextual Awareness', date: '14:30' },
         { id: 'chat-2', title: 'Rich Content Demo', date: '16:00' }
@@ -276,6 +281,55 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab, onNavigate
     setActiveChatId(id);
     setTimeout(() => {
       setChatMessages(sessions[id].messages);
+      setIsSwitching(false);
+    }, 400);
+  };
+
+  const handleStartNewChat = (context: { course?: Course; module?: Module; lesson?: Lesson }) => {
+    setIsSelectorOpen(false);
+    
+    if (!context.course) return;
+
+    const newChatId = `chat-${generateId()}`;
+    const title = context.lesson 
+      ? context.lesson.title 
+      : context.module 
+        ? context.module.title
+        : `${context.course.title} Chat`;
+
+    const newSession: ChatSessionData = {
+      id: newChatId,
+      title,
+      messages: [
+        {
+          id: generateId(),
+          sender: 'system',
+          text: `Session started: ${title}`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        },
+        {
+          id: generateId(),
+          sender: 'tutor',
+          text: `Hello! I see you want to discuss ${title}. How can I help you today?`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }
+      ],
+      context: {
+        module: context.module ? context.module.title : context.course.title,
+        lesson: context.lesson ? context.lesson.title : 'General Discussion',
+        progress: 0,
+        weakPoints: [],
+        snippets: []
+      }
+    };
+
+    setSessions(prev => ({ ...prev, [newChatId]: newSession }));
+    
+    // Select the newly created chat (bypassing handleSelectChat to avoid stale state)
+    setIsSwitching(true);
+    setActiveChatId(newChatId);
+    setTimeout(() => {
+      setChatMessages(newSession.messages);
       setIsSwitching(false);
     }, 400);
   };
@@ -417,8 +471,11 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab, onNavigate
         <div className={`p-4 border-b border-line flex items-center justify-between transition-opacity duration-300 ${leftCollapsed ? 'opacity-0' : 'opacity-100'}`}>
           <h3 className="font-bold text-[10px] uppercase text-muted tracking-wider truncate">History</h3>
           <div className="flex items-center space-x-1">
-            <button className="p-1 hover:bg-line rounded transition-colors text-muted hover:text-cyan">
-              <Plus className="w-3.5 h-3.5" />
+            <button 
+              onClick={() => setIsSelectorOpen(true)}
+              className="p-1 hover:bg-line rounded transition-colors text-muted hover:text-cyan"
+            >
+              <Plus className="w-5 h-5" />
             </button>
             <button 
               onClick={() => setLeftCollapsed(true)}
@@ -630,6 +687,12 @@ export const AITutorPage: React.FC<AITutorPageProps> = ({ initialTab, onNavigate
           </div>
         </div>
       </div>
+
+      <ContextSelectorModal 
+        isOpen={isSelectorOpen} 
+        onClose={() => setIsSelectorOpen(false)} 
+        onStartChat={handleStartNewChat} 
+      />
     </div>
   );
 };
