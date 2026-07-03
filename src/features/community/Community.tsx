@@ -697,7 +697,7 @@ export const Community: React.FC<CommunityProps> = () => {
                       <span className="text-[10px] text-muted">{reply.timestamp}</span>
                     </div>
                     
-                    <div className={`mt-1 text-sm p-3 rounded-xl border ${reply.isAcceptedAnswer ? 'bg-green/5 border-green/30 text-green-100' : reply.isAiSuggested ? 'bg-purple/5 border-purple/20 text-text/90' : 'bg-bg/50 border-line text-text/90'} whitespace-pre-wrap leading-relaxed`}>
+                    <div className={`mt-1 text-sm p-3 rounded-xl border ${reply.isAcceptedAnswer ? 'bg-green/5 border-green/30 text-text/90' : reply.isAiSuggested ? 'bg-purple/5 border-purple/20 text-text/90' : 'bg-bg/50 border-line text-text/90'} whitespace-pre-wrap leading-relaxed`}>
                       {renderBody(reply.body)}
                     </div>
 

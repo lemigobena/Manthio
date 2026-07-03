@@ -107,8 +107,8 @@ export const TopBar: React.FC<TopBarProps> = ({
   }
 
   return (
-    <div className="bg-panel border-b border-line h-16 px-3 md:px-6 lg:px-8 shrink-0 relative z-[60]">
-      <div className="max-w-[1400px] mx-auto h-full flex items-center justify-between gap-5 w-full">
+    <div className="bg-panel border-b border-line h-16 max-[374px]:px-2 px-3 md:px-6 lg:px-8 shrink-0 relative z-[60]">
+      <div className="max-w-[1400px] mx-auto h-full flex items-center justify-between gap-5 max-[374px]:gap-2 w-full">
         {/* Mobile/Tablet Menu Button Toggle */}
         <button 
           onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -128,12 +128,12 @@ export const TopBar: React.FC<TopBarProps> = ({
           />
         </div>
 
-        <div className="flex items-center space-x-4 ml-auto shrink-0">
+        <div className="flex items-center space-x-4 max-[374px]:space-x-2 ml-auto shrink-0">
           
           {/* Mobile Search Icon (<768px) */}
           <button 
             onClick={handleOpenSearch}
-            className="md:hidden h-9 w-9 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer"
+            className="md:hidden h-9 w-9 max-[374px]:h-8 max-[374px]:w-8 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer"
             title="Search"
           >
             <Search className="w-4 h-4" />
@@ -142,7 +142,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           {/* Streak Flame Indicator (REQ-TOPBAR-003) */}
           <button 
             onClick={() => onNavigate('analytics')}
-            className="h-9 flex items-center space-x-1.5 px-3 rounded-full bg-bg border border-line hover:border-yellow group transition-all duration-300 cursor-pointer"
+            className="h-9 max-[374px]:h-8 flex items-center space-x-1.5 px-3 max-[374px]:px-2 rounded-full bg-bg border border-line hover:border-yellow group transition-all duration-300 cursor-pointer"
             title="Your daily activity"
           >
             {/* Streak Flame Emoji: Expands and bounces on hover */}
@@ -157,7 +157,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           {/* Theme Toggle (REQ-NFR-053) */}
           <button 
             onClick={toggleTheme}
-            className="h-9 w-9 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer"
+            className="h-9 w-9 max-[374px]:h-8 max-[374px]:w-8 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer"
             title={resolvedTheme === 'dark' ? 'Switch to light design' : 'Switch to dark design'}
           >
             {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -167,7 +167,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <div className="relative" ref={notificationsRef}>
             <button 
               onClick={handleToggleNotifications}
-              className="h-9 w-9 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer relative"
+              className="h-9 w-9 max-[374px]:h-8 max-[374px]:w-8 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer relative"
             >
               <Bell className="w-4 h-4" />
               {unreadCount > 0 && (
@@ -179,7 +179,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
             {/* Notifications Panel */}
             {notificationsOpen && (
-              <div className="absolute right-0 top-full mt-2 w-[340px] bg-panel border border-line rounded-2xl shadow-xl p-0 z-50 overflow-hidden flex flex-col max-h-[80vh]">
+              <div className="absolute max-[429px]:fixed max-[429px]:inset-x-3 max-[429px]:top-[72px] max-[429px]:mt-0 max-[429px]:w-auto right-0 top-full mt-2 w-[340px] bg-panel border border-line rounded-2xl shadow-xl p-0 z-50 overflow-hidden flex flex-col max-h-[80vh]">
                 <div className="flex justify-between items-center border-b border-line p-3 shrink-0 bg-panel">
                   <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Notifications</h4>
                   {unreadCount > 0 && (
@@ -264,12 +264,12 @@ export const TopBar: React.FC<TopBarProps> = ({
             <div className="relative" ref={profileMenuRef}>
               <button 
                 onClick={handleToggleProfile}
-                className={`h-9 w-9 flex items-center justify-center rounded-full bg-bg border transition-all cursor-pointer ${
+                className={`h-9 w-9 max-[374px]:h-8 max-[374px]:w-8 flex items-center justify-center rounded-full bg-bg border transition-all cursor-pointer ${
                   profileOpen ? 'border-cyan ring-1 ring-cyan' : 'border-line hover:border-cyan'
                 }`}
               >
-                <div className="relative w-8 h-8">
-                  <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
+                <div className="relative w-8 h-8 max-[374px]:w-7 max-[374px]:h-7">
+                  <img src={user.avatar} alt={user.name} className="w-8 h-8 max-[374px]:w-7 max-[374px]:h-7 rounded-full object-cover" />
                   {/* Online indicator */}
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green border-2 border-panel shadow-[0_0_6px_rgba(43,222,126,0.7)]" />
                 </div>
