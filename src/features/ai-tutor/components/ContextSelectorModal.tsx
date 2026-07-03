@@ -37,7 +37,7 @@ const ItemButton = ({
 }: {
   icon: React.ReactNode;
   label: string;
-  sublabel: string;
+  sublabel?: string;
   isSelected: boolean;
   hasChevron?: boolean;
   onClick: () => void;
