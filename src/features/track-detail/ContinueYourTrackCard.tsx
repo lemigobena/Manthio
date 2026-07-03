@@ -16,6 +16,7 @@ const TrackItem: React.FC<{
   onNavigate: (path: string) => void; 
   setActiveTrackId: (id: string) => void; 
 }> = ({ activeEntry, onNavigate, setActiveTrackId }) => {
+  const { restartTrack, getTrackPercentage } = useTrack();
   const activeTrack = TRACKS.find(t => t.id === activeEntry.trackId);
   if (!activeTrack) return null;
 
@@ -41,7 +42,6 @@ const TrackItem: React.FC<{
         }]
   );
 
-  const { restartTrack, getTrackPercentage } = useTrack();
   const progressPct = getTrackPercentage(activeTrack);
   const isCompleted = activeEntry.completedAt != null || progressPct === 100;
 
