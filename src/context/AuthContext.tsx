@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import type { UserProfile } from '../types';
+import defaultAvatar from '../assets/avatars/avatar.png';
 
 interface OnboardingAnswers {
   reason: string;
@@ -121,7 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const mockUser: UserProfile = {
       name: fullName,
       email: email,
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150',
+      avatar: defaultAvatar,
       bio: 'Software Developer & Python Enthusiast. Enrolled in Python Bootcamp by Apigenio.',
       level: 42,
       xp: 42500,
@@ -140,7 +141,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const mockUser: UserProfile = {
       name,
       email,
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150',
+      avatar: defaultAvatar,
       bio: 'Enrolled in Python Bootcamp by Apigenio.',
       level: 1,
       xp: 0,
@@ -177,7 +178,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const guestUser: UserProfile = {
       name: 'Guest Developer',
       email: 'guest@example.com',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150',
+      avatar: defaultAvatar,
       bio: 'Exploring the platform as a guest.',
       level: 1,
       xp: 0,
