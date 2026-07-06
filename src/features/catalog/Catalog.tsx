@@ -312,42 +312,42 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
             <>
               <button 
                 onClick={() => handleTabChange('all')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'all' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer text-center ${activeTab === 'all' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
               >
-                All Courses ({COURSES.length})
+                <span className="whitespace-nowrap">All Courses</span> ({COURSES.length})
               </button>
               <button 
                 onClick={() => handleTabChange('enrolled')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'enrolled' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer text-center ${activeTab === 'enrolled' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
               >
-                My Courses ({COURSES.filter(c => c.enrolled).length})
+                <span className="whitespace-nowrap">My Courses</span> ({COURSES.filter(c => c.enrolled).length})
               </button>
               <button 
                 onClick={() => handleTabChange('completed')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'completed' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer text-center ${activeTab === 'completed' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
               >
-                Completed ({COURSES.filter(c => c.progress === 100).length})
+                <span className="whitespace-nowrap">Completed</span> ({COURSES.filter(c => c.progress === 100).length})
               </button>
             </>
           ) : (
             <>
               <button 
                 onClick={() => handleTabChange('all')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'all' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer text-center ${activeTab === 'all' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
               >
-                All Tracks ({TRACKS.length})
+                <span className="whitespace-nowrap">All Tracks</span> ({TRACKS.length})
               </button>
               <button 
                 onClick={() => handleTabChange('enrolled')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'enrolled' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer text-center ${activeTab === 'enrolled' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
               >
-                My Tracks ({TRACKS.filter(t => t.enrolled).length})
+                <span className="whitespace-nowrap">My Tracks</span> ({TRACKS.filter(t => t.enrolled).length})
               </button>
               <button 
                 onClick={() => handleTabChange('completed')}
-                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'completed' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer text-center ${activeTab === 'completed' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
               >
-                Completed ({TRACKS.filter(t => t.progress === 100).length})
+                <span className="whitespace-nowrap">Completed</span> ({TRACKS.filter(t => t.progress === 100).length})
               </button>
             </>
           )}
@@ -541,9 +541,9 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
               </div>
 
               {/* Action Bar Skeleton */}
-              <div className="p-5 pt-0 border-t border-line mt-4 flex items-center justify-between">
-                <div className="h-4 bg-line rounded w-16 animate-pulse" />
-                <div className="h-8 bg-line rounded w-28 animate-pulse" />
+              <div className="p-5 pt-4 border-t border-line mt-auto flex items-center justify-between gap-3 bg-bg/20">
+                <div className="h-4 bg-line rounded w-16 animate-pulse min-w-0" />
+                <div className="h-8 bg-line rounded w-28 animate-pulse flex-shrink-0" />
               </div>
             </div>
           ))}
@@ -684,12 +684,12 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
               </div>
 
               {/* Action Bar */}
-              <div className="p-5 pt-4 border-t border-line mt-auto flex items-center justify-between bg-bg/20">
-                <div>
+              <div className="p-5 pt-4 border-t border-line mt-auto flex items-center justify-between gap-3 bg-bg/20">
+                <div className="min-w-0">
                   {course.enrolled ? (
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-3 min-w-0">
                       {/* Progress Ring or Completed Icon */}
-                      <div className="relative w-9 h-9 flex items-center justify-center">
+                      <div className="relative w-9 h-9 flex items-center justify-center flex-shrink-0">
                         {course.progress === 100 ? (
                           <div className="bg-green/10 p-1.5 rounded-full ring-2 ring-green/20">
                             <CheckCircle className="w-5 h-5 text-green" />
@@ -706,19 +706,19 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                           </div>
                         )}
                       </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] text-cyan font-black leading-none mb-1 uppercase tracking-wider">
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[10px] text-cyan font-black leading-none mb-1 uppercase tracking-wider truncate">
                           {course.progress === 100 ? 'Completed' : 'Active'}
                         </span>
-                        <span className="text-[12px] font-bold text-text opacity-80">
+                        <span className="text-[12px] font-bold text-text opacity-80 truncate">
                           {course.progress === 100 ? 'Content Reviewed' : 'Continue Course'}
                         </span>
                       </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-muted font-bold uppercase mb-0.5 tracking-tight">Price Status</span>
-                      <span className="text-[13px] font-black text-text tracking-tight">
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[10px] text-muted font-bold uppercase mb-0.5 tracking-tight truncate">Price Status</span>
+                      <span className="text-[13px] font-black text-text tracking-tight truncate">
                         {course.priceStatus === 'included' ? 'Included in your plan' : 
                          course.priceStatus === 'employer' ? 'Provided by your employer' : 
                          course.price}
@@ -743,7 +743,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                       onNavigate('checkout');
                     }
                   }}
-                  className={`relative overflow-hidden group/btn bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer`}
+                  className={`relative overflow-hidden group/btn flex-shrink-0 bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer`}
                 >
                   <span className="relative z-10">
                     {course.progress === 100 ? 'Review' : course.enrolled ? 'Continue' : 'Enrol Now'}
@@ -801,12 +801,12 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
               </div>
 
               {/* Action Bar */}
-              <div className="p-5 pt-4 border-t border-line mt-auto flex items-center justify-between bg-bg/20">
-                <div>
+              <div className="p-5 pt-4 border-t border-line mt-auto flex items-center justify-between gap-3 bg-bg/20">
+                <div className="min-w-0">
                   {track.enrolled ? (
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-3 min-w-0">
                       {/* Progress Ring or Completed Icon */}
-                      <div className="relative w-9 h-9 flex items-center justify-center">
+                      <div className="relative w-9 h-9 flex items-center justify-center flex-shrink-0">
                         {getTrackPercentage(track as unknown as CareerTrack) === 100 ? (
                           <div className="bg-green/10 p-1.5 rounded-full ring-2 ring-green/20">
                             <CheckCircle className="w-5 h-5 text-green" />
@@ -823,19 +823,19 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                           </div>
                         )}
                       </div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] text-cyan font-black leading-none mb-1 uppercase tracking-wider">
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[10px] text-cyan font-black leading-none mb-1 uppercase tracking-wider truncate">
                           {getTrackPercentage(track as unknown as CareerTrack) === 100 ? 'Completed' : 'Active'}
                         </span>
-                        <span className="text-[12px] font-bold text-text opacity-80">
+                        <span className="text-[12px] font-bold text-text opacity-80 truncate">
                           {getTrackPercentage(track as unknown as CareerTrack) === 100 ? 'Review Final Step' : 'Resume Learning'}
                         </span>
                       </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-muted font-bold uppercase mb-0.5 tracking-tight">Track Path</span>
-                      <span className="text-[13px] font-black text-text tracking-tight uppercase">Multi-Course</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[10px] text-muted font-bold uppercase mb-0.5 tracking-tight truncate">Track Path</span>
+                      <span className="text-[13px] font-black text-text tracking-tight uppercase truncate">Multi-Course</span>
                     </div>
                   )}
                 </div>
@@ -847,7 +847,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                     setActiveTrackId(track.id);
                     onNavigate('track-detail');
                   }}
-                  className="relative overflow-hidden group/btn bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer"
+                  className="relative overflow-hidden group/btn flex-shrink-0 bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer"
                 >
                   <span className="relative z-10">
                     {track.progress === 100 ? 'Review' : track.enrolled ? 'Continue' : 'Enrol'}

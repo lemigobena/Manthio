@@ -135,7 +135,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
             </span>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-black text-text tracking-tight">{displayTitle}</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-text tracking-tight break-words hyphens-auto w-full">{displayTitle}</h1>
           <p className="text-muted text-sm md:text-base leading-relaxed max-w-2xl font-medium">
             {track ? track.description : (course!.longDescription || course!.description)}
           </p>

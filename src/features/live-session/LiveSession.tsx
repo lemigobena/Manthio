@@ -783,7 +783,7 @@ const PostSessionView: React.FC<{ data: any, onContactTrainer: () => void }> = (
                 <span>Book Slot</span>
               </button>
               {showBooking && (
-                <div className="absolute bottom-full right-0 mb-4 w-80 z-[100]">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-80 max-w-[calc(100vw-1rem)] z-[100]">
                   <BookingCalendarWidget
                     onBook={(day, time, dur) => {
                       setShowBooking(false);
@@ -916,17 +916,17 @@ const BookingCalendarWidget: React.FC<{ onBook: (day: string, time: string, dura
 
       <div className="p-4 space-y-4">
         {/* Duration picker */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center flex-wrap gap-2">
           <span className="text-[10px] text-muted font-bold uppercase tracking-wider shrink-0">Duration</span>
-          <div className="flex bg-bg/80 p-0.5 rounded-lg border border-line">
+          <div className="flex flex-wrap bg-bg/80 p-0.5 rounded-lg border border-line gap-0.5">
             {SLOT_DURATIONS.map(d => (
               <button
                 key={d}
                 onClick={() => setDuration(d)}
-                className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${duration === d ? 'bg-cyan text-bg' : 'text-muted hover:text-text'
+                className={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all ${duration === d ? 'bg-cyan text-bg' : 'text-muted hover:text-text'
                   }`}
               >
-                {d} min
+                {d}m
               </button>
             ))}
           </div>
@@ -972,15 +972,15 @@ const BookingCalendarWidget: React.FC<{ onBook: (day: string, time: string, dura
         <button
           disabled={!selectedTime}
           onClick={handleConfirm}
-          className={`w-full py-2.5 rounded-xl font-bold text-[11px] transition-all flex items-center justify-center space-x-2 ${selectedTime
+          className={`w-full py-2.5 rounded-xl font-bold text-[11px] transition-all flex items-center justify-center gap-2 ${selectedTime
             ? 'bg-cyan text-bg hover:bg-cyan/90 shadow-[0_0_16px_rgba(0,245,228,0.2)]'
             : 'bg-line/20 text-muted/50 cursor-not-allowed'
             }`}
         >
-          <Check size={13} />
-          <span>
+          <Check size={13} className="shrink-0" />
+          <span className="truncate">
             {selectedTime
-              ? `Confirm — ${DATES[selectedDay]}, ${selectedTime} · ${duration} min`
+              ? `Confirm — ${DATES[selectedDay]}, ${selectedTime} · ${duration}m`
               : 'Select a time slot'}
           </span>
         </button>
@@ -1140,14 +1140,14 @@ const TrainerDirectView: React.FC<{
             </h2>
           </div>
         </div>
-        <div className="flex items-center space-x-1">
+        <div className="relative flex items-center space-x-1" ref={mobileContainerRef}>
           {activeThread && (
-            <div className="relative" ref={mobileContainerRef}>
+            <>
               <button onClick={() => setShowBooking(v => v === 'mobile' ? false : 'mobile')} className={`p-1.5 transition-all ${showBooking === 'mobile' ? 'text-cyan' : 'text-muted hover:text-cyan'}`}>
                 <Calendar size={16} />
               </button>
               {showBooking === 'mobile' && (
-                <div className="absolute top-full right-0 mt-4 w-72 sm:w-80 z-[100]">
+                <div className="absolute top-full right-0 mt-2 w-72 sm:w-80 max-w-[calc(100vw-1rem)] z-[100]">
                   <BookingCalendarWidget
                     onBook={handleBook}
                     onClose={() => setShowBooking(false)}
@@ -1155,7 +1155,7 @@ const TrainerDirectView: React.FC<{
                   />
                 </div>
               )}
-            </div>
+            </>
           )}
           <button className="p-1.5 text-muted hover:text-cyan transition-all"><Star size={16} /></button>
           <button className="p-1.5 text-muted hover:text-cyan transition-all"><Info size={16} /></button>
@@ -1331,15 +1331,15 @@ const TrainerDirectView: React.FC<{
         {/* Booking widget (inline in scroll area) was removed in favor of overlays */}
 
         {/* AI Pre-screening */}
-        <div className={`max-w-[80%] md:max-w-[65%] transition-all duration-500 overflow-hidden ${isAnswerExpanded ? 'bg-purple/10 border-purple/40 ring-1 ring-purple/20' : 'bg-purple/5 border-purple/20'
+        <div className={`max-w-[90%] md:max-w-[65%] transition-all duration-500 overflow-hidden ${isAnswerExpanded ? 'bg-purple/10 border-purple/40 ring-1 ring-purple/20' : 'bg-purple/5 border-purple/20'
           } border rounded-2xl p-4 flex flex-col space-y-3 relative`}>
           <div className="flex items-start space-x-3">
             <Bot size={18} className="text-purple shrink-0 mt-1" />
             <div className="flex-1 space-y-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <span className="text-[10px] font-bold text-purple uppercase tracking-widest">AI Pre-screening ACTIVE</span>
-                  <div className="px-2 py-0.5 bg-purple/10 rounded text-[9px] text-purple">Opt-in Enabled</div>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-[10px] font-bold text-purple uppercase tracking-widest whitespace-nowrap">AI Pre-screening ACTIVE</span>
+                  <div className="px-2 py-0.5 bg-purple/10 rounded text-[9px] text-purple whitespace-nowrap">Opt-in Enabled</div>
                 </div>
                 {isAnswerExpanded && (
                   <button onClick={() => setIsAnswerExpanded(false)} className="text-[10px] font-bold text-muted hover:text-purple transition-colors flex items-center space-x-1">
@@ -1363,7 +1363,7 @@ const TrainerDirectView: React.FC<{
                 </div>
               )}
 
-              <div className="flex items-center justify-between pt-1">
+              <div className="flex flex-wrap items-center gap-2 pt-1">
                 <button
                   onClick={() => {
                     setIsAnswerExpanded(!isAnswerExpanded);
@@ -1373,7 +1373,7 @@ const TrainerDirectView: React.FC<{
                       }, 100);
                     }
                   }}
-                  className={`text-[10px] font-bold px-3 py-1 rounded-lg border transition-all ${isAnswerExpanded
+                  className={`flex-1 min-w-[120px] text-[10px] font-bold px-3 py-1.5 rounded-lg border transition-all text-center ${isAnswerExpanded
                     ? 'bg-purple text-white border-purple'
                     : 'text-purple border-purple/30 hover:border-purple hover:bg-purple/5'
                     }`}
@@ -1383,7 +1383,7 @@ const TrainerDirectView: React.FC<{
                 <button
                   onClick={handleSendAnyway}
                   disabled={hasSentAnyway}
-                  className="text-[10px] font-bold px-3 py-1 bg-cyan/10 text-cyan border border-cyan/30 rounded-lg hover:bg-cyan hover:text-bg hover:border-cyan transition-all disabled:opacity-50"
+                  className="flex-1 min-w-[120px] text-[10px] font-bold px-3 py-1.5 bg-cyan/10 text-cyan border border-cyan/30 rounded-lg hover:bg-cyan hover:text-bg hover:border-cyan transition-all disabled:opacity-50 text-center"
                 >
                   {hasSentAnyway ? 'Sent to Trainer' : 'Send to Trainer anyway'}
                 </button>
@@ -1407,7 +1407,7 @@ const TrainerDirectView: React.FC<{
               </button>
               
               {showBooking === 'input' && (
-                <div className="absolute bottom-full left-0 mb-4 w-72 sm:w-80 z-[100]">
+                <div className="absolute bottom-full left-0 mb-4 w-72 sm:w-80 max-w-[calc(100vw-1rem)] z-[100]">
                   <BookingCalendarWidget
                     onBook={handleBook}
                     onClose={() => setShowBooking(false)}

@@ -110,18 +110,18 @@ export const SelfAssessmentStrip: React.FC<SelfAssessmentStripProps> = ({
 
   return (
     <div className="bg-panel border border-line rounded-2xl p-5 space-y-4">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-1 p-1 bg-bg border border-line rounded-xl w-fit">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch gap-1 p-1 bg-bg border border-line rounded-xl w-full lg:w-fit">
           {LEVELS.map(lvl => {
             const isActive = currentLevel === lvl.key;
             return (
               <button
                 key={lvl.key}
                 onClick={() => onChange(lvl.key)}
-                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                className={`flex-1 px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all text-center whitespace-nowrap cursor-pointer ${
                   isActive
-                    ? 'bg-panel text-cyan shadow-lg border border-line'
-                    : 'text-muted hover:text-text'
+                    ? 'bg-panel text-cyan shadow-sm border border-line'
+                    : 'bg-panel/20 text-muted hover:text-text border border-line/60 hover:border-line'
                 }`}
               >
                 {lvl.label}
