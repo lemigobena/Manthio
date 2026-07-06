@@ -280,6 +280,7 @@ const ActiveSessionView: React.FC<{
   onNavigate?: (page: string) => void
 }> = ({ data, onLeave, onNavigate }) => {
   const [activeTab, setActiveTab] = useState<'chat' | 'polls' | 'materials' | 'ai-tutor'>('chat');
+  const chatScrollRef = useRef<HTMLDivElement>(null);
   const [groupChatInput, setGroupChatInput] = useState('');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [groupChatMessages, setGroupChatMessages] = useState<any[]>([
@@ -311,6 +312,12 @@ const ActiveSessionView: React.FC<{
       text: "Wait, are you wondering about 'memoization'? I have a snippet for that in the local resources."
     }
   ]);
+
+  useEffect(() => {
+    if (activeTab === 'chat' && chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [groupChatMessages, activeTab]);
 
   const handleGroupChatSend = () => {
     if (!groupChatInput.trim()) return;
@@ -462,7 +469,7 @@ const ActiveSessionView: React.FC<{
       </div>
 
       {/* Side Panel */}
-      <div className="w-full lg:w-80 h-[500px] lg:h-full bg-panel border border-line rounded-2xl flex flex-col overflow-hidden">
+      <div className="w-full lg:w-80 h-[800px] lg:h-full bg-panel border border-line rounded-2xl flex flex-col overflow-hidden">
         <div className="flex border-b border-line">
           {([
             { id: 'chat', icon: MessageSquare, label: 'Chat' },
@@ -483,10 +490,10 @@ const ActiveSessionView: React.FC<{
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col">
+        <div className="flex-1 flex flex-col overflow-hidden">
           {activeTab === 'chat' && (
             <>
-              <div className="flex-1 space-y-4">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={chatScrollRef}>
                 {groupChatMessages.map((msg) => {
                   if (msg.isTutor) {
                     return (
@@ -514,12 +521,12 @@ const ActiveSessionView: React.FC<{
                 })}
               </div>
 
-              <div className="mt-4 pt-4 border-t border-line space-y-3 shrink-0">
+              <div className="p-4 border-t border-line shrink-0 bg-panel">
                 <div className="flex items-center space-x-2 bg-bg border border-line rounded-xl px-3 py-1.5">
                   <input
                     type="text"
                     placeholder="Type a message..."
-                    className="flex-1 bg-transparent border-none text-[11px] focus:outline-none text-text"
+                    className="flex-1 bg-transparent border-none text-[11px] focus:outline-none !outline-none focus:ring-0 focus:shadow-none text-text"
                     value={groupChatInput}
                     onChange={(e) => setGroupChatInput(e.target.value)}
                     onKeyDown={handleGroupChatKeyDown}
@@ -537,7 +544,7 @@ const ActiveSessionView: React.FC<{
           )}
 
           {activeTab === 'ai-tutor' && (
-            <div className="flex-1 flex flex-col h-full -m-4">
+            <div className="flex-1 flex flex-col h-full">
               <AITutorChat
                 messages={aiMessages}
                 isTyping={isAiTyping}
@@ -550,7 +557,7 @@ const ActiveSessionView: React.FC<{
           )}
 
           {activeTab === 'polls' && (
-            <div className="space-y-6">
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
               <div className="space-y-3">
                 <div className="text-[10px] font-bold text-muted uppercase tracking-widest">Active Poll</div>
                 <div className="bg-bg border border-line rounded-xl p-4 space-y-4">
@@ -586,7 +593,7 @@ const ActiveSessionView: React.FC<{
           )}
 
           {activeTab === 'materials' && (
-            <div className="space-y-3">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {data.materials?.map((file: any, i: number) => (
                 <div key={i} className="bg-bg border border-line rounded-xl p-3 flex items-center justify-between">

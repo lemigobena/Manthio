@@ -58,7 +58,7 @@ export const FillInTheBlanks: React.FC<FillInTheBlanksProps> = ({ data, onComple
                     setAnswers(newAnswers);
                     setResults(null); // Reset results on change
                   }}
-                  className={`w-28 sm:w-32 md:w-40 px-2 py-1 bg-bg border-b-2 text-center focus:outline-none transition-colors text-sm sm:text-base ${
+                  className={`w-28 sm:w-32 md:w-40 px-2 py-1 bg-bg border-b-2 text-center focus:outline-none !outline-none transition-colors text-sm sm:text-base ${
                     results === null 
                       ? 'border-line focus:border-cyan text-text' 
                       : results[index] 
