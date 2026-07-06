@@ -28,26 +28,26 @@ export const Quiz: React.FC<QuizProps> = ({ data, onComplete }) => {
   const allAnswered = data.questions.length > 0 && Object.keys(answers).length === data.questions.length;
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-panel border border-line rounded-2xl p-8 shadow-xl space-y-8">
+    <div className="w-full max-w-3xl mx-auto bg-panel border border-line rounded-xl sm:rounded-2xl p-3 sm:p-6 md:p-8 shadow-xl space-y-4 sm:space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-text mb-2">Quiz</h2>
-        <p className="text-muted">Answer all questions to complete the quiz.</p>
+        <h2 className="text-lg sm:text-2xl font-bold text-text mb-1 sm:mb-2">Quiz</h2>
+        <p className="text-xs sm:text-base text-muted">Answer all questions to complete the quiz.</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-3 sm:space-y-6">
         {data.questions.map((q, idx) => {
           const userAnswer = answers[q.id];
           const isCorrect = userAnswer === q.correctAnswerIndex;
 
           return (
-            <div key={q.id} className="bg-bg/50 border border-line rounded-2xl p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-bold text-text mb-6 leading-relaxed">
-                <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-cyan/10 text-cyan font-black mr-3">
+            <div key={q.id} className="bg-bg/50 border border-line rounded-xl sm:rounded-2xl p-3 sm:p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-base sm:text-xl md:text-2xl font-bold text-text mb-3 sm:mb-6 leading-snug sm:leading-relaxed flex items-start">
+                <span className="inline-flex shrink-0 items-center justify-center w-5 h-5 sm:w-8 sm:h-8 rounded-md sm:rounded-lg bg-cyan/10 text-cyan font-black mr-2 sm:mr-3 mt-0.5 sm:mt-0 text-xs sm:text-base">
                   {idx + 1}
                 </span>
-                {q.question}
+                <span>{q.question}</span>
               </h3>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {q.options.map((opt, optIdx) => {
                   const isSelected = userAnswer === optIdx;
                   let btnClass = "border-line hover:border-cyan text-text bg-panel hover:bg-cyan/5";
@@ -69,7 +69,7 @@ export const Quiz: React.FC<QuizProps> = ({ data, onComplete }) => {
                       key={optIdx}
                       disabled={submitted}
                       onClick={() => handleSelect(q.id, optIdx)}
-                      className={`w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 transform ${
+                      className={`w-full text-left px-3 py-2 sm:px-5 sm:py-4 rounded-lg sm:rounded-xl border transition-all duration-200 transform text-xs sm:text-base ${
                         !submitted && !isSelected ? 'hover:-translate-y-0.5' : ''
                       } ${btnClass}`}
                     >
@@ -99,11 +99,11 @@ export const Quiz: React.FC<QuizProps> = ({ data, onComplete }) => {
         })}
       </div>
 
-      <div className="flex justify-end pt-4 border-t border-line">
+      <div className="flex justify-center sm:justify-end pt-3 sm:pt-4 border-t border-line">
         <button
           onClick={handleSubmit}
           disabled={!allAnswered || submitted}
-          className={`px-8 py-3 rounded-xl font-bold transition-all shadow-lg ${
+          className={`w-full sm:w-auto px-4 py-2 sm:px-8 sm:py-3 rounded-lg sm:rounded-xl font-bold transition-all shadow-lg text-sm sm:text-base ${
             !allAnswered || submitted
               ? 'bg-line text-muted cursor-not-allowed shadow-none'
               : 'bg-cyan hover:bg-cyan2 text-bg hover:-translate-y-0.5 shadow-cyan/20'

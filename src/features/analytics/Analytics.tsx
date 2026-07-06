@@ -225,7 +225,13 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
     const prevLog = [...analyticsData.prevActivityLog].slice(0, daysCount).reverse();
     const cohortLog = [...analyticsData.cohortActivityLog].slice(0, daysCount).reverse();
     
-    const labels = log.map(d => {
+    // Downsample 30 days to 15 data points for better visual fit
+    const step = chartMode === '30days' ? 2 : 1;
+    const sampledLog = log.filter((_, i) => i % step === 0);
+    const sampledPrev = prevLog.filter((_, i) => i % step === 0);
+    const sampledCohort = cohortLog.filter((_, i) => i % step === 0);
+    
+    const labels = sampledLog.map(d => {
       const date = new Date(d.date);
       return chartMode === '7days' 
         ? date.toLocaleDateString([], { weekday: 'short' })
@@ -234,9 +240,9 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
 
     return {
       labels,
-      current: log,
-      previous: prevLog,
-      cohort: cohortLog
+      current: sampledLog,
+      previous: sampledPrev,
+      cohort: sampledCohort
     };
   };
 
@@ -493,7 +499,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                 </div>
                 
                 {/* Chart controls */}
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-3 sm:mt-0">
                   <div className="flex bg-bg/50 p-0.5 rounded-lg border border-line">
                     <button 
                       onClick={() => setChartStyle('bar')}
@@ -599,7 +605,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                 {chartData.current.map((d, idx) => {
                   const percent = Math.min(100, (d.minutes / maxVal) * 100);
                   return (
-                    <div key={idx} className="flex flex-col items-center z-10 w-full group relative cursor-pointer" onClick={() => setActiveChartIdx(prev => prev === idx ? null : idx)} role="button" tabIndex={0}>
+                    <div key={idx} className="flex-1 flex flex-col items-center z-10 group relative cursor-pointer" onClick={() => setActiveChartIdx(prev => prev === idx ? null : idx)} role="button" tabIndex={0}>
                       {/* Hover Tooltip / Mobile Tap Tooltip */}
                       <div className={`absolute bottom-full mb-2 ${activeChartIdx === idx ? 'flex' : 'hidden'} group-hover:flex flex-col items-center bg-panel border border-line text-[9px] text-text rounded-md px-2 py-1.5 whitespace-nowrap z-50 shadow-2xl pointer-events-none`}>
                         <span className="font-bold">{new Date(d.date).toLocaleDateString([], { month: 'short', day: 'numeric' })}</span>
@@ -611,13 +617,15 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
 
                       {/* Bar */}
                       <div 
-                        className={`bg-cyan/25 border-t border-x border-cyan/40 hover:bg-cyan/85 rounded-t-[3px] transition-all duration-500 ${
-                          chartMode === '7days' ? 'w-8 sm:w-12' : 'w-3 sm:w-4'
+                        className={`bg-cyan/25 border-t border-x border-cyan/40 hover:bg-cyan/85 rounded-t-[3px] transition-all duration-500 mx-auto ${
+                          chartMode === '7days' ? 'w-5 sm:w-8 md:w-12' : 'w-2.5 sm:w-4 md:w-6'
                         } ${chartStyle === 'curve' ? 'opacity-0 h-full' : ''}`}
                         style={{ height: chartStyle === 'bar' ? `${(percent / 100) * 160}px` : '100%' }}
                       />
                       
-                      <span className="text-[9px] text-muted mt-1.5 truncate max-w-[40px]">{chartData.labels[idx]}</span>
+                      <span className={`text-[8px] sm:text-[9px] text-muted mt-1.5 truncate max-w-[40px] transition-opacity ${chartMode === '30days' && idx % 2 !== 0 ? 'opacity-0 md:opacity-100' : 'opacity-100'}`}>
+                        {chartData.labels[idx]}
+                      </span>
                     </div>
                   );
                 })}

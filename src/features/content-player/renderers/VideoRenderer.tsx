@@ -364,24 +364,24 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
         
         {/* Play overlay button */}
         <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${controlsVisible ? 'opacity-100' : 'opacity-0'}`}>
-           <div className="bg-black/50 p-4 md:p-6 rounded-full pointer-events-auto cursor-pointer hover:bg-cyan/90 transition-colors" onClick={(e) => { e.stopPropagation(); togglePlay(); }}>
+           <div className="bg-black/50 backdrop-blur-sm p-2 sm:p-4 md:p-6 rounded-full pointer-events-auto cursor-pointer hover:bg-cyan/90 transition-colors shadow-xl" onClick={(e) => { e.stopPropagation(); togglePlay(); }}>
              {isPlaying ? (
-               <Pause className="w-12 h-12 md:w-16 md:h-16 text-white" fill="currentColor" />
+               <Pause className="w-6 h-6 sm:w-12 sm:h-12 md:w-16 md:h-16 text-white" fill="currentColor" />
              ) : (
-               <Play className="w-12 h-12 md:w-16 md:h-16 text-white" fill="currentColor" />
+               <Play className="w-6 h-6 sm:w-12 sm:h-12 md:w-16 md:h-16 text-white" fill="currentColor" />
              )}
            </div>
         </div>
         
         {/* Video Controls Overlay */}
         <div 
-          className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 md:p-6 flex flex-col justify-end h-32 md:h-40 transition-opacity duration-300 pointer-events-none ${controlsVisible ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-2 pt-8 sm:p-4 sm:pt-16 md:p-6 md:pt-24 flex flex-col justify-end transition-opacity duration-300 pointer-events-none ${controlsVisible ? 'opacity-100' : 'opacity-0'}`}
         >
           {/* Progress Bar with Chapters */}
           <div 
             ref={progressRef}
             onClick={(e) => { e.stopPropagation(); handleProgressClick(e); }}
-            className="w-full h-1.5 md:h-2 bg-white/30 rounded-full mb-4 cursor-pointer relative group/progress hover:h-2 md:hover:h-3 transition-all pointer-events-auto"
+            className="w-full h-1 md:h-1.5 bg-white/30 rounded-full mb-2 sm:mb-4 cursor-pointer relative group/progress hover:h-1.5 md:hover:h-2 transition-all pointer-events-auto"
           >
             {chapters.map(pt => (
                <div key={pt} className="absolute top-0 bottom-0 w-1 bg-black/80 z-10 hover:w-1.5 transition-all" style={{left: `${pt * 100}%`}} />
@@ -394,25 +394,25 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
             />
           </div>
           
-          <div className="flex items-center justify-between text-[11px] md:text-sm text-white font-semibold pointer-events-auto" onClick={e => e.stopPropagation()}>
+          <div className="flex items-center justify-between text-[10px] sm:text-[11px] md:text-sm text-white font-semibold pointer-events-auto" onClick={e => e.stopPropagation()}>
             {/* Left Controls */}
-            <div className="flex items-center space-x-3 md:space-x-5">
+            <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-5">
               <button onClick={togglePlay} className="hover:text-cyan transition-colors">
-                {isPlaying ? <Pause className="w-4 h-4 md:w-6 md:h-6" fill="currentColor" /> : <Play className="w-4 h-4 md:w-6 md:h-6" fill="currentColor" />}
+                {isPlaying ? <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-6 md:h-6" fill="currentColor" /> : <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-6 md:h-6" fill="currentColor" />}
               </button>
               
-              <button onClick={(e) => {e.stopPropagation(); skip(-10)}} className="hover:text-cyan transition-colors hidden sm:block relative w-4 h-4 md:w-5 md:h-5" title="Skip backward 10s">
-                <RotateCcw className="w-4 h-4 md:w-5 md:h-5 absolute inset-0" />
-                <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold font-mono mt-[1px]">10</span>
+              <button onClick={(e) => {e.stopPropagation(); skip(-10)}} className="hover:text-cyan transition-colors hidden sm:block relative w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" title="Skip backward 10s">
+                <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 absolute inset-0" />
+                <span className="absolute inset-0 flex items-center justify-center text-[6px] sm:text-[7px] font-bold font-mono mt-[1px]">10</span>
               </button>
-              <button onClick={(e) => {e.stopPropagation(); skip(10)}} className="hover:text-cyan transition-colors hidden sm:block relative w-4 h-4 md:w-5 md:h-5" title="Skip forward 10s">
-                <RotateCw className="w-4 h-4 md:w-5 md:h-5 absolute inset-0" />
-                <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold font-mono mt-[1px]">10</span>
+              <button onClick={(e) => {e.stopPropagation(); skip(10)}} className="hover:text-cyan transition-colors hidden sm:block relative w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" title="Skip forward 10s">
+                <RotateCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 absolute inset-0" />
+                <span className="absolute inset-0 flex items-center justify-center text-[6px] sm:text-[7px] font-bold font-mono mt-[1px]">10</span>
               </button>
               
-              <div className="flex items-center space-x-2 group/vol">
+              <div className="flex items-center space-x-1 sm:space-x-2 group/vol">
                 <button onClick={() => setIsMuted(!isMuted)} className="hover:text-cyan transition-colors">
-                  {isMuted || volume === 0 ? <VolumeX className="w-4 h-4 md:w-5 md:h-5" /> : <Volume2 className="w-4 h-4 md:w-5 md:h-5" />}
+                  {isMuted || volume === 0 ? <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" /> : <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />}
                 </button>
                 <input 
                   type="range" min="0" max="1" step="0.05" 
@@ -431,9 +431,9 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
             </div>
             
             {/* Right Controls */}
-            <div className="flex items-center space-x-3 md:space-x-5 text-white/90 relative h-6">
+            <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-5 text-white/90 relative h-6">
               <button onClick={addBookmark} className="hover:text-cyan transition-colors flex items-center justify-center h-full" title="Add Bookmark">
-                <Bookmark className="w-4 h-4 md:w-5 md:h-5" />
+                <Bookmark className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
               </button>
               
               {/* Settings Menu */}
@@ -443,7 +443,7 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
                   className="hover:text-cyan transition-colors flex items-center justify-center" 
                   title="Settings"
                 >
-                  <Settings className="w-4 h-4 md:w-5 md:h-5" />
+                  <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
                 </button>
                 {showQualityMenu && (
                   <div className="absolute bottom-full right-0 mb-4 flex flex-col bg-panel border border-line rounded-lg p-2 text-xs md:text-sm whitespace-nowrap z-50 shadow-2xl min-w-[160px]">
@@ -496,7 +496,7 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
                   className={`hover:text-cyan transition-colors flex items-center justify-center ${ccLanguage !== 'off' ? 'text-cyan' : ''}`}
                   title="Closed Captions"
                 >
-                  <Subtitles className="w-4 h-4 md:w-5 md:h-5" />
+                  <Subtitles className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
                 </button>
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 hidden group-hover/cc:flex flex-col bg-panel border border-line rounded-lg p-2 text-xs md:text-sm whitespace-nowrap z-50 shadow-2xl">
                   <div className="text-muted font-bold px-3 py-1 border-b border-line mb-1 uppercase tracking-wider text-[10px]">Captions</div>
@@ -516,10 +516,10 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
               </div>
 
               <button onClick={(e) => {e.stopPropagation(); togglePiP()}} className="hover:text-cyan transition-colors hidden sm:flex items-center justify-center h-full" title="Picture in Picture">
-                <PictureInPicture className="w-4 h-4 md:w-5 md:h-5" />
+                <PictureInPicture className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
               </button>
               <button onClick={(e) => {e.stopPropagation(); toggleFullscreen()}} className="hover:text-cyan transition-colors flex items-center justify-center h-full" title="Fullscreen">
-                <Maximize className="w-4 h-4 md:w-5 md:h-5" />
+                <Maximize className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
               </button>
             </div>
           </div>

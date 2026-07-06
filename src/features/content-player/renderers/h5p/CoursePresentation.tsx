@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { H5PCoursePresentationData } from '../../../../types';
-import { ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface CoursePresentationProps {
   data: H5PCoursePresentationData;
@@ -32,30 +32,30 @@ export const CoursePresentation: React.FC<CoursePresentationProps> = ({ data, on
   const slide = data.slides[currentSlide];
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col h-[600px] bg-bg border border-line rounded-2xl shadow-xl overflow-hidden">
+    <div className="w-full max-w-4xl mx-auto flex flex-col h-[500px] md:h-[600px] bg-bg border border-line rounded-2xl shadow-xl overflow-hidden">
       
       {/* Slide Content Area */}
-      <div className="flex-1 relative bg-panel m-4 rounded-xl border border-line overflow-hidden">
-        {slide.elements.map(element => {
+      <div className="flex-1 relative bg-panel m-2 sm:m-4 rounded-xl border border-line overflow-y-auto sm:overflow-hidden flex flex-col sm:block p-4 sm:p-0 gap-4">
+        {[...slide.elements].sort((a, b) => a.y - b.y).map(element => {
           return (
             <div
               key={element.id}
-              className="absolute"
+              className="relative sm:absolute w-full sm:w-[var(--w)] h-auto sm:h-[var(--h)] left-auto sm:left-[var(--x)] top-auto sm:top-[var(--y)] shrink-0"
               style={{
-                left: `${element.x}%`,
-                top: `${element.y}%`,
-                width: `${element.width}%`,
-                height: `${element.height}%`
-              }}
+                '--x': `${element.x}%`,
+                '--y': `${element.y}%`,
+                '--w': `${element.width}%`,
+                '--h': `${element.height}%`
+              } as React.CSSProperties}
             >
               {element.type === 'text' && (
-                <div className="w-full h-full flex items-center justify-center p-4">
-                  <p className="text-text font-medium text-center" dangerouslySetInnerHTML={{ __html: element.content }} />
+                <div className="w-full h-full flex items-center justify-center sm:p-4">
+                  <div className="text-text font-medium text-center text-sm sm:text-base md:text-lg [&>h2]:text-lg [&>h2]:sm:text-xl [&>h2]:md:text-2xl [&>h2]:font-bold [&>h2]:mb-2" dangerouslySetInnerHTML={{ __html: element.content }} />
                 </div>
               )}
               {element.type === 'image' && (
-                <div className="w-full h-full flex items-center justify-center">
-                  <img src={element.content} alt="" className="max-w-full max-h-full object-contain rounded-lg shadow-md" />
+                <div className="w-full h-full flex items-center justify-center py-2 sm:py-0">
+                  <img src={element.content} alt="" className="max-w-full max-h-[250px] sm:max-h-full object-contain rounded-lg shadow-md" />
                 </div>
               )}
               {element.type === 'video' && (
@@ -117,12 +117,6 @@ export const CoursePresentation: React.FC<CoursePresentationProps> = ({ data, on
         </button>
       </div>
 
-      {completedSlides.has(data.slides.length - 1) && (
-        <div className="absolute top-4 right-4 bg-green text-bg font-bold px-4 py-2 rounded-xl shadow-lg flex items-center space-x-2 animate-in fade-in slide-in-from-top-2">
-          <CheckCircle2 className="w-4 h-4" />
-          <span className="text-xs uppercase tracking-widest">Presentation Completed</span>
-        </div>
-      )}
     </div>
   );
 };

@@ -321,10 +321,10 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               </div>
 
               {/* Main Title */}
-              <h1 className="text-4xl lg:text-5xl xl:text-6xl font-black text-text font-display leading-[1.1] tracking-tight">
+              <h1 className="text-[32px] leading-[1.3] sm:text-4xl lg:text-5xl xl:text-6xl font-black text-text font-display sm:leading-[1.1] tracking-tight">
                 Now learning from<br />
                 anywhere, and build<br />
-                your <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan to-purple whitespace-nowrap">
+                your <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan to-purple">
                   bright career.
                   {/* Swoosh Underline */}
                   <svg className="absolute w-full h-4 -bottom-2 left-0 text-cyan opacity-80" viewBox="0 0 200 20" preserveAspectRatio="none">

@@ -44,11 +44,11 @@ export const MarkTheWords: React.FC<MarkTheWordsProps> = ({ data, onComplete }) 
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-panel border border-line rounded-2xl p-8 shadow-xl">
-      <h2 className="text-xl font-bold text-text mb-6">Mark the correct words</h2>
+    <div className="w-full max-w-3xl mx-auto bg-panel border border-line rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl">
+      <h2 className="text-lg md:text-xl font-bold text-text mb-4 md:mb-6">Mark the correct words</h2>
       <p className="text-sm text-muted mb-4">Click on the words to select them.</p>
       
-      <div className="text-lg leading-loose text-text font-medium bg-bg/50 p-6 rounded-xl border border-line flex flex-wrap gap-x-2 gap-y-3">
+      <div className="text-sm sm:text-base md:text-lg leading-loose text-text font-medium bg-bg/50 p-4 sm:p-6 rounded-xl border border-line flex flex-wrap gap-x-2 gap-y-2 sm:gap-y-3">
         {words.map((word, index) => {
           const isSelected = selectedIndices.has(index);
           const isCorrectAnswer = data.correctWordIndices.includes(index);
@@ -84,31 +84,31 @@ export const MarkTheWords: React.FC<MarkTheWordsProps> = ({ data, onComplete }) 
         })}
       </div>
 
-      <div className="mt-8 flex items-center justify-between">
+      <div className="mt-6 md:mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         {isChecked && (
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 text-center sm:text-left">
             {Array.from(selectedIndices).every(i => data.correctWordIndices.includes(i)) && data.correctWordIndices.every(i => selectedIndices.has(i)) ? (
               <>
-                <CheckCircle2 className="w-5 h-5 text-green" />
-                <span className="text-green font-bold">Perfect! You found all the words.</span>
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green shrink-0" />
+                <span className="text-green font-bold text-sm sm:text-base">Perfect! You found all the words.</span>
               </>
             ) : (
               <>
-                <XCircle className="w-5 h-5 text-red" />
-                <span className="text-red font-bold">Not quite right. Keep trying.</span>
+                <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red shrink-0" />
+                <span className="text-red font-bold text-sm sm:text-base">Not quite right. Keep trying.</span>
               </>
             )}
           </div>
         )}
-        <div className="flex-1" />
-        <div className="flex gap-4">
+        <div className="flex-1 hidden sm:block" />
+        <div className="flex gap-3 sm:gap-4 w-full sm:w-auto">
           {isChecked && (
             <button
               onClick={() => {
                 setIsChecked(false);
                 setSelectedIndices(new Set());
               }}
-              className="bg-bg border border-line text-text hover:border-cyan/50 font-bold px-6 py-3 rounded-xl transition-all"
+              className="flex-1 sm:flex-none bg-bg border border-line text-text hover:border-cyan/50 font-bold px-4 sm:px-6 py-2 sm:py-3 rounded-xl transition-all text-sm md:text-base text-center"
             >
               Retry
             </button>
@@ -116,7 +116,7 @@ export const MarkTheWords: React.FC<MarkTheWordsProps> = ({ data, onComplete }) 
           <button
             onClick={handleCheck}
             disabled={isChecked}
-            className={`font-black px-8 py-3 rounded-xl transition-transform shadow-lg ${isChecked ? 'bg-line text-muted cursor-not-allowed shadow-none' : 'bg-cyan hover:bg-cyan2 text-bg hover:-translate-y-0.5 shadow-cyan/20'}`}
+            className={`flex-1 sm:flex-none font-black px-4 sm:px-8 py-2 sm:py-3 rounded-xl transition-transform shadow-lg text-sm md:text-base text-center ${isChecked ? 'bg-line text-muted cursor-not-allowed shadow-none' : 'bg-cyan hover:bg-cyan2 text-bg hover:-translate-y-0.5 shadow-cyan/20'}`}
           >
             Check Answers
           </button>
