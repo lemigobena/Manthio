@@ -76,26 +76,28 @@ export const TopBar: React.FC<TopBarProps> = ({
     return (
       <div className="bg-panel border-b border-line h-16 px-3 md:px-6 lg:px-8 shrink-0 relative z-[60]">
         <div className="max-w-[1400px] mx-auto h-full flex items-center justify-between w-full">
-          <img 
-            src="/Branding/primary/logo_7_prio_1_variation.png" 
-            alt="Manthio Logo" 
-            className="h-30 -ml-[45px] cursor-pointer object-left object-contain transition-transform hover:scale-105"
-            onClick={() => onNavigate('explore')}
-          />
-          <div className="flex items-center gap-3">
-            <button onClick={toggleTheme} className="p-2 rounded-xl text-muted hover:text-text hover:bg-bg/50 transition-colors">
-              {resolvedTheme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          <div className="min-w-0 shrink">
+            <img 
+              src="/Branding/primary/logo_7_prio_1_variation.png" 
+              alt="Manthio Logo" 
+              className="h-[90px] sm:h-[120px] md:h-24 lg:h-30 -ml-[25px] sm:-ml-[35px] md:-ml-[45px] cursor-pointer object-left object-contain transition-transform hover:scale-105"
+              onClick={() => onNavigate('explore')}
+            />
+          </div>
+          <div className="flex items-center gap-1 sm:gap-3 shrink-0 ml-1">
+            <button onClick={toggleTheme} className="p-1 sm:p-2 rounded-xl text-muted hover:text-text hover:bg-bg/50 transition-colors">
+              {resolvedTheme === 'dark' ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
             </button>
             {isAuthenticated ? (
-              <button onClick={() => onNavigate('dashboard')} className="bg-cyan hover:bg-cyan2 text-bg text-sm font-bold px-4 py-2 rounded-xl transition-colors">
-                Go to Dashboard
+              <button onClick={() => onNavigate('dashboard')} className="bg-cyan hover:bg-cyan2 text-bg text-xs sm:text-sm font-bold px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-colors whitespace-nowrap">
+                Dashboard
               </button>
             ) : (
               <>
-                <button onClick={() => { signOut(); onNavigate('signin'); }} className="bg-transparent border border-cyan text-cyan hover:bg-cyan/10 text-sm font-bold px-4 py-2 rounded-xl transition-colors">
+                <button onClick={() => { signOut(); onNavigate('signin'); }} className="bg-transparent border border-cyan text-cyan hover:bg-cyan/10 text-xs sm:text-sm font-bold px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-colors whitespace-nowrap">
                   Login
                 </button>
-                <button onClick={() => { onNavigate('signup'); }} className="bg-cyan hover:bg-cyan2 text-bg text-sm font-bold px-4 py-2 rounded-xl transition-colors">
+                <button onClick={() => { onNavigate('signup'); }} className="bg-cyan hover:bg-cyan2 text-bg text-xs sm:text-sm font-bold px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-colors whitespace-nowrap">
                   Sign Up
                 </button>
               </>

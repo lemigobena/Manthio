@@ -48,17 +48,17 @@ export const BranchingScenario: React.FC<BranchingScenarioProps> = ({ nodes, sta
 
   return (
     <div ref={containerRef} className="w-full h-full flex flex-col bg-bg border border-line rounded-xl overflow-hidden shadow-xl">
-      <div className={`bg-panel px-6 py-4 border-b border-line flex shrink-0 ${
+      <div className={`bg-panel px-4 sm:px-6 py-3 sm:py-4 border-b border-line flex shrink-0 ${
         containerWidth < 640 ? 'flex-col gap-3 items-stretch' : 'justify-between items-center'
       }`}>
-        <h2 className="text-xl font-bold truncate" title={currentNode.title}>{currentNode.title}</h2>
+        <h2 className="text-base sm:text-lg md:text-xl font-bold truncate" title={currentNode.title}>{currentNode.title}</h2>
         <button 
           onClick={handleRestart}
-          className={`text-muted hover:text-text transition-colors flex items-center space-x-2 text-sm font-bold shrink-0 ${
+          className={`text-muted hover:text-text transition-colors flex items-center space-x-2 text-xs md:text-sm font-bold shrink-0 ${
             containerWidth < 640 ? 'justify-center w-full border border-cyan text-cyan py-2 rounded-lg' : ''
           }`}
         >
-          <RotateCcw className="w-4 h-4 text-cyan" />
+          <RotateCcw className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan" />
           <span className='text-cyan'>Restart Scenario</span>
         </button>
       </div>
@@ -67,53 +67,68 @@ export const BranchingScenario: React.FC<BranchingScenarioProps> = ({ nodes, sta
         containerWidth < 850 ? 'flex-col' : 'flex-row'
       }`}>
         {/* Media / Content Area */}
-        <div className={`flex-1 p-8 overflow-y-auto flex flex-col items-center justify-center border-line ${
+        <div className={`flex-1 p-4 sm:p-8 overflow-y-auto flex flex-col items-center justify-center border-line ${
           containerWidth < 850 ? 'border-b' : 'border-r'
         }`}>
           {currentNode.mediaUrl && (
             <img 
               src={currentNode.mediaUrl} 
               alt={currentNode.title}
-              className="max-h-64 w-auto object-contain rounded-xl shadow-lg mb-8"
+              className="max-h-48 sm:max-h-64 w-auto object-contain rounded-xl shadow-lg mb-4 sm:mb-8"
             />
           )}
           <div className="prose prose-invert max-w-2xl text-center">
-            <p className="text-lg leading-relaxed">{currentNode.content}</p>
+            <p className="text-sm sm:text-base md:text-lg leading-relaxed">{currentNode.content}</p>
           </div>
         </div>
 
         {/* Choices Area */}
-        <div className={`bg-panel p-6 flex flex-col shrink-0 overflow-y-auto ${
-          containerWidth < 850 ? 'w-full max-h-[250px]' : 'w-96'
+        <div className={`bg-panel p-4 sm:p-6 flex flex-col shrink-0 overflow-y-auto ${
+          containerWidth < 850 ? `w-full ${isEndNode ? '' : 'max-h-[250px] sm:max-h-[350px]'}` : 'w-96'
         }`}>
-          <h3 className="text-sm font-bold text-muted uppercase tracking-wider mb-6">
+          <h3 className="text-xs sm:text-sm font-bold text-muted uppercase tracking-wider mb-4 sm:mb-6">
             {isEndNode ? 'Conclusion' : 'What will you do?'}
           </h3>
 
           {isEndNode ? (
             <div className="flex-1 flex flex-col items-center justify-center space-y-6">
-              <div className="w-16 h-16 bg-cyan/20 rounded-full flex items-center justify-center text-cyan">
-                <ArrowRight className="w-8 h-8" />
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
+                currentNode.title.toLowerCase().includes('fail') ? 'bg-red/20 text-red' : 'bg-cyan/20 text-cyan'
+              }`}>
+                {currentNode.title.toLowerCase().includes('fail') ? <RotateCcw className="w-8 h-8" /> : <ArrowRight className="w-8 h-8" />}
               </div>
-              <p className="text-center font-bold">You have reached the end of this scenario.</p>
-              <button
-                onClick={() => onComplete()}
-                className="w-full bg-cyan hover:bg-cyan2 text-bg font-bold py-3 rounded-xl transition-all shadow-lg shadow-cyan/20"
-              >
-                Complete Module
-              </button>
+              <p className="text-center font-bold text-sm sm:text-base">
+                {currentNode.title.toLowerCase().includes('fail') 
+                  ? 'You did not complete the scenario successfully.' 
+                  : 'You have reached the end of this scenario.'}
+              </p>
+              {currentNode.title.toLowerCase().includes('fail') ? (
+                <button
+                  onClick={handleRestart}
+                  className="w-full bg-red hover:bg-red/90 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-red/20 text-sm sm:text-base"
+                >
+                  Try Again
+                </button>
+              ) : (
+                <button
+                  onClick={() => onComplete()}
+                  className="w-full bg-cyan hover:bg-cyan2 text-bg font-bold py-3 rounded-xl transition-all shadow-lg shadow-cyan/20 text-sm sm:text-base"
+                >
+                  Complete Module
+                </button>
+              )}
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {currentNode.choices.map((choice, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleChoice(choice.nextId)}
-                  className="w-full text-left bg-bg hover:bg-line border border-line hover:border-cyan text-text p-4 rounded-xl transition-all group relative overflow-hidden"
+                  className="w-full text-left bg-bg hover:bg-line border border-line hover:border-cyan text-text p-3 sm:p-4 rounded-xl transition-all group relative overflow-hidden"
                 >
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <p className="font-medium pr-8">{choice.text}</p>
-                  <ArrowRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted group-hover:text-cyan transition-colors" />
+                  <p className="text-sm sm:text-base font-medium pr-8">{choice.text}</p>
+                  <ArrowRight className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted group-hover:text-cyan transition-colors" />
                 </button>
               ))}
             </div>

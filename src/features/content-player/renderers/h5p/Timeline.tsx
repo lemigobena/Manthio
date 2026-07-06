@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { H5PTimelineData } from '../../../../types';
-import { CheckCircle2 } from 'lucide-react';
+
 
 interface TimelineProps {
   data: H5PTimelineData;
@@ -33,18 +33,12 @@ export const Timeline: React.FC<TimelineProps> = ({ data, onComplete }) => {
   }, [data.events.length, completed, onComplete]);
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-panel border border-line rounded-2xl p-8 shadow-xl">
-      <div className="flex justify-between items-center mb-8 pb-4 border-b border-line">
+    <div className="w-full max-w-4xl mx-auto bg-panel border border-line rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 pb-4 border-b border-line gap-4 sm:gap-0">
         <div>
-          <h2 className="text-2xl font-bold text-text">Timeline</h2>
-          <p className="text-muted text-sm mt-1">Scroll and explore all events to complete.</p>
+          <h2 className="text-xl md:text-2xl font-bold text-text">Timeline</h2>
+          <p className="text-muted text-xs sm:text-sm mt-1">Scroll and explore all events to complete.</p>
         </div>
-        {completed && (
-          <div className="flex items-center space-x-2 text-green font-bold bg-green/10 px-4 py-2 rounded-lg">
-            <CheckCircle2 className="w-5 h-5" />
-            <span>Completed</span>
-          </div>
-        )}
       </div>
 
       <div className="relative border-l-2 border-line ml-4 space-y-16 pb-8">
@@ -66,11 +60,11 @@ export const Timeline: React.FC<TimelineProps> = ({ data, onComplete }) => {
               <div className={`transition-all duration-500 transform ${
                 isViewed ? 'opacity-100 translate-x-0' : 'opacity-60 group-hover:opacity-100 group-hover:translate-x-2'
               }`}>
-                <span className="text-cyan font-black tracking-widest text-sm uppercase block mb-2 bg-cyan/10 inline-block px-3 py-1 rounded-md">
+                <span className="text-cyan font-black tracking-widest text-xs sm:text-sm uppercase block mb-1.5 sm:mb-2 bg-cyan/10 inline-block px-2 sm:px-3 py-1 rounded-md">
                   {event.year}
                 </span>
-                <h3 className="text-2xl font-bold text-text mb-3 leading-tight">{event.title}</h3>
-                <p className="text-muted leading-relaxed max-w-2xl text-lg">{event.description}</p>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-text mb-2 sm:mb-3 leading-tight">{event.title}</h3>
+                <p className="text-muted leading-relaxed max-w-2xl text-sm sm:text-base md:text-lg">{event.description}</p>
               </div>
             </div>
           );

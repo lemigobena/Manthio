@@ -141,8 +141,18 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ data, onComplete }) =>
                   key={zone.id}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, zone.id)}
-                  className={`border-2 border-dashed rounded-xl p-6 min-h-[160px] flex flex-col transition-colors ${
-                    isSubmitted ? 'border-line' : 'border-line hover:border-cyan hover:bg-cyan/5'
+                  onClick={() => {
+                    if (draggedItemId && !isSubmitted) {
+                      setPlacements(prev => ({ ...prev, [draggedItemId]: zone.id }));
+                      setDraggedItemId(null);
+                    }
+                  }}
+                  className={`border-2 border-dashed rounded-xl p-6 min-h-[160px] flex flex-col transition-all cursor-pointer ${
+                    isSubmitted 
+                      ? 'border-line' 
+                      : draggedItemId
+                        ? 'border-cyan bg-cyan/5 shadow-inner shadow-cyan/10'
+                        : 'border-line hover:border-cyan hover:bg-cyan/5'
                   }`}
                 >
                   <h3 className="font-bold text-lg mb-4 text-center opacity-80">{zone.label}</h3>
@@ -152,7 +162,10 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ data, onComplete }) =>
                       return (
                         <div
                           key={item.id}
-                          onClick={() => handleRemoveFromZone(item.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveFromZone(item.id);
+                          }}
                           className={`px-4 py-2 rounded-lg shadow-sm font-medium cursor-pointer transition-all ${
                             isCorrect === null 
                               ? 'bg-panel border border-line hover:border-cyan text-text'
@@ -181,7 +194,7 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ data, onComplete }) =>
         {/* Draggable Items Bank */}
         <div className={`bg-panel border-line p-6 flex flex-col shrink-0 ${
           containerWidth < 850 
-            ? 'w-full border-t max-h-[160px] overflow-y-auto' 
+            ? 'w-full border-t' 
             : 'w-80 border-l'
         }`}>
           <h3 className="font-bold text-sm uppercase tracking-wider text-muted mb-6">Word Bank</h3>
@@ -193,8 +206,17 @@ export const DragAndDrop: React.FC<DragAndDropProps> = ({ data, onComplete }) =>
                 draggable
                 onDragStart={(e) => handleDragStart(e, item.id)}
                 onDragEnd={handleDragEnd}
-                className={`px-4 py-3 rounded-lg bg-bg border border-line cursor-grab active:cursor-grabbing font-medium shadow-sm transition-all hover:border-cyan hover:shadow-cyan/10 ${
-                  draggedItemId === item.id ? 'opacity-50 scale-95' : 'hover:-translate-y-0.5'
+                onClick={() => {
+                  if (draggedItemId === item.id) {
+                    setDraggedItemId(null);
+                  } else {
+                    setDraggedItemId(item.id);
+                  }
+                }}
+                className={`px-4 py-3 rounded-lg bg-bg cursor-grab active:cursor-grabbing font-medium transition-all shadow-sm ${
+                  draggedItemId === item.id 
+                    ? 'border-2 border-cyan ring-4 ring-cyan/20 scale-105 z-10 relative' 
+                    : 'border border-line hover:border-cyan hover:shadow-cyan/10 hover:-translate-y-0.5'
                 }`}
               >
                 {item.content}

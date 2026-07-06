@@ -40,10 +40,10 @@ export const FillInTheBlanks: React.FC<FillInTheBlanksProps> = ({ data, onComple
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-panel border border-line rounded-2xl p-8 shadow-xl">
-      <h2 className="text-xl font-bold text-text mb-6">Fill in the missing words</h2>
+    <div className="w-full max-w-3xl mx-auto bg-panel border border-line rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl">
+      <h2 className="text-lg md:text-xl font-bold text-text mb-4 md:mb-6">Fill in the missing words</h2>
       
-      <div className="text-lg leading-loose text-text font-medium bg-bg/50 p-6 rounded-xl border border-line">
+      <div className="text-sm sm:text-base md:text-lg leading-loose text-text font-medium bg-bg/50 p-4 sm:p-6 rounded-xl border border-line">
         {parts.map((part, index) => (
           <React.Fragment key={index}>
             <span>{part}</span>
@@ -58,7 +58,7 @@ export const FillInTheBlanks: React.FC<FillInTheBlanksProps> = ({ data, onComple
                     setAnswers(newAnswers);
                     setResults(null); // Reset results on change
                   }}
-                  className={`w-32 px-3 py-1 bg-bg border-b-2 text-center focus:outline-none transition-colors ${
+                  className={`w-28 sm:w-32 md:w-40 px-2 py-1 bg-bg border-b-2 text-center focus:outline-none transition-colors text-sm sm:text-base ${
                     results === null 
                       ? 'border-line focus:border-cyan text-text' 
                       : results[index] 
@@ -73,26 +73,26 @@ export const FillInTheBlanks: React.FC<FillInTheBlanksProps> = ({ data, onComple
         ))}
       </div>
 
-      <div className="mt-8 flex items-center justify-between">
+      <div className="mt-6 md:mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         {results !== null && (
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 text-center sm:text-left">
             {results.every(r => r) ? (
               <>
-                <CheckCircle2 className="w-5 h-5 text-green" />
-                <span className="text-green font-bold">Perfect! All blanks are correct.</span>
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green shrink-0" />
+                <span className="text-green font-bold text-sm sm:text-base">Perfect! All blanks are correct.</span>
               </>
             ) : (
               <>
-                <XCircle className="w-5 h-5 text-red" />
-                <span className="text-red font-bold">Some answers are incorrect. Please try again.</span>
+                <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red shrink-0" />
+                <span className="text-red font-bold text-sm sm:text-base">Some answers are incorrect. Please try again.</span>
               </>
             )}
           </div>
         )}
-        <div className="flex-1" />
+        <div className="flex-1 hidden sm:block" />
         <button
           onClick={handleCheck}
-          className="bg-cyan hover:bg-cyan2 text-bg font-black px-8 py-3 rounded-xl transition-transform hover:-translate-y-0.5 shadow-lg shadow-cyan/20"
+          className="w-full sm:w-auto bg-cyan hover:bg-cyan2 text-bg font-black px-6 md:px-8 py-2 md:py-3 rounded-xl transition-transform hover:-translate-y-0.5 shadow-lg shadow-cyan/20 text-sm md:text-base"
         >
           Check Answers
         </button>

@@ -183,8 +183,8 @@ export const InteractiveVideo: React.FC<InteractiveVideoProps> = ({ data, onComp
 
         {/* Play overlay button */}
         <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${showControls && !isPlaying && showInteraction === null ? 'opacity-100' : 'opacity-0'}`}>
-           <div className="bg-black/50 p-4 md:p-6 rounded-full pointer-events-auto cursor-pointer hover:bg-cyan/90 transition-colors" onClick={(e) => { e.stopPropagation(); togglePlay(); }}>
-             <Play className="w-12 h-12 md:w-16 md:h-16 text-white" fill="currentColor" />
+           <div className="bg-black/50 backdrop-blur-sm p-2 sm:p-4 md:p-6 rounded-full pointer-events-auto cursor-pointer hover:bg-cyan/90 transition-colors shadow-xl" onClick={(e) => { e.stopPropagation(); togglePlay(); }}>
+             <Play className="w-6 h-6 sm:w-12 sm:h-12 md:w-16 md:h-16 text-white" fill="currentColor" />
            </div>
         </div>
 
@@ -234,10 +234,10 @@ export const InteractiveVideo: React.FC<InteractiveVideoProps> = ({ data, onComp
         {/* Video Controls Overlay */}
         <div 
           onClick={(e) => e.stopPropagation()}
-          className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 md:p-6 flex flex-col justify-end h-32 md:h-40 transition-opacity duration-300 z-20 ${showControls && showInteraction === null ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+          className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-2 pt-8 sm:p-4 sm:pt-16 md:p-6 md:pt-24 flex flex-col justify-end transition-opacity duration-300 z-20 ${showControls && showInteraction === null ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         >
           {/* Progress Bar with Interaction Markers */}
-          <div className="relative w-full h-1.5 md:h-2 bg-white/30 rounded-full mb-4 group/progress hover:h-2 md:hover:h-3 transition-all flex items-center">
+          <div className="relative w-full h-1 md:h-1.5 bg-white/30 rounded-full mb-2 sm:mb-4 group/progress hover:h-1.5 md:hover:h-2 transition-all flex items-center">
             <input
               type="range"
               min="0"
@@ -269,25 +269,25 @@ export const InteractiveVideo: React.FC<InteractiveVideoProps> = ({ data, onComp
             })}
           </div>
           
-          <div className="flex items-center justify-between text-[11px] md:text-sm text-white font-semibold">
+          <div className="flex items-center justify-between text-[10px] sm:text-[11px] md:text-sm text-white font-semibold">
             {/* Left Controls */}
-            <div className="flex items-center space-x-3 md:space-x-5">
+            <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-5">
               <button onClick={togglePlay} className="hover:text-cyan transition-colors">
-                {isPlaying ? <Pause className="w-5 h-5 md:w-6 md:h-6" fill="currentColor" /> : <Play className="w-5 h-5 md:w-6 md:h-6" fill="currentColor" />}
+                {isPlaying ? <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-6 md:h-6" fill="currentColor" /> : <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-6 md:h-6" fill="currentColor" />}
               </button>
               
-              <button onClick={(e) => {e.stopPropagation(); skip(-10)}} className="hover:text-cyan transition-colors hidden sm:block relative w-5 h-5" title="Skip backward 10s">
-                <RotateCcw className="w-5 h-5 absolute inset-0" />
-                <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold font-mono mt-[1px]">10</span>
+              <button onClick={(e) => {e.stopPropagation(); skip(-10)}} className="hover:text-cyan transition-colors hidden sm:block relative w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" title="Skip backward 10s">
+                <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 absolute inset-0" />
+                <span className="absolute inset-0 flex items-center justify-center text-[6px] sm:text-[7px] font-bold font-mono mt-[1px]">10</span>
               </button>
-              <button onClick={(e) => {e.stopPropagation(); skip(10)}} className="hover:text-cyan transition-colors hidden sm:block relative w-5 h-5" title="Skip forward 10s">
-                <RotateCw className="w-5 h-5 absolute inset-0" />
-                <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold font-mono mt-[1px]">10</span>
+              <button onClick={(e) => {e.stopPropagation(); skip(10)}} className="hover:text-cyan transition-colors hidden sm:block relative w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" title="Skip forward 10s">
+                <RotateCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 absolute inset-0" />
+                <span className="absolute inset-0 flex items-center justify-center text-[6px] sm:text-[7px] font-bold font-mono mt-[1px]">10</span>
               </button>
               
-              <div className="flex items-center space-x-2 group/vol">
+              <div className="flex items-center space-x-1 sm:space-x-2 group/vol">
                 <button onClick={() => setIsMuted(!isMuted)} className="hover:text-cyan transition-colors">
-                  {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  {isMuted || volume === 0 ? <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" /> : <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />}
                 </button>
                 <input 
                   type="range" min="0" max="1" step="0.05" 
@@ -306,9 +306,9 @@ export const InteractiveVideo: React.FC<InteractiveVideoProps> = ({ data, onComp
             </div>
             
             {/* Right Controls */}
-            <div className="flex items-center space-x-3 md:space-x-5 text-white/90">
-              <button onClick={(e) => { e.stopPropagation(); toggleFullscreen(); }} className="hover:text-cyan transition-colors" title="Fullscreen">
-                <Maximize className="w-4 h-4 md:w-5 md:h-5" />
+            <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-5 text-white/90 relative h-6">
+              <button onClick={(e) => { e.stopPropagation(); toggleFullscreen(); }} className="hover:text-cyan transition-colors flex items-center justify-center h-full" title="Fullscreen">
+                <Maximize className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
               </button>
             </div>
           </div>

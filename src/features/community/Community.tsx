@@ -491,8 +491,8 @@ export const Community: React.FC<CommunityProps> = () => {
                       )}
 
                       {/* Actions */}
-                      <div className="flex items-center space-x-3 mt-3">
-                        <div className="flex items-center space-x-3">
+                      <div className="flex flex-wrap items-center gap-3 mt-3">
+                        <div className="flex items-center gap-3">
                           <span className="text-muted text-sm font-bold min-w-[20px] text-center">{msg.upvotes}</span>
                           <div className="flex items-center space-x-2 rounded-lg p-0.5">
                             <button 
@@ -701,8 +701,8 @@ export const Community: React.FC<CommunityProps> = () => {
                       {renderBody(reply.body)}
                     </div>
 
-                    <div className="flex items-center space-x-3 mt-2">
-                      <div className="flex items-center space-x-3">
+                    <div className="flex flex-wrap items-center gap-3 mt-2">
+                      <div className="flex items-center gap-3">
                         <span className="text-muted text-sm font-bold min-w-[20px] text-center">{reply.upvotes}</span>
                         <div className="flex items-center space-x-2 rounded-lg p-0.5">
                           <button 
