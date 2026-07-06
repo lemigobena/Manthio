@@ -18,10 +18,10 @@ interface TrackDetailProps {
 }
 
 const GOAL_TYPE_COLORS: Record<string, string> = {
-  certification: 'bg-cyan/10 text-cyan border-cyan/30',
-  role:          'bg-purple/10 text-purple border-purple/30',
-  project:       'bg-orange/10 text-orange border-orange/30',
-  topic:         'bg-green/10 text-green border-green/30',
+  certification: 'bg-cyan text-bg border-cyan',
+  role:          'bg-purple text-white border-purple',
+  project:       'bg-orange text-white border-orange',
+  topic:         'bg-green text-white border-green',
 };
 
 const GOAL_TYPE_LABELS: Record<string, string> = {
@@ -32,9 +32,9 @@ const GOAL_TYPE_LABELS: Record<string, string> = {
 };
 
 const DIFFICULTY_COLORS: Record<string, string> = {
-  beginner:     'text-green border-green/40 bg-green/10',
-  intermediate: 'text-yellow border-yellow/40 bg-yellow/10',
-  advanced:     'text-red border-red/40 bg-red/10',
+  beginner:     'bg-bg text-text border-line',
+  intermediate: 'bg-bg text-text border-line',
+  advanced:     'bg-bg text-text border-line',
 };
 
 export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
@@ -166,16 +166,34 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
     <div className="relative -mx-3 md:-mx-[44px] -my-6 bg-bg border-y border-line px-3 md:px-[44px] py-6">
       <div className="max-w-[1400px] mx-auto space-y-8 pb-20">
 
-        {/* Back breadcrumb - Only show for authenticated users */}
-        {isAuthenticated && (
-          <button
-            onClick={() => onNavigate('catalog')}
-            className="flex items-center gap-2 text-muted hover:text-cyan text-xs font-bold transition-colors uppercase tracking-wider"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            All Tracks
-          </button>
-        )}
+        {/* Top Navigation Row */}
+        <div className="flex items-center justify-between">
+          {isAuthenticated ? (
+            <button
+              onClick={() => onNavigate('catalog')}
+              className="flex items-center gap-2 text-muted hover:text-cyan text-xs font-bold transition-colors uppercase tracking-wider"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              All Tracks
+            </button>
+          ) : <div />}
+
+          {/* Bookmark Button */}
+          {isAuthenticated && (
+            <button
+              onClick={handleBookmark}
+              className={`flex items-center gap-2 px-5 py-2 rounded font-bold text-[11px] border transition-all uppercase tracking-wider shadow-sm hover:shadow-md hover:translate-y-[-1px] ${
+                isBookmarked
+                  ? 'border-cyan bg-cyan/10 text-cyan'
+                  : 'border-line bg-panel hover:border-cyan/50 text-text hover:text-cyan'
+              }`}
+              title={isBookmarked ? 'Remove bookmark' : 'Bookmark this track'}
+            >
+              {isBookmarked ? <BookmarkCheck className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
+              {isBookmarked ? 'Saved' : 'Save Track'}
+            </button>
+          )}
+        </div>
 
         {/* ── Hero Header ── */}
         <div className="relative bg-panel border border-line rounded-2xl overflow-hidden">
@@ -185,27 +203,13 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
             {/* Goal type chip */}
             <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
-              <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-full border ${GOAL_TYPE_COLORS[goalType]}`}>
+              <span className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded border shadow-sm ${GOAL_TYPE_COLORS[goalType]}`}>
                 {GOAL_TYPE_LABELS[goalType]}
               </span>
-              <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-full border ${DIFFICULTY_COLORS[difficulty]}`}>
+              <span className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded border shadow-sm ${DIFFICULTY_COLORS[difficulty]}`}>
                 {difficulty}
               </span>
             </div>
-            {/* Bookmark - Only show for authenticated users */}
-            {isAuthenticated && (
-              <button
-                onClick={handleBookmark}
-                className={`absolute top-4 right-4 p-2.5 rounded-xl backdrop-blur-sm transition-all border ${
-                  isBookmarked
-                    ? 'bg-cyan/20 border-cyan/40 text-cyan'
-                    : 'bg-bg/60 border-line text-muted hover:text-cyan hover:border-cyan/30'
-                }`}
-                title={isBookmarked ? 'Remove bookmark' : 'Bookmark this track'}
-              >
-                {isBookmarked ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
-              </button>
-            )}
           </div>
 
           <div className="p-6 md:p-8 space-y-4">
@@ -272,7 +276,7 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
                       handleNavigateToCourse(mappedMilestones[0].courseId, 'learning-path');
                     }
                   }}
-                  className="relative overflow-hidden group bg-cyan hover:bg-cyan2 text-bg font-black text-sm px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(0,245,228,0.25)] hover:shadow-[0_6px_30px_rgba(0,245,228,0.4)] hover:translate-y-[-2px] flex items-center gap-2"
+                  className="relative overflow-hidden group bg-cyan hover:bg-cyan2 text-bg font-black text-sm px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(0,245,228,0.25)] hover:shadow-[0_6px_30px_rgba(0,245,228,0.4)] hover:translate-y-[-2px] flex items-center justify-center gap-2"
                 >
                   <Zap className="w-4 h-4 fill-current" />
                   {completedRequired === totalMilestones ? 'Review Track' : 'Continue Learning'}
@@ -281,7 +285,7 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
               ) : (
                 <button
                   onClick={() => setShowEnrollConfirm(true)}
-                  className="relative overflow-hidden group bg-cyan hover:bg-cyan2 text-bg font-black text-sm px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(0,245,228,0.25)] hover:shadow-[0_6px_30px_rgba(0,245,228,0.4)] hover:translate-y-[-2px] flex items-center gap-2"
+                  className="relative overflow-hidden group bg-cyan hover:bg-cyan2 text-bg font-black text-sm px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(0,245,228,0.25)] hover:shadow-[0_6px_30px_rgba(0,245,228,0.4)] hover:translate-y-[-2px] flex items-center justify-center gap-2"
                 >
                   <Award className="w-4 h-4" />
                   {isCompletedTrack ? 'Start A New' : 'Start Your Journey'}
@@ -357,10 +361,10 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
                 { dot: 'bg-green shadow-[0_0_8px_rgba(43,222,126,0.5)]', label: 'Completed' },
                 { dot: 'bg-cyan animate-pulse shadow-[0_0_10px_rgba(0,245,228,0.6)]', label: 'Current' },
                 { dot: 'bg-bg border-2 border-cyan/40', label: 'Available' },
-                { dot: 'bg-bg border-2 border-dashed border-line/40', label: 'Locked' },
-              ].map(l => (
-                <span key={l.label} className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${l.dot}`} />
+                { icon: <Lock className="w-3 h-3 text-muted" />, label: 'Locked' },
+              ].map((l) => (
+                <span key={l.label} className="flex items-center gap-1.5">
+                  {l.dot ? <span className={`w-3 h-3 rounded-full flex-shrink-0 ${l.dot}`} /> : l.icon}
                   {l.label}
                 </span>
               ))}
@@ -380,13 +384,13 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
         {/* ── Sibling Tracks ── */}
         {TRACKS.filter(t => t.id !== track.id).length > 0 && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <h3 className="font-black text-text text-base">Other Career Tracks</h3>
               <button
                 onClick={() => onNavigate('catalog')}
-                className="text-cyan hover:text-cyan2 text-xs font-bold flex items-center gap-1 transition-colors"
+                className="text-cyan hover:text-cyan2 text-xs font-bold flex items-center gap-1 transition-colors whitespace-nowrap shrink-0"
               >
-                View all <ArrowRight className="w-3.5 h-3.5" />
+                View all <ArrowRight className="w-3.5 h-3.5 shrink-0" />
               </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

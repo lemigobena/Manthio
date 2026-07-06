@@ -40,9 +40,9 @@ export const LiveSessionsDirectory: React.FC<LiveSessionsDirectoryProps> = ({ on
         className="group relative bg-panel border border-line rounded-2xl overflow-hidden cursor-pointer hover:border-cyan/50 transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-cyan/10"
       >
         {isLive && (
-          <div className="absolute top-4 right-4 z-10 flex items-center space-x-2 bg-red/10 text-red px-3 py-1.5 rounded-full border border-red/20 backdrop-blur-md">
-            <div className="w-1.5 h-1.5 rounded-full bg-red animate-pulse shadow-[0_0_8px_var(--red)]" />
-            <span className="text-[10px] font-bold uppercase tracking-widest">Live Now</span>
+          <div className="absolute top-4 right-4 z-10 flex items-center justify-center sm:gap-2 bg-red/10 text-red w-6 h-6 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1 rounded-full sm:rounded border-0 sm:border border-red/20 backdrop-blur-md">
+            <div className="w-1.5 h-1.5 rounded-full bg-red animate-pulse shadow-[0_0_8px_var(--red)] shrink-0" />
+            <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">Live Now</span>
           </div>
         )}
 

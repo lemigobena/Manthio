@@ -232,10 +232,13 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
         {/* 14.2 Primary CTA */}
         <button 
           onClick={() => onNavigate('content-player')}
-          className="w-full bg-cyan hover:bg-cyan2 text-bg font-bold py-3.5 rounded-xl flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-lg shadow-cyan/10"
+          className="w-full bg-cyan hover:bg-cyan2 text-bg font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 overflow-hidden transition-all cursor-pointer shadow-lg shadow-cyan/10"
         >
-          <Play className="w-4 h-4 fill-current" />
-          <span className="text-[11px] uppercase tracking-widest">Continue: {inProgressModule?.title}</span>
+          <Play className="w-4 h-4 fill-current flex-shrink-0" />
+          <span className="text-[11px] uppercase tracking-widest flex items-center gap-1 min-w-0">
+            <span className="whitespace-nowrap">Continue:</span>
+            <span className="truncate">{inProgressModule?.title}</span>
+          </span>
         </button>
       </div>
 

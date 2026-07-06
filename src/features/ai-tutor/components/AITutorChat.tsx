@@ -133,7 +133,7 @@ const AutoExpandingTextarea: React.FC<{
       disabled={disabled}
       placeholder="Ask a question..."
       rows={1}
-      className="flex-1 bg-transparent border-none !border-none !outline-none text-sm py-2.5 text-text focus:outline-none focus:ring-0 focus:shadow-none outline-none resize-none min-h-[40px] max-h-[200px] transition-all"
+      className="flex-1 min-w-0 w-full bg-transparent border-none !border-none !outline-none text-sm py-2.5 text-text focus:outline-none focus:ring-0 focus:shadow-none outline-none resize-none min-h-[40px] max-h-[200px] transition-all"
     />
   );
 };
@@ -292,27 +292,29 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
             
             <AutoExpandingTextarea value={chatInput} onChange={setChatInput} onSend={() => handleSend()} disabled={isTyping} />
             
-            <div className="flex items-center space-x-2 shrink-0">
-              <div className="relative group">
-                <button className="p-2 text-muted hover:text-cyan transition-colors" disabled>
-                  <Mic size={20} />
-                </button>
-                <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-32 text-center bg-panel2 border border-line p-2 rounded-lg shadow-xl text-[10px] text-text">
-                  Voice input coming soon!
+            <div className="flex items-center shrink-0">
+              {!chatInput.trim() && !isTyping ? (
+                <div className="relative group">
+                  <button className="p-2 text-muted hover:text-cyan transition-colors" disabled>
+                    <Mic size={20} />
+                  </button>
+                  <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-32 text-center bg-panel2 border border-line p-2 rounded-lg shadow-xl text-[10px] text-text">
+                    Voice input coming soon!
+                  </div>
                 </div>
-              </div>
-              
-              <button 
-                onClick={() => handleSend()} 
-                disabled={!chatInput.trim() || isTyping} 
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all shrink-0 shadow-lg ${
-                  chatInput.trim() && !isTyping
-                    ? 'bg-cyan text-bg scale-100 shadow-cyan/20 hover:scale-105' 
-                    : 'bg-line/20 text-muted/40 scale-95 opacity-50'
-                }`}
-              >
-                <ArrowUp size={20} className="shrink-0" />
-              </button>
+              ) : (
+                <button 
+                  onClick={() => handleSend()} 
+                  disabled={!chatInput.trim() || isTyping} 
+                  className={`w-9 h-9 ml-1 rounded-full flex items-center justify-center transition-all shrink-0 shadow-lg ${
+                    chatInput.trim() && !isTyping
+                      ? 'bg-cyan text-bg scale-100 shadow-cyan/20 hover:scale-105' 
+                      : 'bg-line/20 text-muted/40 scale-95 opacity-50'
+                  }`}
+                >
+                  <ArrowUp size={20} className="shrink-0" />
+                </button>
+              )}
             </div>
           </div>
           <div className="text-center mt-1.5 flex flex-col items-center justify-center space-y-1">
