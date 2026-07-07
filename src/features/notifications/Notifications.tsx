@@ -50,21 +50,21 @@ export const Notifications: React.FC<NotificationsProps> = ({ onNavigate }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-text">Notifications</h1>
           <p className="text-sm text-muted mt-1">Stay updated with your learning progress and community.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           <button
             onClick={() => onNavigate('settings:preferences')}
-            className="px-4 py-2 bg-bg border border-line hover:border-cyan text-sm font-semibold rounded-xl transition-colors cursor-pointer text-text"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 bg-bg border border-line hover:border-cyan text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer text-text whitespace-nowrap"
           >
             Preferences
           </button>
           <button
             onClick={markAllAsRead}
-            className="px-4 py-2 bg-cyan/10 text-cyan hover:bg-cyan/20 text-sm font-bold rounded-xl transition-colors cursor-pointer"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 bg-cyan/10 text-cyan hover:bg-cyan/20 text-xs sm:text-sm font-bold rounded-xl transition-colors cursor-pointer whitespace-nowrap"
           >
             Mark all read
           </button>

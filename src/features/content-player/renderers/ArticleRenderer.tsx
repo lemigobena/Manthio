@@ -49,7 +49,7 @@ export const ArticleRenderer: React.FC<ArticleRendererProps> = ({ lesson, onCrit
   }, [lesson.id, hasScrollCriteria, threshold, onCriteriaMet]);
 
   return (
-    <div ref={scrollRef} className="p-6 md:p-8 space-y-6 prose prose-invert max-w-none w-full">
+    <div ref={scrollRef} className="px-3 py-6 sm:p-6 md:p-8 space-y-6 prose prose-invert max-w-none w-full">
       <div className="flex justify-between items-start border-b border-line pb-6">
         <div>
           <h2 className="text-xl md:text-3xl font-bold text-text m-0">{lesson.title}</h2>
@@ -183,7 +183,7 @@ export const ArticleRenderer: React.FC<ArticleRendererProps> = ({ lesson, onCrit
           affects the output of our immutable pipeline.
         </p>
 
-        <div className="mt-12 bg-panel border border-line rounded-2xl p-6 md:p-8 flex flex-col items-center shadow-lg">
+        <div className="mt-12 w-full bg-panel border border-line rounded-2xl px-4 py-6 sm:p-6 md:p-8 flex flex-col items-center shadow-lg">
           <div className="text-center mb-6">
             <h4 className="font-bold text-lg text-text">Knowledge Check</h4>
             <p className="text-sm text-muted mt-1">Test your understanding before moving on.</p>

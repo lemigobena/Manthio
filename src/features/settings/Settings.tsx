@@ -687,14 +687,14 @@ const PreferencesTab: React.FC<PreferencesTabProps> = ({ themeMode, setThemeMode
       <div className="space-y-4">
         <h3 className="font-bold text-text text-sm uppercase tracking-wider text-muted">Notification Preferences</h3>
         
-        <div className="p-4 bg-bg border border-line rounded-xl overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
+        <div className="p-2 sm:p-4 bg-bg border border-line rounded-xl overflow-x-auto">
+          <table className="w-full text-left text-[11px] sm:text-sm">
             <thead>
               <tr className="text-muted border-b border-line">
-                <th className="pb-3 font-semibold">Notification Type</th>
-                <th className="pb-3 font-semibold text-center">In-App</th>
-                <th className="pb-3 font-semibold text-center">Email</th>
-                <th className="pb-3 font-semibold text-center">Push</th>
+                <th className="pb-2 sm:pb-3 font-semibold pr-1 sm:pr-2">Type</th>
+                <th className="pb-2 sm:pb-3 font-semibold text-center px-0.5 sm:px-2">App</th>
+                <th className="pb-2 sm:pb-3 font-semibold text-center px-0.5 sm:px-2">Email</th>
+                <th className="pb-2 sm:pb-3 font-semibold text-center px-0.5 sm:px-2">Push</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
@@ -708,40 +708,40 @@ const PreferencesTab: React.FC<PreferencesTabProps> = ({ themeMode, setThemeMode
                 const k = type.key as NotificationCategory;
                 return (
                   <tr key={k}>
-                    <td className="py-3">
-                      <div className="font-bold text-text">{type.label}</div>
-                      <div className="text-[10px] text-muted">{type.desc}</div>
+                    <td className="py-2 sm:py-3 pr-1 sm:pr-2">
+                      <div className="font-bold text-text text-[11px] sm:text-sm leading-tight sm:leading-normal">{type.label}</div>
+                      <div className="text-[9px] sm:text-[10px] text-muted leading-tight sm:leading-normal mt-0.5 min-w-[80px] sm:min-w-0">{type.desc}</div>
                     </td>
-                    <td className="py-3 text-center">
+                    <td className="py-2 sm:py-3 text-center">
                       <div className="flex justify-center">
                         <button
                           type="button"
                           onClick={() => updatePreferences({ [k]: { ...preferences[k], inApp: !preferences[k].inApp } })}
-                          className={`w-8 h-5 rounded-full flex items-center px-0.5 transition-colors cursor-pointer ${preferences[k].inApp ? 'bg-cyan' : 'bg-line'}`}
+                          className={`w-7 sm:w-8 h-4 sm:h-5 rounded-full flex items-center px-0.5 transition-colors cursor-pointer ${preferences[k].inApp ? 'bg-cyan' : 'bg-line'}`}
                         >
-                          <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${preferences[k].inApp ? 'translate-x-3.5' : 'translate-x-0'}`} />
+                          <div className={`w-3 sm:w-3.5 h-3 sm:h-3.5 rounded-full bg-white transition-transform ${preferences[k].inApp ? 'translate-x-3 sm:translate-x-3.5' : 'translate-x-0'}`} />
                         </button>
                       </div>
                     </td>
-                    <td className="py-3 text-center">
+                    <td className="py-2 sm:py-3 text-center">
                       <div className="flex justify-center">
                         <button
                           type="button"
                           onClick={() => updatePreferences({ [k]: { ...preferences[k], email: !preferences[k].email } })}
-                          className={`w-8 h-5 rounded-full flex items-center px-0.5 transition-colors cursor-pointer ${preferences[k].email ? 'bg-cyan' : 'bg-line'}`}
+                          className={`w-7 sm:w-8 h-4 sm:h-5 rounded-full flex items-center px-0.5 transition-colors cursor-pointer ${preferences[k].email ? 'bg-cyan' : 'bg-line'}`}
                         >
-                          <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${preferences[k].email ? 'translate-x-3.5' : 'translate-x-0'}`} />
+                          <div className={`w-3 sm:w-3.5 h-3 sm:h-3.5 rounded-full bg-white transition-transform ${preferences[k].email ? 'translate-x-3 sm:translate-x-3.5' : 'translate-x-0'}`} />
                         </button>
                       </div>
                     </td>
-                    <td className="py-3 text-center">
+                    <td className="py-2 sm:py-3 text-center">
                       <div className="flex justify-center">
                         <button
                           type="button"
                           onClick={() => updatePreferences({ [k]: { ...preferences[k], push: !preferences[k].push } })}
-                          className={`w-8 h-5 rounded-full flex items-center px-0.5 transition-colors cursor-pointer ${preferences[k].push ? 'bg-cyan' : 'bg-line'}`}
+                          className={`w-7 sm:w-8 h-4 sm:h-5 rounded-full flex items-center px-0.5 transition-colors cursor-pointer ${preferences[k].push ? 'bg-cyan' : 'bg-line'}`}
                         >
-                          <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${preferences[k].push ? 'translate-x-3.5' : 'translate-x-0'}`} />
+                          <div className={`w-3 sm:w-3.5 h-3 sm:h-3.5 rounded-full bg-white transition-transform ${preferences[k].push ? 'translate-x-3 sm:translate-x-3.5' : 'translate-x-0'}`} />
                         </button>
                       </div>
                     </td>

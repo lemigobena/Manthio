@@ -54,7 +54,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onNavigate }) =>
           <div>
             <h3 className="font-bold text-text text-lg">Check your email</h3>
             <p className="text-sm text-muted mt-2">
-              We've sent a password reset link to <span className="font-semibold text-text">{email}</span>.
+              We've sent a password reset link to <span className="font-semibold text-text break-all">{email}</span>.
             </p>
           </div>
           <button 

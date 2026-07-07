@@ -45,15 +45,16 @@ export const CompetenceProfile: React.FC<CompetenceProfileProps> = ({ onNavigate
   return (
     <div className="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-3 mb-2">
         <button 
           onClick={() => onNavigate('analytics')}
-          className="p-2 hover:bg-bg rounded-lg transition-colors border border-transparent hover:border-line group"
+          className="flex items-center gap-1.5 w-fit py-1.5 px-2 -ml-2 hover:bg-bg rounded-lg transition-colors border border-transparent hover:border-line group text-muted hover:text-text"
         >
-          <ChevronLeft className="w-5 h-5 text-muted group-hover:text-text transition-colors" />
+          <ChevronLeft className="w-4 h-4" />
+          <span className="text-sm font-bold">Back</span>
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-text font-display">Competence Profile Details</h1>
+          <h1 className="text-2xl font-bold text-text font-display leading-tight">Competence Profile Details</h1>
           <p className="text-muted text-sm mt-1">A deep dive into your technical skills and learning progression.</p>
         </div>
       </div>

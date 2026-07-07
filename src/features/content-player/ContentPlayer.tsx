@@ -272,7 +272,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
         <div className={`flex-1 bg-bg flex flex-col items-center ${
           ['PDF', 'Code', 'H5P'].includes(currentLesson.type) 
             ? 'p-2 md:py-3 md:px-4 overflow-hidden' 
-            : 'p-4 md:p-6 overflow-y-auto'
+            : 'px-2 py-4 sm:p-4 md:p-6 overflow-y-auto'
         }`}>
           <div className={`w-full ${((!curriculumOpen && !toolsOpen) || ['PDF', 'Code', 'H5P'].includes(currentLesson.type)) ? 'max-w-[1400px]' : 'max-w-4xl'} transition-all duration-500 ease-in-out flex-1 flex flex-col items-center min-h-0`}>
             {renderCenterContent()}

@@ -539,7 +539,7 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
 
       <div className="grid grid-cols-1 gap-6">
         {/* Transcript (REQ-VIDEO-004) */}
-        <div className="bg-panel border border-line rounded-2xl p-6 space-y-4 min-[1024px]:hidden flex flex-col h-[350px]">
+        <div className="bg-panel border border-line rounded-2xl px-4 py-6 sm:p-6 space-y-4 min-[1024px]:hidden flex flex-col h-[350px]">
           <div className="flex items-center space-x-2 border-b border-line pb-4 shrink-0">
             <FileText className="w-5 h-5 text-cyan" />
             <h3 className="font-bold text-sm uppercase tracking-wider text-text">Transcript</h3>
@@ -552,7 +552,7 @@ export const VideoRenderer: React.FC<VideoRendererProps> = ({ lesson }) => {
       </div>
 
       {/* Inline Quiz / Knowledge Check */}
-      <div className="bg-panel border border-line rounded-2xl p-6 md:p-8 flex flex-col items-center shadow-lg">
+      <div className="w-full bg-panel border border-line rounded-2xl px-4 py-6 sm:p-6 md:p-8 flex flex-col items-center shadow-lg">
         <div className="text-center mb-6">
           <h4 className="font-bold text-lg text-text">Knowledge Check</h4>
           <p className="text-sm text-muted mt-1">Make sure you understood the core concepts from the video.</p>
