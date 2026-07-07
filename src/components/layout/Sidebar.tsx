@@ -262,13 +262,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green border-2 border-panel rounded-full" />
                 </div>
                 <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
-                  <div className="flex justify-between items-center mb-0.5 overflow-hidden">
-                    <span className="text-sm font-bold text-text truncate tracking-tight whitespace-nowrap">{user?.name || "Alex Chen"}</span>
-                    <span className="text-[10px] font-bold text-cyan ml-2">LVL {level}</span>
+                  <div className="flex justify-between items-center mb-0.5 overflow-hidden gap-2">
+                    <span className="text-sm font-bold text-text truncate tracking-tight flex-1 min-w-0">{user?.name || "Alex Chen"}</span>
+                    <span className="text-[10px] font-bold text-cyan shrink-0">LVL {level}</span>
                   </div>
-                  <div className="flex justify-between items-center mb-1 overflow-hidden">
-                    <span className="text-[9px] font-bold text-cyan uppercase tracking-wider whitespace-nowrap">{animatedXp.toLocaleString()} XP</span>
-                    <span className="text-[9px] font-bold text-muted">{animatedProgress}%</span>
+                  <div className="flex justify-between items-center mb-1 overflow-hidden gap-2">
+                    <span className="text-[9px] font-bold text-cyan uppercase tracking-wider truncate flex-1 min-w-0">{animatedXp.toLocaleString()} XP</span>
+                    <span className="text-[9px] font-bold text-muted shrink-0">{animatedProgress}%</span>
                   </div>
                   <div className="w-full h-[2px] bg-line/30 rounded-full overflow-hidden">
                     <div 

@@ -49,8 +49,8 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
   const track = TRACKS.find(t => t.id === activeTrackId) ?? TRACKS[0];
 
   const progress = getProgress(track.id);
-  const isEnrolled = !!(progress?.enrolledAt);
-  const displayAsEnrolled = !isAuthenticated ? true : isEnrolled;
+  const isEnrolled = !!(progress?.enrolledAt) || track.enrolled;
+  const displayAsEnrolled = isEnrolled;
   const isBookmarked = !!(progress?.bookmarkedAt);
   const selfLevel = progress?.selfAssessmentLevel ?? 'nothing';
   // Build the milestones in the new extended format
@@ -284,7 +284,10 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
                 </button>
               ) : (
                 <button
-                  onClick={() => setShowEnrollConfirm(true)}
+                  onClick={() => {
+                    setCheckoutItem({ type: 'track', id: track.id });
+                    onNavigate('checkout');
+                  }}
                   className="relative overflow-hidden group bg-cyan hover:bg-cyan2 text-bg font-black text-sm px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(0,245,228,0.25)] hover:shadow-[0_6px_30px_rgba(0,245,228,0.4)] hover:translate-y-[-2px] flex items-center justify-center gap-2"
                 >
                   <Award className="w-4 h-4" />

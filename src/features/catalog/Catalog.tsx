@@ -121,7 +121,7 @@ interface CatalogProps {
 export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
   const { setActiveCourseId, setActiveTrackId } = useAuth();
   const { addToast } = useXP();
-  const { getTrackPercentage } = useTrack();
+  const { getTrackPercentage, getProgress } = useTrack();
   const [discoveryMode, setDiscoveryMode] = useState<'courses' | 'tracks'>(() => {
     const lastUsed = localStorage.getItem('catalogDiscoveryMode');
     return (lastUsed as 'courses' | 'tracks') || (COURSES.some(c => c.enrolled) ? 'courses' : 'tracks');
@@ -803,7 +803,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
               {/* Action Bar */}
               <div className="p-5 pt-4 border-t border-line mt-auto flex items-center justify-between gap-3 bg-bg/20">
                 <div className="min-w-0">
-                  {track.enrolled ? (
+                  {track.progress === 100 || !!getProgress(track.id)?.enrolledAt || track.enrolled ? (
                     <div className="flex items-center space-x-3 min-w-0">
                       {/* Progress Ring or Completed Icon */}
                       <div className="relative w-9 h-9 flex items-center justify-center flex-shrink-0">
@@ -834,8 +834,8 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                     </div>
                   ) : (
                     <div className="flex flex-col min-w-0">
-                      <span className="text-[10px] text-muted font-bold uppercase mb-0.5 tracking-tight truncate">Track Path</span>
-                      <span className="text-[13px] font-black text-text tracking-tight uppercase truncate">Multi-Course</span>
+                      <span className="text-[10px] text-muted font-bold uppercase mb-0.5 tracking-tight truncate">Multi Course</span>
+                      <span className="text-[13px] font-black text-text tracking-tight uppercase truncate">CHF {((track as unknown as CareerTrack).coursesCount * 120 * 0.8).toFixed(2)}</span>
                     </div>
                   )}
                 </div>
@@ -850,7 +850,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                   className="relative overflow-hidden group/btn flex-shrink-0 bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer"
                 >
                   <span className="relative z-10">
-                    {track.progress === 100 ? 'Review' : track.enrolled ? 'Continue' : 'Enrol'}
+                    {track.progress === 100 ? 'Review' : (!!getProgress(track.id)?.enrolledAt || track.enrolled) ? 'Continue' : 'Enrol'}
                   </span>
                   <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
                 </button>
