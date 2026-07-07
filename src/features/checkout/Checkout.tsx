@@ -238,7 +238,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 xl:px-8 flex flex-col h-full xl:overflow-hidden overflow-y-auto">
+    <div className="max-w-7xl mx-auto px-4 xl:px-8 flex flex-col h-full overflow-y-auto">
       {/* Compact Header */}
       <div className="flex items-center space-x-3 pb-3 pt-2 xl:pt-0 border-b border-line/50 shrink-0 sticky top-0 bg-bg z-10">
         <button 
@@ -251,9 +251,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
       </div>
 
       <div className="flex-1 min-h-0 pt-4 pb-4">
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:h-full">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 pb-15">
           {/* Left Form Section */}
-          <div className="mb-15 xl:col-span-8 space-y-6 xl:space-y-0 xl:justify-between pr-2 flex flex-col xl:h-full">
+          <div className="xl:col-span-8 space-y-8 xl:space-y-10 pr-2 flex flex-col">
             
             {/* Section 1: Contact */}
             <div className="space-y-6">
@@ -390,8 +390,8 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
 
           </div>
 
-          <div className="mb-15 xl:col-span-4 xl:h-full flex flex-col min-h-0">
-            <div className="bg-panel border border-line rounded-[24px] p-3 flex flex-col shadow-xl h-full">
+          <div className="xl:col-span-4 flex flex-col min-h-0">
+            <div className="bg-panel border border-line rounded-[24px] p-3 flex flex-col shadow-xl flex-1">
               <h2 className="text-base font-black text-text uppercase tracking-tight mb-2 shrink-0">Order</h2>
               
               <div className="flex-1 flex flex-col space-y-2 min-h-0 pr-1">
@@ -511,7 +511,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                             />
                           </div>
                         </div>
-                        <span className="text-[9px] text-muted leading-tight font-medium select-none whitespace-nowrap">
+                        <span className="text-[9px] text-muted leading-tight font-medium select-none">
                           I accept the <span className="text-cyan underline cursor-pointer">terms of agreement</span> and the <span className="text-cyan underline cursor-pointer">cancellation policy</span>
                         </span>
                       </label>

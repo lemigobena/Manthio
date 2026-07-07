@@ -136,6 +136,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [ctaSlide, setCtaSlide] = useState(0);
+  const [enrollCourse, setEnrollCourse] = useState<typeof COURSES[0] | null>(null);
 
   // Motion and Animation States
   const [scrollY, setScrollY] = useState(0);
@@ -1026,7 +1027,11 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                   onClick={() => {
                     setActiveTrackId(null);
                     setActiveCourseId(course.id);
-                    onNavigate('course-detail');
+                    if (course.priceStatus === 'included' || course.priceStatus === 'employer') {
+                      setEnrollCourse(course);
+                    } else {
+                      onNavigate('course-detail');
+                    }
                   }}
                   className={`relative overflow-hidden group/btn bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer`}
                 >
@@ -1185,7 +1190,39 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
             </div>
           </div>
 
+          {enrollCourse && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg/80 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="bg-panel border border-line rounded-2xl p-6 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-cyan/10 mx-auto mb-4">
+                  <CheckCircle2 className="w-6 h-6 text-cyan" />
+                </div>
+                <h3 className="text-lg font-bold text-text text-center mb-2">Access Granted</h3>
+                <p className="text-sm text-muted text-center mb-6">
+                  You are enrolling in <strong className="text-text">{enrollCourse.title}</strong>. This access is {enrollCourse.priceStatus === 'included' ? 'included in your active subscription plan' : 'provided by your employer'}.
+                </p>
+                <div className="flex flex-col space-y-3">
+                  <button 
+                    onClick={() => {
+                      onNavigate('course-detail');
+                      setEnrollCourse(null);
+                    }}
+                    className="bg-cyan hover:bg-cyan/90 text-bg font-black py-3 rounded-xl transition-all shadow-lg uppercase tracking-wider text-xs"
+                  >
+                    Proceed to Course Details
+                  </button>
+                  <button 
+                    onClick={() => setEnrollCourse(null)}
+                    className="text-muted hover:text-text font-bold py-2 transition-colors text-xs uppercase tracking-wider"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
     </div>
   );
 };
+
 
