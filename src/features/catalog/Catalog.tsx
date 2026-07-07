@@ -147,6 +147,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
   // Loading & Error States (REQ-LOAD-002, REQ-LOAD-004)
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [enrollCourse, setEnrollCourse] = useState<typeof COURSES[0] | null>(null);
 
   React.useEffect(() => {
     localStorage.setItem('catalogDiscoveryMode', discoveryMode);
@@ -737,8 +738,7 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                     } else if (course.enrolled) {
                       onNavigate('learning-path');
                     } else if (course.priceStatus === 'included' || course.priceStatus === 'employer') {
-                      addToast('success', `🎓 Enrolled in ${course.title} — access granted via ${course.priceStatus === 'included' ? 'your plan' : 'your employer'}.`);
-                      onNavigate('learning-path');
+                      setEnrollCourse(course);
                     } else {
                       onNavigate('checkout');
                     }
@@ -857,6 +857,38 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {enrollCourse && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-panel border border-line rounded-2xl p-6 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-cyan/10 mx-auto mb-4">
+              <CheckCircle className="w-6 h-6 text-cyan" />
+            </div>
+            <h3 className="text-lg font-bold text-text text-center mb-2">Access Granted</h3>
+            <p className="text-sm text-muted text-center mb-6">
+              You are enrolling in <strong className="text-text">{enrollCourse.title}</strong>. This access is {enrollCourse.priceStatus === 'included' ? 'included in your active subscription plan' : 'provided by your employer'}.
+            </p>
+            <div className="flex flex-col space-y-3">
+              <button 
+                onClick={() => {
+                  addToast('success', `🎓 Enrolled in ${enrollCourse.title} — access granted via ${enrollCourse.priceStatus === 'included' ? 'your plan' : 'your employer'}.`);
+                  onNavigate('learning-path');
+                  setEnrollCourse(null);
+                }}
+                className="bg-cyan hover:bg-cyan/90 text-bg font-black py-3 rounded-xl transition-all shadow-lg uppercase tracking-wider text-xs"
+              >
+                Proceed to Course
+              </button>
+              <button 
+                onClick={() => setEnrollCourse(null)}
+                className="text-muted hover:text-text font-bold py-2 transition-colors text-xs uppercase tracking-wider"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
