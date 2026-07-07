@@ -13,7 +13,8 @@ import {
   Percent,
   Sparkles,
   Check,
-  AlertCircle
+  AlertCircle,
+  Layers
 } from 'lucide-react';
 import { useXP } from '../../context/XPContext';
 import { useTrack } from '../track-detail/useTrack';
@@ -49,17 +50,16 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
   const { enrollInTrack } = useTrack();
   const [step, setStep] = useState<'checkout' | 'processing' | 'success' | 'failed' | 'get-ready'>('checkout');
   const [paymentMethod, setPaymentMethod] = useState('card');
-  const [deliveryMethod, setDeliveryMethod] = useState<'online' | 'hybrid'>('online');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [promoActive, setPromoActive] = useState(false);
-  const [simulateFailure, setSimulateFailure] = useState(false);
 
   const isTrack = checkoutItem?.type === 'track';
   const checkoutId = checkoutItem?.id || activeCourseId;
   
   const course = isTrack ? null : (COURSES.find(c => c.id === checkoutId) || COURSES[0]);
   const track = isTrack ? (TRACKS.find(t => t.id === checkoutId) || TRACKS[0]) : null;
+  const displayFormat = selectedFormat || course?.format || 'self-paced';
   
   const activeFormatData = course?.availableFormats?.find(f => f.format === selectedFormat);
   const activeBundle = activeFormatData?.bundledSubscription || course?.bundledSubscription;
@@ -78,10 +78,6 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
     if (!agreedToTerms) return;
     setStep('processing');
     setTimeout(() => {
-      if (simulateFailure) {
-        setStep('failed');
-        return;
-      }
       if (isTrack && track) {
         enrollInTrack(track.id);
         addXp(1000, 'Career Track Enrollment');
@@ -242,25 +238,56 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 lg:px-8 flex flex-col pb-24">
+    <div className="max-w-7xl mx-auto px-4 xl:px-8 flex flex-col h-full xl:overflow-hidden overflow-y-auto">
       {/* Compact Header */}
-      <div className="flex items-center space-x-4 pb-4 border-b border-line/50 shrink-0">
+      <div className="flex items-center space-x-3 pb-3 pt-2 xl:pt-0 border-b border-line/50 shrink-0 sticky top-0 bg-bg z-10">
         <button 
           onClick={() => onNavigate('back')}
-          className="p-2 rounded-lg border border-line bg-panel hover:bg-bg transition-all"
+          className="p-1.5 rounded-lg border border-line bg-panel hover:bg-bg transition-all"
         >
           <ArrowLeft className="w-4 h-4 text-text" />
         </button>
-        <h1 className="text-2xl font-black text-text tracking-tight uppercase">Checkout</h1>
+        <h1 className="text-lg font-black text-text tracking-tight uppercase">Checkout</h1>
       </div>
 
       <div className="flex-1 min-h-0 pt-4 pb-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
-          {/* Left Form Section - Optimized for zero-scroll persistence */}
-          <div className="lg:col-span-8 space-y-8 overflow-y-visible pr-2 flex flex-col">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:h-full">
+          {/* Left Form Section */}
+          <div className="mb-15 xl:col-span-8 space-y-6 xl:space-y-0 xl:justify-between pr-2 flex flex-col xl:h-full">
             
             {/* Section 1: Contact */}
             <div className="space-y-6">
+              {isTrack ? (
+                <div className="bg-cyan/5 border border-cyan/20 rounded-xl p-4 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-cyan/10 flex items-center justify-center shrink-0">
+                    <Layers className="w-5 h-5 text-cyan" />
+                  </div>
+                  <div className="flex flex-col space-y-1">
+                    <span className="text-sm font-black text-text uppercase tracking-tight">Track Enrollment</span>
+                    <span className="text-[11px] text-muted leading-relaxed max-w-xl">
+                      You are enrolling in a comprehensive learning track. This track bundles multiple connected courses into a single guided path, unlocking exclusive rewards and an advanced certification upon completion.
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-cyan/5 border border-cyan/20 rounded-xl p-4 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-cyan/10 flex items-center justify-center shrink-0">
+                    {displayFormat === 'self-paced' ? <Laptop className="w-5 h-5 text-cyan" /> : <Users className="w-5 h-5 text-cyan" />}
+                  </div>
+                  <div className="flex flex-col space-y-1">
+                    <span className="text-sm font-black text-text uppercase tracking-tight">
+                      {displayFormat === 'cohort' ? 'Cohort-Based Learning' : displayFormat === 'flipped' ? 'Flipped Classroom' : 'Self-Paced Learning'}
+                    </span>
+                    <span className="text-[11px] text-muted leading-relaxed max-w-xl">
+                      {displayFormat === 'cohort' 
+                        ? 'You have selected the cohort-based format. You will join a group of peers with scheduled virtual sessions, community interaction, and structured deadlines.' 
+                        : displayFormat === 'flipped'
+                        ? 'You have selected the flipped classroom format. This combines self-paced digital preparation with intensive, structured in-person workshops.'
+                        : 'You have selected the self-paced format. This includes full access to all digital materials, allowing you to learn entirely at your own speed.'}
+                    </span>
+                  </div>
+                </div>
+              )}
               <h2 className="text-sm font-bold text-text flex items-center space-x-2">
                 <span className="text-cyan opacity-40">1.</span>
                 <span>Contact Information</span>
@@ -299,29 +326,13 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            {/* Section 2: Learning Method & Rewards */}
+            {/* Section 2: Rewards */}
             <div className="space-y-6">
               <h2 className="text-sm font-bold text-text flex items-center space-x-2">
                 <span className="text-cyan opacity-40">2.</span>
-                <span>Learning Method & Rewards</span>
+                <span>Rewards</span>
               </h2>
-              <div className="flex space-x-2">
-                <button 
-                  onClick={() => setDeliveryMethod('online')}
-                  className={`flex-1 flex items-center justify-center p-4 rounded-xl border transition-all space-x-2 ${deliveryMethod === 'online' ? 'border-cyan bg-cyan/5' : 'border-line bg-panel opacity-60'}`}
-                >
-                  <Laptop className="w-4 h-4 text-text" />
-                  <span className="text-[9px] font-black uppercase tracking-tight">Self-Paced</span>
-                </button>
-                <button 
-                  onClick={() => setDeliveryMethod('hybrid')}
-                  className={`flex-1 flex items-center justify-center p-4 rounded-xl border transition-all space-x-2 ${deliveryMethod === 'hybrid' ? 'border-cyan bg-cyan/5' : 'border-line bg-panel opacity-60'}`}
-                >
-                  <Users className="w-4 h-4 text-text" />
-                  <span className="text-[9px] font-black uppercase tracking-tight">Hybrid / Live</span>
-                </button>
-              </div>
-              
+
               {/* Promo Code Integrated (REQ-CHECKOUT-004) */}
               <div className="space-y-3 pt-2">
                 <label className="text-[9px] font-black uppercase text-muted tracking-tight ml-1">Promotional Code</label>
@@ -379,13 +390,13 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
 
           </div>
 
-          <div className="mb-15 lg:col-span-4 h-full flex flex-col">
-            <div className="bg-panel border border-line rounded-[24px] pt-5 px-5 pb-7 flex flex-col shadow-xl">
-              <h2 className="text-lg font-black text-text uppercase tracking-tight mb-4">Order</h2>
+          <div className="mb-15 xl:col-span-4 xl:h-full flex flex-col min-h-0">
+            <div className="bg-panel border border-line rounded-[24px] p-3 flex flex-col shadow-xl h-full">
+              <h2 className="text-base font-black text-text uppercase tracking-tight mb-2 shrink-0">Order</h2>
               
-              <div className="flex-1 flex flex-col space-y-4 min-h-0">
+              <div className="flex-1 flex flex-col space-y-2 min-h-0 pr-1">
                 {/* Compact Course Preview */}
-                <div className="relative h-32 shrink-0">
+                <div className="relative h-64 xl:h-44 shrink-0">
                   <img src={isTrack ? track?.imageUrl : course?.imageUrl} alt={isTrack ? track?.title : course?.title} className="w-full h-full object-cover rounded-xl border border-line" />
                   <div className="absolute inset-0 bg-gradient-to-t from-bg/80 to-transparent rounded-xl" />
                   <div className="absolute bottom-3 left-3 pr-3 text-[11px] font-bold text-white line-clamp-1">{isTrack ? track?.title : course?.title}</div>
@@ -393,31 +404,31 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
 
                 {/* Bundled Access Row (REQ-CHECKOUT-010) */}
                 {activeBundle && (
-                  <div className="bg-cyan/10 border border-cyan/20 rounded-xl p-3 flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Sparkles className="w-3.5 h-3.5 text-cyan" />
+                  <div className="bg-cyan/10 border border-cyan/20 rounded-lg p-1.5 flex items-center justify-between">
+                    <div className="flex items-center space-x-1.5">
+                      <Sparkles className="w-3 h-3 text-cyan" />
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-black text-text uppercase leading-none">Access Bundle</span>
-                        <span className="text-[9px] font-bold text-cyan mt-1">{activeBundle.durationMonths}m {activeBundle.label}</span>
+                        <span className="text-[9px] font-black text-text uppercase leading-none">Access Bundle</span>
+                        <span className="text-[8px] font-bold text-cyan mt-0.5">{activeBundle.durationMonths}m {activeBundle.label}</span>
                       </div>
                     </div>
-                    <span className="text-[9px] font-black text-text/50 uppercase">Included</span>
+                    <span className="text-[8px] font-black text-text/50 uppercase">Included</span>
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-3 text-[10px]">
+                <div className="grid grid-cols-2 gap-2 text-[9px]">
                   <div className="space-y-0.5">
                     <span className="text-[8px] font-black text-muted uppercase">Level</span>
-                    <div className="font-bold text-text">{isTrack ? track?.level : course?.level}</div>
+                    <div className="font-bold text-text truncate">{isTrack ? track?.level : course?.level}</div>
                   </div>
                   <div className="space-y-0.5">
                     <span className="text-[8px] font-black text-muted uppercase">Duration</span>
-                    <div className="font-bold text-text">{isTrack ? track?.estimatedTime : course?.duration}</div>
+                    <div className="font-bold text-text truncate">{isTrack ? track?.estimatedTime : course?.duration}</div>
                   </div>
                 </div>
 
                 {/* Compact Breakdown */}
-                <div className="pt-4 border-t border-line/50 space-y-2.5">
+                <div className="pt-2 border-t border-line/50 space-y-1">
                   <div className="flex items-center justify-between text-[11px] font-bold">
                     <span className="text-muted">Subtotal</span>
                     <span className="text-text">CHF {priceValue.toFixed(2)}</span>
@@ -437,70 +448,54 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
 
                 {/* Cohort Booking Status (REQ-CHECKOUT-015) */}
                 {activeCohort && (
-                  <div className="p-3 bg-bg/50 border border-line rounded-xl space-y-2">
-                    <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-wider">
+                  <div className="p-2 bg-bg/50 border border-line rounded-lg space-y-1">
+                    <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-wider">
                       <span className="text-muted">Booking Progress</span>
-                      <span className="text-text">{activeCohort.currentParticipants}/{activeCohort.maxParticipants} <span className="text-muted">Enrolled</span></span>
+                      <span className="text-text">{activeCohort.currentParticipants}/{activeCohort.maxParticipants}</span>
                     </div>
-                    <div className="w-full h-1.5 bg-bg border border-line rounded-full overflow-hidden">
+                    <div className="w-full h-1 bg-bg border border-line rounded-full overflow-hidden">
                       <div 
                         className={`h-full transition-all duration-1000 ${isReserved ? 'bg-orange animate-pulse' : 'bg-green'}`} 
                         style={{ width: `${(activeCohort.currentParticipants / activeCohort.maxParticipants) * 100}%` }} 
                       />
                     </div>
-                    <p className="text-[8px] text-muted font-medium leading-tight italic">
+                    <p className="text-[7px] text-muted font-medium leading-tight italic">
                       {isReserved 
-                        ? `Only ${activeCohort.minParticipants - activeCohort.currentParticipants} more bookings needed to confirm this session.`
-                        : `Session confirmed! ${activeCohort.maxParticipants - activeCohort.currentParticipants} seats remaining.`}
+                        ? `Only ${activeCohort.minParticipants - activeCohort.currentParticipants} more needed.`
+                        : `Session confirmed!`}
                     </p>
                   </div>
                 )}
 
                 {/* Conditional Confirmation Message (REQ-CHECKOUT-016) */}
                 {isReserved && (
-                  <div className="p-3 bg-orange/10 border border-orange/20 rounded-xl">
-                    <p className="text-[9px] text-orange font-bold leading-relaxed">
+                  <div className="p-2 bg-orange/10 border border-orange/20 rounded-lg">
+                    <p className="text-[8px] text-orange font-bold leading-tight">
                       Your seat is reserved. The course runs once {activeCohort.minParticipants} participants are booked. Confirmation by {new Date(activeCohort.confirmationDate).toLocaleDateString()}.
                     </p>
                   </div>
                 )}
                 
-                <div className="mt-6 pt-4 border-t border-line space-y-4">
+                <div className="mt-auto pt-2 border-t border-line space-y-2 shrink-0">
                   <div className="flex items-end justify-between">
-                    <span className="text-xs font-black text-text uppercase">Total</span>
-                    <span className="text-2xl font-black text-text tracking-tighter">CHF {totalAmount.toFixed(2)}</span>
+                    <span className="text-[10px] font-black text-text uppercase">Total</span>
+                    <span className="text-lg font-black text-text tracking-tighter">CHF {totalAmount.toFixed(2)}</span>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <button 
                       onClick={handleProcessPayment}
                       disabled={!agreedToTerms}
-                      className={`w-full py-3.5 rounded-xl flex items-center justify-center space-x-2 transition-all font-black uppercase text-[10px] ${agreedToTerms ? 'bg-cyan hover:bg-cyan/90 text-bg' : 'bg-line text-muted opacity-50'}`}
+                      className={`w-full py-2.5 rounded-lg flex items-center justify-center space-x-2 transition-all font-black uppercase text-[10px] ${agreedToTerms ? 'bg-cyan hover:bg-cyan/90 text-bg' : 'bg-line text-muted opacity-50'}`}
                     >
                       <span className="flex-1 text-center">
                         {isReserved ? 'Reserve Your Seat' : 'Enrol Now'}
                       </span>
-                      <ArrowRight className="w-3.5 h-3.5 mr-2" />
+                      <ArrowRight className="w-3 h-3 mr-2" />
                     </button>
                     
-                    <div className="space-y-3">
-                      <label className="flex items-center gap-3 cursor-pointer group mt-4 mb-2">
-                        <div className="relative shrink-0">
-                          <input 
-                            type="checkbox" 
-                            className="peer sr-only"
-                            checked={simulateFailure}
-                            onChange={(e) => setSimulateFailure(e.target.checked)}
-                          />
-                          <div className="w-4 h-4 rounded border-2 border-line bg-bg transition-all peer-checked:bg-red peer-checked:border-red flex items-center justify-center">
-                            <Check className={`w-2.5 h-2.5 text-bg transition-opacity ${simulateFailure ? 'opacity-100' : 'opacity-0'}`} strokeWidth={4} />
-                          </div>
-                        </div>
-                        <span className="text-[10px] text-muted group-hover:text-text transition-colors font-bold uppercase tracking-widest">
-                          Simulate Payment Failure
-                        </span>
-                      </label>
-                      <label className="flex items-center gap-3 cursor-pointer group">
+                    <div className="space-y-1.5">
+                      <label className="flex items-center gap-2 cursor-pointer group mt-2">
                         <div className="relative shrink-0">
                           <input 
                             type="checkbox" 
@@ -509,19 +504,19 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
                             checked={agreedToTerms}
                             onChange={(e) => setAgreedToTerms(e.target.checked)}
                           />
-                          <div className="w-5 h-5 rounded-lg border-2 border-line bg-bg transition-all duration-300 peer-checked:bg-cyan peer-checked:border-cyan peer-focus:ring-2 peer-focus:ring-cyan/40 flex items-center justify-center">
+                          <div className="w-4 h-4 rounded border-2 border-line bg-bg transition-all duration-300 peer-checked:bg-cyan peer-checked:border-cyan peer-focus:ring-2 peer-focus:ring-cyan/40 flex items-center justify-center">
                             <Check
-                              className={`w-3 h-3 text-bg transition-opacity duration-300 ${agreedToTerms ? 'opacity-100' : 'opacity-0'}`}
+                              className={`w-2.5 h-2.5 text-bg transition-opacity duration-300 ${agreedToTerms ? 'opacity-100' : 'opacity-0'}`}
                               strokeWidth={4}
                             />
                           </div>
                         </div>
-                        <span className="text-[11px] text-muted leading-tight font-medium select-none">
+                        <span className="text-[9px] text-muted leading-tight font-medium select-none whitespace-nowrap">
                           I accept the <span className="text-cyan underline cursor-pointer">terms of agreement</span> and the <span className="text-cyan underline cursor-pointer">cancellation policy</span>
                         </span>
                       </label>
                       {!isTrack && course?.cancellationPolicy && (
-                        <div className="p-3 bg-bg/50 border border-line rounded-xl text-[9px] text-muted leading-relaxed font-medium italic">
+                        <div className="p-1.5 bg-bg/50 border border-line rounded-lg text-[8px] text-muted leading-tight font-medium italic">
                           <strong>Cancellation:</strong> {course.cancellationPolicy}
                         </div>
                       )}
@@ -532,7 +527,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ onNavigate }) => {
             </div>
           </div>
         </div>
-      </div>
+        </div>
     </div>
   );
 };

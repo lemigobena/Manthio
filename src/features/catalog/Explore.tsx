@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
+import { useTrack } from '../track-detail/useTrack';
 import { useAuth } from '../../context/AuthContext';
 import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, Sparkles, Star, Play, Zap, ArrowRight, Code, Command, Cloud, Database, Hexagon, Box, Bot, CheckCircle2, ChevronDown, Check, X } from 'lucide-react';
 import heroImage from '../../assets/hero-student.png';
 import { ParticleNetwork } from '../../components/ui/ParticleNetwork';
+import type { CareerTrack } from '../../types';
 
 interface ExploreDropdownOption { label: string; value: string; }
 interface ExploreDropdownProps {
@@ -119,6 +121,7 @@ interface ExploreProps {
 
 export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
   const { setActiveCourseId, setActiveTrackId, isAuthenticated } = useAuth();
+  const { getProgress, getTrackPercentage } = useTrack();
   const [discoveryMode, setDiscoveryMode] = useState<'courses' | 'tracks'>('tracks');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<string>('All');
@@ -1077,12 +1080,42 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               </div>
 
               {/* Action Bar */}
-              <div className="p-5 pt-4 border-t border-line mt-auto flex items-center justify-between bg-bg/20">
-                <div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-muted font-bold uppercase mb-0.5 tracking-tight">Track Path</span>
-                    <span className="text-[15px] font-black text-text tracking-tight uppercase">Multi-Course</span>
-                  </div>
+              <div className="p-5 pt-4 border-t border-line mt-auto flex items-center justify-between gap-3 bg-bg/20">
+                <div className="min-w-0">
+                  {getTrackPercentage(track as unknown as CareerTrack) === 100 || !!getProgress(track.id)?.enrolledAt || track.enrolled ? (
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <div className="relative w-9 h-9 flex items-center justify-center flex-shrink-0">
+                        {getTrackPercentage(track as unknown as CareerTrack) === 100 ? (
+                          <div className="bg-green/10 p-1.5 rounded-full ring-2 ring-green/20">
+                            <CheckCircle2 className="w-5 h-5 text-green" />
+                          </div>
+                        ) : (
+                          <div className="relative w-9 h-9">
+                            <svg className="w-9 h-9 -rotate-90">
+                              <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" className="text-line opacity-20" />
+                              <circle cx="18" cy="18" r="16" stroke="currentColor" strokeWidth="2.5" fill="transparent" strokeDasharray={100} strokeDashoffset={100 - (100 * getTrackPercentage(track as unknown as CareerTrack)) / 100} className="text-cyan transition-all duration-1000 shadow-[0_0_8px_rgba(45,212,191,0.5)]" />
+                            </svg>
+                            <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-text">
+                              {getTrackPercentage(track as unknown as CareerTrack)}%
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[10px] text-cyan font-black leading-none mb-1 uppercase tracking-wider truncate">
+                          {getTrackPercentage(track as unknown as CareerTrack) === 100 ? 'Completed' : 'Active'}
+                        </span>
+                        <span className="text-[12px] font-bold text-text opacity-80 truncate">
+                          {getTrackPercentage(track as unknown as CareerTrack) === 100 ? 'Review Final Step' : 'Resume Learning'}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[10px] text-muted font-bold uppercase mb-0.5 tracking-tight truncate">Multi Course</span>
+                      <span className="text-[15px] font-black text-text tracking-tight uppercase truncate">CHF {((track as unknown as CareerTrack).coursesCount * 120 * 0.8).toFixed(2)}</span>
+                    </div>
+                  )}
                 </div>
 
                 <button 
@@ -1092,7 +1125,9 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                   }}
                   className="relative overflow-hidden group/btn bg-cyan hover:bg-cyan/90 text-bg text-[12px] font-black px-6 py-2.5 rounded-xl transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)] hover:shadow-[0_6px_20px_rgba(45,212,191,0.4)] hover:translate-y-[-2px] cursor-pointer"
                 >
-                  <span className="relative z-10">Enrol Now</span>
+                  <span className="relative z-10">
+                    {track.progress === 100 ? 'Review' : (!!getProgress(track.id)?.enrolledAt || track.enrolled) ? 'Continue' : 'Enrol'}
+                  </span>
                   <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
                 </button>
               </div>
