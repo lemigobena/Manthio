@@ -63,15 +63,15 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({ onNavigate
         <h1 className="text-3xl font-bold text-text tracking-tight mb-3">
           Check your email
         </h1>
-        <p className="text-muted max-w-sm mx-auto text-sm leading-relaxed">
-          We sent a verification code to <span className="text-text font-semibold">{user?.email || 'your email'}</span>.
+        <p className="text-muted max-w-sm mx-auto text-sm leading-relaxed px-4">
+          We sent a verification code to <span className="text-text font-semibold break-all">{user?.email || 'your email'}</span>.
           Enter it below to secure your account.
         </p>
       </header>
 
       <div className="space-y-8 max-w-sm mx-auto w-full">
         {/* Mock code entry */}
-        <div className="flex gap-3 justify-center">
+        <div className="flex gap-2 sm:gap-3 justify-center px-2">
           {code.map((digit, i) => {
             const borderClass = status === 'error' ? 'border-red-500 text-red-500' : status === 'success' ? 'border-green-500 text-green-500' : 'border-line focus:border-cyan';
             return (
@@ -80,7 +80,7 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({ onNavigate
                 ref={i === 0 ? firstInputRef : undefined}
                 type="text"
                 maxLength={1}
-                className={`w-12 h-14 bg-panel border-2 rounded-xl text-center text-xl font-bold transition-colors !outline-none ${borderClass} ${status === 'idle' ? 'text-text' : ''}`}
+                className={`w-10 h-12 sm:w-12 sm:h-14 bg-panel border-2 rounded-xl text-center text-lg sm:text-xl font-bold transition-colors !outline-none ${borderClass} ${status === 'idle' ? 'text-text' : ''}`}
                 value={digit}
                 onPaste={(e) => {
                   e.preventDefault();

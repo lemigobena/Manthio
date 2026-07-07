@@ -182,7 +182,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete, timeLimit = 
 
   if (phase === 'intro') {
     return (
-      <div className="p-4 sm:p-8 space-y-4 sm:space-y-6 w-full max-w-xl rounded-2xl bg-panel/30 border border-line/50 text-center flex flex-col items-center mx-auto">
+      <div className="p-4 sm:p-8 space-y-4 sm:space-y-6 w-full max-w-3xl rounded-2xl bg-panel/30 border border-line/50 text-center flex flex-col items-center mx-auto">
         <div className="w-12 h-12 sm:w-16 sm:h-16 bg-cyan/10 rounded-full flex items-center justify-center mb-1 sm:mb-2">
           <Brain className="w-6 h-6 sm:w-8 sm:h-8 text-cyan animate-pulse" />
         </div>
@@ -231,7 +231,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete, timeLimit = 
     const passed = accuracy >= passingThreshold;
 
     return (
-      <div className="p-6 sm:p-10 space-y-6 sm:space-y-8 w-full max-w-xl rounded-2xl bg-panel/30 border border-line/50 text-center flex flex-col items-center mx-auto">
+      <div className="p-6 sm:p-10 space-y-6 sm:space-y-8 w-full max-w-3xl rounded-2xl bg-panel/30 border border-line/50 text-center flex flex-col items-center mx-auto">
         <div className="relative">
           <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center ${passed ? 'bg-green/10 text-green' : 'bg-red/10 text-red'}`}>
             {passed ? <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10" /> : <XCircle className="w-8 h-8 sm:w-10 sm:h-10" />}
@@ -276,7 +276,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ onComplete, timeLimit = 
   }
 
   return (
-    <div ref={containerRef} className="p-4 sm:p-6 space-y-4 sm:space-y-5 w-full max-w-xl outline-none rounded-2xl bg-panel/30 border border-line/50 relative overflow-hidden mx-auto">
+    <div ref={containerRef} className="p-4 sm:p-6 space-y-4 sm:space-y-5 w-full max-w-3xl outline-none rounded-2xl bg-panel/30 border border-line/50 relative overflow-hidden mx-auto">
       {/* Progress Bar */}
       <div className="absolute top-0 left-0 w-full h-1 bg-line/20">
         <div 
