@@ -69,36 +69,82 @@ export const TopBar: React.FC<TopBarProps> = ({
     setProfileOpen(prev => !prev);
     setNotificationsOpen(false);
   };
-
   const recentNotifications = notifications.slice(0, 20);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    if (!isPublicView) return;
+    // main is the scroll container in AppLayout
+    const mainElement = document.querySelector('main');
+    if (!mainElement) return;
+    
+    const handleScroll = () => {
+      setScrolled(mainElement.scrollTop > 20);
+    };
+    
+    mainElement.addEventListener('scroll', handleScroll);
+    // trigger once on mount
+    handleScroll();
+    return () => mainElement.removeEventListener('scroll', handleScroll);
+  }, [isPublicView]);
 
   if (isPublicView) {
     return (
-      <div className="bg-panel border-b border-line h-16 px-3 md:px-6 lg:px-8 shrink-0 relative z-[60]">
-        <div className="max-w-[1400px] mx-auto h-full flex items-center justify-between w-full">
-          <div className="min-w-0 shrink">
+      <div className={`fixed top-0 left-0 right-0 h-16 transition-all duration-300 z-[100] ${scrolled ? 'bg-panel/90 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
+        <div className="max-w-[1400px] mx-auto h-full flex items-center justify-between px-4 md:px-8 w-full">
+          <div className="flex items-center shrink-0">
             <img 
               src="/Branding/primary/logo_7_prio_1_variation.png" 
               alt="Manthio Logo" 
-              className="h-[90px] sm:h-[120px] md:h-24 lg:h-30 -ml-[25px] sm:-ml-[35px] md:-ml-[45px] cursor-pointer object-left object-contain transition-transform hover:scale-105"
+              className="h-[80px] sm:h-[100px] md:h-[120px] -ml-[20px] sm:-ml-[30px] md:-ml-[40px] cursor-pointer object-left object-contain transition-transform hover:scale-105"
               onClick={() => onNavigate('explore')}
             />
           </div>
-          <div className="flex items-center gap-1 sm:gap-3 shrink-0 ml-1">
-            <button onClick={toggleTheme} className="p-1 sm:p-2 rounded-xl text-muted hover:text-text hover:bg-bg/50 transition-colors">
-              {resolvedTheme === 'dark' ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
+
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center space-x-8 text-sm font-semibold">
+             {[
+               { label: 'Features', id: 'section-features', offset: 80 },
+               { label: 'Tech', id: 'section-stack', offset: 16 },
+               { label: 'Course', id: 'section-courses', offset: 80 },
+               { label: 'Testimonials', id: 'section-testimonials', offset: 80 },
+             ].map(({ label, id, offset }) => (
+               <button
+                 key={id}
+                 onClick={() => {
+                   const mainEl = document.querySelector('main');
+                   const target = document.getElementById(id);
+                   if (mainEl && target) {
+                     const topOffset = target.getBoundingClientRect().top + mainEl.scrollTop - offset;
+                     mainEl.scrollTo({ top: topOffset, behavior: 'smooth' });
+                   }
+                 }}
+                 className="text-muted hover:text-text transition-colors"
+               >
+                 {label}
+               </button>
+             ))}
+          </div>
+
+          <div className="flex items-center space-x-4 shrink-0">
+            <button 
+              onClick={toggleTheme}
+              className="h-9 w-9 max-[374px]:h-8 max-[374px]:w-8 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer"
+              title={resolvedTheme === 'dark' ? 'Switch to light design' : 'Switch to dark design'}
+            >
+              {resolvedTheme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             {isAuthenticated ? (
-              <button onClick={() => onNavigate('dashboard')} className="bg-cyan hover:bg-cyan2 text-bg text-xs sm:text-sm font-bold px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-colors whitespace-nowrap">
+              <button onClick={() => onNavigate('dashboard')} className="bg-cyan hover:bg-cyan2 text-bg text-sm font-bold px-4 h-9 items-center justify-center rounded-xl transition-all shadow-sm cursor-pointer flex">
                 Dashboard
               </button>
             ) : (
               <>
-                <button onClick={() => { signOut(); onNavigate('signin'); }} className="bg-transparent border border-cyan text-cyan hover:bg-cyan/10 text-xs sm:text-sm font-bold px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-colors whitespace-nowrap">
-                  Login
+                <button onClick={() => { signOut(); onNavigate('signin'); }} className="hidden sm:flex bg-transparent border border-cyan text-cyan hover:bg-cyan/10 text-xs sm:text-sm font-bold px-4 h-9 items-center justify-center rounded-xl transition-colors whitespace-nowrap cursor-pointer">
+                  Log in
                 </button>
-                <button onClick={() => { onNavigate('signup'); }} className="bg-cyan hover:bg-cyan2 text-bg text-xs sm:text-sm font-bold px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl transition-colors whitespace-nowrap">
-                  Sign Up
+                <button onClick={() => { onNavigate('signup'); }} className="bg-cyan hover:bg-cyan2 text-bg text-xs sm:text-sm font-bold px-4 h-9 items-center justify-center rounded-xl transition-colors whitespace-nowrap flex cursor-pointer">
+                  Sign up
                 </button>
               </>
             )}

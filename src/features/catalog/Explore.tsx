@@ -135,7 +135,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
   // Loading & Error States (REQ-LOAD-002, REQ-LOAD-004)
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const [ctaSlide, setCtaSlide] = useState(0);
+
   const [enrollCourse, setEnrollCourse] = useState<typeof COURSES[0] | null>(null);
 
   // Motion and Animation States
@@ -147,13 +147,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  React.useEffect(() => {
-    if (isAuthenticated) return;
-    const interval = setInterval(() => {
-      setCtaSlide(s => (s + 1) % 3);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [isAuthenticated]);
+
 
   React.useEffect(() => {
     localStorage.setItem('catalogDiscoveryMode', discoveryMode);
@@ -519,7 +513,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
           </div>
 
           {/* Powerful Features Vertical Alternating list */}
-          <div className="w-full max-w-7xl mx-auto px-4 mb-24 space-y-24">
+          <div id="section-features" className="w-full max-w-7xl mx-auto px-4 mb-24 space-y-24">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold text-text mb-4">Powerful Features</h2>
               <p className="text-muted text-lg max-w-2xl mx-auto">Explore the frontier of coding evolution. Our latest features redefine the boundaries of what's possible in learning.</p>
@@ -598,13 +592,156 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                 </button>
               </div>
             </div>
+          </div>
 
+          {/* Feature 3 (Text Left, Image Right) - Streaks & Gamification */}
+          <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20 max-w-7xl mx-auto px-4 mb-24">
+            <div className="md:w-1/2 space-y-6">
+              <h3 className="text-3xl font-bold text-text">Keep your momentum with Streaks & XP</h3>
+              <p className="text-muted text-lg leading-relaxed">
+                Stay motivated and build a daily learning habit. Earn XP for every course completed, maintain your daily streaks, and climb the leaderboard.
+              </p>
+              <ul className="space-y-4 pt-4">
+                <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-yellow"/><span className="text-text font-medium">Daily streak tracking and reminders.</span></li>
+                <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-yellow"/><span className="text-text font-medium">Earn XP to unlock new badges and avatars.</span></li>
+                <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-yellow"/><span className="text-text font-medium">Compete with peers on the leaderboard.</span></li>
+              </ul>
+              <div className="pt-4">
+                <button onClick={() => onNavigate('signup')} className="hidden md:flex items-center space-x-2 text-yellow font-bold hover:text-yellow/80 transition-colors cursor-pointer">
+                  <span>Start Your Streak</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <div className="md:w-1/2 w-full h-[400px] bg-bg border border-line rounded-3xl overflow-hidden relative group">
+               <div className="absolute inset-0 flex items-center justify-center flex-col bg-panel">
+                  <div className="w-32 h-32 rounded-full border-4 border-yellow/50 flex items-center justify-center relative mb-6 shadow-[0_0_50px_rgba(250,204,21,0.2)] bg-bg/50 backdrop-blur-sm z-10">
+                    <span className="text-6xl group-hover:scale-125 group-hover:-translate-y-2 transition-transform duration-500">🔥</span>
+                    <div className="absolute -bottom-4 bg-bg border border-yellow text-yellow px-4 py-1 rounded-full text-sm font-bold shadow-lg whitespace-nowrap">14 Days</div>
+                  </div>
+                  <div className="text-center space-y-2 z-10">
+                     <h4 className="text-xl font-bold text-text">You're on fire!</h4>
+                     <p className="text-muted text-sm">+250 XP earned today</p>
+                  </div>
+               </div>
+               <div className="absolute inset-0 bg-gradient-to-tr from-yellow/10 to-orange/10 mix-blend-overlay group-hover:opacity-50 transition-opacity pointer-events-none z-0" />
+            </div>
+            <div className="w-full md:hidden flex justify-center">
+              <button onClick={() => onNavigate('signup')} className="flex items-center space-x-2 text-yellow font-bold hover:text-yellow/80 transition-colors py-3 cursor-pointer">
+                <span>Start Your Streak</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Auto-Scrolling Marquee Section */}
+          <div id="section-stack" className="w-full bg-bg pt-16 pb-24 overflow-hidden relative border-y border-line/50">
+            <style>{`
+              @keyframes marquee-left {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+              }
+              @keyframes marquee-right {
+                0% { transform: translateX(-50%); }
+                100% { transform: translateX(0); }
+              }
+              .animate-marquee-left {
+                animation: marquee-left 40s linear infinite;
+              }
+              .animate-marquee-right {
+                animation: marquee-right 40s linear infinite;
+              }
+              .marquee-track {
+                width: max-content;
+              }
+            `}</style>
+            
+            <div className="text-center max-w-3xl mx-auto px-6 mb-16 relative z-10">
+              <h2 className="text-4xl md:text-5xl lg:text-[64px] font-medium text-text mb-6 font-display tracking-tight leading-[1.1]">
+                Master the Most<br className="hidden md:block"/> In-Demand Tech
+              </h2>
+              <p className="text-muted text-base md:text-xl mb-10 max-w-2xl mx-auto font-light">
+                Learn modern frameworks, languages, and tools through hands-on, interactive coding sessions.
+              </p>
+              <button 
+                onClick={() => onNavigate('signup')} 
+                className="bg-cyan hover:bg-cyan2 text-bg px-8 py-4 rounded-full font-bold transition-all shadow-[0_0_20px_rgba(45,212,191,0.3)] cursor-pointer flex items-center gap-2 mx-auto hover:-translate-y-1"
+              >
+                Start Learning Now <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Marquee Tracks */}
+            <div className="flex flex-col gap-6 relative z-0">
+              {/* Fade Edges */}
+              <div className="absolute top-0 left-0 bottom-0 w-32 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
+              <div className="absolute top-0 right-0 bottom-0 w-32 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
+
+              {/* Track 1 (Left) */}
+              <div className="flex animate-marquee-left gap-6 marquee-track hover:[animation-play-state:paused]">
+                {[...Array(2)].map((_, i) => (
+                  <div key={i} className="flex gap-6 shrink-0">
+                    {[
+                      { name: 'Python', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg' },
+                      { name: 'JavaScript', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg' },
+                      { name: 'AWS', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg' },
+                      { name: 'C++', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg' },
+                      { name: 'React', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg' },
+                      { name: 'Docker', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg' },
+                    ].map((icon, j) => (
+                      <div key={j} className="w-48 h-32 md:w-64 md:h-40 rounded-3xl bg-panel flex items-center justify-center shrink-0 border border-line/20 shadow-lg hover:border-cyan/50 transition-colors cursor-pointer group">
+                        <img src={icon.url} alt={icon.name} className="w-16 h-16 md:w-20 md:h-20 object-contain group-hover:scale-110 transition-transform duration-500" />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+
+              {/* Track 2 (Right) */}
+              <div className="flex animate-marquee-right gap-6 marquee-track hover:[animation-play-state:paused]">
+                {[...Array(2)].map((_, i) => (
+                  <div key={i} className="flex gap-6 shrink-0">
+                    {[
+                      { name: 'Go', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/go/go-original.svg' },
+                      { name: 'TypeScript', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg' },
+                      { name: 'PostgreSQL', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg' },
+                      { name: 'Kubernetes', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kubernetes/kubernetes-plain.svg' },
+                      { name: 'Rust', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rust/rust-original.svg' },
+                      { name: 'Next.js', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original.svg' },
+                    ].map((icon, j) => (
+                      <div key={j} className="w-48 h-32 md:w-64 md:h-40 rounded-3xl bg-panel flex items-center justify-center shrink-0 border border-line/20 shadow-lg hover:border-cyan/50 transition-colors cursor-pointer group">
+                        {icon.name === 'Next.js' ? 
+                           <img src={icon.url} alt={icon.name} className="w-16 h-16 md:w-20 md:h-20 object-contain group-hover:scale-110 transition-transform duration-500 dark:invert" />
+                           :
+                           <img src={icon.url} alt={icon.name} className="w-16 h-16 md:w-20 md:h-20 object-contain group-hover:scale-110 transition-transform duration-500" />
+                        }
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row items-center justify-center gap-12 mt-16 text-sm text-muted relative z-10">
+              <div className="text-center">
+                 <h4 className="font-bold text-text mb-1">Industry Standard</h4>
+                 <p className="text-xs max-w-[120px]">Learn the tools used by top tech companies.</p>
+              </div>
+              <div className="text-center">
+                 <h4 className="font-bold text-text mb-1">Hands-on Practice</h4>
+                 <p className="text-xs max-w-[120px]">Write code directly in the browser.</p>
+              </div>
+              <div className="text-center">
+                 <h4 className="font-bold text-text mb-1">AI Guided</h4>
+                 <p className="text-xs max-w-[120px]">Get instant feedback and help when stuck.</p>
+              </div>
+            </div>
           </div>
         </>
       )}
 
       {/* REQ-CATALOG-002: Discovery Modes */}
-      <div className="flex justify-center mb-2">
+      <div id="section-courses" className="flex justify-center mb-2">
         <div className="bg-panel border border-line p-1 rounded-2xl flex space-x-1 shadow-sm">
           <button 
             onClick={() => handleDiscoveryModeChange('tracks')}
@@ -880,7 +1017,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeIn_0.3s_ease-out]">
-          {discoveryMode === 'courses' ? sortedCourses.map((course, index) => (
+          {discoveryMode === 'courses' ? sortedCourses.slice(0, !isAuthenticated ? 6 : undefined).map((course, index) => (
             <React.Fragment key={course.id}>
               {/* First CTA: Image Split Design */}
               {!isAuthenticated && index === 3 && (
@@ -910,54 +1047,6 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-panel via-panel/50 to-transparent md:w-1/2" />
-                  </div>
-                </div>
-              )}
-
-              {/* Second CTA: Testimonial Carousel Design */}
-              {!isAuthenticated && index === 9 && (
-                <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-gradient-to-br from-indigo-900/40 via-purple-900/20 to-bg border border-indigo-500/30 rounded-3xl p-8 md:p-12 relative overflow-hidden shadow-2xl my-16 flex flex-col items-center justify-center min-h-[400px]">
-                  {/* Background decoration */}
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
-                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl" />
-                  
-                  <div className="relative z-10 w-full max-w-4xl mx-auto text-center">
-                    <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-widest mb-8">What our learners say</h3>
-                    
-                    <div className="relative h-[200px] flex items-center justify-center">
-                      {[
-                        { text: "Manthio helped me land a Senior React Developer role in just 3 months. The interactive projects are a game-changer.", author: "Sarah Jenkins", role: "Frontend Engineer @ TechFlow" },
-                        { text: "The AI tutor feels like pair programming with a senior dev. It explains the 'why' behind the code, not just the 'how'.", author: "David Chen", role: "Full Stack Developer" },
-                        { text: "I've tried many platforms, but Manthio's career tracks provide the most structured and practical learning experience.", author: "Elena Rodriguez", role: "Data Scientist" }
-                      ].map((slide, i) => (
-                        <div 
-                          key={i} 
-                          className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-700 transform ${ctaSlide === i ? 'opacity-100 translate-x-0 scale-100' : 'opacity-0 translate-x-8 scale-95 pointer-events-none'}`}
-                        >
-                          <div className="flex gap-1 mb-6">
-                            {[1,2,3,4,5].map(star => <Star key={star} className="w-5 h-5 fill-yellow text-yellow" />)}
-                          </div>
-                          <p className="text-xl md:text-3xl font-medium text-text leading-tight mb-8 max-w-3xl">"{slide.text}"</p>
-                          <div className="flex items-center gap-3 text-left">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan to-purple flex items-center justify-center text-white font-bold text-xl shadow-lg">{slide.author.charAt(0)}</div>
-                            <div>
-                              <p className="font-bold text-text">{slide.author}</p>
-                              <p className="text-xs text-muted">{slide.role}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="flex items-center justify-center gap-3 mt-10">
-                      {[0,1,2].map(i => (
-                        <button 
-                          key={i} 
-                          onClick={() => setCtaSlide(i)}
-                          className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer ${ctaSlide === i ? 'bg-indigo-400 w-8' : 'bg-line hover:bg-muted'}`}
-                        />
-                      ))}
-                    </div>
                   </div>
                 </div>
               )}
@@ -1041,7 +1130,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               </div>
             </div>
             </React.Fragment>
-          )) : tracksToShow.map(track => (
+          )) : tracksToShow.slice(0, !isAuthenticated ? 6 : undefined).map(track => (
             <div 
               key={track.id} 
               className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:translate-y-[-4px] duration-300 h-[420px]"
@@ -1138,6 +1227,55 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Login to see more CTA */}
+      {!isAuthenticated && (discoveryMode === 'courses' ? sortedCourses.length > 6 : tracksToShow.length > 6) && (
+        <div className="mt-12 flex justify-center w-full max-w-7xl mx-auto px-4">
+           <button 
+             onClick={() => onNavigate('signin')} 
+             className="bg-transparent border-2 border-cyan text-cyan hover:bg-cyan/10 font-bold py-3 px-8 rounded-xl transition-all flex items-center gap-2"
+           >
+             Login to see more {discoveryMode === 'courses' ? 'courses' : 'tracks'}
+             <ArrowRight className="w-4 h-4" />
+           </button>
+        </div>
+      )}
+
+      {/* Testimonial Section */}
+      {!isAuthenticated && (
+        <div id="section-testimonials" className="w-full max-w-7xl mx-auto px-4 mt-24 mb-10">
+          <div className="text-center mb-14">
+            <span className="inline-block text-xs font-bold uppercase tracking-widest text-cyan mb-3">What our learners say</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-text mb-4">Loved by Developers</h2>
+            <p className="text-muted text-lg max-w-xl mx-auto">Join thousands of engineers who've accelerated their careers with Manthio.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { text: "Manthio helped me land a Senior React Developer role in just 3 months. The interactive projects are a game-changer.", author: "Sarah Jenkins", role: "Frontend Engineer @ TechFlow", avatar: "SJ", color: "from-cyan to-blue-500" },
+              { text: "The AI tutor feels like pair programming with a senior dev. It explains the 'why' behind the code, not just the 'how'.", author: "David Chen", role: "Full Stack Developer @ Vercel", avatar: "DC", color: "from-purple to-pink-500" },
+              { text: "I've tried many platforms, but Manthio's career tracks provide the most structured and practical learning experience.", author: "Elena Rodriguez", role: "Data Scientist @ Meta", avatar: "ER", color: "from-yellow to-orange-400" },
+              { text: "The streak system kept me consistent. I went from beginner to getting my AWS certification in 60 days.", author: "James Okafor", role: "Cloud Engineer @ AWS", avatar: "JO", color: "from-green to-teal-400" },
+              { text: "The course content is incredibly up-to-date. I learned Docker and Kubernetes concepts I'm already using at work.", author: "Aisha Patel", role: "DevOps Engineer @ Spotify", avatar: "AP", color: "from-blue-400 to-cyan" },
+              { text: "Manthio's community is everything. Got a job referral from a peer I met in a live coding session!", author: "Marcus Liu", role: "Backend Developer @ Stripe", avatar: "ML", color: "from-pink-400 to-purple" },
+            ].map((t, i) => (
+              <div key={i} className="bg-panel border border-line rounded-2xl p-6 flex flex-col gap-4 hover:border-cyan/40 hover:shadow-[0_0_30px_rgba(45,212,191,0.05)] transition-all duration-300 group">
+                <div className="flex gap-1">
+                  {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-yellow text-yellow" />)}
+                </div>
+                <p className="text-text/90 text-sm leading-relaxed flex-1">"{t.text}"</p>
+                <div className="flex items-center gap-3 pt-2 border-t border-line">
+                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0`}>{t.avatar}</div>
+                  <div>
+                    <p className="font-bold text-text text-sm">{t.author}</p>
+                    <p className="text-xs text-muted">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
