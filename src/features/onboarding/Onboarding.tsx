@@ -10,13 +10,17 @@ import {
   ChevronRight,
   Sun,
   Moon,
-  Brain,
-  Bot,
   Sparkles,
   BookOpen,
   Code2,
   Globe,
   Upload,
+  Terminal,
+  Cloud,
+  GitBranch,
+  Cpu,
+  Layers,
+  FlaskConical,
 } from 'lucide-react';
 // Import custom avatars
 import boy from '../../assets/avatars/boy.png';
@@ -301,170 +305,158 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
       <div className={`flex-1 relative w-full h-full ${(step === 2 || step > 2) ? 'overflow-y-auto md:overflow-hidden bg-bg' : 'overflow-hidden'}`}>
 
         {step === 0 && (
-          <div className="relative h-full w-full flex flex-col items-center justify-center bg-bg overflow-hidden pt-12">
-            {/* --- MAIN CONTENT AREA WITH ORBITS --- */}
-            <div className="relative flex items-center justify-center w-full h-[80%] flex-1">
+          <div className="relative h-full w-full flex flex-col bg-bg overflow-hidden">
 
-              {/* --- ORBITAL SYSTEM CONTAINER (Locked Aspect Ratio for Perfect Alignment) --- */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1600px] h-[1000px] pointer-events-none z-0 scale-[0.6] lg:scale-[0.8] xl:scale-100 origin-center">
 
-                {/* ORBITAL SVG LAYER */}
-                <div className="absolute inset-0">
-                  <svg className="w-full h-full" viewBox="0 0 1600 1000" fill="none">
-                    {/* Highly Visible Expanded Orbits */}
-                    <circle cx="800" cy="500" r="350" stroke="var(--line)" strokeWidth="1.5" strokeOpacity="0.8" />
-                    <circle cx="800" cy="500" r="520" stroke="var(--line)" strokeWidth="1.5" strokeOpacity="0.6" />
-                    <circle cx="800" cy="500" r="720" stroke="var(--line)" strokeWidth="1.5" strokeOpacity="0.4" />
-                  </svg>
+            {/* ── SCROLLING TICKER MARQUEE (top) — seamless infinite ── */}
+            {(() => {
+              const topItems = [
+                '🔥 Peer Learning', '✨ AI Tutor', '🏅 XP & Streaks', '🌐 Community',
+                '📜 Certified', '💻 Live REPL', '🚀 Flipped Classroom', '🤝 Collaborate',
+              ];
+              const sep = <span className="inline-block w-6 text-center text-line select-none">·</span>;
+              const track = (
+                <div className="flex items-center shrink-0">
+                  {topItems.map((item, i) => (
+                    <React.Fragment key={i}>
+                      <span className="text-[11px] font-black tracking-[0.15em] text-muted/100 whitespace-nowrap px-4">
+                        {item}
+                      </span>
+                      {sep}
+                    </React.Fragment>
+                  ))}
                 </div>
-
-                {/* FLOATING NODES - Identical Coordinate System */}
-                <div className="absolute inset-0">
-
-                  {/* INNER ORBIT (R=350) */}
-                  <div className="absolute flex items-center justify-center" style={{ left: 800 + 350 * 0.707 - 20, top: 500 - 350 * 0.707 - 20 }}>
-                    <div className="w-10 h-10 rounded-full bg-cyan/10 border border-cyan/30 flex items-center justify-center text-cyan shadow-lg">
-                      <BookOpen className="w-5 h-5" />
-                    </div>
+              );
+              return (
+                <div className="relative z-10 mt-4 overflow-hidden w-full">
+                  <div className="flex animate-[marquee_22s_linear_infinite]" style={{ width: 'max-content' }}>
+                    {track}{track}{track}
                   </div>
-                  <div className="absolute flex items-center space-x-1.5 opacity-60" style={{ left: 800 + 350 * 0.94 - 10, top: 500 - 350 * 0.34 - 10 }}>
-                    <div className="bg-panel p-1 rounded shadow-sm border border-line">
-                      <svg className="w-3 h-3 text-muted" fill="currentColor" viewBox="0 0 20 20"><path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a.2 .2 0 010 2l-3-3a.2 .2 0 00-.2 .2H4a2 2 0 01-2-2V5z" /></svg>
-                    </div>
-                    <span className="text-[10px] font-bold text-text/40">32</span>
-                  </div>
-                  <div className="absolute -translate-x-1/2" style={{ left: 800, top: 500 + 350 - 10 }}>
-                    <svg className="w-5 h-5 text-text/30" fill="currentColor" viewBox="0 0 24 24"><path d="M13.16 12.46L18 11.23L6.00001 5L10.23 18.23L12.46 13.16L17 17.71L17.71 17L13.16 12.46Z" /></svg>
-                  </div>
-                  <div className="absolute flex items-center space-x-1" style={{ left: 800 - 350 * 0.866 - 15, top: 500 + 350 * 0.5 - 10 }}>
-                    <span className="text-sm">🏅</span>
-                    <span className="text-[10px] font-bold text-text/40">35</span>
-                  </div>
-                  <div className="absolute" style={{ left: 800 - 350 * 0.866 - 20, top: 500 - 350 * 0.5 - 20 }}>
-                    <img src="https://i.pravatar.cc/150?u=11" className="w-10 h-10 rounded-full border-2 border-bg" alt="" />
-                  </div>
-
-                  {/* MIDDLE ORBIT (R=520) */}
-                  <div className="absolute" style={{ left: 800 - 520 * 0.707 - 22, top: 500 - 520 * 0.707 - 22 }}>
-                    <img src="https://i.pravatar.cc/150?u=12" className="w-11 h-11 rounded-full border-2 border-bg shadow-xl" alt="" />
-                  </div>
-                  <div className="absolute flex items-center space-x-1.5 opacity-50" style={{ left: 800 - 520 * 0.866 - 15, top: 500 - 520 * 0.5 - 15 }}>
-                    <svg className="w-4 h-4 text-muted" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" /></svg>
-                    <span className="text-[11px] font-bold text-text/40">10</span>
-                  </div>
-                  <div className="absolute -translate-y-1/2 -translate-x-1/2 flex items-center justify-center" style={{ left: 800 - 520, top: 500 }}>
-                    <div className="w-11 h-11 rounded-full bg-purple/10 border border-purple/30 flex items-center justify-center text-purple shadow-xl">
-                      <Code2 className="w-6 h-6" />
-                    </div>
-                  </div>
-                  <div className="absolute" style={{ left: 800 - 520 * 0.94 - 40, top: 500 + 520 * 0.34 - 15 }}>
-                    <div className="flex items-center space-x-2 px-4 py-2 rounded-full border border-green/30 bg-green/5 text-[10px] font-black text-green uppercase tracking-wider">
-                      <div className="w-2 h-2 rounded-full bg-green" />
-                      <span>Verified Solution</span>
-                    </div>
-                  </div>
-                  <div className="absolute" style={{ left: 800 - 520 * 0.707 - 20, top: 500 + 520 * 0.707 - 20 }}>
-                    <img src="https://i.pravatar.cc/150?u=14" className="w-10 h-10 rounded-full border-2 border-bg shadow-md" alt="" />
-                  </div>
-                  <div className="absolute flex items-center space-x-3" style={{ left: 800 - 520 * 0.17 - 25, top: 500 - 520 * 0.98 - 25 }}>
-                    <div className="w-10 h-10 rounded-xl bg-panel border border-line flex items-center justify-center text-cyan shadow-xl">
-                      <Brain className="w-5 h-5" />
-                    </div>
-                    <span className="text-[11px] font-black text-text/40">4</span>
-                  </div>
-                  <div className="absolute flex items-center space-x-2" style={{ left: 800 - 520 * 0.5 - 30, top: 500 + 520 * 0.866 - 25 }}>
-                    <div className="w-11 h-11 rounded-2xl bg-panel border border-line flex items-center justify-center animate-[cel-float_4s_infinite] shadow-2xl text-purple">
-                      <Bot className="w-6 h-6" />
-                    </div>
-                    <span className="text-[11px] font-black text-text/40">4</span>
-                  </div>
-
-                  <div className="absolute" style={{ left: 800 + 520 * 0.866 - 18, top: 500 - 520 * 0.5 - 18 }}>
-                    <img src="https://i.pravatar.cc/150?u=15" className="w-9 h-9 rounded-full border-2 border-bg opacity-70" alt="" />
-                  </div>
-                  <div className="absolute -translate-y-1/2 flex flex-col items-center" style={{ left: 800 + 520 - 22, top: 500 }}>
-                    <div className="w-11 h-11 rounded-[22px] bg-panel border border-line flex items-center justify-center text-cyan shadow-xl animate-pulse">
-                      <Sparkles className="w-6 h-6" />
-                    </div>
-                    <div className="mt-1 flex items-center space-x-0.5">
-                      <span className="text-[10px] font-bold text-text/40">AI Powered</span>
-                    </div>
-                  </div>
-                  <div className="absolute -translate-x-1/2" style={{ left: 800 + 520 * 0.866, top: 500 + 520 * 0.5 - 20 }}>
-                    <img src="https://i.pravatar.cc/150?u=16" className="w-10 h-10 rounded-full border-2 border-bg shadow-md" alt="" />
-                  </div>
-                  <div className="absolute -translate-x-1/2" style={{ left: 800 + 520 * 0.5, top: 500 + 520 * 0.866 - 22 }}>
-                    <div className="w-11 h-11 rounded-full bg-green text-bg shadow-2xl flex items-center justify-center">
-                      <Check className="w-6 h-6 stroke-[4]" />
-                    </div>
-                  </div>
-
-                  {/* OUTER ORBIT (R=720) */}
-                  <div className="absolute flex items-center space-x-3" style={{ left: 800 + 720 * 0.866 - 30, top: 500 - 720 * 0.5 - 24 }}>
-                    <div className="w-12 h-12 rounded-full bg-panel border border-line flex items-center justify-center relative shadow-xl">
-                      <svg className="w-6 h-6 text-muted" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" /></svg>
-                      <div className="absolute -right-3 top-0 bg-red text-white p-1 rounded-full shadow-sm">
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5 22 12.28 18.6 15.36 13.45 20.03L12 21.35z" /></svg>
-                      </div>
-                    </div>
-                    <span className="text-[12px] font-black text-text/30">10</span>
-                  </div>
-                  <div className="absolute flex items-center space-x-3 opacity-80" style={{ left: 800 + 720 - 25, top: 485 }}>
-                    <svg className="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
-                    <span className="text-[12px] font-black text-text/30">68</span>
-                  </div>
-                  <div className="absolute flex items-center justify-center" style={{ left: 800 + 720 * 0.866 - 24, top: 500 + 720 * 0.5 - 24 }}>
-                    <div className="w-12 h-12 rounded-full bg-orange/10 border border-orange/30 flex items-center justify-center text-orange shadow-2xl">
-                      <Globe className="w-6 h-6" />
-                    </div>
-                  </div>
-                  <div className="absolute" style={{ left: 800 + 720 * 0.707 - 25, top: 500 + 720 * 0.707 - 25 }}>
-                    <span className="text-5xl filter drop-shadow-[0_0_15px_rgba(255,207,63,0.5)]">✨</span>
-                  </div>
-
-                  <div className="absolute translate-x-[-150px] translate-y-[280px]" style={{ left: 400, top: 500 }}>
-                    <div className="relative w-36 h-36 flex items-center justify-center">
-                      <div className="absolute inset-0 bg-purple/20 rounded-full blur-3xl animate-pulse" />
-                      <span className="text-9xl select-none filter drop-shadow-2xl">🎓</span>
-                    </div>
-                  </div>
-
                 </div>
-              </div>
+              );
+            })()}
 
-              {/* --- CENTRAL TEXT BLOCK (Pixel-aligned to image - Manthio Colors) --- */}
-              <div className="relative z-10 flex flex-col items-center text-center max-w-xl px-6 animate-[cel-reveal_0.8s_ease-out]">
-                <h1 className="text-4xl md:text-6xl font-[900] text-cyan leading-[1.1] tracking-[-0.03em] mb-4 font-sans drop-shadow-sm">
-                  Welcome to Manthio {user?.name?.split(' ')[0] || ''} 👋
-                </h1>
+            {/* ── CENTERED HERO & STATS ── */}
+            <div className="flex-1 flex flex-col justify-center w-full">
 
-                <h2 className="text-2xl md:text-3xl font-normal text-text mb-8 opacity-90">
-                  The home <br className="md:hidden" /> for peer learning
-                </h2>
+              {/* ── MAIN HERO CONTENT ── */}
+              <div className="relative z-10 flex flex-col items-center justify-center px-6 text-center mb-20">
 
-                <p className="text-text/70 text-base md:text-lg font-medium leading-relaxed mb-8 max-w-md">
-                  Join a community of developers mastering skills together. Share knowledge, collaborate on code, and earn verified recognition.
+              {/* Greeting + headline */}
+              <div className="mb-8 animate-[cel-reveal_0.6s_ease-out] select-none" style={{ fontFamily: 'var(--font-display)' }}>
+                {/* Hello name */}
+                <p className="text-[clamp(1rem,3vw,1.4rem)] font-[400] tracking-[0.06em] text-muted/70 mb-1">
+                  Hello, {user?.name?.split(' ')[0] || 'there'} 👋
                 </p>
+                {/* Welcome to Manthio — big gradient */}
+                <h1
+                  className="font-[900] tracking-[-0.04em] leading-[0.9] text-[clamp(2.2rem,10vw,6.5rem)]"
+                  style={{
+                    background: 'linear-gradient(110deg, var(--text) 30%, #00F5E4 85%, #9D6CFF 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                >
+                  Welcome to<br />Manthio.
+                </h1>
+              </div>
 
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => setStep(1)}
-                    className="h-[56px] px-10 rounded-xl bg-cyan hover:bg-cyan2 text-bg text-[16px] font-black hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(0,245,228,0.25)] flex items-center space-x-2 cursor-pointer group"
-                  >
-                    <span>Get started learning</span>
-                    <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                  </button>
+              {/* Sub-copy */}
+              <p className="text-muted text-base md:text-lg font-medium max-w-sm mb-10 leading-relaxed animate-[cel-reveal_0.7s_ease-out]">
+                The dev community where you level up together AI-powered, gamified, and actually fun.
+              </p>
+
+              {/* Avatar social proof + CTA row */}
+              <div className="flex flex-col sm:flex-row items-center gap-4 animate-[cel-reveal_0.8s_ease-out]">
+                {/* Stacked avatars */}
+                <div className="flex items-center gap-2">
+                  <div className="flex -space-x-3">
+                    {[boy, girl, man, woman, man1].map((src, i) => (
+                      <img
+                        key={i}
+                        src={src}
+                        alt=""
+                        className="w-9 h-9 rounded-full border-2 border-bg object-cover"
+                        style={{ zIndex: 5 - i }}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-[12px] font-bold text-muted">+12k devs</span>
                 </div>
+
+                <div className="hidden sm:block w-px h-6 bg-line" />
+
+                {/* CTA */}
+                <button
+                  onClick={() => setStep(1)}
+                  className="group flex items-center gap-2 h-[52px] px-8 rounded-2xl bg-cyan hover:bg-cyan2 text-bg text-[15px] font-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(0,245,228,0.3)] cursor-pointer"
+                >
+                  <span>Let's go</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </button>
               </div>
 
             </div>
 
-            {/* --- SUB-HERO SLOGAN --- */}
-            <div className="relative z-20 pb-16 text-center">
-              <h2 className="text-2xl md:text-3xl font-black text-text tracking-tight">
-                Dedicated space for knowledge.
-              </h2>
+            {/* ── STATS ROW ── */}
+            <div className="relative z-10 mb-10 mx-auto w-full max-w-md sm:max-w-lg md:max-w-xl px-4 sm:px-6">
+              <div className="flex items-center justify-center divide-x divide-line/60">
+                {[
+                  { value: '12k+', label: 'Learners',  color: '#00F5E4' },
+                  { value: '240+', label: 'Courses',   color: '#9D6CFF' },
+                  { value: '98%',  label: 'Completed', color: '#2BDE7E' },
+                ].map(({ value, label, color }) => (
+                  <div key={label} className="flex-1 flex flex-col items-center gap-0.5 px-2 sm:px-6">
+                    <span
+                      className="text-[clamp(1.2rem,5vw,2rem)] font-[900] leading-none tabular-nums"
+                      style={{ fontFamily: 'var(--font-display)', color }}
+                    >
+                      {value}
+                    </span>
+                    <span className="text-[8px] sm:text-[10px] font-bold text-muted/60 uppercase tracking-[0.1em] sm:tracking-[0.18em] text-center">{label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            </div>
+
+            {/* ── BOTTOM MARQUEE (reversed, icon-based) — seamless infinite ── */}
+            {(() => {
+              const bottomItems: { label: string; icon: React.ReactNode }[] = [
+                { label: 'Web Dev',      icon: <Globe        className="w-3 h-3" /> },
+                { label: 'Python',       icon: <Terminal     className="w-3 h-3" /> },
+                { label: 'DevOps',       icon: <GitBranch    className="w-3 h-3" /> },
+                { label: 'Cloud Native', icon: <Cloud        className="w-3 h-3" /> },
+                { label: 'AI',           icon: <Cpu          className="w-3 h-3" /> },
+                { label: 'Open Source',  icon: <GitBranch    className="w-3 h-3" /> },
+                { label: 'TypeScript',   icon: <Code2        className="w-3 h-3" /> },
+                { label: 'React',        icon: <Layers       className="w-3 h-3" /> },
+                { label: 'Sys Design',   icon: <FlaskConical className="w-3 h-3" /> },
+              ];
+              const sep = <span className="inline-block w-6 text-center text-line select-none">·</span>;
+              const track = (
+                <div className="flex items-center shrink-0">
+                  {bottomItems.map(({ label, icon }, i) => (
+                    <React.Fragment key={i}>
+                      <span className="flex items-center gap-1.5 whitespace-nowrap px-4 text-[11px] font-bold text-muted/100 tracking-widest">
+                        <span className="text-muted/100">{icon}</span>
+                        {label}
+                      </span>
+                      {sep}
+                    </React.Fragment>
+                  ))}
+                </div>
+              );
+              return (
+                <div className="relative z-10 mb-4 overflow-hidden w-full">
+                  <div className="flex animate-[marquee_28s_linear_infinite_reverse]" style={{ width: 'max-content' }}>
+                    {track}{track}{track}
+                  </div>
+                </div>
+              );
+            })()}
 
           </div>
         )}
