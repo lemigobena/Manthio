@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight, X, MessageSquare, Cpu, BookOpen, RefreshCw, Award, Clock } from 'lucide-react';
+import { Sparkles, ArrowRight, X, MessageSquare, Cpu, BookOpen, Award, Clock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { COURSES } from '../../services/mockData';
 
 // High-fidelity Sticky Note Stat component copied from Dashboard for the template
-const StickyNoteStat: React.FC<{ 
-  label: string; 
-  value: string | number; 
-  subtext: string; 
+const StickyNoteStat: React.FC<{
+  label: string;
+  value: string | number;
+  subtext: string;
   color: 'peach' | 'lavender' | 'sky' | 'mint';
   rotation: string;
   onClick?: () => void;
@@ -27,7 +27,7 @@ const StickyNoteStat: React.FC<{
   }[color];
 
   return (
-    <button 
+    <button
       onClick={onClick}
       className={`group relative ${bgStyles} border-b-4 border-r-2 p-5 rounded-2xl text-left transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] shadow-xl ${rotation} ${onClick ? 'cursor-pointer' : 'cursor-default'}`}
     >
@@ -158,7 +158,7 @@ export const DashboardEmptyTemplate: React.FC<{ onNavigate: (p: string) => void 
                 You haven't started a technical track yet. Explore our curated laboratory paths and build your engineering legacy today.
               </p>
             </div>
-            <button 
+            <button
               onClick={() => onNavigate('explore')}
               className="relative z-10 w-full md:w-auto bg-cyan hover:bg-cyan2 text-bg text-xs font-black px-10 py-4 rounded-xl transition-all shadow-lg active:scale-95 uppercase tracking-widest"
             >
@@ -171,28 +171,28 @@ export const DashboardEmptyTemplate: React.FC<{ onNavigate: (p: string) => void 
       {/* Quick Stats Grid - Sticky Note Style (Empty Values) */}
       <div className="max-w-6xl mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-12 mt-8 md:mt-12 mb-8 md:mb-10">
-          <StickyNoteStat 
+          <StickyNoteStat
             label="Learning Level"
             value={0}
             subtext="Ready to master the core foundations"
             color="peach"
             rotation="md:rotate-1"
           />
-          <StickyNoteStat 
+          <StickyNoteStat
             label="Current Streak"
             value="0 Days"
             subtext="Start learning today to build your streak"
             color="lavender"
             rotation="md:-rotate-2"
           />
-          <StickyNoteStat 
+          <StickyNoteStat
             label="Total XP Pool"
             value="0"
             subtext="Points to be earned through laboratory work"
             color="sky"
             rotation="md:rotate-2"
           />
-          <StickyNoteStat 
+          <StickyNoteStat
             label="Module Progress"
             value="0/0"
             subtext="Enroll in a track to track module progress"
@@ -204,7 +204,7 @@ export const DashboardEmptyTemplate: React.FC<{ onNavigate: (p: string) => void 
 
       {/* Main Two-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-stretch">
-        
+
         {/* Left Column (Courses & Activity) */}
         <div className="lg:col-span-2 space-y-6">
           <div className="space-y-6">
@@ -214,12 +214,12 @@ export const DashboardEmptyTemplate: React.FC<{ onNavigate: (p: string) => void 
                 <p className="text-muted text-sm">Track your progress and continue building new skills.</p>
               </div>
             </div>
-            
+
             <div className="py-20 flex flex-col items-center justify-center border border-dashed border-line rounded-2xl bg-panel/50">
               <BookOpen size={48} className="text-muted/50 mb-4" />
               <h3 className="text-lg font-bold text-white mb-2">No active courses yet</h3>
               <p className="text-sm text-muted mb-6">Head to the catalog to find your first course.</p>
-              <button 
+              <button
                 onClick={() => onNavigate('catalog')}
                 className="bg-panel border border-line hover:border-cyan text-text px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center space-x-2 cursor-pointer"
               >
@@ -235,8 +235,8 @@ export const DashboardEmptyTemplate: React.FC<{ onNavigate: (p: string) => void 
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {COURSES.slice(0, 3).map(course => (
-                  <div 
-                    key={course.id} 
+                  <div
+                    key={course.id}
                     onClick={() => {
                       onNavigate('course-detail');
                     }}
@@ -262,7 +262,7 @@ export const DashboardEmptyTemplate: React.FC<{ onNavigate: (p: string) => void 
                         <p className="text-muted text-[10px] line-clamp-2 leading-relaxed min-h-[30px]">
                           {course.description}
                         </p>
-                        
+
                         <div className="flex items-center space-x-4 pt-1 text-[10px] font-bold">
                           <div className="flex items-center space-x-1 h-3">
                             <Award className="w-3 h-3 text-cyan flex-shrink-0" />
@@ -284,7 +284,7 @@ export const DashboardEmptyTemplate: React.FC<{ onNavigate: (p: string) => void 
                           {course.priceStatus === 'included' ? 'Included' : course.price}
                         </span>
                       </div>
-                      <button 
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onNavigate('checkout');
@@ -303,9 +303,9 @@ export const DashboardEmptyTemplate: React.FC<{ onNavigate: (p: string) => void 
 
         {/* Right Column (Community Events, Recommendations, and Weak Points) */}
         <div className="flex flex-col gap-6">
-          
+
           <NeuralActivityChartEmpty />
-          
+
           {/* Upcoming Community Event (Empty state) */}
           <div className="bg-panel border border-line rounded-xl p-5 space-y-4">
             <div className="flex justify-between items-center">
@@ -329,18 +329,18 @@ export const DashboardEmptyTemplate: React.FC<{ onNavigate: (p: string) => void 
             </div>
 
             <div className="space-y-4">
-               <div className="bg-bg/50 border border-line rounded-xl p-4 flex items-start gap-3 relative overflow-hidden">
-                 <div className="absolute top-0 left-0 w-1 h-full bg-purple" />
-                 <div className="space-y-1">
-                   <h4 className="text-xs font-bold text-purple uppercase tracking-widest">Welcome</h4>
-                   <p className="text-sm text-text leading-relaxed">
-                     I'm your AI Tutor. Once you begin your track, I'll analyze your performance and provide tailored recommendations here.
-                   </p>
-                 </div>
-               </div>
+              <div className="bg-bg/50 border border-line rounded-xl p-4 flex items-start gap-3 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-purple" />
+                <div className="space-y-1">
+                  <h4 className="text-xs font-bold text-purple uppercase tracking-widest">Welcome</h4>
+                  <p className="text-sm text-text leading-relaxed">
+                    I'm your AI Tutor. Once you begin your track, I'll analyze your performance and provide tailored recommendations here.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <button 
+            <button
               onClick={() => onNavigate('ai-tutor')}
               className="w-full bg-transparent hover:bg-cyan/5 border border-cyan/30 text-cyan text-xs font-bold py-3 rounded-lg transition-all uppercase tracking-widest flex items-center justify-center space-x-2 cursor-pointer"
             >
@@ -349,26 +349,7 @@ export const DashboardEmptyTemplate: React.FC<{ onNavigate: (p: string) => void 
             </button>
           </div>
 
-          {/* Offline Workspace Sync */}
-          <div className="bg-panel border border-line rounded-xl p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <RefreshCw className="w-4 h-4 text-cyan" />
-                <h3 className="font-bold text-sm uppercase tracking-wider text-muted">Offline Workspace Sync</h3>
-              </div>
-              <span className="bg-cyan/15 text-cyan text-[10px] px-2 py-0.5 rounded font-bold uppercase">Local Cache</span>
-            </div>
-            <div className="space-y-3">
-              <p className="text-muted text-xs leading-relaxed">
-                Download and cache all bootcamp video lessons, resources, and quiz databases for offline learning access.
-              </p>
-              <button 
-                className="w-full bg-cyan hover:bg-cyan2 text-bg text-xs font-bold py-2.5 rounded-xl transition-colors cursor-pointer text-center"
-              >
-                Start Offline Sync
-              </button>
-            </div>
-          </div>
+
 
         </div>
 

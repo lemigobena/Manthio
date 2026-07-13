@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useModal } from '../../context/ModalContext';
-import { Sparkles, AlertCircle, BookOpen, Award, Bell, ArrowRight, ArrowLeft, ArrowDownToLine, X } from 'lucide-react';
+import { Sparkles, AlertCircle, BookOpen, Award, Bell, ArrowRight, ArrowLeft, ArrowDownToLine, X, RefreshCw } from 'lucide-react';
 import { FileUpload } from '../../components/modules/FileUpload';
 import { Certificate } from '../../components/ui/Certificate';
 import { toPng } from 'html-to-image';
+import { useXP } from '../../context/XPContext';
 
 interface DemoCenterProps {
   onNavigate: (page: string) => void;
@@ -11,7 +12,51 @@ interface DemoCenterProps {
 
 export const DemoCenter: React.FC<DemoCenterProps> = ({ onNavigate }) => {
   const { openModal } = useModal();
+  const { addToast } = useXP();
   const [showUpload, setShowUpload] = useState(false);
+
+  // Offline Workspace Sync State
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncProgress, setSyncProgress] = useState(0);
+  const [syncStep, setSyncStep] = useState('');
+  const syncIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
+    };
+  }, []);
+
+  const handleStartSync = () => {
+    if (isSyncing) return;
+    setIsSyncing(true);
+    setSyncProgress(0);
+    setSyncStep('Initializing sync engine...');
+    syncIntervalRef.current = setInterval(() => {
+      setSyncProgress(prev => {
+        const next = Math.min(prev + 1.25, 100);
+        if (next >= 100) {
+          if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
+          setIsSyncing(false);
+          addToast('success', '✓ Workspace synced successfully');
+          return 100;
+        }
+        if (next < 25) setSyncStep('Updating local module schemas...');
+        else if (next < 55) setSyncStep('Caching lesson assets...');
+        else if (next < 85) setSyncStep('Optimizing offline search index...');
+        else setSyncStep('Finalizing local manifest...');
+        return next;
+      });
+    }, 50);
+  };
+
+  const handleCancelSync = () => {
+    if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
+    setIsSyncing(false);
+    setSyncProgress(0);
+    setSyncStep('');
+    addToast('info', 'Sync cancelled');
+  };
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-16">
@@ -230,6 +275,63 @@ export const DemoCenter: React.FC<DemoCenterProps> = ({ onNavigate }) => {
             <Sparkles className="w-8 h-8 text-purple mb-3 group-hover:scale-110 transition-transform" />
             <span className="font-bold text-purple">Multi-step Quiz</span>
           </button>
+        </div>
+      </div>
+
+      {/* Offline Workspace Sync Test Lab */}
+      <div className="bg-panel border border-line rounded-2xl p-8 space-y-6 mt-8">
+        <div className="flex items-center space-x-2">
+          <RefreshCw className={`w-6 h-6 text-cyan ${isSyncing ? 'animate-spin' : ''}`} />
+          <h2 className="text-xl font-bold font-display">Offline Workspace Sync</h2>
+        </div>
+        <p className="text-muted text-sm">
+          Test the offline synchronization UI and state transitions.
+        </p>
+
+        <div className="bg-bg/40 border border-line/50 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-bold text-sm uppercase tracking-wider text-muted">Data Pre-fetch</h3>
+            <span className="bg-cyan/15 text-cyan text-[10px] px-2 py-0.5 rounded font-bold uppercase">Local Cache</span>
+          </div>
+
+          {!isSyncing && syncProgress === 0 ? (
+            <div className="space-y-3">
+              <p className="text-muted text-xs leading-relaxed">
+                Download and cache all bootcamp video lessons, resources, and quiz databases for offline learning access.
+              </p>
+              <button
+                onClick={handleStartSync}
+                className="w-full bg-cyan hover:bg-cyan2 text-bg text-xs font-bold py-2.5 rounded-xl transition-colors cursor-pointer text-center"
+              >
+                Start Offline Sync
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3 animate-[fadeIn_0.3s_ease-out]">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-muted truncate max-w-[70%] font-semibold block">{syncStep}</span>
+                <span className="font-bold text-text shrink-0">{Math.floor(syncProgress)}%</span>
+              </div>
+
+              {/* Horizontal Progress Bar */}
+              <div className="w-full h-2.5 bg-bg rounded-full overflow-hidden border border-line">
+                <div
+                  className="h-full bg-cyan transition-all duration-100 ease-out"
+                  style={{ width: `${syncProgress}%` }}
+                />
+              </div>
+
+              <div className="flex gap-2 pt-1">
+                <button
+                  onClick={handleCancelSync}
+                  className="w-full bg-red/10 hover:bg-red/20 text-red border border-red/20 hover:border-red/35 text-xs font-semibold py-2 rounded-xl flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  <span>Cancel Sync</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
