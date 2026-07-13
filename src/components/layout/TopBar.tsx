@@ -139,14 +139,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                 Dashboard
               </button>
             ) : (
-              <>
-                <button onClick={() => { signOut(); onNavigate('signin'); }} className="hidden sm:flex bg-transparent border border-cyan text-cyan hover:bg-cyan/10 text-xs sm:text-sm font-bold px-4 h-9 items-center justify-center rounded-xl transition-colors whitespace-nowrap cursor-pointer">
-                  Log in
-                </button>
-                <button onClick={() => { onNavigate('signup'); }} className="bg-cyan hover:bg-cyan2 text-bg text-xs sm:text-sm font-bold px-4 h-9 items-center justify-center rounded-xl transition-colors whitespace-nowrap flex cursor-pointer">
-                  Sign up
-                </button>
-              </>
+              <button onClick={() => { signOut(); onNavigate('signup'); }} className="flex bg-transparent border border-cyan text-cyan hover:bg-cyan/10 text-xs sm:text-sm font-bold px-4 h-9 items-center justify-center rounded-xl transition-colors whitespace-nowrap cursor-pointer">
+                Join us today
+              </button>
             )}
           </div>
         </div>

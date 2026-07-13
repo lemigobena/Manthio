@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { useTrack } from '../track-detail/useTrack';
 import { useAuth } from '../../context/AuthContext';
-import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, Sparkles, Star, Play, Zap, ArrowRight, Code, Command, Cloud, Database, Hexagon, Box, Bot, CheckCircle2, ChevronDown, Check, X } from 'lucide-react';
+import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, Star, ArrowRight, Command, Cloud, Database, Hexagon, Box, CheckCircle2, ChevronDown, Check, X, Terminal } from 'lucide-react';
 import heroImage from '../../assets/hero-student.png';
 import { ParticleNetwork } from '../../components/ui/ParticleNetwork';
 import type { CareerTrack } from '../../types';
@@ -243,6 +243,71 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
     return true;
   }) : [];
 
+  const renderFirstCTA = () => (
+    <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col md:flex-row py-16 my-16 group gap-8 md:gap-12 w-full items-center relative isolate">
+      {/* Full-bleed background breakout */}
+      <div className="absolute top-0 w-[100vw] h-full bg-panel -z-10" style={{ left: 'calc(50% - 50vw)' }} />
+      
+      <div className="flex-1 space-y-6 relative z-10 flex flex-col justify-center items-start w-full">
+        <h3 className="text-3xl md:text-4xl font-black text-text font-display leading-tight">
+          Elevate your learning experience
+        </h3>
+        <div className="space-y-4 w-full">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 text-cyan mt-1 shrink-0" />
+            <div>
+              <h4 className="font-bold text-text">Organization Sponsors</h4>
+              <p className="text-muted text-sm">Let your employer invest in your growth by covering the cost of your courses.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 text-purple mt-1 shrink-0" />
+            <div>
+              <h4 className="font-bold text-text">Live Sessions</h4>
+              <p className="text-muted text-sm">Join real-time interactive classes with expert instructors.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 text-yellow mt-1 shrink-0" />
+            <div>
+              <h4 className="font-bold text-text">Direct Tutor Chat</h4>
+              <p className="text-muted text-sm">Chat with your tutor anytime you need help or guidance.</p>
+            </div>
+          </div>
+        </div>
+        <button 
+          onClick={() => onNavigate('signup')}
+          className="px-8 py-3 bg-transparent border border-cyan text-cyan hover:bg-cyan/10 font-bold rounded-xl transition-all cursor-pointer hover:-translate-y-1 mt-4"
+        >
+          Discover All Features
+        </button>
+      </div>
+      <div className="flex-1 relative flex items-center justify-end w-full">
+        <div className="flex flex-col gap-4 w-full max-w-lg z-10">
+          <div className="flex gap-4">
+            <img 
+              src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&auto=format&fit=crop&q=80" 
+              alt="Organization Sponsors" 
+              className="w-1/2 h-32 md:h-40 object-cover rounded-2xl shadow-lg hover:scale-105 transition-transform duration-500"
+            />
+            <img 
+              src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?w=800&auto=format&fit=crop&q=80" 
+              alt="Live Sessions" 
+              className="w-1/2 h-32 md:h-40 object-cover rounded-2xl shadow-lg hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+          <div className="flex justify-center">
+            <img 
+              src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=800&auto=format&fit=crop&q=80" 
+              alt="Chat with Tutor" 
+              className="w-1/2 h-32 md:h-40 object-cover rounded-2xl shadow-lg hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <style>{`
@@ -267,7 +332,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
       `}</style>
       {!isAuthenticated && (
         <>
-          <div className="relative w-[100vw] ml-[calc(50%-50vw)] overflow-hidden mb-20 flex flex-col items-center min-h-[90svh] pt-12 lg:pt-28 pb-12">
+          <div className="relative w-[100vw] ml-[calc(50%-50vw)] overflow-hidden mb-20 flex flex-col items-center justify-center min-h-[90svh] pt-12 lg:pt-28 pb-12" style={{ WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)', maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)' }}>
           
           {/* Moving Particle Network Background */}
           <div className="absolute top-0 left-0 w-full h-full lg:h-[120vh] pointer-events-none z-0 overflow-hidden">
@@ -283,13 +348,12 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
           </div>
 
 
-          {/* Abstract Background Elements (the 'glowing circle' behind the app from Redsun) */}
           <div 
-            className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-cyan/10 rounded-full blur-[120px] opacity-70 pointer-events-none transition-transform duration-1000"
+            className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-cyan/10 rounded-full blur-[80px] opacity-30 pointer-events-none transition-transform duration-1000"
             style={{ transform: `translate(-50%, ${scrollY * 0.2}px)` }}
           />
           <div 
-            className="absolute top-[50%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-purple/10 rounded-full blur-[100px] opacity-50 pointer-events-none transition-transform duration-1000"
+            className="absolute top-[50%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-purple/10 rounded-full blur-[60px] opacity-20 pointer-events-none transition-transform duration-1000"
             style={{ transform: `translate(-50%, ${scrollY * 0.1}px)` }}
           />
 
@@ -311,7 +375,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
             </div>
 
             {/* Left: Text Content */}
-            <div className="flex-1 flex flex-col items-center text-center space-y-4 w-full lg:max-w-2xl relative z-20">
+            <div className="flex-1 flex flex-col items-start text-left space-y-4 w-full lg:max-w-2xl relative z-20">
               
               {/* Subtitle Above */}
               <div className="text-cyan font-bold tracking-wide text-sm md:text-base">
@@ -320,10 +384,9 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
 
               {/* Main Title */}
               <h1 className="text-[32px] leading-[1.3] sm:text-4xl lg:text-5xl xl:text-6xl font-black text-text font-display sm:leading-[1.1] tracking-tight">
-                Now learning from<br />
-                anywhere, and build<br />
-                your <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan to-purple">
-                  bright career.
+                Learn anywhere.<br />
+                Build your <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan to-purple">
+                  career.
                   {/* Swoosh Underline */}
                   <svg className="absolute w-full h-4 -bottom-2 left-0 text-cyan opacity-80" viewBox="0 0 200 20" preserveAspectRatio="none">
                     <path d="M5,15 Q100,0 195,15" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
@@ -332,9 +395,8 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                 </span>
               </h1>
 
-              {/* Description */}
               <p className="text-muted text-base md:text-lg leading-relaxed max-w-md mt-4">
-                It has survived not only five centuries but also the leap into electronic typesetting.
+                Accelerate your journey with interactive, hands-on courses.
               </p>
 
               {/* Button */}
@@ -345,7 +407,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                 >
                   Start Your Journey
                   <svg 
-                    xmlns="http://w3.org" 
+                    xmlns="http://www.w3.org" 
                     fill="none" 
                     viewBox="0 0 24 24" 
                     strokeWidth={2.5} 
@@ -380,7 +442,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                {/* Center Floating Badge (Courses) */}
                <div className="absolute top-[15%] lg:top-[25%] left-0 lg:-left-12 z-20 flex flex-col items-center animate-float">
                  <div className="w-32 h-32 rounded-full bg-panel/95 border-2 border-cyan/40 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(45,212,191,0.25)] backdrop-blur-md relative">
-                   <BookOpen className="w-8 h-8 text-cyan mb-1" />
+                   <Terminal className="w-8 h-8 text-cyan mb-1" />
                    <span className="text-2xl font-black text-text">1,235</span>
                    <span className="text-sm text-muted font-medium">courses</span>
                    {/* Decorative underline swooshes */}
@@ -396,79 +458,10 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                  src={heroImage} 
                  alt="Student studying with laptop" 
                  className="w-full h-auto object-contain z-10 scale-[1.15] -translate-y-4"
+                 style={{ WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)', maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)' }}
                />
 
-               {/* Top Right Floating Badge (Rating) */}
-               <div className="absolute top-[5%] right-0 lg:-right-8 z-20 bg-bg/95 backdrop-blur-xl rounded-full px-6 py-4 border border-line shadow-[0_0_30px_rgba(0,0,0,0.5)] animate-float-reverse flex items-center gap-2">
-                 <span className="text-2xl font-black text-text">4.8</span>
-                 <Star className="w-6 h-6 text-yellow fill-yellow" />
-                 <span className="text-sm text-muted font-medium hidden sm:inline ml-2">rating (86k)</span>
-               </div>
-            </div>
-          </div>
 
-          {/* Visual "App" Block Below (Giant overlapping cards/UI representation) */}
-          <div className="relative z-20 w-full max-w-5xl mx-auto mt-16 px-4" style={{ perspective: '1200px' }}>
-            <div 
-              className="relative w-full h-[400px] md:h-[500px] bg-panel/80 backdrop-blur-xl border border-line rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col transition-all duration-300 ease-out"
-              style={{
-                transform: `rotateX(${Math.max(0, 20 - scrollY * 0.05)}deg) scale(${Math.min(1, 0.9 + scrollY * 0.0002)}) translateY(${scrollY * 0.1}px)`,
-                transformStyle: 'preserve-3d',
-                boxShadow: `0 ${Math.max(20, 50 - scrollY * 0.1)}px ${Math.max(40, 100 - scrollY * 0.1)}px rgba(0,0,0,0.4)`
-              }}
-            >
-              
-              {/* Fake Browser Header */}
-              <div className="h-12 bg-bg/50 border-b border-line flex items-center px-6 space-x-2 relative">
-                <div className="flex space-x-2 absolute left-6">
-                  <div className="w-3 h-3 rounded-full bg-red" />
-                  <div className="w-3 h-3 rounded-full bg-yellow" />
-                  <div className="w-3 h-3 rounded-full bg-green" />
-                </div>
-                <div className="mx-auto bg-panel border border-line rounded-md px-3 py-1.5 text-[10px] text-muted flex items-center justify-center space-x-2 w-1/2 md:w-1/3">
-                  <Code className="w-3 h-3" />
-                  <span>manthio.app/workspace</span>
-                </div>
-              </div>
-
-              {/* Editor Body */}
-              <div className="flex-1 p-8 font-mono text-sm leading-relaxed relative flex items-center justify-center bg-bg/30 overflow-hidden">
-                {/* Inner Glowing orb inside app */}
-                <div className="absolute w-[300px] h-[300px] bg-cyan/10 rounded-full blur-[80px]" />
-                
-                {/* Central Floating Code Snippet */}
-                <div className="relative z-10 w-full max-w-lg bg-panel border border-line rounded-xl p-6 shadow-2xl text-left animate-float">
-                  <div className="flex items-center justify-between mb-4 pb-4 border-b border-line/50">
-                    <span className="text-xs text-muted">train_model.py</span>
-                    <Play className="w-4 h-4 text-cyan cursor-pointer hover:scale-110 transition-transform" />
-                  </div>
-                  <div className="text-purple">def <span className="text-cyan">train_model</span><span className="text-text">(data):</span></div>
-                  <div className="pl-4 text-muted"># Initialize neural network</div>
-                  <div className="pl-4 text-text">model = Sequential([</div>
-                  <div className="pl-8 text-yellow">Dense(128, activation='relu'),</div>
-                  <div className="pl-8 text-yellow">Dropout(0.2),</div>
-                  <div className="pl-8 text-yellow">Dense(10, activation='softmax')</div>
-                  <div className="pl-4 text-text">])</div>
-                  <div className="pl-4 text-purple">return <span className="text-text">model.fit(data)</span></div>
-                  <div className="mt-6 flex items-center space-x-2 animate-pulse text-cyan">
-                    <span className="w-2 h-4 bg-cyan inline-block"></span>
-                    <span className="text-xs">AI Tutor is analyzing your code...</span>
-                  </div>
-                </div>
-
-                {/* Overlapping Terminal Card */}
-                <div className="absolute right-[-10px] sm:right-10 bottom-[-10px] sm:bottom-10 z-20 w-64 bg-bg/95 backdrop-blur-xl border border-cyan/30 rounded-xl shadow-[0_0_30px_rgba(45,212,191,0.15)] p-4 animate-float-reverse">
-                  <div className="flex items-center space-x-2 text-cyan font-bold text-xs mb-2">
-                    <Zap className="w-3.5 h-3.5 fill-cyan" />
-                    <span>Real-time Output</span>
-                  </div>
-                  <div className="font-mono text-[10px] text-muted space-y-1">
-                    <div>&gt; Build successful</div>
-                    <div className="text-text">&gt; Training Epoch 1/10...</div>
-                    <div className="text-green">&gt; Accuracy: 94.2%</div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -487,39 +480,90 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 mb-20">
-              {/* Box 4 (Wide, text left, image right) */}
-              <div className="bento-card relative w-full bg-panel border border-line rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between hover:border-cyan transition-colors overflow-hidden group cursor-pointer">
-                <div className="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-cyan/5 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="md:w-1/2 z-10 text-center md:text-left mb-8 md:mb-0">
-                  <h6 className="text-3xl font-bold text-text mb-4 group-hover:text-cyan transition-colors">AI Sessions</h6>
-                  <p className="text-muted text-lg max-w-md mx-auto md:mx-0">Get unstuck instantly with our state-of-the-art AI tutor that understands your code and guides you without giving away the answers.</p>
-                </div>
-                <div className="md:w-1/2 flex justify-center md:justify-end z-10 w-full">
-                  <div className="w-full max-w-sm h-48 bg-bg rounded-2xl border border-line shadow-2xl flex flex-col p-4 transform group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(45,212,191,0.15)] transition-all">
-                    <div className="flex items-center space-x-2 mb-4">
-                       <Bot className="w-6 h-6 text-cyan" />
-                       <span className="font-bold text-sm text-text">Tutor</span>
-                    </div>
-                    <div className="bg-panel rounded-lg p-3 text-xs text-muted font-mono mb-2">
-                       "It looks like you're missing a parenthesis on line 4. Try checking the syntax for the print function."
-                    </div>
-                    <div className="bg-cyan/10 border border-cyan/30 rounded-lg p-3 text-xs text-cyan font-mono ml-4 self-end">
-                       "Ah, I see! print('hello')!"
-                    </div>
-                  </div>
-                </div>
-              </div>
-          </div>
+
 
           {/* Powerful Features Vertical Alternating list */}
-          <div id="section-features" className="w-full max-w-7xl mx-auto px-4 mb-24 space-y-24">
+          <div id="section-features" className="w-full max-w-[1300px] mx-auto mb-24 space-y-24">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold text-text mb-4">Powerful Features</h2>
               <p className="text-muted text-lg max-w-2xl mx-auto">Explore the frontier of coding evolution. Our latest features redefine the boundaries of what's possible in learning.</p>
             </div>
 
-            {/* Feature 1 (Text Left, Image Right) */}
+            {/* Feature 1 (Text Left, Image Right) - AI Sessions */}
+            <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20">
+              <div className="md:w-1/2 space-y-6">
+                <h3 className="text-3xl font-bold text-text">AI Sessions, get unstuck in seconds</h3>
+                <p className="text-muted text-lg leading-relaxed">
+                  Get unstuck instantly with our state-of-the-art AI tutor that understands your code and guides you without giving away the answers.
+                </p>
+                <ul className="space-y-4 pt-4">
+                  <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-cyan"/><span className="text-text font-medium">Context-aware AI that reads your code.</span></li>
+                  <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-cyan"/><span className="text-text font-medium">Guided hints never spoils the solution.</span></li>
+                  <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-cyan"/><span className="text-text font-medium">Available 24/7 for any language or topic.</span></li>
+                </ul>
+                <div className="pt-4">
+                  {/* Desktop button only; mobile variant placed after the card */}
+                  <button onClick={() => onNavigate('signin')} className="hidden md:flex items-center space-x-2 text-cyan font-bold hover:text-cyan2 transition-colors cursor-pointer">
+                    <span>Try AI Tutor</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="md:w-1/2 w-full h-[400px] bg-bg border border-line rounded-3xl overflow-hidden relative group">
+                 <img 
+                    src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&auto=format&fit=crop&q=80" 
+                    alt="AI Tutor Session" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-tr from-cyan/20 to-purple/20 mix-blend-overlay group-hover:opacity-50 transition-opacity" />
+              </div>
+              {/* Mobile-only button placed after the card so it appears below the card on phones */}
+              <div className="w-full md:hidden flex justify-center">
+                <button onClick={() => onNavigate('signin')} className="flex items-center space-x-2 text-cyan font-bold hover:text-cyan2 transition-colors py-3 cursor-pointer">
+                  <span>Try AI Tutor</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Feature 2 (Image Left, Text Right) - Multiple Format Courses */}
+            <div className="flex flex-col md:flex-row-reverse items-center gap-12 lg:gap-20">
+              <div className="md:w-1/2 space-y-6">
+                <h3 className="text-3xl font-bold text-text">Multiple formats to fit your learning style</h3>
+                <p className="text-muted text-lg leading-relaxed">
+                  Whether you prefer learning on your own schedule or thriving in a group setting, we offer flexible course formats designed for you.
+                </p>
+                <ul className="space-y-4 pt-4">
+                  <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-green"/><span className="text-text font-medium">Self-paced: Learn at your own speed, anytime.</span></li>
+                  <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-green"/><span className="text-text font-medium">Cohort: Join a group of peers and learn together.</span></li>
+                  <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-green"/><span className="text-text font-medium">Flipped: Review materials beforehand, engage deeply in sessions.</span></li>
+                </ul>
+                <div className="pt-4">
+                  {/* Desktop button only; mobile variant placed after the card */}
+                  <button onClick={() => onNavigate('courses')} className="hidden md:flex items-center space-x-2 text-green font-bold hover:text-green/80 transition-colors cursor-pointer">
+                    <span>Explore Formats</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="md:w-1/2 w-full h-[400px] bg-bg border border-line rounded-3xl overflow-hidden relative group">
+                 <img 
+                    src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&auto=format&fit=crop&q=80" 
+                    alt="Multiple Format Courses" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-tr from-green/20 to-teal/20 mix-blend-overlay group-hover:opacity-50 transition-opacity" />
+              </div>
+              {/* Mobile-only button placed after the card so it appears below the card on phones */}
+              <div className="w-full md:hidden flex justify-center">
+                <button onClick={() => onNavigate('courses')} className="flex items-center space-x-2 text-green font-bold hover:text-green/80 transition-colors py-3 cursor-pointer">
+                  <span>Explore Formats</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Feature 3 (Text Left, Image Right) - Top Management */}
             <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20">
               <div className="md:w-1/2 space-y-6">
                 <h3 className="text-3xl font-bold text-text">Top Management, to help you see the bigger picture</h3>
@@ -541,7 +585,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               </div>
               <div className="md:w-1/2 w-full h-[400px] bg-bg border border-line rounded-3xl overflow-hidden relative group">
                  <img 
-                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80" 
+                    src="https://images.unsplash.com/photo-1649478680984-01586ce84ac0?w=800&auto=format&fit=crop&q=80" 
                     alt="Management Dashboard" 
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                  />
@@ -556,7 +600,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            {/* Feature 2 (Image Left, Text Right) */}
+            {/* Feature 4 (Image Left, Text Right) - Real-time Collaboration */}
             <div className="flex flex-col md:flex-row-reverse items-center gap-12 lg:gap-20">
               <div className="md:w-1/2 space-y-6">
                 <h3 className="text-3xl font-bold text-text">Real-time collaboration and feedback</h3>
@@ -578,7 +622,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               </div>
               <div className="md:w-1/2 w-full h-[400px] bg-bg border border-line rounded-3xl overflow-hidden relative group">
                  <img 
-                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80" 
+                    src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800&auto=format&fit=crop&q=80" 
                     alt="Team Collaboration" 
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                  />
@@ -594,8 +638,8 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* Feature 3 (Text Left, Image Right) - Streaks & Gamification */}
-          <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20 max-w-7xl mx-auto px-4 mb-24">
+          {/* Feature 5 (Text Left, Image Right) - Streaks & Gamification */}
+          <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20 max-w-[1300px] mx-auto mb-24">
             <div className="md:w-1/2 space-y-6">
               <h3 className="text-3xl font-bold text-text">Keep your momentum with Streaks & XP</h3>
               <p className="text-muted text-lg leading-relaxed">
@@ -614,17 +658,12 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               </div>
             </div>
             <div className="md:w-1/2 w-full h-[400px] bg-bg border border-line rounded-3xl overflow-hidden relative group">
-               <div className="absolute inset-0 flex items-center justify-center flex-col bg-panel">
-                  <div className="w-32 h-32 rounded-full border-4 border-yellow/50 flex items-center justify-center relative mb-6 shadow-[0_0_50px_rgba(250,204,21,0.2)] bg-bg/50 backdrop-blur-sm z-10">
-                    <span className="text-6xl group-hover:scale-125 group-hover:-translate-y-2 transition-transform duration-500">🔥</span>
-                    <div className="absolute -bottom-4 bg-bg border border-yellow text-yellow px-4 py-1 rounded-full text-sm font-bold shadow-lg whitespace-nowrap">14 Days</div>
-                  </div>
-                  <div className="text-center space-y-2 z-10">
-                     <h4 className="text-xl font-bold text-text">You're on fire!</h4>
-                     <p className="text-muted text-sm">+250 XP earned today</p>
-                  </div>
-               </div>
-               <div className="absolute inset-0 bg-gradient-to-tr from-yellow/10 to-orange/10 mix-blend-overlay group-hover:opacity-50 transition-opacity pointer-events-none z-0" />
+               <img
+                  src="https://cdn.dribbble.com/userupload/42944401/file/original-43d273b30cd843b5293edaa8ee39617c.png?resize=752x&vertical=center"
+                  alt="Streaks & XP"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+               />
+               <div className="absolute inset-0 bg-gradient-to-tr from-yellow/10 to-orange/10 mix-blend-overlay group-hover:opacity-50 transition-opacity pointer-events-none" />
             </div>
             <div className="w-full md:hidden flex justify-center">
               <button onClick={() => onNavigate('signup')} className="flex items-center space-x-2 text-yellow font-bold hover:text-yellow/80 transition-colors py-3 cursor-pointer">
@@ -635,7 +674,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
           </div>
 
           {/* Auto-Scrolling Marquee Section */}
-          <div id="section-stack" className="w-full bg-bg pt-16 pb-24 overflow-hidden relative border-y border-line/50">
+          <div id="section-stack" className="relative w-screen left-1/2 -translate-x-1/2 bg-bg pt-16 pb-24 overflow-hidden border-y border-line/50">
             <style>{`
               @keyframes marquee-left {
                 0% { transform: translateX(0); }
@@ -688,9 +727,11 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                       { name: 'C++', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg' },
                       { name: 'React', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg' },
                       { name: 'Docker', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg' },
+                      { name: 'Node.js', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg' },
+                      { name: 'Git', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg' },
                     ].map((icon, j) => (
-                      <div key={j} className="w-48 h-32 md:w-64 md:h-40 rounded-3xl bg-panel flex items-center justify-center shrink-0 border border-line/20 shadow-lg hover:border-cyan/50 transition-colors cursor-pointer group">
-                        <img src={icon.url} alt={icon.name} className="w-16 h-16 md:w-20 md:h-20 object-contain group-hover:scale-110 transition-transform duration-500" />
+                      <div key={j} className="w-32 h-20 md:w-48 md:h-28 rounded-2xl bg-panel flex items-center justify-center shrink-0 border border-line/20 shadow-lg hover:border-cyan/50 transition-colors cursor-pointer group">
+                        <img src={icon.url} alt={icon.name} className="w-10 h-10 md:w-14 md:h-14 object-contain group-hover:scale-110 transition-transform duration-500" />
                       </div>
                     ))}
                   </div>
@@ -708,12 +749,14 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                       { name: 'Kubernetes', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kubernetes/kubernetes-plain.svg' },
                       { name: 'Rust', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rust/rust-original.svg' },
                       { name: 'Next.js', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original.svg' },
+                      { name: 'Vue.js', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vuejs/vuejs-original.svg' },
+                      { name: 'Linux', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linux/linux-original.svg' },
                     ].map((icon, j) => (
-                      <div key={j} className="w-48 h-32 md:w-64 md:h-40 rounded-3xl bg-panel flex items-center justify-center shrink-0 border border-line/20 shadow-lg hover:border-cyan/50 transition-colors cursor-pointer group">
+                      <div key={j} className="w-32 h-20 md:w-48 md:h-28 rounded-2xl bg-panel flex items-center justify-center shrink-0 border border-line/20 shadow-lg hover:border-cyan/50 transition-colors cursor-pointer group">
                         {icon.name === 'Next.js' ? 
-                           <img src={icon.url} alt={icon.name} className="w-16 h-16 md:w-20 md:h-20 object-contain group-hover:scale-110 transition-transform duration-500 dark:invert" />
+                           <img src={icon.url} alt={icon.name} className="w-10 h-10 md:w-14 md:h-14 object-contain group-hover:scale-110 transition-transform duration-500 dark:invert" />
                            :
-                           <img src={icon.url} alt={icon.name} className="w-16 h-16 md:w-20 md:h-20 object-contain group-hover:scale-110 transition-transform duration-500" />
+                           <img src={icon.url} alt={icon.name} className="w-10 h-10 md:w-14 md:h-14 object-contain group-hover:scale-110 transition-transform duration-500" />
                         }
                       </div>
                     ))}
@@ -1020,36 +1063,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
           {discoveryMode === 'courses' ? sortedCourses.slice(0, !isAuthenticated ? 6 : undefined).map((course, index) => (
             <React.Fragment key={course.id}>
               {/* First CTA: Image Split Design */}
-              {!isAuthenticated && index === 3 && (
-                <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-panel border border-line rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-xl shadow-bg/50 my-16 group">
-                  <div className="p-8 md:p-12 flex-1 space-y-6 relative z-10 bg-gradient-to-br from-panel to-bg/80 flex flex-col justify-center items-start">
-                    <div className="inline-flex items-center space-x-2 bg-cyan/10 text-cyan px-4 py-2 rounded-full font-bold text-xs uppercase tracking-wider">
-                      <Sparkles className="w-4 h-4" />
-                      <span>Manthio Pro</span>
-                    </div>
-                    <h3 className="text-3xl md:text-4xl font-black text-text font-display leading-tight">
-                      Learn faster with AI-powered tutoring
-                    </h3>
-                    <p className="text-muted text-base md:text-lg leading-relaxed max-w-xl">
-                      Experience our revolutionary in-browser coding environments paired with 24/7 AI guidance. We don't just show you how to code, we code with you.
-                    </p>
-                    <button 
-                      onClick={() => onNavigate('signup')}
-                      className="px-8 py-4 bg-text text-bg hover:bg-cyan hover:text-bg font-bold rounded-xl transition-all shadow-lg hover:shadow-[0_0_20px_rgba(45,212,191,0.5)] cursor-pointer hover:-translate-y-1 mt-4"
-                    >
-                      Start Free Trial
-                    </button>
-                  </div>
-                  <div className="flex-1 min-h-[300px] relative overflow-hidden">
-                    <img 
-                      src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80" 
-                      alt="Team collaborating" 
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-r from-panel via-panel/50 to-transparent md:w-1/2" />
-                  </div>
-                </div>
-              )}
+              {!isAuthenticated && index === 3 && renderFirstCTA()}
 
             <div 
               className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:translate-y-[-4px] duration-300 h-[420px]"
@@ -1130,9 +1144,12 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               </div>
             </div>
             </React.Fragment>
-          )) : tracksToShow.slice(0, !isAuthenticated ? 6 : undefined).map(track => (
+          )) : tracksToShow.slice(0, !isAuthenticated ? 6 : undefined).map((track, index) => (
+            <React.Fragment key={track.id}>
+              {/* First CTA: Image Split Design */}
+              {!isAuthenticated && index === 3 && renderFirstCTA()}
+
             <div 
-              key={track.id} 
               className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:translate-y-[-4px] duration-300 h-[420px]"
             >
               <div>
@@ -1226,13 +1243,14 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                 </button>
               </div>
             </div>
+            </React.Fragment>
           ))}
         </div>
       )}
 
       {/* Login to see more CTA */}
       {!isAuthenticated && (discoveryMode === 'courses' ? sortedCourses.length > 6 : tracksToShow.length > 6) && (
-        <div className="mt-12 flex justify-center w-full max-w-7xl mx-auto px-4">
+        <div className="mt-12 flex justify-center w-full max-w-[1300px] mx-auto">
            <button 
              onClick={() => onNavigate('signin')} 
              className="bg-transparent border-2 border-cyan text-cyan hover:bg-cyan/10 font-bold py-3 px-8 rounded-xl transition-all flex items-center gap-2"
@@ -1245,7 +1263,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
 
       {/* Testimonial Section */}
       {!isAuthenticated && (
-        <div id="section-testimonials" className="w-full max-w-7xl mx-auto px-4 mt-24 mb-10">
+        <div id="section-testimonials" className="w-full max-w-[1300px] mx-auto mt-24 mb-10">
           <div className="text-center mb-14">
             <span className="inline-block text-xs font-bold uppercase tracking-widest text-cyan mb-3">What our learners say</span>
             <h2 className="text-4xl md:text-5xl font-bold text-text mb-4">Loved by Developers</h2>
@@ -1278,56 +1296,6 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
           </div>
         </div>
       )}
-
-          {/* Features Combined Card */}
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 mt-40 mb-20">
-            <div className="bg-bg/50 border border-line rounded-[2.5rem] p-6 md:p-8 shadow-xl backdrop-blur-sm">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Section 1 */}
-                <div className="relative border border-line rounded-3xl flex flex-col items-center text-center justify-between min-h-[300px] group cursor-pointer overflow-hidden hover:border-cyan transition-colors">
-                  <div className="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=800&q=80" alt="Interactive" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 dark:opacity-50 dark:group-hover:opacity-70 group-hover:scale-110 transition-all duration-700" />
-                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent dark:from-bg/70 dark:via-bg/10" />
-                  </div>
-                  <div className="absolute inset-0 bg-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                  
-                  <div className="relative z-10 w-full h-full flex flex-col items-center justify-end p-8">
-                    <h6 className="text-xl font-bold text-white mb-2 group-hover:text-cyan transition-colors drop-shadow-md">Interactive</h6>
-                    <p className="text-white/80 text-sm drop-shadow-md">Write code directly in your browser with instant feedback.</p>
-                  </div>
-                </div>
-
-                {/* Section 2 */}
-                <div className="relative border border-line rounded-3xl flex flex-col items-center text-center justify-between min-h-[300px] group cursor-pointer overflow-hidden hover:border-purple transition-colors">
-                  <div className="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Users" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 dark:opacity-50 dark:group-hover:opacity-70 group-hover:scale-110 transition-all duration-700" />
-                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent dark:from-bg/70 dark:via-bg/10" />
-                  </div>
-                  <div className="absolute inset-0 bg-purple/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                  
-                  <div className="relative z-10 w-full h-full flex flex-col items-center justify-end p-8">
-                    <h6 className="text-xl font-bold text-white mb-2 group-hover:text-purple transition-colors drop-shadow-md">Community</h6>
-                    <p className="text-white/80 text-sm drop-shadow-md">Join a global community of passionate learners.</p>
-                  </div>
-                </div>
-
-                {/* Section 3 */}
-                <div className="relative border border-line rounded-3xl flex flex-col items-center text-center justify-between min-h-[300px] group cursor-pointer overflow-hidden hover:border-yellow transition-colors">
-                  <div className="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80" alt="Create" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 dark:opacity-50 dark:group-hover:opacity-70 group-hover:scale-110 transition-all duration-700" />
-                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent dark:from-bg/70 dark:via-bg/10" />
-                  </div>
-                  <div className="absolute inset-0 bg-yellow/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                  
-                  <div className="relative z-10 w-full h-full flex flex-col items-center justify-end p-8">
-                    <h6 className="text-xl font-bold text-white mb-2 group-hover:text-yellow transition-colors drop-shadow-md">Create</h6>
-                    <p className="text-white/80 text-sm drop-shadow-md">Build real-world projects to add to your portfolio.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {enrollCourse && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg/80 backdrop-blur-sm animate-in fade-in duration-200">
               <div className="bg-panel border border-line rounded-2xl p-6 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">
