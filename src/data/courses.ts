@@ -910,13 +910,13 @@ export const COURSES: Course[] = [
           { id: 'py-les-1-1', title: 'Install Python & Set up IDE', type: 'Video', duration: '20min', status: 'completed', required: true, bloomLevel: 'Remember', microChunkable: true, checkpoints: 4 },
           { id: 'py-les-1-2', title: 'Python Cheatsheet', type: 'PDF', duration: '10min', status: 'completed', required: true, bloomLevel: 'Remember' },
           { id: 'py-les-1-3', title: 'Variables & Data Types', type: 'Article', duration: '25min', status: 'completed', required: true, bloomLevel: 'Understand' },
-          { 
-            id: 'py-les-1-4', 
-            title: 'Your first script', 
-            type: 'Code', 
-            duration: '20min', 
-            status: 'in_progress', 
-            required: true, 
+          {
+            id: 'py-les-1-4',
+            title: 'Your first script',
+            type: 'Code',
+            duration: '20min',
+            status: 'in_progress',
+            required: true,
             bloomLevel: 'Apply',
             sandboxData: {
               language: 'python',
@@ -945,13 +945,13 @@ export const COURSES: Course[] = [
               ]
             }
           },
-          { 
-            id: 'py-les-1-5', 
-            title: 'Interactive Flow Quiz', 
-            type: 'H5P', 
-            duration: '15min', 
-            status: 'completed', 
-            required: true, 
+          {
+            id: 'py-les-1-5',
+            title: 'Interactive Flow Quiz',
+            type: 'H5P',
+            duration: '15min',
+            status: 'completed',
+            required: true,
             bloomLevel: 'Apply',
             h5pData: {
               type: 'Composite',
@@ -1006,18 +1006,24 @@ export const COURSES: Course[] = [
                     type: 'CoursePresentation',
                     coursePresentation: {
                       slides: [
-                        { id: 's1', elements: [
-                          { id: 'e1', type: 'text', content: '<h2>Python OOP: Classes</h2><p>Classes encapsulate data and behavior.</p>', x: 10, y: 5, width: 80, height: 20 },
-                          { id: 'img1', type: 'image', content: '/images/oop_classes_diagram_1782205252964.png', x: 10, y: 25, width: 80, height: 70 }
-                        ] },
-                        { id: 's2', elements: [
-                          { id: 'e2', type: 'text', content: '<h2>The __init__ method</h2><p>Initializes a new instance of a class.</p>', x: 10, y: 5, width: 80, height: 20 },
-                          { id: 'img2', type: 'image', content: '/images/init_method_diagram_1782205265997.png', x: 10, y: 25, width: 80, height: 70 }
-                        ] },
-                        { id: 's3', elements: [
-                          { id: 'e3', type: 'text', content: '<h2>Inheritance</h2><p>Child classes inherit from parent classes.</p>', x: 10, y: 5, width: 80, height: 20 },
-                          { id: 'img3', type: 'image', content: '/images/inheritance_diagram_1782205277306.png', x: 10, y: 25, width: 80, height: 70 }
-                        ] }
+                        {
+                          id: 's1', elements: [
+                            { id: 'e1', type: 'text', content: '<h2>Python OOP: Classes</h2><p>Classes encapsulate data and behavior.</p>', x: 10, y: 5, width: 80, height: 20 },
+                            { id: 'img1', type: 'image', content: '/images/oop_classes_diagram_1782205252964.png', x: 10, y: 25, width: 80, height: 70 }
+                          ]
+                        },
+                        {
+                          id: 's2', elements: [
+                            { id: 'e2', type: 'text', content: '<h2>The __init__ method</h2><p>Initializes a new instance of a class.</p>', x: 10, y: 5, width: 80, height: 20 },
+                            { id: 'img2', type: 'image', content: '/images/init_method_diagram_1782205265997.png', x: 10, y: 25, width: 80, height: 70 }
+                          ]
+                        },
+                        {
+                          id: 's3', elements: [
+                            { id: 'e3', type: 'text', content: '<h2>Inheritance</h2><p>Child classes inherit from parent classes.</p>', x: 10, y: 5, width: 80, height: 20 },
+                            { id: 'img3', type: 'image', content: '/images/inheritance_diagram_1782205277306.png', x: 10, y: 25, width: 80, height: 70 }
+                          ]
+                        }
                       ]
                     }
                   },
@@ -1057,13 +1063,13 @@ export const COURSES: Course[] = [
           },
           { id: 'py-les-1-6', title: 'Setup Verification', type: 'Assignment', duration: '15min', status: 'in_progress', required: true, bloomLevel: 'Apply' },
           { id: 'py-les-1-7', title: 'Official Docs Link', type: 'External', duration: '5min', status: 'not_started', required: false, bloomLevel: 'Remember' },
-          { 
-            id: 'py-les-1-8', 
-            title: 'Review Quiz', 
-            type: 'H5P', 
-            duration: '10min', 
-            status: 'not_started', 
-            required: true, 
+          {
+            id: 'py-les-1-8',
+            title: 'Review Quiz',
+            type: 'H5P',
+            duration: '10min',
+            status: 'not_started',
+            required: true,
             bloomLevel: 'Remember',
             h5pData: {
               type: 'FillInTheBlanks',
@@ -1474,13 +1480,13 @@ export const COURSES: Course[] = [
         status: 'Open',
         type: 'Self-study',
         lessons: [
-          { 
-            id: 'md-les-1-1', 
-            title: 'Identify Markdown Syntax', 
-            type: 'H5P', 
-            duration: '15min', 
-            status: 'not_started', 
-            required: true, 
+          {
+            id: 'md-les-1-1',
+            title: 'Identify Markdown Syntax',
+            type: 'H5P',
+            duration: '15min',
+            status: 'not_started',
+            required: true,
             bloomLevel: 'Remember',
             h5pData: {
               type: 'MarkTheWords',
@@ -1490,13 +1496,13 @@ export const COURSES: Course[] = [
               }
             }
           },
-          { 
-            id: 'md-les-1-2', 
-            title: 'Complete the Markdown', 
-            type: 'H5P', 
-            duration: '20min', 
-            status: 'not_started', 
-            required: true, 
+          {
+            id: 'md-les-1-2',
+            title: 'Complete the Markdown',
+            type: 'H5P',
+            duration: '20min',
+            status: 'not_started',
+            required: true,
             bloomLevel: 'Understand',
             h5pData: {
               type: 'FillInTheBlanks',
@@ -1583,13 +1589,13 @@ export const COURSES: Course[] = [
           { id: 'sql-les-1-1', title: 'Database Fundamentals', type: 'Video', duration: '30min', status: 'completed', required: true, bloomLevel: 'Remember' },
           { id: 'sql-les-1-2', title: 'Defining Schemas & Tables', type: 'Code', duration: '40min', status: 'not_started', required: true, bloomLevel: 'Apply' },
           { id: 'sql-les-1-3', title: 'Inserting and Selecting Data', type: 'Code', duration: '35min', status: 'not_started', required: true, bloomLevel: 'Apply' },
-          { 
-            id: 'sql-les-1-4', 
-            title: 'Match Database Terminology', 
-            type: 'H5P', 
-            duration: '10min', 
-            status: 'not_started', 
-            required: true, 
+          {
+            id: 'sql-les-1-4',
+            title: 'Match Database Terminology',
+            type: 'H5P',
+            duration: '10min',
+            status: 'not_started',
+            required: true,
             bloomLevel: 'Understand',
             h5pData: {
               type: 'DragAndDrop',
@@ -1726,13 +1732,13 @@ export const COURSES: Course[] = [
         lessons: [
           { id: 'ai-les-3-1', title: 'Structuring System Commands', type: 'Article', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
           { id: 'ai-les-3-2', title: 'Zero vs Few-shot Prompting', type: 'Video', duration: '30min', status: 'locked', required: true, bloomLevel: 'Understand' },
-          { 
-            id: 'ai-les-3-3', 
-            title: 'AI Ethics Decision Tree', 
-            type: 'H5P', 
-            duration: '20min', 
-            status: 'locked', 
-            required: true, 
+          {
+            id: 'ai-les-3-3',
+            title: 'AI Ethics Decision Tree',
+            type: 'H5P',
+            duration: '20min',
+            status: 'locked',
+            required: true,
             bloomLevel: 'Apply',
             h5pData: {
               type: 'BranchingScenario',
