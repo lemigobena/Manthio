@@ -1,4 +1,5 @@
 // Real-time Analytics & Progress Service for Manthio
+import type { UserProfile } from "../types"
 
 export interface Weakness {
   id: string;
@@ -23,6 +24,7 @@ export interface ActivityDay {
 }
 
 export interface AnalyticsData {
+  userProfile?: UserProfile;
   totalStudyTime: {
     week: number; // in minutes
     month: number;
@@ -66,10 +68,10 @@ const generateHistoryDays = (count: number, offsetDays = 0): ActivityDay[] => {
     let baseMins = 30 + Math.sin(i * 0.4) * 20;
     if (dayOfWeek === 0 || dayOfWeek === 6) baseMins -= 15; // less on weekends
     const minutes = Math.max(0, Math.floor(baseMins + Math.random() * 15));
-    
+
     // Modules completed on some days
     const modulesCompleted = (i > 0 && i % 12 === 0) ? 1 : 0;
-    
+
     // Simulate some XP earned
     const xpEarned = Math.floor(minutes * 5 + modulesCompleted * 500 + Math.random() * 50);
 
@@ -302,7 +304,7 @@ export const analyticsService = {
         // Elevate severity and update wrong patterns
         if (weakness.severity === 'light') weakness.severity = 'moderate';
         else if (weakness.severity === 'moderate') weakness.severity = 'significant';
-        
+
         weakness.wrongPatterns = `${weakness.wrongPatterns} | Also missed: "${questionText}"`;
         weakness.detectedAt = new Date().toISOString();
       }
@@ -320,7 +322,7 @@ export const analyticsService = {
       // Increment competence as it is resolved
       const topic = data.weaknesses[weaknessIndex].topic;
       data.competencies[topic] = Math.min(100, (data.competencies[topic] || 50) + 15);
-      
+
       this.saveAnalyticsData(data);
     }
   },
@@ -352,12 +354,12 @@ export const analyticsService = {
   // Get status of review quiz (available vs countdown)
   getReviewQuizStatus(weakness: Weakness): { available: boolean; remainingDays: number } {
     if (weakness.resolved) return { available: false, remainingDays: 0 };
-    
+
     const baseTime = weakness.lastReviewAt ? new Date(weakness.lastReviewAt).getTime() : new Date(weakness.detectedAt).getTime();
     const targetDays = weakness.reviewCycleDays[weakness.currentCycleIdx];
     const targetTime = baseTime + targetDays * 24 * 60 * 60 * 1000;
     const now = Date.now();
-    
+
     if (now >= targetTime) {
       return { available: true, remainingDays: 0 };
     } else {
