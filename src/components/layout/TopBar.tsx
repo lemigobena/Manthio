@@ -91,7 +91,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   if (isPublicView) {
     return (
       <div className={`fixed top-0 left-0 right-0 h-16 transition-all duration-300 z-[100] ${scrolled ? 'bg-panel/90 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
-        <div className="max-w-[1400px] mx-auto h-full flex items-center justify-between px-4 md:px-8 w-full">
+        <div className="max-w-[1300px] mx-auto h-full flex items-center justify-between pr-4 md:px-[44px] w-full">
           <div className="flex items-center shrink-0">
             <img 
               src="/Branding/primary/logo_7_prio_1_variation.png" 
