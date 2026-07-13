@@ -791,6 +791,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                     // Color mapping for SVG stroke
                     const strokeColor = color === 'cyan' ? 'var(--color-cyan)' : color === 'purple' ? '#b624ff' : color === 'yellow' ? '#ffb800' : '#00ff9d';
 
+                    // Static class map so Tailwind can detect these at build time
+                    const upNextClasses = {
+                      cyan:   { wrap: 'bg-cyan/5 border-cyan/15',     icon: 'text-cyan' },
+                      purple: { wrap: 'bg-purple/5 border-purple/15', icon: 'text-purple' },
+                      yellow: { wrap: 'bg-yellow/5 border-yellow/15', icon: 'text-yellow' },
+                      green:  { wrap: 'bg-green/5 border-green/15',   icon: 'text-green' },
+                    }[color] ?? { wrap: 'bg-cyan/5 border-cyan/15', icon: 'text-cyan' };
+
                     return (
                       <div
                         key={course.id}
@@ -855,8 +863,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                               <span className="ml-auto text-[10px] font-bold text-yellow shrink-0">100%</span>
                             </div>
                           ) : course.modules[0]?.lessons[0] ? (
-                            <div className={`flex items-center gap-2 bg-${color}/5 border border-${color}/15 rounded-xl px-3 py-2.5 mb-4`}>
-                              <PlayCircle className={`w-4 h-4 text-${color} shrink-0`} />
+                            <div className={`flex items-center gap-2 ${upNextClasses.wrap} border rounded-xl px-3 py-2.5 mb-4`}>
+                              <PlayCircle className={`w-4 h-4 ${upNextClasses.icon} shrink-0`} />
                               <div className="min-w-0">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-muted mb-0.5">Up Next</p>
                                 <p className="text-xs font-semibold text-text truncate">{course.modules[0].lessons[0].title}</p>
@@ -936,11 +944,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
             <div className="flex flex-col gap-6">
 
               {/* REQ-DASH-010: Upcoming Events */}
-              <div className="rounded-2xl p-6 space-y-5">
+              <div className="rounded-2xl p-6 lg:p-4 xl:p-6 space-y-5 lg:space-y-3 xl:space-y-5">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center space-x-2">
                     <Calendar className="w-4 h-4 text-orange" />
-                    <h3 className="font-bold text-base text-text">Upcoming Events</h3>
+                    <h3 className="font-bold text-base lg:text-sm xl:text-base text-text">Upcoming Events</h3>
                   </div>
                   <button
                     onClick={() => onNavigate('live-sessions')}
@@ -950,14 +958,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                   </button>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3 lg:space-y-2 xl:space-y-3">
 
                   {/* Event 1 - Live Session */}
-                  <div className="group relative bg-panel border border-line hover:border-purple/40 rounded-xl p-4 transition-all duration-200 hover:shadow-md">
+                  <div className="group relative bg-panel border border-line hover:border-purple/40 rounded-xl p-4 lg:p-3 xl:p-4 transition-all duration-200 hover:shadow-md">
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple rounded-l-xl" />
-                    <div className="pl-3">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-2 flex-wrap">
+                    <div className="pl-3 lg:pl-2 xl:pl-3">
+                      <div className="flex items-start justify-between gap-2 mb-2 lg:mb-1.5 xl:mb-2">
+                        <div className="flex items-center gap-2 lg:gap-1.5 xl:gap-2 flex-wrap">
                           <span className="bg-purple/20 text-purple text-[9px] px-2 py-0.5 rounded-md font-black uppercase tracking-wider">Live Session</span>
                           <span className="text-[9px] text-muted font-bold flex items-center gap-1"><MapPin className="w-2.5 h-2.5" /> Zürich Lab</span>
                         </div>
@@ -966,16 +974,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                           Today
                         </div>
                       </div>
-                      <h4 className="font-bold text-sm text-text leading-snug mb-0.5">Flipped Session A — Python Basics</h4>
-                      <p className="text-xs text-muted mb-3 leading-relaxed">Review of core syntax & collaborative group exercises with your cohort peers.</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 text-[10px] text-muted font-semibold">
-                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> 18:00 – 19:30</span>
-                          <span className="flex items-center gap-1"><Users className="w-3 h-3" /> 12 attending</span>
+                      <h4 className="font-bold text-sm lg:text-[13px] xl:text-sm text-text leading-snug mb-0.5">Flipped Session A — Python Basics</h4>
+                      <p className="text-xs lg:text-[11px] xl:text-xs text-muted mb-3 lg:mb-2 xl:mb-3 leading-relaxed">Review of core syntax & collaborative group exercises with your cohort peers.</p>
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-3 lg:gap-2 xl:gap-3 text-[10px] lg:text-[9px] xl:text-[10px] text-muted font-semibold min-w-0">
+                          <span className="flex items-center gap-1 whitespace-nowrap"><Clock className="w-3 h-3 shrink-0" /> 18:00 – 19:30</span>
+                          <span className="flex items-center gap-1 whitespace-nowrap"><Users className="w-3 h-3 shrink-0" /> 12 attending</span>
                         </div>
                         <button
                           onClick={() => onNavigate('live-session')}
-                          className="bg-purple hover:brightness-110 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg transition-all active:scale-95"
+                          className="bg-purple hover:brightness-110 text-white text-[10px] font-black uppercase tracking-wider px-3 lg:px-2.5 xl:px-3 py-1.5 lg:py-1 xl:py-1.5 rounded-lg transition-all active:scale-95 shrink-0"
                         >
                           Join Now
                         </button>
@@ -984,20 +992,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                   </div>
 
                   {/* Event 2 - Assignment Deadline */}
-                  <div className="group relative bg-panel border border-line hover:border-yellow/40 rounded-xl p-4 transition-all duration-200 hover:shadow-md">
+                  <div className="group relative bg-panel border border-line hover:border-yellow/40 rounded-xl p-4 lg:p-3 xl:p-4 transition-all duration-200 hover:shadow-md">
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-yellow rounded-l-xl" />
-                    <div className="pl-3">
-                      <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="pl-3 lg:pl-2 xl:pl-3">
+                      <div className="flex items-start justify-between gap-2 mb-2 lg:mb-1.5 xl:mb-2 flex-wrap">
                         <span className="bg-yellow/20 text-yellow text-[9px] px-2 py-0.5 rounded-md font-black uppercase tracking-wider">Deadline</span>
                         <span className="text-[9px] text-muted font-bold shrink-0">Tomorrow · 23:59</span>
                       </div>
-                      <h4 className="font-bold text-sm text-text leading-snug mb-0.5">Capstone Draft Submission</h4>
-                      <p className="text-xs text-muted mb-3 leading-relaxed">Submit your initial project architecture for peer and mentor review.</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1 text-[10px] text-yellow font-bold">
-                          <AlertCircle className="w-3 h-3" /> Don't miss it
+                      <h4 className="font-bold text-sm lg:text-[13px] xl:text-sm text-text leading-snug mb-0.5">Capstone Draft Submission</h4>
+                      <p className="text-xs lg:text-[11px] xl:text-xs text-muted mb-3 lg:mb-2 xl:mb-3 leading-relaxed">Submit your initial project architecture for peer and mentor review.</p>
+                      <div className="flex items-center justify-between gap-2 flex-wrap lg:flex-nowrap">
+                        <div className="flex items-center gap-1 text-[10px] lg:text-[9px] xl:text-[10px] text-yellow font-bold min-w-0">
+                          <AlertCircle className="w-3 h-3 shrink-0" /> <span className="truncate">Don't miss it</span>
                         </div>
-                        <button className="border border-yellow/40 text-yellow hover:bg-yellow/10 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg transition-all">
+                        <button className="border border-yellow/40 text-yellow hover:bg-yellow/10 text-[10px] font-black uppercase tracking-wider px-3 lg:px-2.5 xl:px-3 py-1.5 lg:py-1 xl:py-1.5 rounded-lg transition-all shrink-0">
                           Submit
                         </button>
                       </div>
@@ -1005,24 +1013,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                   </div>
 
                   {/* Event 3 - Workshop */}
-                  <div className="group relative bg-panel border border-line hover:border-cyan/40 rounded-xl p-4 transition-all duration-200 hover:shadow-md">
+                  <div className="group relative bg-panel border border-line hover:border-cyan/40 rounded-xl p-4 lg:p-3 xl:p-4 transition-all duration-200 hover:shadow-md">
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan rounded-l-xl" />
-                    <div className="pl-3">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-2 flex-wrap">
+                    <div className="pl-3 lg:pl-2 xl:pl-3">
+                      <div className="flex items-start justify-between gap-2 mb-2 lg:mb-1.5 xl:mb-2">
+                        <div className="flex items-center gap-2 lg:gap-1.5 xl:gap-2 flex-wrap">
                           <span className="bg-cyan/20 text-cyan text-[9px] px-2 py-0.5 rounded-md font-black uppercase tracking-wider">Workshop</span>
                           <span className="text-[9px] text-muted font-bold flex items-center gap-1"><Globe className="w-2.5 h-2.5" /> Online</span>
                         </div>
                         <span className="text-[9px] text-muted font-bold shrink-0">Oct 12 · 10:00</span>
                       </div>
-                      <h4 className="font-bold text-sm text-text leading-snug mb-0.5">Prompt Engineering Deep Dive</h4>
-                      <p className="text-xs text-muted mb-3 leading-relaxed">Hands-on workshop covering zero-shot, few-shot and chain-of-thought techniques.</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 text-[10px] text-muted font-semibold">
-                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> 2h</span>
-                          <span className="flex items-center gap-1"><Users className="w-3 h-3" /> 34 seats left</span>
+                      <h4 className="font-bold text-sm lg:text-[13px] xl:text-sm text-text leading-snug mb-0.5">Prompt Engineering Deep Dive</h4>
+                      <p className="text-xs lg:text-[11px] xl:text-xs text-muted mb-3 lg:mb-2 xl:mb-3 leading-relaxed">Hands-on workshop covering zero-shot, few-shot and chain-of-thought techniques.</p>
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-3 lg:gap-2 xl:gap-3 text-[10px] lg:text-[9px] xl:text-[10px] text-muted font-semibold min-w-0">
+                          <span className="flex items-center gap-1 whitespace-nowrap"><Clock className="w-3 h-3 shrink-0" /> 2h</span>
+                          <span className="flex items-center gap-1 whitespace-nowrap"><Users className="w-3 h-3 shrink-0" /> 34 seats left</span>
                         </div>
-                        <button className="border border-cyan/40 text-cyan hover:bg-cyan/10 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg transition-all">
+                        <button className="border border-cyan/40 text-cyan hover:bg-cyan/10 text-[10px] font-black uppercase tracking-wider px-3 lg:px-2.5 xl:px-3 py-1.5 lg:py-1 xl:py-1.5 rounded-lg transition-all shrink-0">
                           Reserve
                         </button>
                       </div>
