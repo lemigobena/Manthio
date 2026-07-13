@@ -1,19 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useXP } from '../../context/XPContext';
-import { useAuth } from '../../context/AuthContext';
+// import { useAuth } from '../../context/AuthContext';
 import { analyticsService, type Weakness } from '../../services/analyticsService';
-import { COURSES } from '../../services/mockData';
-import { 
-  Award, 
-  Clock, 
-  Flame, 
-  Sparkles, 
-  AlertTriangle, 
-  FileSpreadsheet, 
-  AlertCircle, 
-  TrendingUp, 
-  Play, 
-  CheckCircle2, 
+import {
+  Award,
+  Clock,
+  Flame,
+  Sparkles,
+  AlertTriangle,
+  FileSpreadsheet,
+  AlertCircle,
+  TrendingUp,
+  CheckCircle2,
   XCircle,
   Check,
   ChevronDown,
@@ -21,6 +19,7 @@ import {
   BarChart3,
   Lock
 } from 'lucide-react';
+import { Certificate } from '../../components/ui/Certificate';
 
 const ModernDropdown: React.FC<{
   value: string;
@@ -63,9 +62,8 @@ const ModernDropdown: React.FC<{
             <button
               key={option.value}
               type="button"
-              className={`flex items-center justify-between w-full px-3 py-2 text-xs font-medium text-left transition-colors hover:bg-cyan/10 ${
-                value === option.value ? 'text-cyan bg-cyan/5' : 'text-text'
-              }`}
+              className={`flex items-center justify-between w-full px-3 py-2 text-xs font-medium text-left transition-colors hover:bg-cyan/10 ${value === option.value ? 'text-cyan bg-cyan/5' : 'text-text'
+                }`}
               onClick={() => {
                 onChange(option.value);
                 setIsOpen(false);
@@ -87,18 +85,18 @@ interface AnalyticsProps {
 
 export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
   const { streak, addToast } = useXP();
-  const { setActiveCourseId } = useAuth();
-  
+  // const { setActiveCourseId } = useAuth();
+
   // Real-time analytics state synced with service
   const [analyticsData, setAnalyticsData] = useState(() => analyticsService.getAnalyticsData());
-  
+
   // Controls
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'quarter' | 'year' | 'allTime'>('week');
   const [chartMode, setChartMode] = useState<'7days' | '30days'>('7days');
   const [chartStyle, setChartStyle] = useState<'bar' | 'curve'>('bar');
   const [showCohort, setShowCohort] = useState(false);
   const [competencyFilter, setCompetencyFilter] = useState<'all' | 'python'>('all');
-  
+
   // Loading state simulation
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -182,10 +180,10 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
   // 18.2.6 Heatmap calculation
   const renderHeatmap = () => {
     const log = analyticsData.activityLog;
-    
+
     // Sort activity logs so oldest is first for rendering left-to-right
     const sortedLog = [...log].slice(0, 90).reverse();
-    
+
     const getIntensityClass = (mins: number) => {
       if (mins === 0) return 'bg-bg border border-line';
       if (mins < 15) return 'bg-cyan/20 border border-cyan/10';
@@ -224,16 +222,16 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
     const log = [...analyticsData.activityLog].slice(0, daysCount).reverse();
     const prevLog = [...analyticsData.prevActivityLog].slice(0, daysCount).reverse();
     const cohortLog = [...analyticsData.cohortActivityLog].slice(0, daysCount).reverse();
-    
+
     // Downsample 30 days to 15 data points for better visual fit
     const step = chartMode === '30days' ? 2 : 1;
     const sampledLog = log.filter((_, i) => i % step === 0);
     const sampledPrev = prevLog.filter((_, i) => i % step === 0);
     const sampledCohort = cohortLog.filter((_, i) => i % step === 0);
-    
+
     const labels = sampledLog.map(d => {
       const date = new Date(d.date);
-      return chartMode === '7days' 
+      return chartMode === '7days'
         ? date.toLocaleDateString([], { weekday: 'short' })
         : date.getDate().toString();
     });
@@ -281,11 +279,11 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
 
       path += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
     }
-    
+
     if (isArea) {
       path += ` L ${points[points.length - 1].x.toFixed(1)} 100 L ${points[0].x.toFixed(1)} 100 Z`;
     }
-    
+
     return path;
   };
 
@@ -298,18 +296,18 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
   const filteredCompetencies = () => {
     const scores = analyticsData.competencies;
     if (competencyFilter === 'python') {
-      return Object.entries(scores).filter(([key]) => 
+      return Object.entries(scores).filter(([key]) =>
         ['Python Syntax', 'OOP Concepts', 'Error Handling'].includes(key)
       );
     }
     return Object.entries(scores);
   };
 
-  // Continue course logic
-  const handleContinueCourse = (courseId: string) => {
-    setActiveCourseId(courseId);
-    onNavigate('content-player');
-  };
+  // // Continue course logic
+  // const handleContinueCourse = (courseId: string) => {
+  //   setActiveCourseId(courseId);
+  //   onNavigate('content-player');
+  // };
 
   // Review Quiz questions mapped to topics
   const REVIEW_QUESTIONS: Record<string, { question: string; options: string[]; correctIndex: number; explanation: string }> = {
@@ -338,13 +336,13 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
     if (selectedReviewAnswer === null || !activeReviewWeakness) return;
     const qDetails = REVIEW_QUESTIONS[activeReviewWeakness.id] || REVIEW_QUESTIONS['oop'];
     const isCorrect = selectedReviewAnswer === qDetails.correctIndex;
-    
+
     setReviewIsCorrect(isCorrect);
     setReviewSubmitted(true);
-    
+
     // Save to analytics service
     analyticsService.submitReviewQuizResult(activeReviewWeakness.id, isCorrect);
-    
+
     if (isCorrect) {
       addToast('success', 'Correct! Weakness review stage progressed.');
     } else {
@@ -377,25 +375,25 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
           <h1 className="text-2xl font-bold text-text font-display">Analytics & Progress</h1>
           <p className="text-muted text-sm mt-1">Detailed real-time insights into your learning activities, streaks, and gaps.</p>
         </div>
-        
+
         {/* Time Selector and Export buttons */}
         <div className="grid grid-cols-2 sm:flex sm:flex-row items-center gap-3 w-full sm:w-auto">
-            <ModernDropdown 
-              disabled={isLoading || isError}
-              value={timeRange} 
-              onChange={(val) => setTimeRange(val as 'week' | 'month' | 'quarter' | 'year' | 'allTime')}
-              containerClassName="w-full"
-              className="bg-panel text-xs font-bold rounded-lg px-3 py-2 cursor-pointer w-full flex justify-between"
-              options={[
-                { value: 'week', label: 'This Week' },
-                { value: 'month', label: 'This Month' },
-                { value: 'quarter', label: 'This Quarter' },
-                { value: 'year', label: 'This Year' },
-                { value: 'allTime', label: 'All Time' },
-              ]}
-            />
-          
-          <button 
+          <ModernDropdown
+            disabled={isLoading || isError}
+            value={timeRange}
+            onChange={(val) => setTimeRange(val as 'week' | 'month' | 'quarter' | 'year' | 'allTime')}
+            containerClassName="w-full"
+            className="bg-panel text-xs font-bold rounded-lg px-3 py-2 cursor-pointer w-full flex justify-between"
+            options={[
+              { value: 'week', label: 'This Week' },
+              { value: 'month', label: 'This Month' },
+              { value: 'quarter', label: 'This Quarter' },
+              { value: 'year', label: 'This Year' },
+              { value: 'allTime', label: 'All Time' },
+            ]}
+          />
+
+          <button
             disabled={isLoading || isError}
             onClick={exportCSV}
             className="w-full sm:w-auto bg-transparent border border-cyan hover:bg-cyan/10 text-cyan text-xs font-semibold px-3 py-2 rounded-lg flex items-center justify-center space-x-1.5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed h-[34px]"
@@ -415,7 +413,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
             <h3 className="font-bold text-text text-base">Failed to load analytics</h3>
             <p className="text-muted text-xs max-w-xs mx-auto">We encountered an issue retrieving your progress metrics. Please check your internet connection.</p>
           </div>
-          <button 
+          <button
             onClick={handleRetry}
             className="bg-cyan hover:bg-cyan2 text-bg text-xs font-bold px-5 py-2.5 rounded-xl transition-colors cursor-pointer"
           >
@@ -455,7 +453,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
               <div className="text-2xl font-bold mt-2 font-mono">{studyTimeStats.value}</div>
               <span className="text-[10px] text-green font-semibold mt-1 block">{studyTimeStats.compare}</span>
             </div>
-            
+
             <div className="bg-panel border border-line p-5 rounded-2xl transition-all duration-300 hover:border-yellow/35 group relative overflow-hidden">
               <div className="absolute top-0 right-0 w-16 h-16 bg-yellow/5 rounded-full blur-xl group-hover:scale-150 transition-all duration-700" />
               <div className="flex justify-between items-start text-muted text-[10px] uppercase font-bold tracking-wider">
@@ -465,7 +463,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
               <div className="text-2xl font-bold mt-2 font-mono">{streak} Days</div>
               <span className="text-[10px] text-muted mt-1 block">Best streak: {analyticsData.longestStreak} days</span>
             </div>
-            
+
             <div className="bg-panel border border-line p-5 rounded-2xl transition-all duration-300 hover:border-purple/35 group relative overflow-hidden">
               <div className="absolute top-0 right-0 w-16 h-16 bg-purple/5 rounded-full blur-xl group-hover:scale-150 transition-all duration-700" />
               <div className="flex justify-between items-start text-muted text-[10px] uppercase font-bold tracking-wider">
@@ -489,7 +487,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
 
           {/* 18.2.2 Activity Chart & 18.2.4 Skill Profile */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
+
             {/* Weekly/Monthly Activity Chart */}
             <div className="lg:col-span-2 bg-panel border border-line rounded-2xl p-6 space-y-4 relative flex flex-col justify-between">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -497,18 +495,18 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                   <h3 className="font-bold text-base font-display">Study Activity</h3>
                   <p className="text-muted text-xs">Daily learning minutes vs previous period</p>
                 </div>
-                
+
                 {/* Chart controls */}
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-3 sm:mt-0">
                   <div className="flex bg-bg/50 p-0.5 rounded-lg border border-line">
-                    <button 
+                    <button
                       onClick={() => setChartStyle('bar')}
                       className={`p-1.5 rounded-md transition-all ${chartStyle === 'bar' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
                       title="Bar Chart"
                     >
                       <BarChart3 className="w-3.5 h-3.5" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => setChartStyle('curve')}
                       className={`p-1.5 rounded-md transition-all ${chartStyle === 'curve' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
                       title="Curve Area Chart"
@@ -516,30 +514,29 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                       <Activity className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  
+
                   <div className="flex bg-bg/50 p-0.5 rounded-lg border border-line">
-                    <button 
+                    <button
                       onClick={() => setChartMode('7days')}
                       className={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all ${chartMode === '7days' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
                     >
                       7d
                     </button>
-                    <button 
+                    <button
                       onClick={() => setChartMode('30days')}
                       className={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all ${chartMode === '30days' ? 'bg-cyan text-bg' : 'text-muted hover:text-text'}`}
                     >
                       30d
                     </button>
                   </div>
-                  
+
                   {/* REQ-ANALYTICS-004 Cohort comparison toggle */}
-                  <button 
+                  <button
                     onClick={() => setShowCohort(!showCohort)}
-                    className={`px-2.5 py-1.5 border rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer ${
-                      showCohort 
-                        ? 'bg-purple/10 border-purple/40 text-purple' 
-                        : 'bg-bg border-line text-muted hover:text-text'
-                    }`}
+                    className={`px-2.5 py-1.5 border rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer ${showCohort
+                      ? 'bg-purple/10 border-purple/40 text-purple'
+                      : 'bg-bg border-line text-muted hover:text-text'
+                      }`}
                   >
                     <TrendingUp className="w-3.5 h-3.5" />
                     <span>Cohort Avg</span>
@@ -564,39 +561,39 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                           <stop offset="100%" stopColor="var(--cyan)" stopOpacity="0.02" />
                         </linearGradient>
                       </defs>
-                      <path 
-                        d={currentAreaPath} 
-                        fill="url(#currentAreaGrad)" 
-                        className="transition-all duration-500" 
+                      <path
+                        d={currentAreaPath}
+                        fill="url(#currentAreaGrad)"
+                        className="transition-all duration-500"
                       />
-                      <path 
-                        d={currentLinePath} 
-                        fill="none" 
-                        stroke="var(--cyan)" 
-                        strokeWidth="2.5" 
+                      <path
+                        d={currentLinePath}
+                        fill="none"
+                        stroke="var(--cyan)"
+                        strokeWidth="2.5"
                         vectorEffect="non-scaling-stroke"
-                        className="transition-all duration-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" 
+                        className="transition-all duration-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]"
                       />
                     </>
                   )}
                   {/* Previous period line */}
-                  <path 
-                    d={prevLinePath} 
-                    fill="none" 
-                    stroke="var(--orange)" 
-                    strokeWidth="1.5" 
+                  <path
+                    d={prevLinePath}
+                    fill="none"
+                    stroke="var(--orange)"
+                    strokeWidth="1.5"
                     vectorEffect="non-scaling-stroke"
-                    className="opacity-50 transition-all duration-500" 
+                    className="opacity-50 transition-all duration-500"
                   />
                   {/* Cohort average line */}
                   {showCohort && (
-                    <path 
-                      d={cohortLinePath} 
-                      fill="none" 
-                      stroke="var(--purple)" 
-                      strokeWidth="2" 
+                    <path
+                      d={cohortLinePath}
+                      fill="none"
+                      stroke="var(--purple)"
+                      strokeWidth="2"
                       vectorEffect="non-scaling-stroke"
-                      className="opacity-80 transition-all duration-500" 
+                      className="opacity-80 transition-all duration-500"
                     />
                   )}
                 </svg>
@@ -616,13 +613,12 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                       </div>
 
                       {/* Bar */}
-                      <div 
-                        className={`bg-cyan/25 border-t border-x border-cyan/40 hover:bg-cyan/85 rounded-t-[3px] transition-all duration-500 mx-auto ${
-                          chartMode === '7days' ? 'w-5 sm:w-8 md:w-12' : 'w-2.5 sm:w-4 md:w-6'
-                        } ${chartStyle === 'curve' ? 'opacity-0 h-full' : ''}`}
+                      <div
+                        className={`bg-cyan/25 border-t border-x border-cyan/40 hover:bg-cyan/85 rounded-t-[3px] transition-all duration-500 mx-auto ${chartMode === '7days' ? 'w-5 sm:w-8 md:w-12' : 'w-2.5 sm:w-4 md:w-6'
+                          } ${chartStyle === 'curve' ? 'opacity-0 h-full' : ''}`}
                         style={{ height: chartStyle === 'bar' ? `${(percent / 100) * 160}px` : '100%' }}
                       />
-                      
+
                       <span className={`text-[8px] sm:text-[9px] text-muted mt-1.5 truncate max-w-[40px] transition-opacity ${chartMode === '30days' && idx % 2 !== 0 ? 'opacity-0 md:opacity-100' : 'opacity-100'}`}>
                         {chartData.labels[idx]}
                       </span>
@@ -656,10 +652,10 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                   <h3 className="font-bold text-base font-display truncate">Competence Profile</h3>
                   <p className="text-muted text-[11px] sm:text-xs">Skill levels from activities</p>
                 </div>
-                
+
                 {/* Skill Filter */}
                 <div className="shrink-0 flex">
-                  <ModernDropdown 
+                  <ModernDropdown
                     value={competencyFilter}
                     onChange={(val) => setCompetencyFilter(val as 'all' | 'python')}
                     className="bg-bg text-[10px] font-bold rounded px-2.5 py-1.5 cursor-pointer w-full whitespace-nowrap min-w-max"
@@ -670,7 +666,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-3.5 flex-1 pt-2">
                 {filteredCompetencies().map(([skill, score]) => {
                   const getSkillColor = (pct: number) => {
@@ -686,21 +682,21 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                         <span className="font-bold font-mono text-[11px] text-muted">{score}%</span>
                       </div>
                       <div className="w-full h-2 bg-bg rounded-full overflow-hidden border border-line/45 relative">
-                        <div 
-                          className={`h-full ${getSkillColor(score)} transition-all duration-1000 ease-out`} 
-                          style={{ width: `${score}%` }} 
+                        <div
+                          className={`h-full ${getSkillColor(score)} transition-all duration-1000 ease-out`}
+                          style={{ width: `${score}%` }}
                         />
                       </div>
                     </div>
                   );
                 })}
               </div>
-              
+
               <div className="flex items-center justify-between gap-4 pt-3 border-t border-line/45 mt-2">
                 <div className="text-[10px] text-muted/70 italic leading-tight">
                   Skills update dynamically from exercises.
                 </div>
-                <button 
+                <button
                   onClick={() => onNavigate('competence-profile')}
                   className="text-[10px] font-bold text-cyan hover:text-cyan2 bg-cyan/10 hover:bg-cyan/20 px-3 py-1.5 rounded-md transition-colors whitespace-nowrap cursor-pointer"
                 >
@@ -716,7 +712,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
               <h3 className="font-bold text-base font-display">AI Weakness Analysis</h3>
               <p className="text-muted text-xs">Knowledge gaps identified by AI. Complete remediation sessions or review quizzes to resolve them.</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {analyticsData.weaknesses.filter(w => !w.resolved).map((w) => {
                 const getSeverityStyles = (sev: string) => {
@@ -731,9 +727,8 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                   <div key={w.id} className="bg-bg border border-line p-4 rounded-xl flex flex-col justify-between space-y-4 hover:border-line/80 transition-all">
                     <div className="flex items-start space-x-3">
                       <div className="mt-0.5">
-                        <AlertTriangle className={`w-5 h-5 shrink-0 ${
-                          w.severity === 'significant' ? 'text-red' : w.severity === 'moderate' ? 'text-orange' : 'text-cyan'
-                        }`} />
+                        <AlertTriangle className={`w-5 h-5 shrink-0 ${w.severity === 'significant' ? 'text-red' : w.severity === 'moderate' ? 'text-orange' : 'text-cyan'
+                          }`} />
                       </div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -759,7 +754,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                       <div className="flex flex-wrap items-center gap-2 mt-1 sm:mt-0">
                         {/* Spaced-repetition Quiz option */}
                         {reviewStatus.available ? (
-                          <button 
+                          <button
                             onClick={() => handleStartReviewQuiz(w)}
                             className="bg-purple hover:bg-purple/90 text-bg text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
                           >
@@ -771,7 +766,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                           </span>
                         )}
 
-                        <button 
+                        <button
                           onClick={() => onNavigate(`ai-tutor:remediation-${w.id}`)}
                           className="bg-cyan hover:bg-cyan2 text-bg text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap"
                         >
@@ -792,74 +787,46 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* 18.2.5 Course Progress Overview */}
+          {/* 18.2.5 Certificates Overview */}
           <div className="space-y-4">
             <div>
-              <h3 className="font-bold text-base font-display">My Courses & Certifications</h3>
-              <p className="text-muted text-xs">Direct course resume operations and completion checkpoints.</p>
+              <h3 className="font-bold text-base font-display">Certificates</h3>
+              <p className="text-muted text-xs">Your earned certificates and achievements.</p>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {COURSES.filter(c => c.enrolled).map(course => {
-                const getStatusStyle = (prog: number) => {
-                  if (prog === 100) return 'bg-green/10 border-green/30 text-green';
-                  if (prog === 0) return 'bg-line border-line/30 text-muted';
-                  return 'bg-cyan/10 border-cyan/30 text-cyan';
-                };
 
-                const getStatusText = (prog: number) => {
-                  if (prog === 100) return 'Completed';
-                  if (prog === 0) return 'Paused';
-                  return 'In Progress';
-                };
-
-                return (
-                  <div key={course.id} className="bg-bg border border-line p-5 rounded-xl flex flex-col justify-between gap-5 hover:border-line/75 transition-all min-h-[200px]">
-                    <div className="space-y-2.5 flex-1">
-                      <div className="flex items-start gap-2.5 flex-wrap">
-                        <h4 className="font-bold text-sm text-text leading-snug">{course.title}</h4>
-                        <span className={`text-[8px] font-bold uppercase px-2 py-0.5 rounded border whitespace-nowrap ${getStatusStyle(course.progress)}`}>
-                          {getStatusText(course.progress)}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted leading-relaxed">{course.description}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { id: 'cert-1', title: 'Python Fundamentals', issueDate: 'June 15, 2026', credentialId: 'PY-102948', icon: 'Award', imageUrl: 'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?auto=format&fit=crop&w=800&q=80' },
+                { id: 'cert-2', title: 'Advanced React Patterns', issueDate: 'July 02, 2026', credentialId: 'RE-492011', icon: 'Award', imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80' }
+              ].map(cert => (
+                <div key={cert.id} className="bg-bg border border-line p-5 rounded-xl flex flex-col justify-between gap-5 hover:border-cyan/50 transition-all min-h-[200px] group cursor-pointer overflow-hidden">
+                  <div className="space-y-4 flex-1">
+                    <div className="w-full h-auto rounded-lg overflow-hidden border border-line/50 relative">
+                      <Certificate
+                        recipientName={analyticsData.userProfile?.name || "Student"}
+                        courseName={cert.title}
+                        completionDate={cert.issueDate}
+                        platformName="Manthio"
+                        certificateId={cert.credentialId}
+                      />
                     </div>
 
-                    <div className="space-y-3 w-full">
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-[10px] text-muted">
-                          <span>Progress</span>
-                          <span className="font-mono font-bold text-text">{course.progress}%</span>
-                        </div>
-                        <div className="w-full bg-panel h-1.5 rounded-full overflow-hidden border border-line">
-                          <div className="bg-cyan h-full rounded-full transition-all duration-1000" style={{ width: `${course.progress}%` }} />
-                        </div>
+                    <div>
+                      <h4 className="font-bold text-sm text-text leading-snug">{cert.title}</h4>
+                      <div className="space-y-1 mt-2">
+                        <p className="text-[11px] text-muted"><span className="font-semibold text-text/70">Issued:</span> {cert.issueDate}</p>
+                        <p className="text-[11px] text-muted"><span className="font-semibold text-text/70">Credential ID:</span> {cert.credentialId}</p>
                       </div>
-
-                      <button 
-                        onClick={() => handleContinueCourse(course.id)}
-                        className={`text-[10px] font-bold w-full px-4 py-2.5 rounded-lg flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
-                          course.progress === 100 
-                            ? 'bg-line hover:bg-line/80 text-text' 
-                            : 'bg-cyan hover:bg-cyan2 text-bg'
-                        }`}
-                      >
-                        {course.progress === 100 ? (
-                          <>
-                            <Award className="w-3.5 h-3.5" />
-                            <span>Review Material</span>
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-3 h-3 fill-current" />
-                            <span>Continue</span>
-                          </>
-                        )}
-                      </button>
                     </div>
                   </div>
-                );
-              })}
+
+                  <div className="w-full mt-2">
+                    <button className="text-[10px] font-bold w-full px-4 py-2.5 rounded-lg flex items-center justify-center space-x-1.5 transition-all cursor-pointer bg-cyan/10 hover:bg-cyan/20 text-cyan border border-cyan/20">
+                      <span>View Credential</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -920,7 +887,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                   </div>
                   <span className="text-[10px] font-bold text-text">Certified</span>
                 </div>
-                
+
                 <div className="flex flex-col items-center gap-1 opacity-50 cursor-default">
                   <div className="w-14 h-14 bg-bg border border-dashed border-line/60 rounded-full flex items-center justify-center">
                     <Lock className="w-5 h-5 text-muted" />
@@ -951,11 +918,10 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                 ].map(user => (
                   <div key={user.rank} className={`flex items-center justify-between p-2 rounded-lg ${user.isCurrentUser ? 'bg-cyan/10 border border-cyan/20' : 'bg-bg border border-line'}`}>
                     <div className="flex items-center gap-3">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                        user.rank === 1 ? 'bg-yellow/20 text-yellow' : 
-                        user.rank === 2 ? 'bg-zinc-300/20 text-zinc-300' : 
-                        'bg-orange/20 text-orange'
-                      }`}>
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${user.rank === 1 ? 'bg-yellow/20 text-yellow' :
+                        user.rank === 2 ? 'bg-zinc-300/20 text-zinc-300' :
+                          'bg-orange/20 text-orange'
+                        }`}>
                         {user.rank}
                       </div>
                       <span className={`text-xs ${user.isCurrentUser ? 'font-bold text-cyan' : 'font-medium text-text'}`}>
@@ -980,7 +946,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                 <h3 className="font-bold text-sm text-text font-display">Spaced-Repetition Review Quiz</h3>
                 <span className="text-[10px] text-purple font-semibold uppercase tracking-wider block mt-0.5">Topic: {activeReviewWeakness.topic}</span>
               </div>
-              <button 
+              <button
                 onClick={handleCloseReviewQuiz}
                 className="text-muted hover:text-text cursor-pointer transition-colors"
               >
@@ -1001,7 +967,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                     {qDetails.options.map((opt, idx) => {
                       const isSelected = selectedReviewAnswer === idx;
                       const isCorrect = idx === qDetails.correctIndex;
-                      
+
                       let optionStyle = 'border-line text-text hover:border-cyan/50';
                       if (isSelected) {
                         optionStyle = 'border-cyan bg-cyan/10 text-cyan';
@@ -1032,9 +998,8 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                   </div>
 
                   {reviewSubmitted && (
-                    <div className={`p-3 rounded-xl text-xs font-semibold text-center ${
-                      reviewIsCorrect ? 'bg-green/10 border border-green/30 text-green' : 'bg-red/10 border border-red/30 text-red'
-                    }`}>
+                    <div className={`p-3 rounded-xl text-xs font-semibold text-center ${reviewIsCorrect ? 'bg-green/10 border border-green/30 text-green' : 'bg-red/10 border border-red/30 text-red'
+                      }`}>
                       {reviewIsCorrect ? '🎉 Correct Answer! Spaced repetition stage progressed.' : '❌ Incorrect. Severity reset and review rescheduled.'}
                     </div>
                   )}
@@ -1059,9 +1024,8 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
                     <button
                       onClick={handleSubmitReviewQuiz}
                       disabled={selectedReviewAnswer === null}
-                      className={`w-full font-bold py-2.5 rounded-xl text-xs transition-colors cursor-pointer ${
-                        selectedReviewAnswer === null ? 'bg-line text-muted cursor-not-allowed' : 'bg-cyan hover:bg-cyan2 text-bg'
-                      }`}
+                      className={`w-full font-bold py-2.5 rounded-xl text-xs transition-colors cursor-pointer ${selectedReviewAnswer === null ? 'bg-line text-muted cursor-not-allowed' : 'bg-cyan hover:bg-cyan2 text-bg'
+                        }`}
                     >
                       Check Answer
                     </button>
