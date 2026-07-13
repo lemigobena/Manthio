@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { useTrack } from '../track-detail/useTrack';
 import { useAuth } from '../../context/AuthContext';
-import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, Sparkles, Star, Play, Zap, ArrowRight, Code, Command, Cloud, Database, Hexagon, Box, Bot, CheckCircle2, ChevronDown, Check, X } from 'lucide-react';
+import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, Star, ArrowRight, Command, Cloud, Database, Hexagon, Box, CheckCircle2, ChevronDown, Check, X, Terminal } from 'lucide-react';
 import heroImage from '../../assets/hero-student.png';
 import { ParticleNetwork } from '../../components/ui/ParticleNetwork';
 import type { CareerTrack } from '../../types';
@@ -135,7 +135,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
   // Loading & Error States (REQ-LOAD-002, REQ-LOAD-004)
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const [ctaSlide, setCtaSlide] = useState(0);
+
   const [enrollCourse, setEnrollCourse] = useState<typeof COURSES[0] | null>(null);
 
   // Motion and Animation States
@@ -147,13 +147,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  React.useEffect(() => {
-    if (isAuthenticated) return;
-    const interval = setInterval(() => {
-      setCtaSlide(s => (s + 1) % 3);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [isAuthenticated]);
+
 
   React.useEffect(() => {
     localStorage.setItem('catalogDiscoveryMode', discoveryMode);
@@ -249,6 +243,71 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
     return true;
   }) : [];
 
+  const renderFirstCTA = () => (
+    <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col md:flex-row py-16 my-16 group gap-8 md:gap-12 w-full items-center relative isolate">
+      {/* Full-bleed background breakout */}
+      <div className="absolute top-0 w-[100vw] h-full bg-panel -z-10" style={{ left: 'calc(50% - 50vw)' }} />
+      
+      <div className="flex-1 space-y-6 relative z-10 flex flex-col justify-center items-start w-full">
+        <h3 className="text-3xl md:text-4xl font-black text-text font-display leading-tight">
+          Elevate your learning experience
+        </h3>
+        <div className="space-y-4 w-full">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 text-cyan mt-1 shrink-0" />
+            <div>
+              <h4 className="font-bold text-text">Organization Sponsors</h4>
+              <p className="text-muted text-sm">Let your employer invest in your growth by covering the cost of your courses.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 text-purple mt-1 shrink-0" />
+            <div>
+              <h4 className="font-bold text-text">Live Sessions</h4>
+              <p className="text-muted text-sm">Join real-time interactive classes with expert instructors.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 text-yellow mt-1 shrink-0" />
+            <div>
+              <h4 className="font-bold text-text">Direct Tutor Chat</h4>
+              <p className="text-muted text-sm">Chat with your tutor anytime you need help or guidance.</p>
+            </div>
+          </div>
+        </div>
+        <button 
+          onClick={() => onNavigate('signup')}
+          className="px-8 py-3 bg-transparent border border-cyan text-cyan hover:bg-cyan/10 font-bold rounded-xl transition-all cursor-pointer hover:-translate-y-1 mt-4"
+        >
+          Discover All Features
+        </button>
+      </div>
+      <div className="flex-1 relative flex items-center justify-end w-full">
+        <div className="flex flex-col gap-4 w-full max-w-lg z-10">
+          <div className="flex gap-4">
+            <img 
+              src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&auto=format&fit=crop&q=80" 
+              alt="Organization Sponsors" 
+              className="w-1/2 h-32 md:h-40 object-cover rounded-2xl shadow-lg hover:scale-105 transition-transform duration-500"
+            />
+            <img 
+              src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?w=800&auto=format&fit=crop&q=80" 
+              alt="Live Sessions" 
+              className="w-1/2 h-32 md:h-40 object-cover rounded-2xl shadow-lg hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+          <div className="flex justify-center">
+            <img 
+              src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=800&auto=format&fit=crop&q=80" 
+              alt="Chat with Tutor" 
+              className="w-1/2 h-32 md:h-40 object-cover rounded-2xl shadow-lg hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <style>{`
@@ -273,7 +332,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
       `}</style>
       {!isAuthenticated && (
         <>
-          <div className="relative w-[100vw] ml-[calc(50%-50vw)] overflow-hidden mb-20 flex flex-col items-center min-h-[90svh] pt-12 lg:pt-28 pb-12">
+          <div className="relative w-[100vw] ml-[calc(50%-50vw)] overflow-hidden mb-20 flex flex-col items-center justify-center min-h-[90svh] pt-12 lg:pt-28 pb-12" style={{ WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)', maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)' }}>
           
           {/* Moving Particle Network Background */}
           <div className="absolute top-0 left-0 w-full h-full lg:h-[120vh] pointer-events-none z-0 overflow-hidden">
@@ -289,13 +348,12 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
           </div>
 
 
-          {/* Abstract Background Elements (the 'glowing circle' behind the app from Redsun) */}
           <div 
-            className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-cyan/10 rounded-full blur-[120px] opacity-70 pointer-events-none transition-transform duration-1000"
+            className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-cyan/10 rounded-full blur-[80px] opacity-30 pointer-events-none transition-transform duration-1000"
             style={{ transform: `translate(-50%, ${scrollY * 0.2}px)` }}
           />
           <div 
-            className="absolute top-[50%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-purple/10 rounded-full blur-[100px] opacity-50 pointer-events-none transition-transform duration-1000"
+            className="absolute top-[50%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-purple/10 rounded-full blur-[60px] opacity-20 pointer-events-none transition-transform duration-1000"
             style={{ transform: `translate(-50%, ${scrollY * 0.1}px)` }}
           />
 
@@ -317,7 +375,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
             </div>
 
             {/* Left: Text Content */}
-            <div className="flex-1 flex flex-col items-center text-center space-y-4 w-full lg:max-w-2xl relative z-20">
+            <div className="flex-1 flex flex-col items-start text-left space-y-4 w-full lg:max-w-2xl relative z-20">
               
               {/* Subtitle Above */}
               <div className="text-cyan font-bold tracking-wide text-sm md:text-base">
@@ -326,10 +384,9 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
 
               {/* Main Title */}
               <h1 className="text-[32px] leading-[1.3] sm:text-4xl lg:text-5xl xl:text-6xl font-black text-text font-display sm:leading-[1.1] tracking-tight">
-                Now learning from<br />
-                anywhere, and build<br />
-                your <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan to-purple">
-                  bright career.
+                Learn anywhere.<br />
+                Build your <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan to-purple">
+                  career.
                   {/* Swoosh Underline */}
                   <svg className="absolute w-full h-4 -bottom-2 left-0 text-cyan opacity-80" viewBox="0 0 200 20" preserveAspectRatio="none">
                     <path d="M5,15 Q100,0 195,15" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
@@ -338,9 +395,8 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                 </span>
               </h1>
 
-              {/* Description */}
               <p className="text-muted text-base md:text-lg leading-relaxed max-w-md mt-4">
-                It has survived not only five centuries but also the leap into electronic typesetting.
+                Accelerate your journey with interactive, hands-on courses.
               </p>
 
               {/* Button */}
@@ -351,7 +407,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                 >
                   Start Your Journey
                   <svg 
-                    xmlns="http://w3.org" 
+                    xmlns="http://www.w3.org" 
                     fill="none" 
                     viewBox="0 0 24 24" 
                     strokeWidth={2.5} 
@@ -386,7 +442,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                {/* Center Floating Badge (Courses) */}
                <div className="absolute top-[15%] lg:top-[25%] left-0 lg:-left-12 z-20 flex flex-col items-center animate-float">
                  <div className="w-32 h-32 rounded-full bg-panel/95 border-2 border-cyan/40 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(45,212,191,0.25)] backdrop-blur-md relative">
-                   <BookOpen className="w-8 h-8 text-cyan mb-1" />
+                   <Terminal className="w-8 h-8 text-cyan mb-1" />
                    <span className="text-2xl font-black text-text">1,235</span>
                    <span className="text-sm text-muted font-medium">courses</span>
                    {/* Decorative underline swooshes */}
@@ -402,79 +458,10 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                  src={heroImage} 
                  alt="Student studying with laptop" 
                  className="w-full h-auto object-contain z-10 scale-[1.15] -translate-y-4"
+                 style={{ WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)', maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)' }}
                />
 
-               {/* Top Right Floating Badge (Rating) */}
-               <div className="absolute top-[5%] right-0 lg:-right-8 z-20 bg-bg/95 backdrop-blur-xl rounded-full px-6 py-4 border border-line shadow-[0_0_30px_rgba(0,0,0,0.5)] animate-float-reverse flex items-center gap-2">
-                 <span className="text-2xl font-black text-text">4.8</span>
-                 <Star className="w-6 h-6 text-yellow fill-yellow" />
-                 <span className="text-sm text-muted font-medium hidden sm:inline ml-2">rating (86k)</span>
-               </div>
-            </div>
-          </div>
 
-          {/* Visual "App" Block Below (Giant overlapping cards/UI representation) */}
-          <div className="relative z-20 w-full max-w-5xl mx-auto mt-16 px-4" style={{ perspective: '1200px' }}>
-            <div 
-              className="relative w-full h-[400px] md:h-[500px] bg-panel/80 backdrop-blur-xl border border-line rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col transition-all duration-300 ease-out"
-              style={{
-                transform: `rotateX(${Math.max(0, 20 - scrollY * 0.05)}deg) scale(${Math.min(1, 0.9 + scrollY * 0.0002)}) translateY(${scrollY * 0.1}px)`,
-                transformStyle: 'preserve-3d',
-                boxShadow: `0 ${Math.max(20, 50 - scrollY * 0.1)}px ${Math.max(40, 100 - scrollY * 0.1)}px rgba(0,0,0,0.4)`
-              }}
-            >
-              
-              {/* Fake Browser Header */}
-              <div className="h-12 bg-bg/50 border-b border-line flex items-center px-6 space-x-2 relative">
-                <div className="flex space-x-2 absolute left-6">
-                  <div className="w-3 h-3 rounded-full bg-red" />
-                  <div className="w-3 h-3 rounded-full bg-yellow" />
-                  <div className="w-3 h-3 rounded-full bg-green" />
-                </div>
-                <div className="mx-auto bg-panel border border-line rounded-md px-3 py-1.5 text-[10px] text-muted flex items-center justify-center space-x-2 w-1/2 md:w-1/3">
-                  <Code className="w-3 h-3" />
-                  <span>manthio.app/workspace</span>
-                </div>
-              </div>
-
-              {/* Editor Body */}
-              <div className="flex-1 p-8 font-mono text-sm leading-relaxed relative flex items-center justify-center bg-bg/30 overflow-hidden">
-                {/* Inner Glowing orb inside app */}
-                <div className="absolute w-[300px] h-[300px] bg-cyan/10 rounded-full blur-[80px]" />
-                
-                {/* Central Floating Code Snippet */}
-                <div className="relative z-10 w-full max-w-lg bg-panel border border-line rounded-xl p-6 shadow-2xl text-left animate-float">
-                  <div className="flex items-center justify-between mb-4 pb-4 border-b border-line/50">
-                    <span className="text-xs text-muted">train_model.py</span>
-                    <Play className="w-4 h-4 text-cyan cursor-pointer hover:scale-110 transition-transform" />
-                  </div>
-                  <div className="text-purple">def <span className="text-cyan">train_model</span><span className="text-text">(data):</span></div>
-                  <div className="pl-4 text-muted"># Initialize neural network</div>
-                  <div className="pl-4 text-text">model = Sequential([</div>
-                  <div className="pl-8 text-yellow">Dense(128, activation='relu'),</div>
-                  <div className="pl-8 text-yellow">Dropout(0.2),</div>
-                  <div className="pl-8 text-yellow">Dense(10, activation='softmax')</div>
-                  <div className="pl-4 text-text">])</div>
-                  <div className="pl-4 text-purple">return <span className="text-text">model.fit(data)</span></div>
-                  <div className="mt-6 flex items-center space-x-2 animate-pulse text-cyan">
-                    <span className="w-2 h-4 bg-cyan inline-block"></span>
-                    <span className="text-xs">AI Tutor is analyzing your code...</span>
-                  </div>
-                </div>
-
-                {/* Overlapping Terminal Card */}
-                <div className="absolute right-[-10px] sm:right-10 bottom-[-10px] sm:bottom-10 z-20 w-64 bg-bg/95 backdrop-blur-xl border border-cyan/30 rounded-xl shadow-[0_0_30px_rgba(45,212,191,0.15)] p-4 animate-float-reverse">
-                  <div className="flex items-center space-x-2 text-cyan font-bold text-xs mb-2">
-                    <Zap className="w-3.5 h-3.5 fill-cyan" />
-                    <span>Real-time Output</span>
-                  </div>
-                  <div className="font-mono text-[10px] text-muted space-y-1">
-                    <div>&gt; Build successful</div>
-                    <div className="text-text">&gt; Training Epoch 1/10...</div>
-                    <div className="text-green">&gt; Accuracy: 94.2%</div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -493,39 +480,90 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 mb-20">
-              {/* Box 4 (Wide, text left, image right) */}
-              <div className="bento-card relative w-full bg-panel border border-line rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between hover:border-cyan transition-colors overflow-hidden group cursor-pointer">
-                <div className="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-cyan/5 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="md:w-1/2 z-10 text-center md:text-left mb-8 md:mb-0">
-                  <h6 className="text-3xl font-bold text-text mb-4 group-hover:text-cyan transition-colors">AI Sessions</h6>
-                  <p className="text-muted text-lg max-w-md mx-auto md:mx-0">Get unstuck instantly with our state-of-the-art AI tutor that understands your code and guides you without giving away the answers.</p>
-                </div>
-                <div className="md:w-1/2 flex justify-center md:justify-end z-10 w-full">
-                  <div className="w-full max-w-sm h-48 bg-bg rounded-2xl border border-line shadow-2xl flex flex-col p-4 transform group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(45,212,191,0.15)] transition-all">
-                    <div className="flex items-center space-x-2 mb-4">
-                       <Bot className="w-6 h-6 text-cyan" />
-                       <span className="font-bold text-sm text-text">Tutor</span>
-                    </div>
-                    <div className="bg-panel rounded-lg p-3 text-xs text-muted font-mono mb-2">
-                       "It looks like you're missing a parenthesis on line 4. Try checking the syntax for the print function."
-                    </div>
-                    <div className="bg-cyan/10 border border-cyan/30 rounded-lg p-3 text-xs text-cyan font-mono ml-4 self-end">
-                       "Ah, I see! print('hello')!"
-                    </div>
-                  </div>
-                </div>
-              </div>
-          </div>
+
 
           {/* Powerful Features Vertical Alternating list */}
-          <div className="w-full max-w-7xl mx-auto px-4 mb-24 space-y-24">
+          <div id="section-features" className="w-full max-w-[1300px] mx-auto mb-24 space-y-24">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold text-text mb-4">Powerful Features</h2>
               <p className="text-muted text-lg max-w-2xl mx-auto">Explore the frontier of coding evolution. Our latest features redefine the boundaries of what's possible in learning.</p>
             </div>
 
-            {/* Feature 1 (Text Left, Image Right) */}
+            {/* Feature 1 (Text Left, Image Right) - AI Sessions */}
+            <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20">
+              <div className="md:w-1/2 space-y-6">
+                <h3 className="text-3xl font-bold text-text">AI Sessions, get unstuck in seconds</h3>
+                <p className="text-muted text-lg leading-relaxed">
+                  Get unstuck instantly with our state-of-the-art AI tutor that understands your code and guides you without giving away the answers.
+                </p>
+                <ul className="space-y-4 pt-4">
+                  <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-cyan"/><span className="text-text font-medium">Context-aware AI that reads your code.</span></li>
+                  <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-cyan"/><span className="text-text font-medium">Guided hints never spoils the solution.</span></li>
+                  <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-cyan"/><span className="text-text font-medium">Available 24/7 for any language or topic.</span></li>
+                </ul>
+                <div className="pt-4">
+                  {/* Desktop button only; mobile variant placed after the card */}
+                  <button onClick={() => onNavigate('signin')} className="hidden md:flex items-center space-x-2 text-cyan font-bold hover:text-cyan2 transition-colors cursor-pointer">
+                    <span>Try AI Tutor</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="md:w-1/2 w-full h-[400px] bg-bg border border-line rounded-3xl overflow-hidden relative group">
+                 <img 
+                    src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&auto=format&fit=crop&q=80" 
+                    alt="AI Tutor Session" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-tr from-cyan/20 to-purple/20 mix-blend-overlay group-hover:opacity-50 transition-opacity" />
+              </div>
+              {/* Mobile-only button placed after the card so it appears below the card on phones */}
+              <div className="w-full md:hidden flex justify-center">
+                <button onClick={() => onNavigate('signin')} className="flex items-center space-x-2 text-cyan font-bold hover:text-cyan2 transition-colors py-3 cursor-pointer">
+                  <span>Try AI Tutor</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Feature 2 (Image Left, Text Right) - Multiple Format Courses */}
+            <div className="flex flex-col md:flex-row-reverse items-center gap-12 lg:gap-20">
+              <div className="md:w-1/2 space-y-6">
+                <h3 className="text-3xl font-bold text-text">Multiple formats to fit your learning style</h3>
+                <p className="text-muted text-lg leading-relaxed">
+                  Whether you prefer learning on your own schedule or thriving in a group setting, we offer flexible course formats designed for you.
+                </p>
+                <ul className="space-y-4 pt-4">
+                  <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-green"/><span className="text-text font-medium">Self-paced: Learn at your own speed, anytime.</span></li>
+                  <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-green"/><span className="text-text font-medium">Cohort: Join a group of peers and learn together.</span></li>
+                  <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-green"/><span className="text-text font-medium">Flipped: Review materials beforehand, engage deeply in sessions.</span></li>
+                </ul>
+                <div className="pt-4">
+                  {/* Desktop button only; mobile variant placed after the card */}
+                  <button onClick={() => onNavigate('courses')} className="hidden md:flex items-center space-x-2 text-green font-bold hover:text-green/80 transition-colors cursor-pointer">
+                    <span>Explore Formats</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="md:w-1/2 w-full h-[400px] bg-bg border border-line rounded-3xl overflow-hidden relative group">
+                 <img 
+                    src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&auto=format&fit=crop&q=80" 
+                    alt="Multiple Format Courses" 
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-tr from-green/20 to-teal/20 mix-blend-overlay group-hover:opacity-50 transition-opacity" />
+              </div>
+              {/* Mobile-only button placed after the card so it appears below the card on phones */}
+              <div className="w-full md:hidden flex justify-center">
+                <button onClick={() => onNavigate('courses')} className="flex items-center space-x-2 text-green font-bold hover:text-green/80 transition-colors py-3 cursor-pointer">
+                  <span>Explore Formats</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Feature 3 (Text Left, Image Right) - Top Management */}
             <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20">
               <div className="md:w-1/2 space-y-6">
                 <h3 className="text-3xl font-bold text-text">Top Management, to help you see the bigger picture</h3>
@@ -547,7 +585,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               </div>
               <div className="md:w-1/2 w-full h-[400px] bg-bg border border-line rounded-3xl overflow-hidden relative group">
                  <img 
-                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80" 
+                    src="https://images.unsplash.com/photo-1649478680984-01586ce84ac0?w=800&auto=format&fit=crop&q=80" 
                     alt="Management Dashboard" 
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                  />
@@ -562,7 +600,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            {/* Feature 2 (Image Left, Text Right) */}
+            {/* Feature 4 (Image Left, Text Right) - Real-time Collaboration */}
             <div className="flex flex-col md:flex-row-reverse items-center gap-12 lg:gap-20">
               <div className="md:w-1/2 space-y-6">
                 <h3 className="text-3xl font-bold text-text">Real-time collaboration and feedback</h3>
@@ -584,7 +622,7 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               </div>
               <div className="md:w-1/2 w-full h-[400px] bg-bg border border-line rounded-3xl overflow-hidden relative group">
                  <img 
-                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80" 
+                    src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800&auto=format&fit=crop&q=80" 
                     alt="Team Collaboration" 
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                  />
@@ -598,13 +636,155 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                 </button>
               </div>
             </div>
+          </div>
 
+          {/* Feature 5 (Text Left, Image Right) - Streaks & Gamification */}
+          <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20 max-w-[1300px] mx-auto mb-24">
+            <div className="md:w-1/2 space-y-6">
+              <h3 className="text-3xl font-bold text-text">Keep your momentum with Streaks & XP</h3>
+              <p className="text-muted text-lg leading-relaxed">
+                Stay motivated and build a daily learning habit. Earn XP for every course completed, maintain your daily streaks, and climb the leaderboard.
+              </p>
+              <ul className="space-y-4 pt-4">
+                <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-yellow"/><span className="text-text font-medium">Daily streak tracking and reminders.</span></li>
+                <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-yellow"/><span className="text-text font-medium">Earn XP to unlock new badges and avatars.</span></li>
+                <li className="flex items-center space-x-3"><CheckCircle2 className="w-5 h-5 text-yellow"/><span className="text-text font-medium">Compete with peers on the leaderboard.</span></li>
+              </ul>
+              <div className="pt-4">
+                <button onClick={() => onNavigate('signup')} className="hidden md:flex items-center space-x-2 text-yellow font-bold hover:text-yellow/80 transition-colors cursor-pointer">
+                  <span>Start Your Streak</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <div className="md:w-1/2 w-full h-[400px] bg-bg border border-line rounded-3xl overflow-hidden relative group">
+               <img
+                  src="https://cdn.dribbble.com/userupload/42944401/file/original-43d273b30cd843b5293edaa8ee39617c.png?resize=752x&vertical=center"
+                  alt="Streaks & XP"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+               />
+               <div className="absolute inset-0 bg-gradient-to-tr from-yellow/10 to-orange/10 mix-blend-overlay group-hover:opacity-50 transition-opacity pointer-events-none" />
+            </div>
+            <div className="w-full md:hidden flex justify-center">
+              <button onClick={() => onNavigate('signup')} className="flex items-center space-x-2 text-yellow font-bold hover:text-yellow/80 transition-colors py-3 cursor-pointer">
+                <span>Start Your Streak</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Auto-Scrolling Marquee Section */}
+          <div id="section-stack" className="relative w-screen left-1/2 -translate-x-1/2 bg-bg pt-16 pb-24 overflow-hidden border-y border-line/50">
+            <style>{`
+              @keyframes marquee-left {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+              }
+              @keyframes marquee-right {
+                0% { transform: translateX(-50%); }
+                100% { transform: translateX(0); }
+              }
+              .animate-marquee-left {
+                animation: marquee-left 40s linear infinite;
+              }
+              .animate-marquee-right {
+                animation: marquee-right 40s linear infinite;
+              }
+              .marquee-track {
+                width: max-content;
+              }
+            `}</style>
+            
+            <div className="text-center max-w-3xl mx-auto px-6 mb-16 relative z-10">
+              <h2 className="text-4xl md:text-5xl lg:text-[64px] font-medium text-text mb-6 font-display tracking-tight leading-[1.1]">
+                Master the Most<br className="hidden md:block"/> In-Demand Tech
+              </h2>
+              <p className="text-muted text-base md:text-xl mb-10 max-w-2xl mx-auto font-light">
+                Learn modern frameworks, languages, and tools through hands-on, interactive coding sessions.
+              </p>
+              <button 
+                onClick={() => onNavigate('signup')} 
+                className="bg-cyan hover:bg-cyan2 text-bg px-8 py-4 rounded-full font-bold transition-all shadow-[0_0_20px_rgba(45,212,191,0.3)] cursor-pointer flex items-center gap-2 mx-auto hover:-translate-y-1"
+              >
+                Start Learning Now <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Marquee Tracks */}
+            <div className="flex flex-col gap-6 relative z-0">
+              {/* Fade Edges */}
+              <div className="absolute top-0 left-0 bottom-0 w-32 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
+              <div className="absolute top-0 right-0 bottom-0 w-32 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
+
+              {/* Track 1 (Left) */}
+              <div className="flex animate-marquee-left gap-6 marquee-track hover:[animation-play-state:paused]">
+                {[...Array(2)].map((_, i) => (
+                  <div key={i} className="flex gap-6 shrink-0">
+                    {[
+                      { name: 'Python', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg' },
+                      { name: 'JavaScript', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg' },
+                      { name: 'AWS', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg' },
+                      { name: 'C++', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg' },
+                      { name: 'React', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg' },
+                      { name: 'Docker', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg' },
+                      { name: 'Node.js', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg' },
+                      { name: 'Git', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg' },
+                    ].map((icon, j) => (
+                      <div key={j} className="w-32 h-20 md:w-48 md:h-28 rounded-2xl bg-panel flex items-center justify-center shrink-0 border border-line/20 shadow-lg hover:border-cyan/50 transition-colors cursor-pointer group">
+                        <img src={icon.url} alt={icon.name} className="w-10 h-10 md:w-14 md:h-14 object-contain group-hover:scale-110 transition-transform duration-500" />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+
+              {/* Track 2 (Right) */}
+              <div className="flex animate-marquee-right gap-6 marquee-track hover:[animation-play-state:paused]">
+                {[...Array(2)].map((_, i) => (
+                  <div key={i} className="flex gap-6 shrink-0">
+                    {[
+                      { name: 'Go', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/go/go-original.svg' },
+                      { name: 'TypeScript', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg' },
+                      { name: 'PostgreSQL', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg' },
+                      { name: 'Kubernetes', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kubernetes/kubernetes-plain.svg' },
+                      { name: 'Rust', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rust/rust-original.svg' },
+                      { name: 'Next.js', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original.svg' },
+                      { name: 'Vue.js', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vuejs/vuejs-original.svg' },
+                      { name: 'Linux', url: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linux/linux-original.svg' },
+                    ].map((icon, j) => (
+                      <div key={j} className="w-32 h-20 md:w-48 md:h-28 rounded-2xl bg-panel flex items-center justify-center shrink-0 border border-line/20 shadow-lg hover:border-cyan/50 transition-colors cursor-pointer group">
+                        {icon.name === 'Next.js' ? 
+                           <img src={icon.url} alt={icon.name} className="w-10 h-10 md:w-14 md:h-14 object-contain group-hover:scale-110 transition-transform duration-500 dark:invert" />
+                           :
+                           <img src={icon.url} alt={icon.name} className="w-10 h-10 md:w-14 md:h-14 object-contain group-hover:scale-110 transition-transform duration-500" />
+                        }
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex flex-col md:flex-row items-center justify-center gap-12 mt-16 text-sm text-muted relative z-10">
+              <div className="text-center">
+                 <h4 className="font-bold text-text mb-1">Industry Standard</h4>
+                 <p className="text-xs max-w-[120px]">Learn the tools used by top tech companies.</p>
+              </div>
+              <div className="text-center">
+                 <h4 className="font-bold text-text mb-1">Hands-on Practice</h4>
+                 <p className="text-xs max-w-[120px]">Write code directly in the browser.</p>
+              </div>
+              <div className="text-center">
+                 <h4 className="font-bold text-text mb-1">AI Guided</h4>
+                 <p className="text-xs max-w-[120px]">Get instant feedback and help when stuck.</p>
+              </div>
+            </div>
           </div>
         </>
       )}
 
       {/* REQ-CATALOG-002: Discovery Modes */}
-      <div className="flex justify-center mb-2">
+      <div id="section-courses" className="flex justify-center mb-2">
         <div className="bg-panel border border-line p-1 rounded-2xl flex space-x-1 shadow-sm">
           <button 
             onClick={() => handleDiscoveryModeChange('tracks')}
@@ -880,87 +1060,10 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeIn_0.3s_ease-out]">
-          {discoveryMode === 'courses' ? sortedCourses.map((course, index) => (
+          {discoveryMode === 'courses' ? sortedCourses.slice(0, !isAuthenticated ? 6 : undefined).map((course, index) => (
             <React.Fragment key={course.id}>
               {/* First CTA: Image Split Design */}
-              {!isAuthenticated && index === 3 && (
-                <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-panel border border-line rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-xl shadow-bg/50 my-16 group">
-                  <div className="p-8 md:p-12 flex-1 space-y-6 relative z-10 bg-gradient-to-br from-panel to-bg/80 flex flex-col justify-center items-start">
-                    <div className="inline-flex items-center space-x-2 bg-cyan/10 text-cyan px-4 py-2 rounded-full font-bold text-xs uppercase tracking-wider">
-                      <Sparkles className="w-4 h-4" />
-                      <span>Manthio Pro</span>
-                    </div>
-                    <h3 className="text-3xl md:text-4xl font-black text-text font-display leading-tight">
-                      Learn faster with AI-powered tutoring
-                    </h3>
-                    <p className="text-muted text-base md:text-lg leading-relaxed max-w-xl">
-                      Experience our revolutionary in-browser coding environments paired with 24/7 AI guidance. We don't just show you how to code, we code with you.
-                    </p>
-                    <button 
-                      onClick={() => onNavigate('signup')}
-                      className="px-8 py-4 bg-text text-bg hover:bg-cyan hover:text-bg font-bold rounded-xl transition-all shadow-lg hover:shadow-[0_0_20px_rgba(45,212,191,0.5)] cursor-pointer hover:-translate-y-1 mt-4"
-                    >
-                      Start Free Trial
-                    </button>
-                  </div>
-                  <div className="flex-1 min-h-[300px] relative overflow-hidden">
-                    <img 
-                      src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80" 
-                      alt="Team collaborating" 
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-r from-panel via-panel/50 to-transparent md:w-1/2" />
-                  </div>
-                </div>
-              )}
-
-              {/* Second CTA: Testimonial Carousel Design */}
-              {!isAuthenticated && index === 9 && (
-                <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-gradient-to-br from-indigo-900/40 via-purple-900/20 to-bg border border-indigo-500/30 rounded-3xl p-8 md:p-12 relative overflow-hidden shadow-2xl my-16 flex flex-col items-center justify-center min-h-[400px]">
-                  {/* Background decoration */}
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
-                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl" />
-                  
-                  <div className="relative z-10 w-full max-w-4xl mx-auto text-center">
-                    <h3 className="text-sm font-bold text-indigo-400 uppercase tracking-widest mb-8">What our learners say</h3>
-                    
-                    <div className="relative h-[200px] flex items-center justify-center">
-                      {[
-                        { text: "Manthio helped me land a Senior React Developer role in just 3 months. The interactive projects are a game-changer.", author: "Sarah Jenkins", role: "Frontend Engineer @ TechFlow" },
-                        { text: "The AI tutor feels like pair programming with a senior dev. It explains the 'why' behind the code, not just the 'how'.", author: "David Chen", role: "Full Stack Developer" },
-                        { text: "I've tried many platforms, but Manthio's career tracks provide the most structured and practical learning experience.", author: "Elena Rodriguez", role: "Data Scientist" }
-                      ].map((slide, i) => (
-                        <div 
-                          key={i} 
-                          className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-700 transform ${ctaSlide === i ? 'opacity-100 translate-x-0 scale-100' : 'opacity-0 translate-x-8 scale-95 pointer-events-none'}`}
-                        >
-                          <div className="flex gap-1 mb-6">
-                            {[1,2,3,4,5].map(star => <Star key={star} className="w-5 h-5 fill-yellow text-yellow" />)}
-                          </div>
-                          <p className="text-xl md:text-3xl font-medium text-text leading-tight mb-8 max-w-3xl">"{slide.text}"</p>
-                          <div className="flex items-center gap-3 text-left">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan to-purple flex items-center justify-center text-white font-bold text-xl shadow-lg">{slide.author.charAt(0)}</div>
-                            <div>
-                              <p className="font-bold text-text">{slide.author}</p>
-                              <p className="text-xs text-muted">{slide.role}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="flex items-center justify-center gap-3 mt-10">
-                      {[0,1,2].map(i => (
-                        <button 
-                          key={i} 
-                          onClick={() => setCtaSlide(i)}
-                          className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer ${ctaSlide === i ? 'bg-indigo-400 w-8' : 'bg-line hover:bg-muted'}`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
+              {!isAuthenticated && index === 3 && renderFirstCTA()}
 
             <div 
               className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:translate-y-[-4px] duration-300 h-[420px]"
@@ -1041,9 +1144,12 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
               </div>
             </div>
             </React.Fragment>
-          )) : tracksToShow.map(track => (
+          )) : tracksToShow.slice(0, !isAuthenticated ? 6 : undefined).map((track, index) => (
+            <React.Fragment key={track.id}>
+              {/* First CTA: Image Split Design */}
+              {!isAuthenticated && index === 3 && renderFirstCTA()}
+
             <div 
-              key={track.id} 
               className="bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:translate-y-[-4px] duration-300 h-[420px]"
             >
               <div>
@@ -1137,59 +1243,59 @@ export const Explore: React.FC<ExploreProps> = ({ onNavigate }) => {
                 </button>
               </div>
             </div>
+            </React.Fragment>
           ))}
         </div>
       )}
 
-          {/* Features Combined Card */}
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 mt-40 mb-20">
-            <div className="bg-bg/50 border border-line rounded-[2.5rem] p-6 md:p-8 shadow-xl backdrop-blur-sm">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Section 1 */}
-                <div className="relative border border-line rounded-3xl flex flex-col items-center text-center justify-between min-h-[300px] group cursor-pointer overflow-hidden hover:border-cyan transition-colors">
-                  <div className="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=800&q=80" alt="Interactive" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 dark:opacity-50 dark:group-hover:opacity-70 group-hover:scale-110 transition-all duration-700" />
-                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent dark:from-bg/70 dark:via-bg/10" />
-                  </div>
-                  <div className="absolute inset-0 bg-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                  
-                  <div className="relative z-10 w-full h-full flex flex-col items-center justify-end p-8">
-                    <h6 className="text-xl font-bold text-white mb-2 group-hover:text-cyan transition-colors drop-shadow-md">Interactive</h6>
-                    <p className="text-white/80 text-sm drop-shadow-md">Write code directly in your browser with instant feedback.</p>
-                  </div>
-                </div>
+      {/* Login to see more CTA */}
+      {!isAuthenticated && (discoveryMode === 'courses' ? sortedCourses.length > 6 : tracksToShow.length > 6) && (
+        <div className="mt-12 flex justify-center w-full max-w-[1300px] mx-auto">
+           <button 
+             onClick={() => onNavigate('signin')} 
+             className="bg-transparent border-2 border-cyan text-cyan hover:bg-cyan/10 font-bold py-3 px-8 rounded-xl transition-all flex items-center gap-2"
+           >
+             Login to see more {discoveryMode === 'courses' ? 'courses' : 'tracks'}
+             <ArrowRight className="w-4 h-4" />
+           </button>
+        </div>
+      )}
 
-                {/* Section 2 */}
-                <div className="relative border border-line rounded-3xl flex flex-col items-center text-center justify-between min-h-[300px] group cursor-pointer overflow-hidden hover:border-purple transition-colors">
-                  <div className="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Users" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 dark:opacity-50 dark:group-hover:opacity-70 group-hover:scale-110 transition-all duration-700" />
-                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent dark:from-bg/70 dark:via-bg/10" />
-                  </div>
-                  <div className="absolute inset-0 bg-purple/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                  
-                  <div className="relative z-10 w-full h-full flex flex-col items-center justify-end p-8">
-                    <h6 className="text-xl font-bold text-white mb-2 group-hover:text-purple transition-colors drop-shadow-md">Community</h6>
-                    <p className="text-white/80 text-sm drop-shadow-md">Join a global community of passionate learners.</p>
-                  </div>
-                </div>
+      {/* Testimonial Section */}
+      {!isAuthenticated && (
+        <div id="section-testimonials" className="w-full max-w-[1300px] mx-auto mt-24 mb-10">
+          <div className="text-center mb-14">
+            <span className="inline-block text-xs font-bold uppercase tracking-widest text-cyan mb-3">What our learners say</span>
+            <h2 className="text-4xl md:text-5xl font-bold text-text mb-4">Loved by Developers</h2>
+            <p className="text-muted text-lg max-w-xl mx-auto">Join thousands of engineers who've accelerated their careers with Manthio.</p>
+          </div>
 
-                {/* Section 3 */}
-                <div className="relative border border-line rounded-3xl flex flex-col items-center text-center justify-between min-h-[300px] group cursor-pointer overflow-hidden hover:border-yellow transition-colors">
-                  <div className="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80" alt="Create" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 dark:opacity-50 dark:group-hover:opacity-70 group-hover:scale-110 transition-all duration-700" />
-                    <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent dark:from-bg/70 dark:via-bg/10" />
-                  </div>
-                  <div className="absolute inset-0 bg-yellow/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                  
-                  <div className="relative z-10 w-full h-full flex flex-col items-center justify-end p-8">
-                    <h6 className="text-xl font-bold text-white mb-2 group-hover:text-yellow transition-colors drop-shadow-md">Create</h6>
-                    <p className="text-white/80 text-sm drop-shadow-md">Build real-world projects to add to your portfolio.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { text: "Manthio helped me land a Senior React Developer role in just 3 months. The interactive projects are a game-changer.", author: "Sarah Jenkins", role: "Frontend Engineer @ TechFlow", avatar: "SJ", color: "from-cyan to-blue-500" },
+              { text: "The AI tutor feels like pair programming with a senior dev. It explains the 'why' behind the code, not just the 'how'.", author: "David Chen", role: "Full Stack Developer @ Vercel", avatar: "DC", color: "from-purple to-pink-500" },
+              { text: "I've tried many platforms, but Manthio's career tracks provide the most structured and practical learning experience.", author: "Elena Rodriguez", role: "Data Scientist @ Meta", avatar: "ER", color: "from-yellow to-orange-400" },
+              { text: "The streak system kept me consistent. I went from beginner to getting my AWS certification in 60 days.", author: "James Okafor", role: "Cloud Engineer @ AWS", avatar: "JO", color: "from-green to-teal-400" },
+              { text: "The course content is incredibly up-to-date. I learned Docker and Kubernetes concepts I'm already using at work.", author: "Aisha Patel", role: "DevOps Engineer @ Spotify", avatar: "AP", color: "from-blue-400 to-cyan" },
+              { text: "Manthio's community is everything. Got a job referral from a peer I met in a live coding session!", author: "Marcus Liu", role: "Backend Developer @ Stripe", avatar: "ML", color: "from-pink-400 to-purple" },
+            ].map((t, i) => (
+              <div key={i} className="bg-panel border border-line rounded-2xl p-6 flex flex-col gap-4 hover:border-cyan/40 hover:shadow-[0_0_30px_rgba(45,212,191,0.05)] transition-all duration-300 group">
+                <div className="flex gap-1">
+                  {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-yellow text-yellow" />)}
+                </div>
+                <p className="text-text/90 text-sm leading-relaxed flex-1">"{t.text}"</p>
+                <div className="flex items-center gap-3 pt-2 border-t border-line">
+                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0`}>{t.avatar}</div>
+                  <div>
+                    <p className="font-bold text-text text-sm">{t.author}</p>
+                    <p className="text-xs text-muted">{t.role}</p>
                   </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
-
+        </div>
+      )}
           {enrollCourse && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg/80 backdrop-blur-sm animate-in fade-in duration-200">
               <div className="bg-panel border border-line rounded-2xl p-6 max-w-sm w-full shadow-2xl animate-in zoom-in-95 duration-200">

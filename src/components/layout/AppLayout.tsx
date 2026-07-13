@@ -232,7 +232,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
         {/* Content View Body */}
         <main ref={mainRef} className="relative flex-1 overflow-y-auto overflow-x-hidden px-3 md:px-[44px] py-6 flex flex-col">
-          <div className="max-w-7xl mx-auto w-full flex-1">
+          <div className={`${activePage === 'explore' ? 'max-w-[1300px]' : 'max-w-7xl'} mx-auto w-full flex-1`}>
             {children}
           </div>
           
