@@ -390,7 +390,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
                 {/* CTA */}
                 <button
                   onClick={() => setStep(1)}
-                  className="group flex items-center gap-2 h-[52px] px-8 rounded-2xl bg-cyan hover:bg-cyan2 text-bg text-[15px] font-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(0,245,228,0.3)] cursor-pointer"
+                  className="group flex items-center gap-2 h-[52px] px-8 rounded-full bg-cyan hover:bg-cyan2 text-bg text-[15px] font-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(0,245,228,0.2)] cursor-pointer"
                 >
                   <span>Let's go</span>
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
