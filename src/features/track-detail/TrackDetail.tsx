@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTrack } from './useTrack';
 import { RingProgress } from '../dashboard/Dashboard';
 import { SelfAssessmentStrip } from './SelfAssessmentStrip';
-import { TrackVisualPath } from './TrackVisualPath';
+import { TrackPathBrowser } from './TrackPathBrowser';
 import { TrackCompletionModal } from './TrackCompletionModal';
 import { useNotifications } from '../../context/NotificationContext';
 import { calculateTrackProgress } from '../../services/progressUtils';
@@ -523,7 +523,7 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          <TrackVisualPath
+          <TrackPathBrowser
             milestones={mappedMilestones}
             completedMilestoneIds={completedMilestoneIds}
             selfAssessmentLevel={selfLevel}
