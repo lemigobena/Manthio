@@ -1,11 +1,25 @@
 import React, { useState } from 'react';
 import { COURSES } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronDown, ChevronUp, Star, Award, CheckCircle, Clock, Sparkles, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, ChevronRight, Users, ArrowRight, Laptop, PlayCircle, Box } from 'lucide-react';
+import { ChevronDown, Star, Award, CheckCircle, Clock, Sparkles, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, ChevronRight, Users, ArrowRight, Laptop, PlayCircle, Box, Bookmark, Share2, MessageSquare, Info, Eye, Lock, Play, FileText, Code2, Monitor } from 'lucide-react';
 import { useXP } from '../../context/XPContext';
 import { useTrack } from '../track-detail/useTrack';
 import { calculateCourseProgress } from '../../services/progressUtils';
-import type { Course, Review } from '../../types';
+import { AvatarStack } from '../../components/social/SocialKit';
+import { hashNum } from '../../components/social/socialUtils';
+import type { Course, Review, LessonType } from '../../types';
+
+// Lesson-type → icon (module curriculum list)
+const getLessonTypeIcon = (type: LessonType) => {
+  switch (type) {
+    case 'Video':      return <Play className="w-3.5 h-3.5 fill-current" />;
+    case 'Article':    return <FileText className="w-3.5 h-3.5" />;
+    case 'Quiz':       return <HelpCircle className="w-3.5 h-3.5" />;
+    case 'Code':       return <Code2 className="w-3.5 h-3.5" />;
+    case 'Live Event': return <Users className="w-3.5 h-3.5" />;
+    default:           return <FileText className="w-3.5 h-3.5" />;
+  }
+};
 
 interface CourseDetailProps {
   onNavigate: (page: string) => void;
@@ -19,13 +33,25 @@ const MOCK_DATES = {
 };
 
 export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic }) => {
-  const { activeCourseId, selectedFormat, setSelectedFormat, setActiveCourseId, setActiveTrackId } = useAuth();
-  const { addToast } = useXP();
+  const { user, activeCourseId, selectedFormat, setSelectedFormat, setActiveCourseId, setActiveTrackId } = useAuth();
+  const { addToast, addXp } = useXP();
   const { completedLessonIds } = useTrack();
   const [visibleReviews, setVisibleReviews] = useState(3);
+  const [savedOn, setSavedOn] = useState(false);
+  const [followOn, setFollowOn] = useState(false);
+  // Rate + submit testimonial
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewText, setReviewText] = useState('');
+  const [myReviews, setMyReviews] = useState<Review[]>([]);
   const { todayStr, nextWeekStr, nextTwoWeeksStr } = MOCK_DATES;
 
   const course = COURSES.find(c => c.id === activeCourseId) || COURSES[0];
+
+  // Social-proof numbers (deterministic, stable across renders)
+  const enrolledCount = course.enrolled ? hashNum(course.id, 3200, 14800) : hashNum(course.id, 800, 5200);
+  const onlineNow      = hashNum(course.id + 'live', 30, 210);
 
   const displayTitle = course.title;
   const displayImageUrl = course.imageUrl;
@@ -88,11 +114,35 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
     { q: "What if I miss a live workshop session?", a: "Workshop sessions are highly interactive and not recorded to protect student privacy. If you miss one, we provide detailed debrief materials, but we strongly recommend attending for the live feedback." }
   ];
 
+  const handleSubmitReview = () => {
+    if (reviewRating === 0 || !reviewText.trim()) {
+      addToast('error', 'Please add a star rating and a short review before submitting.');
+      return;
+    }
+    const newReview: Review = {
+      id: `my-review-${myReviews.length}-${reviewText.length}`,
+      userName: user?.name || 'You',
+      userAvatar: user?.avatar,
+      rating: reviewRating,
+      comment: reviewText.trim(),
+      date: new Date(Date.now()).toISOString(),
+      isVerified: true,
+      helpfulCount: 0,
+    };
+    setMyReviews(prev => [newReview, ...prev]);
+    setReviewRating(0);
+    setHoverRating(0);
+    setReviewText('');
+    setShowReviewForm(false);
+    addXp(75, 'Shared a course review');
+    addToast('success', '🎉 Thanks! Your testimonial has been posted.');
+  };
+
   return (
     <div className="relative -mx-3 md:-mx-[44px] -my-6 bg-bg border-y border-line px-3 md:px-[44px] py-6">
       <div className="space-y-8 pb-32 max-w-[1600px] mx-auto">
         {/* Course Hero Header */}
-      <div className="bg-panel border border-line rounded-2xl p-6 relative overflow-hidden flex flex-col md:flex-row gap-6 items-center">
+      <div className="bg-gradient-to-br from-panel via-panel to-cyan/[0.04] border border-line rounded-2xl p-6 relative overflow-hidden flex flex-col md:flex-row gap-6 items-center shadow-sm">
         <div className="w-full md:w-1/3 h-48 bg-bg rounded-xl overflow-hidden border border-line">
           <img src={displayImageUrl} alt={displayTitle} className="w-full h-full object-cover" />
         </div>
@@ -119,43 +169,38 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                 </span>
               )}
             </div>
-            <span className="bg-bg/40 backdrop-blur-md border border-line text-[10px] px-2.5 py-1 rounded font-bold uppercase text-muted flex items-center gap-1.5">
-              <Clock className="w-3 h-3 text-cyan" />
-              {course?.duration}
-            </span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-text tracking-tight break-words hyphens-auto w-full">{displayTitle}</h1>
-          <p className="text-muted text-sm md:text-base leading-relaxed max-w-2xl font-medium">
+          <p className="text-muted text-sm md:text-base leading-relaxed max-w-2xl font-medium line-clamp-3">
             {course!.longDescription || course!.description}
           </p>
 
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 pt-2 text-xs text-muted font-bold">
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className={`w-3.5 h-3.5 ${star <= 4 ? 'text-cyan fill-cyan' : 'text-line'}`} />
-                ))}
-              </div>
-              <span className="text-text">{course?.rating || 4.8}</span>
-              <span className="opacity-60">({course?.ratingCount || 100} students)</span>
+          {/* Consolidated meta row — rating · students · duration · language */}
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-2 text-xs font-bold">
+            <div className="flex items-center gap-1.5 text-text">
+              <Star className="w-3.5 h-3.5 text-orange fill-orange" />
+              <span>{course?.rating || 4.8}</span>
+              <span className="text-muted font-medium">({course?.ratingCount || 100})</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <div className="p-1 rounded bg-purple/10 text-purple">
-                <Award className="w-3.5 h-3.5" />
-              </div>
-              <span className="text-text">+{course?.xpReward || 1500} XP Reward</span>
-            </div>
-            {course && (
-              <div className="flex items-center space-x-2">
-                <img src={course?.trainer?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150'} alt={course?.trainer?.name || 'Trainer'} className="w-5 h-5 rounded-full border border-line object-cover" />
-                <span className="text-text">Trainer: <span className="text-cyan">{course?.trainer?.name}</span></span>
-              </div>
-            )}
-            <div className="flex items-center space-x-2">
-              <Globe className="w-3.5 h-3.5 text-cyan" />
-              <span className="text-text">{course?.language || 'English'}</span>
-            </div>
+            <span className="w-1 h-1 rounded-full bg-line" />
+            <div className="flex items-center gap-1.5 text-text"><Clock className="w-3.5 h-3.5 text-cyan" />{course?.duration}</div>
+            <span className="w-1 h-1 rounded-full bg-line" />
+            <div className="flex items-center gap-1.5 text-text"><Globe className="w-3.5 h-3.5 text-cyan" />{course?.language || 'English'}</div>
+            <span className="w-1 h-1 rounded-full bg-line" />
+            <div className="flex items-center gap-1.5 text-purple"><Award className="w-3.5 h-3.5" />+{course?.xpReward || 1500} XP</div>
+          </div>
+
+          {/* Social proof strip */}
+          <div className="flex items-center justify-center md:justify-start gap-2.5 flex-wrap">
+            <AvatarStack seed={course.id} count={4} size={26} />
+            <span className="text-xs text-muted font-semibold">
+              <span className="text-text font-bold">{enrolledCount.toLocaleString()}</span> enrolled
+              <span className="mx-1.5 opacity-40">·</span>
+              <span className="inline-flex items-center gap-1 text-green font-bold align-middle">
+                <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse" />{onlineNow} learning now
+              </span>
+            </span>
           </div>
 
           {/* Cohort Progress Bar (REQ-CHECKOUT-015) */}
@@ -219,6 +264,33 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
               </button>
             )}
           </div>
+        </div>
+
+        {/* Quick actions — save / discuss / share (top-right corner toolbar) */}
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5">
+          <button
+            onClick={() => setSavedOn(v => !v)}
+            title={savedOn ? 'Saved' : 'Save course'}
+            className={`w-9 h-9 rounded-full border flex items-center justify-center transition-all active:scale-90 backdrop-blur-md ${
+              savedOn ? 'bg-cyan/15 border-cyan/40 text-cyan' : 'bg-bg/70 border-line text-muted hover:text-text hover:border-line'
+            }`}
+          >
+            <Bookmark className={`w-4 h-4 ${savedOn ? 'fill-cyan' : ''}`} />
+          </button>
+          <button
+            onClick={() => onNavigate('community')}
+            title="Discuss"
+            className="w-9 h-9 rounded-full border border-line bg-bg/70 text-muted hover:text-text hover:border-line flex items-center justify-center transition-all active:scale-90 backdrop-blur-md"
+          >
+            <MessageSquare className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => addToast('success', '🔗 Course link copied to clipboard!')}
+            title="Share"
+            className="w-9 h-9 rounded-full border border-line bg-bg/70 text-muted hover:text-text hover:border-line flex items-center justify-center transition-all active:scale-90 backdrop-blur-md"
+          >
+            <Share2 className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Completion Badge (Bottom Right) */}
@@ -349,129 +421,199 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
         <div className="lg:col-span-2 space-y-8">
 
           {/* Format & Delivery Section */}
-          <div className="py-6 border-b border-line space-y-5">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 rounded-xl bg-panel border border-line">
-                <Box className="w-4 h-4 text-cyan" />
+          <div className="py-6 border-b border-line">
+            {/* Section Header */}
+            <div className="flex items-center gap-3 mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-cyan/20 rounded-xl" />
+                <div className="relative p-2.5 rounded-xl bg-gradient-to-br from-cyan/20 to-cyan/5 border border-cyan/30">
+                  <Box className="w-4 h-4 text-cyan" />
+                </div>
               </div>
-              <h2 className="text-xl font-bold text-text">Format & Delivery</h2>
+              <div>
+                <h2 className="text-lg font-black text-text tracking-tight uppercase">Format & Delivery</h2>
+                <p className="text-[10px] text-muted tracking-wider">How this course is structured and delivered</p>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* DESCRIPTION BLOCK (Left Column, spans 2 rows) */}
-              {(selectedFormat === 'flipped' || course?.format === 'flipped') ? (
-                <div className="p-5 rounded-2xl bg-panel border border-line shadow-sm space-y-4 md:row-span-2 h-full flex flex-col justify-center">
-                  <div className="flex items-start space-x-3">
-                    <div className="p-2 rounded-xl bg-bg border border-line">
-                      <Globe className="w-4 h-4 text-cyan" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">In-Person Sessions</span>
-                      <p className="text-xs text-muted leading-relaxed font-medium">
-                        Location: apigenio Training Centre, Muri/Bern.<br/>
-                        Dates: {todayStr} & {nextWeekStr}<br/>
-                        Bring: Laptop and valid ID.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3 pt-4 border-t border-line/50">
-                    <div className="p-2 rounded-xl bg-bg border border-line">
-                      <BookOpen className="w-4 h-4 text-cyan" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Self-Study Windows</span>
-                      <p className="text-xs text-muted leading-relaxed font-medium">
-                        Complete units 1–3 before session 1. Complete units 4–7 before final capstone.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ) : selectedFormat === 'cohort' ? (
-                <div className="p-5 rounded-2xl bg-panel border border-line shadow-sm space-y-4 md:row-span-2 h-full flex flex-col justify-center">
-                  <div className="flex items-start space-x-3">
-                    <div className="p-2 rounded-xl bg-bg border border-line">
-                      <Clock className="w-4 h-4 text-cyan" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Schedule & Start Date</span>
-                      <p className="text-xs text-muted leading-relaxed font-medium">
-                        Next cohort starts: {nextTwoWeeksStr}<br/>
-                        Live sessions: Tuesdays at 18:00 CET.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3 pt-4 border-t border-line/50">
-                    <div className="p-2 rounded-xl bg-bg border border-line">
-                      <Award className="w-4 h-4 text-cyan" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Past Outcomes</span>
-                      <ul className="text-xs text-muted leading-relaxed font-medium list-disc pl-3">
-                        <li>85% promotion rate within 6 months</li>
-                        <li>Average salary increase of +18%</li>
-                        <li>High satisfaction from 100+ graduates</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="p-5 rounded-2xl bg-panel border border-line shadow-sm space-y-4 md:row-span-2 h-full flex flex-col justify-center">
-                  <div className="flex items-start space-x-3">
-                    <div className="p-2 rounded-xl bg-bg border border-line">
-                      <Sparkles className="w-4 h-4 text-cyan" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Self-Paced Learning</span>
-                      <p className="text-xs text-muted leading-relaxed font-medium">
-                        Learn entirely at your own pace with unrestricted access to all materials and AI Tutor available 24/7.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3 pt-4 border-t border-line/50">
-                    <div className="p-2 rounded-xl bg-bg border border-line">
-                      <BookOpen className="w-4 h-4 text-cyan" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Interactive Content</span>
-                      <p className="text-xs text-muted leading-relaxed font-medium">
-                        Engage with interactive coding environments, quizzes, and projects to solidify your knowledge.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+            {/* Main delivery card */}
+            <div className="relative rounded-2xl overflow-hidden border border-line bg-panel mb-3">
+              {/* Gradient accent bar */}
+              <div className={`absolute top-0 left-0 right-0 h-[2px] ${
+                (selectedFormat === 'flipped' || course?.format === 'flipped')
+                  ? 'bg-gradient-to-r from-cyan via-cyan/60 to-transparent'
+                  : selectedFormat === 'cohort'
+                  ? 'bg-gradient-to-r from-purple via-purple/60 to-transparent'
+                  : 'bg-gradient-to-r from-cyan via-teal-400/60 to-transparent'
+              }`} />
 
-              {/* Time Commitment (Right Top) */}
-              <div className="p-5 rounded-2xl bg-panel border border-line shadow-sm h-full flex flex-col justify-center">
-                <div className="flex items-start space-x-4">
-                  <div className="p-2 rounded-xl bg-bg border border-line shrink-0">
+              <div className="p-5 flex flex-col gap-5">
+                {/* Format badge + title row */}
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`relative p-3 rounded-xl border ${
+                      (selectedFormat === 'flipped' || course?.format === 'flipped')
+                        ? 'bg-cyan/10 border-cyan/30'
+                        : selectedFormat === 'cohort'
+                        ? 'bg-purple/10 border-purple/30'
+                        : 'bg-cyan/10 border-cyan/30'
+                    }`}>
+                      {(selectedFormat === 'flipped' || course?.format === 'flipped')
+                        ? <Globe className="w-5 h-5 text-cyan" />
+                        : selectedFormat === 'cohort'
+                        ? <Clock className="w-5 h-5 text-purple" />
+                        : <Monitor className="w-5 h-5 text-cyan" />
+                      }
+                    </div>
+                    <div>
+                      <span className={`text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full mb-1 inline-block ${
+                        (selectedFormat === 'flipped' || course?.format === 'flipped')
+                          ? 'bg-cyan/10 text-cyan'
+                          : selectedFormat === 'cohort'
+                          ? 'bg-purple/10 text-purple'
+                          : 'bg-cyan/10 text-cyan'
+                      }`}>
+                        {(selectedFormat === 'flipped' || course?.format === 'flipped')
+                          ? 'Flipped Bootcamp'
+                          : selectedFormat === 'cohort'
+                          ? 'Cohort-Based'
+                          : 'Self-Paced'
+                        }
+                      </span>
+                      <p className="text-sm font-bold text-text">
+                        {(selectedFormat === 'flipped' || course?.format === 'flipped')
+                          ? 'In-Person + Self-Study Hybrid'
+                          : selectedFormat === 'cohort'
+                          ? 'Live Expert-Led Journey'
+                          : 'Learn At Your Own Rhythm'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse" />
+                    <span className="text-[9px] text-cyan font-bold uppercase tracking-wider">Active</span>
+                  </div>
+                </div>
+
+                {/* Detail rows */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {(selectedFormat === 'flipped' || course?.format === 'flipped') ? (
+                    <>
+                      <div className="flex items-start gap-3 p-3 rounded-xl bg-bg border border-line/60">
+                        <div className="p-1.5 rounded-lg bg-cyan/10 border border-cyan/20 shrink-0 mt-0.5">
+                          <Globe className="w-3.5 h-3.5 text-cyan" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">In-Person Sessions</span>
+                          <p className="text-[11px] text-muted leading-relaxed">
+                            apigenio Training Centre, Muri/Bern<br/>
+                            <span className="text-text/80 font-medium">{todayStr} & {nextWeekStr}</span>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-3 rounded-xl bg-bg border border-line/60">
+                        <div className="p-1.5 rounded-lg bg-cyan/10 border border-cyan/20 shrink-0 mt-0.5">
+                          <BookOpen className="w-3.5 h-3.5 text-cyan" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Self-Study Windows</span>
+                          <p className="text-[11px] text-muted leading-relaxed">Units 1–3 before session 1<br/>Units 4–7 before capstone</p>
+                        </div>
+                      </div>
+                    </>
+                  ) : selectedFormat === 'cohort' ? (
+                    <>
+                      <div className="flex items-start gap-3 p-3 rounded-xl bg-bg border border-line/60">
+                        <div className="p-1.5 rounded-lg bg-purple/10 border border-purple/20 shrink-0 mt-0.5">
+                          <Clock className="w-3.5 h-3.5 text-purple" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Schedule & Start Date</span>
+                          <p className="text-[11px] text-muted leading-relaxed">
+                            Next cohort: <span className="text-text/80 font-medium">{nextTwoWeeksStr}</span><br/>
+                            Live sessions: Tuesdays 18:00 CET
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-3 rounded-xl bg-bg border border-line/60">
+                        <div className="p-1.5 rounded-lg bg-purple/10 border border-purple/20 shrink-0 mt-0.5">
+                          <Award className="w-3.5 h-3.5 text-purple" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Past Outcomes</span>
+                          <ul className="text-[11px] text-muted leading-relaxed space-y-0.5">
+                            <li>85% promotion within 6 months</li>
+                            <li>+18% avg. salary increase</li>
+                            <li>100+ satisfied graduates</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-start gap-3 p-3 rounded-xl bg-bg border border-line/60">
+                        <div className="p-1.5 rounded-lg bg-cyan/10 border border-cyan/20 shrink-0 mt-0.5">
+                          <Monitor className="w-3.5 h-3.5 text-cyan" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Self-Paced Access</span>
+                          <p className="text-[11px] text-muted leading-relaxed">Unrestricted access to all materials with AI Tutor available 24/7</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-3 rounded-xl bg-bg border border-line/60">
+                        <div className="p-1.5 rounded-lg bg-cyan/10 border border-cyan/20 shrink-0 mt-0.5">
+                          <BookOpen className="w-3.5 h-3.5 text-cyan" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Interactive Content</span>
+                          <p className="text-[11px] text-muted leading-relaxed">Coding environments, quizzes & real-world projects</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom stat cards row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Time Commitment */}
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-panel border border-line hover:border-cyan/30 transition-colors group">
+                <div className="relative shrink-0">
+                  <div className="absolute inset-0 bg-cyan/15 rounded-lg blur-sm group-hover:blur-md transition-all" />
+                  <div className="relative p-2.5 rounded-lg bg-bg border border-line">
                     <Clock className="w-4 h-4 text-cyan" />
                   </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1.5">Time Commitment</span>
-                    <p className="text-xs text-muted leading-relaxed font-medium">
-                      {selectedFormat === 'flipped' ? "7 self-study modules (10.5h) + 2 half-day workshops." :
-                       selectedFormat === 'cohort' ? "8-week structured journey with weekly live expert sessions." :
-                       course?.format === 'Multiple formats' ? "Flexible delivery. Select between Self-Paced, Cohort, or Flipped models below." :
-                       `Complete at your own pace. Recommended: 8-10h/week over ${course?.duration}.`}
-                    </p>
-                  </div>
+                </div>
+                <div>
+                  <span className="text-[10px] font-black text-text uppercase tracking-widest block mb-0.5">Time Commitment</span>
+                  <p className="text-[11px] text-muted leading-snug">
+                    {selectedFormat === 'flipped'
+                      ? '10.5h self-study + 2 half-day workshops'
+                      : selectedFormat === 'cohort'
+                      ? '8-week journey · weekly live sessions'
+                      : course?.format === 'Multiple formats'
+                      ? 'Self-Paced, Cohort, or Flipped'
+                      : `Recommended: 8–10h/week over ${course?.duration}`}
+                  </p>
                 </div>
               </div>
 
-              {/* Certificate (Right Bottom) */}
-              <div className="p-5 rounded-2xl bg-panel border border-line shadow-sm flex items-start sm:items-center justify-between h-full flex-col sm:flex-row">
-                <div className="flex items-center space-x-4">
-                  <div className="p-2 rounded-xl bg-bg border border-line shrink-0">
+              {/* Certificate */}
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-panel border border-line hover:border-cyan/30 transition-colors group">
+                <div className="relative shrink-0">
+                  <div className="absolute inset-0 bg-cyan/15 rounded-lg blur-sm group-hover:blur-md transition-all" />
+                  <div className="relative p-2.5 rounded-lg bg-bg border border-line">
                     <ShieldCheck className="w-4 h-4 text-cyan" />
                   </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Verifiable Certificate Included</span>
-                    <span className="text-xs text-muted font-medium">Industry recognized credential upon completion</span>
-                  </div>
                 </div>
-                <div className="hidden sm:flex items-center gap-2 pr-2 mt-4 sm:mt-0">
-                  <div className="w-2 h-2 rounded-full bg-cyan animate-pulse" />
+                <div className="flex-1 min-w-0">
+                  <span className="text-[10px] font-black text-text uppercase tracking-widest block mb-0.5">Verifiable Certificate</span>
+                  <p className="text-[11px] text-muted leading-snug">Industry-recognized credential upon completion</p>
+                </div>
+                <div className="shrink-0 flex flex-col items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse" />
                 </div>
               </div>
             </div>
@@ -662,60 +804,61 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
               )}
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-2.5">
               {course?.modules && course?.modules?.map((mod, idx) => {
                 const isOpen = activeModuleIndex === idx;
-                const bgClass = isOpen ? 'bg-cyan/5 border-cyan/30 shadow-sm' : 'bg-panel/60 border-line shadow-sm hover:border-cyan/30 hover:bg-panel/90';
                 return (
-                  <div key={mod.id} className={`border ${bgClass} rounded-2xl transition-all overflow-hidden`}>
+                  <div
+                    key={mod.id}
+                    className={`rounded-2xl border overflow-hidden transition-all ${
+                      isOpen ? 'bg-panel border-cyan/40 shadow-sm' : 'bg-panel border-line hover:border-cyan/30'
+                    }`}
+                  >
+                    {/* Module header row */}
                     <button
                       onClick={() => toggleModule(idx)}
-                      className="w-full flex items-center justify-between p-5 text-left"
+                      className={`w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-4 text-left ${isOpen ? 'border-b border-line' : ''}`}
                     >
-                      <div className="flex space-x-4">
-                        <div className="hidden sm:flex flex-col items-center justify-center w-10 h-10 bg-panel border border-line rounded-xl text-cyan font-black text-xs">
-                          {mod.number}
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-cyan font-black uppercase tracking-widest block opacity-70">
-                            {mod.type} • {mod.duration}
-                          </span>
-                          <span className="font-bold text-sm md:text-base text-text mt-1 block">
-                            {mod.title}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-3 text-muted">
-                        <span className="text-[10px] font-bold uppercase opacity-60 hidden sm:inline">
-                          {mod.lessons.length} Lessons
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className={`text-sm font-bold truncate ${isOpen ? 'text-cyan' : 'text-text'}`}>
+                          <span className="tabular-nums">{String(mod.number).padStart(2, '0')}.</span> {mod.title}
                         </span>
-                        {isOpen ? <ChevronUp className="w-4 h-4 text-cyan" /> : <ChevronDown className="w-4 h-4 opacity-50" />}
+                        <span title={mod.description} className="shrink-0 text-muted/50 hover:text-cyan transition-colors cursor-help">
+                          <Info className="w-3.5 h-3.5" />
+                        </span>
                       </div>
+                      <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-cyan' : 'text-muted'}`} />
                     </button>
 
+                    {/* Lessons */}
                     {isOpen && (
-                      <div className="px-5 pb-5 pt-0 space-y-3">
-                        <p className="text-xs text-muted mb-4 leading-relaxed border-l-2 border-line pl-4">
-                          {mod.description}
-                        </p>
-                        <div className="space-y-2">
-                          {mod.lessons.map(les => (
-                            <div key={les.id} className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-bg border border-line/40 shadow-sm group hover:border-cyan/30 hover:shadow-md transition-all">
-                              <div className="flex items-center space-x-3">
-                                <div className="p-1.5 rounded-lg bg-panel border border-line group-hover:border-cyan/20">
-                                  <Zap className="w-3 h-3 text-cyan/50 group-hover:text-cyan" />
-                                </div>
-                                <span className="font-bold text-[11px] text-text opacity-90 group-hover:opacity-100 transition-opacity">{les.title}</span>
+                      <div>
+                        {mod.lessons.map(les => {
+                          const locked = les.status === 'locked';
+                          return (
+                            <button
+                              key={les.id}
+                              onClick={() => {
+                                if (!locked) {
+                                  localStorage.setItem('manthio_active_lesson', les.id);
+                                  onNavigate('content-player');
+                                }
+                              }}
+                              className={`w-full flex items-center gap-3 px-4 sm:px-5 py-2.5 text-left transition-colors ${
+                                locked ? 'opacity-55 cursor-not-allowed' : 'hover:bg-bg cursor-pointer'
+                              }`}
+                            >
+                              <div className="w-7 h-7 rounded-lg bg-bg border border-line flex items-center justify-center text-muted shrink-0">
+                                {getLessonTypeIcon(les.type)}
                               </div>
-                              <div className="flex items-center space-x-4">
-                                <span className="text-[9px] font-black uppercase text-muted tracking-wider opacity-60">
-                                  {les.type}
-                                </span>
-                                <span className="text-[10px] font-bold text-muted w-10 text-right">{les.duration}</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                              <span className="flex-1 min-w-0 text-[13px] text-text truncate">{les.title}</span>
+                              <span className="text-[11px] text-muted font-medium shrink-0 tabular-nums">{les.duration}</span>
+                              {locked
+                                ? <Lock className="w-3.5 h-3.5 text-muted shrink-0" />
+                                : <Eye className="w-3.5 h-3.5 text-muted shrink-0" />}
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -727,14 +870,88 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
 
           {/* Reviews and Testimonials Section (Moved Up) */}
           <div className="py-8 border-b border-line space-y-8">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <div className="flex items-center space-x-3">
                 <div className="p-2 rounded-xl bg-orange/10">
                   <Star className="w-5 h-5 text-orange fill-orange" />
                 </div>
                 <h2 className="text-xl font-bold text-text tracking-tight">Reviews & Testimonials</h2>
               </div>
+              {!showReviewForm && (
+                <button
+                  onClick={() => setShowReviewForm(true)}
+                  className="shrink-0 flex items-center gap-2 bg-cyan/10 hover:bg-cyan/20 text-cyan border border-cyan/20 px-4 py-2 rounded-xl transition-all text-[10px] sm:text-xs font-bold uppercase tracking-wider"
+                >
+                  <Star className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Write a review</span>
+                  <span className="sm:hidden">Review</span>
+                </button>
+              )}
             </div>
+
+            {/* Rate + submit testimonial form */}
+            {showReviewForm && (
+              <div className="bg-bg/40 border border-cyan/30 rounded-2xl p-5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex items-center gap-3">
+                  <img src={user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150'} alt={user?.name || 'You'} className="w-10 h-10 rounded-full border border-line object-cover" />
+                  <div>
+                    <h4 className="font-bold text-sm text-text">{user?.name || 'You'}</h4>
+                    <p className="text-[10px] text-muted">Share your experience with this course</p>
+                  </div>
+                </div>
+
+                {/* Interactive star rating */}
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setReviewRating(star)}
+                        onMouseEnter={() => setHoverRating(star)}
+                        onMouseLeave={() => setHoverRating(0)}
+                        className="p-0.5 transition-transform hover:scale-110 active:scale-95"
+                        aria-label={`${star} star${star > 1 ? 's' : ''}`}
+                      >
+                        <Star className={`w-6 h-6 transition-colors ${star <= (hoverRating || reviewRating) ? 'text-orange fill-orange' : 'text-line'}`} />
+                      </button>
+                    ))}
+                  </div>
+                  <span className="text-xs font-bold text-muted">
+                    {(hoverRating || reviewRating) > 0
+                      ? ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'][hoverRating || reviewRating]
+                      : 'Tap to rate'}
+                  </span>
+                </div>
+
+                <textarea
+                  value={reviewText}
+                  onChange={e => setReviewText(e.target.value)}
+                  rows={3}
+                  maxLength={500}
+                  placeholder="What did you enjoy? What could be better? Your honest feedback helps other learners."
+                  className="w-full bg-panel border border-line rounded-xl p-3 text-sm text-text placeholder:text-muted/60 !outline-none resize-none focus:outline-none focus:border-cyan/50 transition-colors"
+                />
+
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[10px] text-muted font-medium">{reviewText.length}/500</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => { setShowReviewForm(false); setReviewRating(0); setHoverRating(0); setReviewText(''); }}
+                      className="text-xs font-bold text-muted hover:text-text px-4 py-2 rounded-xl transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSubmitReview}
+                      className="bg-cyan hover:bg-cyan/90 text-bg font-black px-5 py-2 rounded-xl text-xs uppercase tracking-wider transition-all shadow-[0_4px_15px_rgba(45,212,191,0.2)]"
+                    >
+                      Post Review
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-line">
               {/* Rating Summary */}
@@ -772,13 +989,18 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
             </div>
 
             <div className="space-y-6">
-              {(course?.reviews || []).slice(0, visibleReviews).map((review: Review) => (
-                <div key={review.id} className="space-y-4 pb-6 border-b border-line last:border-0 last:pb-0">
+              {[...myReviews, ...(course?.reviews || [])].slice(0, visibleReviews + myReviews.length).map((review: Review) => {
+                const isMine = myReviews.some(r => r.id === review.id);
+                return (
+                <div key={review.id} className={`space-y-4 py-6 border-b border-line last:border-0 last:pb-0 ${isMine ? 'bg-cyan/[0.04] -mx-3 px-3 rounded-xl border-b-0 pb-4' : ''}`}>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-3">
                       <img src={review.userAvatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150'} alt={review.userName} className="w-10 h-10 rounded-full border border-line object-cover" />
                       <div>
-                        <h4 className="font-bold text-sm text-text">{review.userName}</h4>
+                        <h4 className="font-bold text-sm text-text flex items-center gap-2">
+                          {review.userName}
+                          {isMine && <span className="text-[9px] bg-cyan/15 text-cyan px-1.5 py-0.5 rounded font-black tracking-wider">Your review</span>}
+                        </h4>
                         <p className="text-[10px] text-muted">{new Date(review.date).toLocaleDateString()} • Student</p>
                       </div>
                     </div>
@@ -790,7 +1012,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                   </div>
                   <p className="text-sm text-muted leading-relaxed font-medium">"{review.comment}"</p>
                 </div>
-              ))}
+                );
+              })}
 
               {course?.reviews && visibleReviews < course.reviews.length && (
                 <div className="pt-4 flex justify-center">
@@ -802,8 +1025,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                   </button>
                 </div>
               )}
-              {(!course?.reviews || course?.reviews?.length === 0) && (
-                <p className="text-sm text-muted text-center py-4 italic">No reviews available yet for this course.</p>
+              {(!course?.reviews || course?.reviews?.length === 0) && myReviews.length === 0 && (
+                <p className="text-sm text-muted text-center py-4 italic">No reviews yet — be the first to share your experience!</p>
               )}
             </div>
           </div>
@@ -867,12 +1090,23 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                   )}
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
-                <img src={course?.trainer?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150'} alt={course?.trainer?.name || 'Lead Trainer'} className="w-12 h-12 rounded-full border border-line object-cover" />
-                <div>
-                  <h4 className="font-bold text-text text-sm">{course?.trainer?.name || 'Multiple Trainers'}</h4>
-                  <p className="text-muted text-xs">{course?.trainer?.title || 'Industry Experts'}</p>
+              <div className="flex items-center gap-3">
+                <img src={course?.trainer?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150'} alt={course?.trainer?.name || 'Lead Trainer'} className="w-12 h-12 rounded-full border border-line object-cover shrink-0" />
+                <div className="min-w-0">
+                  <h4 className="font-bold text-text text-sm truncate">{course?.trainer?.name || 'Multiple Trainers'}</h4>
+                  <p className="text-muted text-xs truncate">{course?.trainer?.title || 'Industry Experts'}</p>
+                  <p className="text-[10px] text-muted font-semibold mt-0.5">
+                    <span className="text-text font-bold">{hashNum((course?.trainer?.name || 'trainer') + 'f', 4, 42)}.{hashNum(course?.trainer?.name || 'trainer', 0, 9)}k</span> followers
+                  </p>
                 </div>
+                <button
+                  onClick={() => { setFollowOn(v => !v); if (!followOn) addToast('success', `You're now following ${course?.trainer?.name || 'this trainer'}.`); }}
+                  className={`ml-auto shrink-0 text-[10px] font-black uppercase tracking-wider px-3.5 py-2 rounded-lg border transition-all active:scale-95 ${
+                    followOn ? 'bg-bg border-line text-muted' : 'bg-cyan border-cyan text-bg hover:bg-cyan/90'
+                  }`}
+                >
+                  {followOn ? 'Following' : 'Follow'}
+                </button>
               </div>
               <p className="text-muted text-xs leading-relaxed line-clamp-3">
                 {course?.trainer?.bio || 'This course is led by industry experts with over 15 years of combined experience in the field.'}
