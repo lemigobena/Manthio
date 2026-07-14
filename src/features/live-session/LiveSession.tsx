@@ -300,7 +300,7 @@ const PreSessionView: React.FC<{
           </div>
           <button
             onClick={onContactTrainer}
-            className="w-full bg-gradient-to-r from-cyan to-cyan/80 text-bg text-[11px] font-black py-3 rounded-lg transition-all flex items-center justify-center gap-2 shadow-[0_0_24px_rgba(0,245,228,0.2)] hover:shadow-[0_0_32px_rgba(0,245,228,0.35)] hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full bg-gradient-to-r from-cyan to-cyan/80 text-bg text-[11px] font-black py-3 rounded-lg transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(0,245,228,0.2)] hover:shadow-[0_0_13px_rgba(0,245,228,0.35)] hover:scale-[1.02] active:scale-[0.98]"
           >
             <MessageSquare size={14} />
             <span>Contact Trainer</span>

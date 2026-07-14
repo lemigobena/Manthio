@@ -6,7 +6,7 @@ import {
   Check, Lock, Play, ChevronDown, ChevronUp, Clock, HelpCircle,
   FileText, Code2, Users, MapPin, Calendar, AlertCircle,
   Target, Award, Bookmark, MessageSquare, ExternalLink,
-  ShieldCheck, CheckCircle, Video, Gamepad2, ClipboardEdit, Flame,
+  ShieldCheck, CheckCircle, Video, Gamepad2, ClipboardEdit, Flame, StickyNote,
 } from 'lucide-react';
 import { FaPython, FaCode, FaDatabase, FaMobileAlt, FaFigma, FaGithub, FaGitAlt } from 'react-icons/fa';
 import { useTrack } from '../track-detail/useTrack';
@@ -113,6 +113,56 @@ const ModuleThumbnail: React.FC<{
   );
 };
 
+// ── Social proof + reactions (lightweight, menta-style engagement) ───────────
+const LEARNER_AVATARS = [
+  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&h=100',
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100',
+  'https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&w=100&h=100',
+  'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=100&h=100',
+  'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&h=100',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100',
+];
+
+// deterministic pseudo-count so the numbers stay stable across re-renders
+const hashNum = (str: string, min: number, max: number) => {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  return min + (h % (max - min + 1));
+};
+
+const AvatarStack: React.FC<{ seed: string; count?: number; size?: number }> = ({ seed, count = 3, size = 22 }) => {
+  const start = hashNum(seed, 0, LEARNER_AVATARS.length - 1);
+  return (
+    <div className="flex items-center -space-x-2 shrink-0">
+      {Array.from({ length: count }, (_, i) => (
+        <img
+          key={i}
+          src={LEARNER_AVATARS[(start + i) % LEARNER_AVATARS.length]}
+          alt=""
+          style={{ width: size, height: size }}
+          className="rounded-full border-2 border-panel object-cover"
+        />
+      ))}
+    </div>
+  );
+};
+
+const ReactionButton: React.FC<{
+  icon: React.ReactNode; count: number; active: boolean;
+  activeClass: string; label: string; onClick: (e: React.MouseEvent) => void;
+}> = ({ icon, count, active, activeClass, label, onClick }) => (
+  <button
+    onClick={onClick}
+    title={label}
+    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-[11px] font-bold transition-all active:scale-90 ${
+      active ? activeClass : 'bg-bg border-line/60 text-muted hover:text-text hover:border-line'
+    }`}
+  >
+    <span className={`transition-transform duration-200 ${active ? 'scale-110' : ''}`}>{icon}</span>
+    <span className="tabular-nums">{count}</span>
+  </button>
+);
+
 export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
   const { activeCourseId } = useAuth();
   const { addXp } = useXP();
@@ -120,6 +170,12 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
   const { openModal } = useModal();
   const [bookmarkedLessons, setBookmarkedLessons] = useState<Set<string>>(new Set());
   const [justCompletedIds, setJustCompletedIds] = useState<Set<string>>(new Set());
+  const [reactions, setReactions] = useState<Record<string, boolean>>({});
+
+  const toggleReaction = (e: React.MouseEvent, key: string) => {
+    e.stopPropagation();
+    setReactions(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const toggleBookmark = (e: React.MouseEvent, lessonId: string) => {
     e.stopPropagation();
@@ -199,6 +255,8 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
   };
 
   const completedCount    = course.modules.filter(m => m.status === 'Completed').length;
+  const courseLearners    = hashNum(course.id, 1200, 8600);
+  const onlineNow         = hashNum(course.id + 'live', 40, 240);
 
   return (
     <div className="relative -mx-3 md:-mx-[44px] -my-6 bg-bg border-y border-line px-3 md:px-[44px] py-6">
@@ -239,6 +297,18 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
               </div>
               <h1 className="text-2xl md:text-3xl font-black text-text leading-tight">{course.title} Learning Path</h1>
               <p className="text-muted text-sm mt-1.5 leading-relaxed max-w-2xl mx-auto md:mx-0">{course.description}</p>
+
+              {/* Social proof strip */}
+              <div className="mt-3 flex items-center justify-center md:justify-start gap-2.5 flex-wrap">
+                <AvatarStack seed={course.id} count={4} size={24} />
+                <span className="text-[11px] text-muted font-semibold">
+                  <span className="text-text font-bold">{courseLearners.toLocaleString()}</span> learners on this path
+                  <span className="mx-1.5 opacity-40">·</span>
+                  <span className="inline-flex items-center gap-1 text-green font-bold align-middle">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green animate-pulse" />{onlineNow} online
+                  </span>
+                </span>
+              </div>
             </div>
             
             {/* Primary CTA moved to right on desktop */}
@@ -255,55 +325,59 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* ── Modern 4-column stats grid ── */}
+          {/* ── Stats grid ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 pt-6 border-t border-line/50">
-            {/* Progress Stat */}
-            <div className="bg-bg/50 border border-line/50 rounded-xl p-4 flex flex-col justify-center">
-              <div className="flex items-center gap-2 mb-1.5">
-                <Target className="w-4 h-4 text-cyan" />
-                <span className="text-[10px] font-bold text-muted uppercase tracking-wider">Completion</span>
+            {/* Completion */}
+            <div className="group/stat bg-bg/50 border border-line/50 rounded-xl p-4 flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan/40 hover:shadow-[0_6px_20px_rgba(var(--cyan-rgb),0.07)]">
+              <div className="w-10 h-10 rounded-xl bg-cyan/10 text-cyan flex items-center justify-center shrink-0 transition-transform duration-300 group-hover/stat:scale-110 group-hover/stat:-rotate-3">
+                <Target className="w-5 h-5" />
               </div>
-              <div className="flex items-end gap-1.5">
-                <span className="text-2xl font-black text-text leading-none">{displayedProgress}%</span>
-              </div>
-            </div>
-            
-            {/* Modules Stat */}
-            <div className="bg-bg/50 border border-line/50 rounded-xl p-4 flex flex-col justify-center">
-              <div className="flex items-center gap-2 mb-1.5">
-                <FileText className="w-4 h-4 text-cyan" />
-                <span className="text-[10px] font-bold text-muted uppercase tracking-wider">Modules</span>
-              </div>
-              <div className="flex items-end gap-1.5">
-                <span className="text-2xl font-black text-text leading-none">{completedCount}</span>
-                <span className="text-xs font-bold text-muted mb-0.5">/ {course.modules.length}</span>
+              <div className="min-w-0">
+                <span className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Completion</span>
+                <span className="text-xl md:text-2xl font-black text-text leading-none">{displayedProgress}%</span>
               </div>
             </div>
 
-            {/* Time Stat */}
-            <div className="bg-bg/50 border border-line/50 rounded-xl p-4 flex flex-col justify-center">
-              <div className="flex items-center gap-2 mb-1.5">
-                <Clock className="w-4 h-4 text-cyan" />
-                <span className="text-[10px] font-bold text-muted uppercase tracking-wider">Est. Time</span>
+            {/* Modules */}
+            <div className="group/stat bg-bg/50 border border-line/50 rounded-xl p-4 flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-purple/40 hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)]">
+              <div className="w-10 h-10 rounded-xl bg-purple/10 text-purple flex items-center justify-center shrink-0 transition-transform duration-300 group-hover/stat:scale-110 group-hover/stat:-rotate-3">
+                <FileText className="w-5 h-5" />
               </div>
-              <div className="flex items-end gap-1.5">
-                <span className="text-2xl font-black text-text leading-none">24</span>
-                <span className="text-xs font-bold text-muted mb-0.5">hours total</span>
+              <div className="min-w-0">
+                <span className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Modules</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xl md:text-2xl font-black text-text leading-none">{completedCount}</span>
+                  <span className="text-xs font-bold text-muted">/ {course.modules.length}</span>
+                </div>
               </div>
             </div>
 
-            {/* Streak Stat */}
-            <div className="bg-gradient-to-br from-cyan/10 to-bg border border-cyan/30 rounded-xl p-4 flex flex-col justify-center relative overflow-hidden">
-              <div className="absolute -right-2 -top-2 opacity-10">
-                <Flame className="w-20 h-20 text-cyan" />
+            {/* Est. Time */}
+            <div className="group/stat bg-bg/50 border border-line/50 rounded-xl p-4 flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-green/40 hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)]">
+              <div className="w-10 h-10 rounded-xl bg-green/10 text-green flex items-center justify-center shrink-0 transition-transform duration-300 group-hover/stat:scale-110 group-hover/stat:-rotate-3">
+                <Clock className="w-5 h-5" />
               </div>
-              <div className="flex items-center gap-2 mb-1.5 relative z-10">
-                <Flame className="w-4 h-4 text-cyan" />
-                <span className="text-[10px] font-bold text-cyan uppercase tracking-wider">Activity Streak</span>
+              <div className="min-w-0">
+                <span className="block text-[10px] font-bold text-muted uppercase tracking-wider mb-1">Est. Time</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xl md:text-2xl font-black text-text leading-none">24</span>
+                  <span className="text-xs font-bold text-muted">hrs</span>
+                </div>
               </div>
-              <div className="flex items-end gap-1.5 relative z-10">
-                <span className="text-2xl font-black text-text leading-none">12</span>
-                <span className="text-xs font-bold text-cyan mb-0.5">days</span>
+            </div>
+
+            {/* Activity Streak (accented) */}
+            <div className="group/stat relative overflow-hidden bg-gradient-to-br from-orange/10 to-bg border border-orange/30 rounded-xl p-4 flex flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-orange/50 hover:shadow-[0_6px_20px_rgba(249,115,22,0.12)]">
+              <Flame className="absolute -right-3 -top-3 w-20 h-20 text-orange opacity-10 transition-transform duration-300 group-hover/stat:scale-110 group-hover/stat:rotate-6" />
+              <div className="w-10 h-10 rounded-xl bg-orange/15 text-orange flex items-center justify-center shrink-0 relative z-10 transition-transform duration-300 group-hover/stat:scale-110">
+                <Flame className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 relative z-10">
+                <span className="block text-[10px] font-bold text-orange uppercase tracking-wider mb-1">Streak</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xl md:text-2xl font-black text-text leading-none">12</span>
+                  <span className="text-xs font-bold text-orange">days</span>
+                </div>
               </div>
             </div>
           </div>
@@ -366,12 +440,17 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                 code:  mod.lessons.filter(l => l.type === 'Code').length,
                 quiz:  mod.lessons.filter(l => l.type === 'Quiz').length,
               };
+              // Engagement (social proof + reactions)
+              const modLearners  = hashNum(mod.id, 24, 460);
+              const fireCount    = hashNum(mod.id + 'fire', 8, 140);
+              const commentCount = hashNum(mod.id + 'cmt', 2, 26);
+              const fireOn       = !!reactions[mod.id + ':fire'];
 
               return (
                 <div
                   key={mod.id}
                   style={isJustCompleted ? { animation: 'var(--animate-milestone-complete)' } : undefined}
-                  className={`bg-panel border rounded-2xl overflow-hidden transition-all group hover:border-cyan/40 hover:shadow-[0_4px_20px_rgba(var(--cyan-rgb),0.05)] ${
+                  className={`bg-panel border rounded-2xl overflow-hidden transition-all duration-300 group hover:border-cyan/40 hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(var(--cyan-rgb),0.08)] ${
                     isInProgress ? 'border-cyan/40 shadow-[0_0_15px_rgba(var(--cyan-rgb),0.05)]' :
                     isLocked     ? 'border-line/40 opacity-80' :
                     isCompleted  ? 'border-line/50'    :
@@ -385,6 +464,8 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                     className="p-4 sm:p-5 md:p-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 cursor-pointer group min-h-[96px]"
                     onClick={() => toggleExpand(mod.id)}
                   >
+                    {/* Thumbnail + title — kept side-by-side on all breakpoints */}
+                    <div className="flex items-start sm:items-center gap-4 sm:gap-5 flex-1 min-w-0">
                     {/* Square thumbnail (menta-style) */}
                     <ModuleThumbnail
                       type={mod.type} title={mod.title}
@@ -524,6 +605,7 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                           </>
                         )}
                       </div>
+                    </div>
                     </div>
 
                     {/* Right: actions */}
@@ -718,8 +800,9 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                                 <button
                                   onClick={e => { e.stopPropagation(); if (!locked) onNavigate('content-player:notes'); }}
                                   className="p-1.5 text-muted hover:text-cyan transition-colors rounded"
+                                  title="Add a note"
                                 >
-                                  <MessageSquare className="w-3.5 h-3.5" />
+                                  <StickyNote className="w-3.5 h-3.5" />
                                 </button>
 
                                 <div className="w-[88px] flex justify-end ml-1 shrink-0">
@@ -751,6 +834,34 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                       </div>
                     </div>
                   )}
+
+                  {/* ── Engagement footer (social proof + reactions) ── */}
+                  <div className="px-4 sm:px-5 md:px-6 py-3 border-t border-line/40 bg-bg/30 flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <AvatarStack seed={mod.id} />
+                      <span className="text-[10px] sm:text-[11px] text-muted font-semibold truncate">
+                        <span className="text-text font-bold">{modLearners}</span>{' '}
+                        {isCompleted? 'learned this' : 'learning now'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <ReactionButton
+                        label="Fire" active={fireOn}
+                        activeClass="bg-orange/10 border-orange/30 text-orange"
+                        onClick={e => toggleReaction(e, mod.id + ':fire')}
+                        icon={<Flame className={`w-3.5 h-3.5 ${fireOn ? 'fill-orange' : ''}`} />}
+                        count={fireCount + (fireOn ? 1 : 0)}
+                      />
+                      <button
+                        onClick={e => { e.stopPropagation(); onNavigate('community'); }}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-line/60 bg-bg text-muted hover:text-text hover:border-line text-[11px] font-bold transition-all"
+                        title="Discussion"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        <span className="tabular-nums">{commentCount}</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               );
             })}

@@ -131,8 +131,8 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({ moduleId, onNavigate
   const isLocked = module.status === 'Locked';
 
   return (
-    <div className="relative h-[calc(100dvh-64px)] -mx-3 md:-mx-[44px] -my-6 overflow-y-auto bg-bg border-y border-line px-3 md:px-[44px] py-6">
-      <div className="pb-20 space-y-6 max-w-[1600px] mx-auto">
+    <div className="relative -mx-3 md:-mx-[44px] -mt-6 bg-bg border-t border-line px-3 md:px-[44px] pt-6">
+      <div className="pb-8 space-y-6 max-w-[1600px] mx-auto">
       {/* Header & Back Navigation */}
       <div className="flex items-center justify-between">
         <button 
@@ -169,9 +169,9 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({ moduleId, onNavigate
           {module.description}
         </p>
 
-        <div className="flex items-center space-x-6 pt-2 text-[11px] font-bold text-muted relative z-10">
-          <div className="flex items-center space-x-1.5"><Clock className="w-4 h-4" /> <span>{module.duration} Total Time</span></div>
-          <div className="flex items-center space-x-1.5 border-l border-line pl-6"><Play className="w-4 h-4" /> <span>{module.lessons.length} Lessons</span></div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-2 text-[11px] font-bold text-muted relative z-10">
+          <div className="flex items-center space-x-1.5"><Clock className="w-4 h-4 shrink-0" /> <span>{module.duration} Total Time</span></div>
+          <div className="flex items-center space-x-1.5 sm:border-l sm:border-line sm:pl-4"><Play className="w-4 h-4 shrink-0" /> <span>{module.lessons.length} Lessons</span></div>
         </div>
       </div>
 
@@ -222,34 +222,34 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({ moduleId, onNavigate
               }`}
               title={lesson.status === 'locked' ? (lesson.unlockCondition || 'Complete previous lesson to unlock') : undefined}
             >
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center space-x-4">
-                  <div className={`p-2.5 rounded-xl border ${
-                    lesson.status === 'completed' ? 'bg-green/10 border-green/20 text-green' : 
-                    lesson.status === 'in_progress' ? 'bg-cyan text-bg border-cyan' : 
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`p-2.5 rounded-xl border shrink-0 ${
+                    lesson.status === 'completed' ? 'bg-green/10 border-green/20 text-green' :
+                    lesson.status === 'in_progress' ? 'bg-cyan text-bg border-cyan' :
                     'bg-bg border-line text-muted'
                   }`}>
                     {getLessonIcon(lesson.type)}
                   </div>
-                  
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-sm text-text">{lesson.title}</span>
+
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <span className="font-bold text-sm text-text break-words">{lesson.title}</span>
                       {lesson.required ? (
-                        <span className="text-[8px] bg-red/10 text-red px-1.5 py-0.5 rounded-md font-black uppercase">Required</span>
+                        <span className="text-[8px] bg-red/10 text-red px-1.5 py-0.5 rounded-md font-black uppercase shrink-0">Required</span>
                       ) : (
-                        <span className="text-[8px] bg-bg border border-line text-muted px-1.5 py-0.5 rounded-md font-black uppercase">Optional</span>
+                        <span className="text-[8px] bg-bg border border-line text-muted px-1.5 py-0.5 rounded-md font-black uppercase shrink-0">Optional</span>
                       )}
                     </div>
-                    <div className="flex items-center space-x-3 text-[11px] text-muted">
-                      <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {lesson.duration}</span>
-                      <span className="w-1 h-1 rounded-full bg-line" />
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted">
+                      <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 shrink-0" /> {lesson.duration}</span>
+                      <span className="w-1 h-1 rounded-full bg-line shrink-0" />
                       <span className="font-black text-purple/70 uppercase">{lesson.bloomLevel}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="shrink-0 flex items-center space-x-3 w-[100px] justify-end">
+                <div className="shrink-0 flex items-center space-x-3 w-[92px] justify-end">
                   {/* Status Indicator */}
                   {(() => {
                     if (lesson.status === 'locked') {
@@ -322,14 +322,14 @@ export const ModuleDetail: React.FC<ModuleDetailProps> = ({ moduleId, onNavigate
 
       {/* Completion Progress Ribbon (Preserved Progress REQ-PATH-025) */}
       {!isLocked && (
-        <div className="sticky bottom-4 mx-4 bg-cyan text-bg p-4 rounded-2xl shadow-2xl flex items-center justify-between animate-[slideUp_0.4s_ease-out]">
-          <div className="space-y-0.5">
+        <div className="bg-cyan text-bg p-4 rounded-2xl shadow-lg flex items-center justify-between gap-3">
+          <div className="space-y-0.5 min-w-0">
             <div className="text-[10px] font-black uppercase tracking-widest opacity-80">Overall Module Progress</div>
-            <div className="text-lg font-black">{module.status === 'Completed' ? '100% DONE' : 'STILL LEARNING'}</div>
+            <div className="text-base sm:text-lg font-black truncate">{module.status === 'Completed' ? '100% DONE' : 'STILL LEARNING'}</div>
           </div>
-          <button 
+          <button
             onClick={() => onNavigate('content-player')}
-            className="bg-bg text-text font-black px-6 py-2 rounded-xl text-xs uppercase"
+            className="shrink-0 bg-bg text-text font-black px-5 sm:px-6 py-2 rounded-xl text-xs uppercase"
           >
             {module.status === 'Completed' ? 'Review' : 'Continue'}
           </button>
