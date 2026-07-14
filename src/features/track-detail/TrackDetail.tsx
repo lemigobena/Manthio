@@ -1,40 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Clock, BookOpen, Award, Bookmark, BookmarkCheck,
-  ChevronLeft, Target, Users, Zap, ArrowRight, CheckCircle, Lock
+  Clock, BookOpen, Bookmark, BookmarkCheck,
+  ChevronLeft, Target, Users, ArrowRight, CheckCircle, Lock, Sparkles, Rocket, TrendingUp
 } from 'lucide-react';
 import { TRACKS, COURSES } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { useTrack } from './useTrack';
+import { RingProgress } from '../dashboard/Dashboard';
 import { SelfAssessmentStrip } from './SelfAssessmentStrip';
 import { TrackVisualPath } from './TrackVisualPath';
 import { TrackCompletionModal } from './TrackCompletionModal';
 import { useNotifications } from '../../context/NotificationContext';
 import { calculateTrackProgress } from '../../services/progressUtils';
 import type { Course, CareerTrack } from '../../types';
+import heroStudentImg from '../../assets/hero-student.png';
+import manthioLogo from '../../assets/logo_7_prio_1_variation-cropped.png';
+import avatarBoy from '../../assets/avatars/boy.png';
+import avatarGirl from '../../assets/avatars/girl.png';
+import avatarWoman1 from '../../assets/avatars/woman(1).png';
 
 interface TrackDetailProps {
   onNavigate: (page: string) => void;
 }
 
-const GOAL_TYPE_COLORS: Record<string, string> = {
-  certification: 'bg-cyan text-bg border-cyan',
-  role:          'bg-purple text-white border-purple',
-  project:       'bg-orange text-white border-orange',
-  topic:         'bg-green text-white border-green',
-};
-
 const GOAL_TYPE_LABELS: Record<string, string> = {
   certification: '🏅 Certification',
-  role:          '💼 Role',
-  project:       '🛠️ Project',
-  topic:         '📚 Topic',
-};
-
-const DIFFICULTY_COLORS: Record<string, string> = {
-  beginner:     'bg-bg text-text border-line',
-  intermediate: 'bg-bg text-text border-line',
-  advanced:     'bg-bg text-text border-line',
+  role: '💼 Role',
+  project: '🛠️ Project',
+  topic: '📚 Topic',
 };
 
 export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
@@ -59,44 +52,44 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
   const mappedMilestones = track.milestones.flatMap((ms, msIdx) =>
     ms.courses.length > 0
       ? ms.courses.map((courseEntry, cIdx) => ({
-          id: `${ms.id}-${courseEntry.id}`,
-          label: cIdx === 0 ? ms.title : `${ms.title} — Extra`,
-          courseId: courseEntry.id,
-          isOptional: courseEntry.isOptional,
-          isSubCourse: cIdx > 0,
-          primaryIndex: msIdx,
-          prerequisiteMilestoneIds: msIdx === 0 ? [] : [
-            `${track.milestones[msIdx - 1].id}-${track.milestones[msIdx - 1].courses[0]?.id}`
-          ],
-          order: msIdx * 10 + cIdx,
-        }))
+        id: `${ms.id}-${courseEntry.id}`,
+        label: cIdx === 0 ? ms.title : `${ms.title} — Extra`,
+        courseId: courseEntry.id,
+        isOptional: courseEntry.isOptional,
+        isSubCourse: cIdx > 0,
+        primaryIndex: msIdx,
+        prerequisiteMilestoneIds: msIdx === 0 ? [] : [
+          `${track.milestones[msIdx - 1].id}-${track.milestones[msIdx - 1].courses[0]?.id}`
+        ],
+        order: msIdx * 10 + cIdx,
+      }))
       : [{
-          id: `${ms.id}-empty`,
-          label: ms.title,
-          courseId: '',
-          isOptional: false,
-          isSubCourse: false,
-          primaryIndex: msIdx,
-          prerequisiteMilestoneIds: msIdx === 0 ? [] : [
-            `${track.milestones[msIdx - 1].id}-${track.milestones[msIdx - 1].courses[0]?.id}`
-          ],
-          order: msIdx * 10,
-        }]
+        id: `${ms.id}-empty`,
+        label: ms.title,
+        courseId: '',
+        isOptional: false,
+        isSubCourse: false,
+        primaryIndex: msIdx,
+        prerequisiteMilestoneIds: msIdx === 0 ? [] : [
+          `${track.milestones[msIdx - 1].id}-${track.milestones[msIdx - 1].courses[0]?.id}`
+        ],
+        order: msIdx * 10,
+      }]
   );
 
   const totalMilestones = mappedMilestones.filter(m => !m.isOptional).length;
   const isMockCompleted = track.progress === 100;
-  const completedMilestoneIds = isMockCompleted 
-    ? mappedMilestones.map(m => m.id) 
+  const completedMilestoneIds = isMockCompleted
+    ? mappedMilestones.map(m => m.id)
     : (progress?.completedMilestoneIds ?? []);
-  
-  
+
+
   const completedRequired = mappedMilestones.filter(m => !m.isOptional && completedMilestoneIds.includes(m.id)).length;
   const isCompletedTrack = isMockCompleted || completedRequired === totalMilestones;
-  
+
   // REQ-PROGRESS-002: Dynamic track progress based on lessons
-  const progressPct = isCompletedTrack 
-    ? 100 
+  const progressPct = isCompletedTrack
+    ? 100
     : calculateTrackProgress(track as unknown as CareerTrack, COURSES as unknown as Course[], completedLessonIds);
 
   const [showEnrollConfirm, setShowEnrollConfirm] = useState(false);
@@ -144,12 +137,12 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
   // Tags used in catalog
   const goalType = track.id.includes('cloud') ? 'role'
     : track.id.includes('data') ? 'certification'
-    : 'role';
+      : 'role';
 
   const difficulty: 'beginner' | 'intermediate' | 'advanced' =
     track.level === 'Advanced' ? 'advanced'
-    : track.level === 'Intermediate' ? 'intermediate'
-    : 'beginner';
+      : track.level === 'Intermediate' ? 'intermediate'
+        : 'beginner';
 
   if (isPageLoading) {
     return (
@@ -182,11 +175,10 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
           {isAuthenticated && (
             <button
               onClick={handleBookmark}
-              className={`flex items-center gap-2 px-5 py-2 rounded font-bold text-[11px] border transition-all uppercase tracking-wider shadow-sm hover:shadow-md hover:translate-y-[-1px] ${
-                isBookmarked
-                  ? 'border-cyan bg-cyan/10 text-cyan'
-                  : 'border-line bg-panel hover:border-cyan/50 text-text hover:text-cyan'
-              }`}
+              className={`flex items-center gap-2 px-5 py-2 rounded font-bold text-[11px] border transition-all uppercase tracking-wider shadow-sm hover:shadow-md hover:translate-y-[-1px] ${isBookmarked
+                ? 'border-cyan bg-cyan/10 text-cyan'
+                : 'border-line bg-panel hover:border-cyan/50 text-text hover:text-cyan'
+                }`}
               title={isBookmarked ? 'Remove bookmark' : 'Bookmark this track'}
             >
               {isBookmarked ? <BookmarkCheck className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
@@ -195,33 +187,226 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
           )}
         </div>
 
-        {/* ── Hero Header ── */}
-        <div className="relative bg-panel border border-line rounded-2xl overflow-hidden">
-          {/* Banner image */}
-          <div className="h-64 md:h-80 relative overflow-hidden">
-            <img src={track.imageUrl} alt={track.title} className="w-full h-full object-cover opacity-90 block" />
-            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
-            {/* Goal type chip */}
-            <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
-              <span className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded border shadow-sm ${GOAL_TYPE_COLORS[goalType]}`}>
-                {GOAL_TYPE_LABELS[goalType]}
-              </span>
-              <span className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded border shadow-sm ${DIFFICULTY_COLORS[difficulty]}`}>
-                {difficulty}
-              </span>
+        {/* ── Hero: Two-Card Row ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+          {/* Card 1: Track intro with decorative shapes + cutout human image */}
+          <div
+            className="@container track-hero-card relative rounded-2xl overflow-hidden border border-line shadow-lg flex flex-col h-full"
+          >
+            <style>{`
+              .track-hero-card {
+                background: linear-gradient(135deg, #0A2A2E 0%, #0F4A4A 40%, #00A899 100%);
+                --hero-text: #FFFFFF;
+                --hero-text-muted: rgba(255, 255, 255, 0.8);
+                --hero-btn-text: #0A2A2E;
+              }
+              [data-theme='light'] .track-hero-card {
+                background: linear-gradient(135deg, #3FA79A 0%, #5BB8AC 40%, #8DCFC5 100%);
+                --hero-text: #0A2A2E;
+                --hero-text-muted: rgba(10, 42, 46, 0.75);
+                --hero-btn-text: #0A2A2E;
+              }
+            `}</style>
+            {/* Decorative shapes — Manthio brand palette */}
+            <div className="absolute inset-0 pointer-events-none">
+              {/* Gold-toned accent blobs */}
+              <div className="absolute top-4 right-1/3 w-28 h-28 rounded-full bg-yellow/25 blur-2xl" />
+              <div className="absolute -bottom-8 right-4 w-44 h-44 rounded-full bg-cyan/30 blur-2xl" />
+              {/* Subtle ring accents */}
+              <div className="absolute top-1/2 right-10 w-20 h-20 rounded-full border-4 border-yellow/20" />
+              <div className="absolute bottom-10 right-1/3 w-12 h-12 rounded-full border-2 border-white/15" />
+              {/* Manthio logo watermark — large, ghosted behind the hero */}
+              <img
+                src={manthioLogo}
+                alt=""
+                className="absolute top-1/2 right-0 -translate-y-1/2 w-60 h-auto opacity-[0.08] pointer-events-none select-none"
+              />
+              {/* Star sparkle accent */}
+              <svg className="absolute top-4 right-1/4 w-5 h-5 text-yellow/60" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l2.5 7.5H22l-6 4.5 2.5 7.5L12 17l-6.5 4.5L8 14 2 9.5h7.5z" />
+              </svg>
+              <svg className="absolute bottom-8 right-[45%] w-3.5 h-3.5 text-white/40" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+            </div>
+
+            {/* Layout: stacked (text top, image bottom) when narrow; side-by-side when wider */}
+            <div className="relative flex flex-col @[300px]:grid @[300px]:grid-cols-5 flex-1 min-h-[260px]">
+              <div
+                className="@[300px]:col-span-3 p-3 @[360px]:p-5 @[560px]:p-7 flex flex-col justify-between @[440px]:justify-center @[560px]:justify-between gap-2 @[420px]:gap-4 z-10 @[300px]:h-full"
+                style={{ color: 'var(--hero-text)' }}
+              >
+                <div className="flex gap-1.5 flex-wrap">
+                  <span
+                    className="text-[9px] @[360px]:text-[10px] @[520px]:text-[11px] font-bold uppercase px-2 @[420px]:px-2.5 py-0.5 @[420px]:py-1 rounded border"
+                    style={{ backgroundColor: 'color-mix(in srgb, var(--hero-text) 15%, transparent)', borderColor: 'color-mix(in srgb, var(--hero-text) 25%, transparent)', color: 'var(--hero-text)' }}
+                  >
+                    {GOAL_TYPE_LABELS[goalType]}
+                  </span>
+                  <span
+                    className="text-[9px] @[360px]:text-[10px] @[520px]:text-[11px] font-bold uppercase px-2 @[420px]:px-2.5 py-0.5 @[420px]:py-1 rounded border"
+                    style={{ backgroundColor: 'color-mix(in srgb, var(--hero-text) 15%, transparent)', borderColor: 'color-mix(in srgb, var(--hero-text) 25%, transparent)', color: 'var(--hero-text)' }}
+                  >
+                    {difficulty}
+                  </span>
+                </div>
+                <div className="space-y-1.5 @[420px]:space-y-3 @[300px]:flex-1 flex flex-col @[300px]:justify-center">
+                  <h1 className="text-base @[360px]:text-lg @[420px]:text-xl @[520px]:text-2xl @[640px]:text-3xl @[720px]:text-[30px] font-black leading-tight">
+                    {track.title}
+                  </h1>
+                  <p
+                    className="text-[10px] @[360px]:text-[11px] @[420px]:text-xs @[560px]:text-sm @[640px]:text-base leading-relaxed"
+                    style={{ color: 'var(--hero-text-muted)' }}
+                  >
+                    Grow with expert-led courses from top instructors.
+                  </p>
+                </div>
+                {displayAsEnrolled ? (
+                  <button
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        onNavigate('signin');
+                        return;
+                      }
+                      const next = mappedMilestones.find(m => !completedMilestoneIds.includes(m.id) && m.courseId);
+                      if (next?.courseId) {
+                        handleNavigateToCourse(next.courseId, 'learning-path');
+                      } else if (mappedMilestones[0]?.courseId) {
+                        handleNavigateToCourse(mappedMilestones[0].courseId, 'learning-path');
+                      }
+                    }}
+                    className="self-start bg-cyan hover:bg-cyan2 text-bg font-black text-[10px] @[360px]:text-[11px] @[420px]:text-xs @[520px]:text-sm px-3 @[420px]:px-5 py-1.5 @[420px]:py-2.5 rounded-xl transition-all flex items-center gap-1.5 @[420px]:gap-2 shadow-lg shadow-cyan/20 active:scale-[0.98] cursor-pointer"
+                  >
+                    {completedRequired === totalMilestones ? 'Review Track' : 'Continue Learning'}
+                    <ArrowRight className="w-3 h-3 @[420px]:w-3.5 @[420px]:h-3.5" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setCheckoutItem({ type: 'track', id: track.id });
+                      onNavigate('checkout');
+                    }}
+                    className="self-start bg-cyan hover:bg-cyan2 text-bg font-black text-[10px] @[360px]:text-[11px] @[420px]:text-xs @[520px]:text-sm px-3 @[420px]:px-5 py-1.5 @[420px]:py-2.5 rounded-xl transition-all flex items-center gap-1.5 @[420px]:gap-2 shadow-lg shadow-cyan/20 active:scale-[0.98] cursor-pointer"
+                  >
+                    Start for Free
+                    <ArrowRight className="w-3 h-3 @[420px]:w-3.5 @[420px]:h-3.5" />
+                  </button>
+                )}
+              </div>
+              {/* Image column — width-based sizing so it scales with card width */}
+              <div className="@[300px]:col-span-2 relative flex-1 min-h-[100px] @[300px]:min-h-0">
+                <img
+                  src={heroStudentImg}
+                  alt="Learner"
+                  className="absolute right-0 bottom-0 z-10 w-[55%] @[300px]:w-[95%] @[520px]:w-full max-w-none drop-shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="p-6 md:p-8 space-y-4">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-text leading-tight">
-              {track.title}
-            </h1>
+          {/* Card 2: Info laid out with small images, icons, and design accents */}
+          <div className="relative bg-panel border border-line rounded-2xl overflow-hidden shadow-lg">
+            {/* Decorative shapes */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-cyan/10 blur-2xl" />
+              <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-purple/10 blur-2xl" />
+            </div>
+
+            <div className="relative p-6 md:p-7 space-y-4 min-h-[240px]">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1.5">
+                  <div className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase text-cyan tracking-widest">
+                    <Sparkles className="w-3 h-3" />
+                    Track Overview
+                  </div>
+                  <h2 className="text-lg md:text-xl font-black leading-tight text-text">
+                    What you'll master
+                  </h2>
+                </div>
+                {/* Small avatar cluster */}
+                <div className="flex -space-x-2 shrink-0">
+                  <img
+                    src={avatarGirl}
+                    alt="Learner"
+                    className="w-8 h-8 shrink-0 aspect-square rounded-full border-2 border-line object-cover bg-panel"
+                  />
+                  <img
+                    src={avatarBoy}
+                    alt="Learner"
+                    className="w-8 h-8 shrink-0 aspect-square rounded-full border-2 border-line object-cover bg-panel"
+                  />
+                  <img
+                    src={avatarWoman1}
+                    alt="Learner"
+                    className="w-8 h-8 shrink-0 aspect-square rounded-full border-2 border-line object-cover bg-panel"
+                  />
+                  <div className="w-8 h-8 shrink-0 aspect-square rounded-full border-2 border-line bg-cyan/20 text-cyan text-[9px] font-black flex items-center justify-center leading-none">
+                    +{enrolledCourseCount}
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-muted text-xs md:text-sm leading-relaxed">
+                {track.outcomeStatement}
+              </p>
+
+              {/* Info tile grid */}
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-bg border border-line min-w-0">
+                  <div className="w-9 h-9 rounded-lg bg-cyan/15 text-cyan flex items-center justify-center shrink-0">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[9px] font-black uppercase text-muted tracking-wider truncate">Duration</p>
+                    <p className="text-[11px] font-bold text-text truncate">{track.estimatedTime}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-bg border border-line min-w-0">
+                  <div className="w-9 h-9 rounded-lg bg-purple/15 text-purple flex items-center justify-center shrink-0">
+                    <BookOpen className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[9px] font-black uppercase text-muted tracking-wider truncate">Courses</p>
+                    <p className="text-[11px] font-bold text-text truncate">{enrolledCourseCount} courses</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-bg border border-line min-w-0">
+                  <div className="w-9 h-9 rounded-lg bg-orange/15 text-orange flex items-center justify-center shrink-0">
+                    <Target className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[9px] font-black uppercase text-muted tracking-wider truncate">Milestones</p>
+                    <p className="text-[11px] font-bold text-text truncate">{track.milestones.length} stages</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-bg border border-line min-w-0">
+                  <div className="w-9 h-9 rounded-lg bg-green/15 text-green flex items-center justify-center shrink-0">
+                    <TrendingUp className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[9px] font-black uppercase text-muted tracking-wider truncate">Level</p>
+                    <p className="text-[11px] font-bold text-text capitalize truncate">{track.level}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-1 text-[10px] font-bold text-muted">
+                <Rocket className="w-3.5 h-3.5 text-cyan" />
+                Join {enrolledCourseCount * 1284}+ learners already on this path
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Contents displayed after the hero cards ── */}
+        <div className="flex flex-col lg:flex-row lg:items-start gap-4 lg:gap-6">
+          <div className="flex-1 min-w-0 space-y-4">
             <p className="text-muted text-sm md:text-base leading-relaxed max-w-3xl">
               {track.outcomeStatement}
             </p>
 
             {/* Meta row */}
-            <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-muted pt-1">
+            <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-muted">
               <span className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-cyan" />
                 {track.estimatedTime}
@@ -240,68 +425,32 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
               </span>
             </div>
 
-            {/* Progress bar (enrolled only AND authenticated) */}
-            {(displayAsEnrolled && isAuthenticated) && (
-              <div className="space-y-1.5 max-w-sm">
-                <div className="flex items-center justify-between text-[10px] font-black uppercase text-muted">
-                  <span>Track Progress</span>
-                  <span className="text-cyan">{progressPct}%</span>
-                </div>
-                <div className="h-2 bg-bg border border-line rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-cyan shadow-[0_0_10px_rgba(0,245,228,0.4)] transition-all duration-1000 rounded-full"
-                    style={{ width: `${progressPct}%` }}
-                  />
-                </div>
-                <p className="text-[10px] text-muted">
-                  {completedRequired} of {totalMilestones} required milestones
-                </p>
-              </div>
+            {!displayAsEnrolled && (
+              <p className="text-[11px] text-muted font-medium italic">
+                Browse the full path below without enrolling.
+              </p>
             )}
-
-            {/* CTA row */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              {displayAsEnrolled ? (
-                <button
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      onNavigate('signin');
-                      return;
-                    }
-                    // Navigate to first uncompleted milestone's course
-                    const next = mappedMilestones.find(m => !completedMilestoneIds.includes(m.id) && m.courseId);
-                    if (next?.courseId) {
-                      handleNavigateToCourse(next.courseId, 'learning-path');
-                    } else if (mappedMilestones[0]?.courseId) {
-                      handleNavigateToCourse(mappedMilestones[0].courseId, 'learning-path');
-                    }
-                  }}
-                  className="relative overflow-hidden group bg-cyan hover:bg-cyan2 text-bg font-black text-sm px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(0,245,228,0.25)] hover:shadow-[0_6px_30px_rgba(0,245,228,0.4)] hover:translate-y-[-2px] flex items-center justify-center gap-2"
-                >
-                  <Zap className="w-4 h-4 fill-current" />
-                  {completedRequired === totalMilestones ? 'Review Track' : 'Continue Learning'}
-                  <div className="absolute inset-0 bg-white/15 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    setCheckoutItem({ type: 'track', id: track.id });
-                    onNavigate('checkout');
-                  }}
-                  className="relative overflow-hidden group bg-cyan hover:bg-cyan2 text-bg font-black text-sm px-8 py-3.5 rounded-xl transition-all shadow-[0_4px_20px_rgba(0,245,228,0.25)] hover:shadow-[0_6px_30px_rgba(0,245,228,0.4)] hover:translate-y-[-2px] flex items-center justify-center gap-2"
-                >
-                  <Award className="w-4 h-4" />
-                  {isCompletedTrack ? 'Start A New' : 'Start Your Journey'}
-                  <div className="absolute inset-0 bg-white/15 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-[-15deg]" />
-                </button>
-              )}
-              {!displayAsEnrolled && (
-                <p className="self-center text-[11px] text-muted font-medium italic">
-                  Browse the full path below without enrolling.
-                </p>
-              )}
-            </div>
           </div>
+
+          {/* Progress card (enrolled only AND authenticated) */}
+          {(displayAsEnrolled && isAuthenticated) && (
+            <div className="relative bg-panel border border-line rounded-2xl overflow-hidden shadow-lg w-full max-w-sm lg:w-auto lg:shrink-0">
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-cyan/10 blur-2xl" />
+              </div>
+              <div className="relative p-5 flex items-center gap-4">
+                <RingProgress progress={progressPct} size={72} strokeWidth={10} color="var(--cyan)" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-black uppercase text-muted tracking-widest">
+                    Track Progress
+                  </p>
+                  <p className="text-sm font-bold text-text mt-0.5">
+                    {completedRequired} of {totalMilestones} required milestones
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Enroll Confirm Banner */}
@@ -349,7 +498,7 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
         <div className="py-6 space-y-12">
           <div className="flex flex-col items-center text-center space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan/10 border border-cyan/20 text-[10px] font-black uppercase text-cyan tracking-widest">
-               Track Roadmap
+              Track Roadmap
             </div>
             <h2 className="text-3xl md:text-4xl font-black text-text">Learning Path</h2>
             <p className="text-sm text-muted max-w-2xl">
