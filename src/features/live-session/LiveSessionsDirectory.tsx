@@ -33,68 +33,72 @@ export const LiveSessionsDirectory: React.FC<LiveSessionsDirectoryProps> = ({ on
 
   const SessionCard = ({ session, isLive = false, isPast = false }: { session: LiveSessionData, isLive?: boolean, isPast?: boolean }) => {
     const date = new Date(session.startTime);
-    
+    let Icon = Calendar;
+    let circleTheme = 'bg-cyan/10 text-cyan';
+    let badgeTheme = 'bg-cyan/10 text-cyan';
+    let statusText = 'Upcoming';
+
+    if (isLive) {
+      Icon = Video;
+      circleTheme = 'bg-red/10 text-red';
+      badgeTheme = 'bg-red/10 text-red';
+      statusText = 'Live Now';
+    } else if (isPast) {
+      Icon = PlayCircle;
+      circleTheme = 'bg-purple/10 text-purple';
+      badgeTheme = 'bg-purple/10 text-purple';
+      statusText = 'Archived';
+    }
+
     return (
       <div 
         onClick={() => handleSessionClick(session.id)}
-        className="group relative bg-panel border border-line rounded-2xl overflow-hidden cursor-pointer hover:border-cyan/50 transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-cyan/10"
+        className="bg-panel rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 transition-all cursor-pointer border border-line/50 min-h-[320px] relative"
       >
-        {isLive && (
-          <div className="absolute top-4 right-4 z-10 flex items-center justify-center sm:gap-2 bg-red/10 text-red w-6 h-6 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1 rounded-full sm:rounded border-0 sm:border border-red/20 backdrop-blur-md">
-            <div className="w-1.5 h-1.5 rounded-full bg-red animate-pulse shadow-[0_0_8px_var(--red)] shrink-0" />
-            <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">Live Now</span>
-          </div>
-        )}
+        <div className={`absolute top-4 right-4 z-10 px-3 py-1.5 rounded-lg text-[10px] font-bold ${badgeTheme}`}>
+          {statusText}
+        </div>
 
-        <div className="aspect-video relative overflow-hidden bg-bg">
-          {/* Abstract background gradient based on ID */}
-          <div className={`absolute inset-0 opacity-20 bg-gradient-to-br ${
-            isLive ? 'from-cyan to-purple' : isPast ? 'from-purple to-bg' : 'from-bg to-cyan'
-          }`} />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,245,228,0.15)_0%,transparent_70%)]" />
-          
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
-            {isPast ? <PlayCircle size={48} className="text-text/80 group-hover:text-cyan transition-colors group-hover:scale-110 duration-300" /> 
-                    : <Video size={40} className={`mb-4 ${isLive ? 'text-cyan' : 'text-muted'} group-hover:scale-110 transition-transform duration-300`} />}
-            {!isPast && (
-              <h3 className="text-lg font-bold text-text mb-2 leading-tight max-w-xs">{session.title}</h3>
-            )}
+        <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-5 ${circleTheme}`}>
+           <Icon size={32} strokeWidth={1.5} />
+        </div>
+
+        <h3 className="text-lg font-bold text-text mb-3 line-clamp-2">
+          {session.title}
+        </h3>
+
+        <div className="flex items-center justify-center space-x-3 text-[11px] text-cyan/70 mb-4 font-medium">
+          <div className="flex items-center space-x-1">
+            <Calendar size={12} />
+            <span>{date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <Clock size={12} />
+            <span>{date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
         </div>
 
-        <div className="p-5 space-y-4">
-          {isPast && (
-            <h3 className="text-base font-bold text-text leading-tight group-hover:text-cyan transition-colors">{session.title}</h3>
-          )}
+        <p className="text-sm text-muted line-clamp-2 mb-6">
+          {session.description}
+        </p>
 
-          <div className="flex items-center space-x-3 text-xs text-muted">
-            <div className="flex items-center space-x-1.5">
-              <Calendar size={14} className="text-cyan" />
-              <span>{date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-            </div>
-            <div className="flex items-center space-x-1.5">
-              <Clock size={14} className="text-purple" />
-              <span>{date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })} ({session.duration}m)</span>
+        <div className="mt-auto flex items-center justify-between w-full pt-4 border-t border-line/50">
+          <div className="flex items-center space-x-2">
+            <img src={session.trainer.avatar} alt={session.trainer.name} className="w-7 h-7 rounded-full border border-line" />
+            <div className="flex flex-col items-start">
+              <span className="text-[10px] text-muted leading-tight">Trainer</span>
+              <span className="text-[11px] font-bold text-text leading-tight">{session.trainer.name}</span>
             </div>
           </div>
 
-          <p className="text-[11px] text-text/70 line-clamp-2 leading-relaxed">
-            {session.description}
-          </p>
-
-          <div className="flex items-center justify-between pt-4 border-t border-line">
-            <div className="flex items-center space-x-2">
-              <img src={session.trainer.avatar} alt={session.trainer.name} className="w-6 h-6 rounded-full border border-line" />
-              <span className="text-[11px] font-medium text-text">{session.trainer.name}</span>
-            </div>
-            
+          <div className="flex items-center gap-2">
             {isLive ? (
-              <button className="text-[10px] font-bold text-bg bg-cyan px-3 py-1.5 rounded-lg flex items-center space-x-1 group-hover:shadow-[0_0_15px_rgba(0,245,228,0.4)] transition-all">
+              <button className="text-[10px] font-bold text-bg bg-cyan px-3 py-1.5 rounded-lg flex items-center space-x-1 hover:shadow-[0_0_15px_rgba(0,245,228,0.4)] transition-all">
                 <span>Join</span>
                 <ChevronRight size={14} />
               </button>
             ) : isPast ? (
-              <span className="text-[10px] font-bold text-cyan flex items-center space-x-1">
+              <span className="text-[10px] font-bold text-cyan flex items-center space-x-1 bg-cyan/10 px-3 py-1.5 rounded-lg hover:bg-cyan/20 transition-all">
                 <span>Watch</span>
                 <Play size={10} />
               </span>

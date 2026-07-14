@@ -2,10 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useXP } from '../../context/XPContext';
 import {
   Video, Users, MessageSquare, BookOpen, Clock, Calendar,
-  Download, ArrowRight, CheckCircle2, Play, Sparkles,
+  Download, ArrowRight, CheckCircle2, Sparkles,
   Send, Hand, BarChart3, Bot, ChevronRight, Check,
   ExternalLink, Info, Star, Plus, ShieldCheck, ArrowUp,
-  MessageCircle, ChevronDown, X, CalendarPlus
+  MessageCircle, ChevronDown, X, CalendarPlus,
+  BrainCircuit
 } from 'lucide-react';
 import { AITutorChat } from '../ai-tutor/components/AITutorChat';
 import type { ChatMessage } from '../../types';
@@ -40,9 +41,9 @@ export const LiveSession: React.FC<LiveSessionProps> = ({ sessionId = 'session-1
   }
 
   return (
-    <div className="min-h-full space-y-6 animate-cel-reveal">
+    <div className={`animate-cel-reveal ${sessionState === 'live' ? 'absolute inset-0 z-50 bg-bg p-4 flex flex-col overflow-hidden lg:overflow-visible lg:static lg:z-auto lg:bg-transparent lg:p-0 lg:block lg:min-h-full lg:space-y-6' : 'min-h-full space-y-6'}`}>
       {/* Header / Breadcrumb */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 ${sessionState === 'live' ? 'shrink-0 mb-4 lg:mb-0 lg:shrink' : ''}`}>
         <div>
           <div className="flex items-center space-x-2 text-[10px] font-bold text-muted uppercase tracking-widest mb-1">
             <Video size={12} className="text-cyan" />
@@ -55,7 +56,7 @@ export const LiveSession: React.FC<LiveSessionProps> = ({ sessionId = 'session-1
             <ChevronRight size={10} />
             <span className="text-text">Session View</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-text">{sessionData.title}</h1>
+          <h1 className="text-2xl xl:text-3xl font-bold text-text lg:mb-3 ">{sessionData.title}</h1>
         </div>
       </div>
 
@@ -144,19 +145,56 @@ const PreSessionView: React.FC<{
     return () => clearInterval(timer);
   }, []);
 
+  const [hypeCount, setHypeCount] = useState(247);
+  const [hyped, setHyped] = useState(false);
+
+  const handleHype = () => {
+    if (hyped) return;
+    setHyped(true);
+    setHypeCount(c => c + 1);
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Main Info */}
-      <div className="lg:col-span-2 space-y-6">
-        <div className="bg-panel border border-line rounded-2xl overflow-hidden shadow-sm">
-          <div className="h-64 md:h-72 bg-gradient-to-br from-panel2 to-bg flex items-center justify-center relative overflow-hidden">
-            {/* Abstract background graphics */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-cyan/5 rounded-full blur-[100px] -mr-48 -mt-48 animate-pulse" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple/5 rounded-full blur-[100px] -ml-48 -mb-48 animate-pulse" />
+      {/* Main — Hero + Content */}
+      <div className="lg:col-span-2 space-y-5">
 
-            <div className="relative flex flex-col items-center space-y-10">
-              <h2 className="text-3xl md:text-5xl font-bold text-text uppercase tracking-tight">COMING SOON</h2>
+        {/* ── Hero Banner ── */}
+        <div className="relative rounded-3xl overflow-hidden" style={{ minHeight: 320 }}>
+          {/* Gradient base */}
+          <div className="absolute inset-0 bg-gradient-to-br from-panel2 via-panel to-bg" />
+          {/* Coloured glow orbs */}
+          <div className="absolute -top-16 -right-16 w-72 h-72 rounded-full bg-cyan/5 blur-xl opacity-50" />
+          <div className="absolute -bottom-10 -left-10 w-64 h-64 rounded-full bg-purple/5 blur-xl opacity-50" />
 
+          <div className="relative z-10 p-7 flex flex-col gap-6" style={{ minHeight: 320 }}>
+            {/* Top row: badges */}
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="flex items-center gap-1.5 bg-red/20 border border-red/40 text-red text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg backdrop-blur-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red animate-ping inline-block" />
+                  Going Live Soon
+                </span>
+                <span className="bg-text/5 border border-text/10 text-text/70 text-[10px] font-bold px-3 py-1 rounded-lg backdrop-blur-sm">
+                  🎯 React 19 Deep Dive
+                </span>
+                <span className="bg-text/5 border border-text/10 text-text/70 text-[10px] font-bold px-3 py-1 rounded-lg backdrop-blur-sm">
+                  🧠 Advanced
+                </span>
+              </div>
+              {/* Hype button */}
+              <button
+                onClick={handleHype}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[11px] font-black transition-all active:scale-90 border ${hyped ? 'bg-cyan/20 border-cyan/50 text-cyan shadow-[0_0_20px_rgba(0,245,228,0.25)]' : 'bg-text/5 border-text/15 text-text/70 hover:border-cyan/40 hover:text-cyan'}`}
+              >
+                <span className="text-base leading-none">{hyped ? '🔥' : '🤙'}</span>
+                <span>{hypeCount} hyped</span>
+              </button>
+            </div>
+
+            {/* Countdown */}
+            <div className="flex-1 flex flex-col items-center justify-center gap-6 py-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-text/40">drops in</p>
               <div className="flex space-x-3 md:space-x-6">
                 <FlipUnit value={timeLeft.days} label="Days" />
                 <FlipUnit value={timeLeft.hours} label="Hours" />
@@ -164,110 +202,157 @@ const PreSessionView: React.FC<{
                 <FlipUnit value={timeLeft.secs} label="Seconds" />
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="py-6 space-y-6">
-          <div className="space-y-4">
-            <h3 className="text-xl md:text-2xl font-bold text-text">About this Session</h3>
-            <p className="text-base text-muted leading-relaxed max-w-3xl">{data.description}</p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-line/20">
-            <button disabled className="bg-line/50 text-muted text-xs font-bold px-8 py-4 rounded-xl flex items-center space-x-3 cursor-not-allowed border border-line/20 shadow-lg">
-              <Video size={18} />
-              <span>Join Session (Locked)</span>
-            </button>
-            <div className="px-4 py-3 bg-panel border border-line/50 rounded-xl flex items-center space-x-3 text-xs text-muted font-medium">
-              <Info size={16} className="text-cyan animate-pulse" />
-              <span>The join button opens 10 minutes before the start time.</span>
+            {/* Stats row */}
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-1.5 text-[11px] text-text/50 font-semibold">
+                <Users size={13} className="text-cyan/60" />
+                <span>128 enrolled</span>
+              </div>
+              <div className="w-px h-3 bg-text/10" />
+              <div className="flex items-center gap-1.5 text-[11px] text-text/50 font-semibold">
+                <Clock size={13} className="text-purple/60" />
+                <span>90 min session</span>
+              </div>
+              <div className="w-px h-3 bg-text/10" />
+              <div className="flex items-center gap-1.5 text-[11px] text-text/50 font-semibold">
+                <Star size={13} className="text-yellow" />
+                <span>4.9 rating</span>
+              </div>
+              <div className="ml-auto">
+                <button disabled className="flex items-center gap-2 bg-text/5 text-text/40 text-[11px] font-black px-5 py-2.5 rounded-lg border border-text/10 cursor-not-allowed backdrop-blur-sm">
+                  <Video size={14} />
+                  <span>Join (unlocks in {timeLeft.hours}h {timeLeft.mins}m)</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-panel border border-line rounded-2xl p-6">
-          <h3 className="text-sm font-bold text-text mb-4 flex items-center space-x-2">
-            <BookOpen size={16} className="text-purple" />
-            <span>Pre-session Materials</span>
-          </h3>
+        {/* ── About ── */}
+        <div className="bg-panel border border-line/50 rounded-2xl p-6 space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-base">📋</span>
+            <h3 className="text-sm font-black text-text uppercase tracking-wide">What's This About</h3>
+          </div>
+          <p className="text-sm text-muted leading-relaxed">{data.description}</p>
+          <div className="pt-2 flex flex-wrap gap-2">
+            {['React 19', 'Server Components', 'useActionState', 'Suspense', 'Performance'].map(tag => (
+              <span key={tag} className="text-[10px] font-bold bg-panel2 border border-line/50 text-muted px-3 py-1 rounded-lg hover:border-cyan/40 hover:text-cyan transition-all cursor-default">
+                #{tag.toLowerCase().replace(' ', '')}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Pre-session Materials ── */}
+        <div className="bg-panel border border-line/50 rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-base">📦</span>
+            <h3 className="text-sm font-black text-text uppercase tracking-wide">Pre-read</h3>
+            <span className="ml-auto text-[10px] font-bold text-muted bg-panel2 px-2 py-0.5 rounded-full border border-line/40">{data.materials?.length ?? 0} files</span>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {data.materials?.map((file: any, i: number) => (
-              <div key={i} className="group bg-bg border border-line rounded-xl p-4 flex items-center justify-between hover:border-cyan/50 transition-all cursor-pointer">
-                <div className="flex items-center space-x-3 overflow-hidden">
-                  <div className="w-10 h-10 bg-panel2 rounded-lg flex items-center justify-center text-muted group-hover:text-cyan transition-colors">
-                    <Download size={20} />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs font-bold text-text truncate">{file.name}</div>
-                    <div className="text-[10px] text-muted">{file.size}</div>
-                  </div>
+              <div key={i} className="group flex items-center gap-3 bg-bg/60 border border-line/40 rounded-xl p-3.5 hover:border-cyan/40 hover:bg-cyan/5 transition-all cursor-pointer">
+                <div className="w-9 h-9 rounded-xl bg-panel2 border border-line/40 flex items-center justify-center text-muted group-hover:text-cyan group-hover:border-cyan/30 transition-all shrink-0">
+                  <Download size={16} />
                 </div>
-                <ArrowRight size={14} className="text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-text truncate group-hover:text-cyan transition-colors">{file.name}</div>
+                  <div className="text-[10px] text-muted">{file.size}</div>
+                </div>
+                <ArrowRight size={13} className="text-muted/40 group-hover:text-cyan group-hover:translate-x-0.5 transition-all shrink-0" />
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Sidebar Info */}
-      <div className="space-y-6">
-        <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
-          <div className="space-y-4">
-            <h3 className="text-[10px] font-bold text-muted uppercase tracking-widest">Your Trainer</h3>
-            <div className="flex items-center space-x-3">
-              <img src={data.trainer.avatar} className="w-12 h-12 rounded-xl object-cover" alt="" />
-              <div>
-                <div className="text-xs font-bold text-text">{data.trainer.name}</div>
-                <div className="text-[10px] text-muted">{data.trainer.role}</div>
+      {/* ── Sidebar ── */}
+      <div className="space-y-5 sticky top-6 self-start">
+
+        {/* Trainer card — story-ring style */}
+        <div className="relative bg-panel border border-line/50 rounded-3xl p-5 overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-cyan/5 rounded-full blur-[50px] -mr-10 -mt-10" />
+          <p className="text-[10px] font-black text-muted/60 uppercase tracking-widest mb-4">Your Host</p>
+          <div className="flex items-center gap-4 mb-4">
+            {/* Story ring */}
+            <div className="relative shrink-0">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan via-purple to-pink-500 p-[2px]">
+                <img src={data.trainer.avatar} className="w-full h-full rounded-[14px] object-cover" alt="" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green rounded-full border-2 border-panel flex items-center justify-center">
+                <span className="text-[7px] font-black text-bg">✓</span>
               </div>
             </div>
-            <button
-              onClick={onContactTrainer}
-              className="w-full bg-cyan text-bg text-[11px] font-bold py-2.5 rounded-xl transition-all flex items-center justify-center space-x-2 shadow-[0_0_20px_var(--cyan)]/10 hover:shadow-[0_0_20px_var(--cyan)]/20"
-            >
-              <MessageSquare size={16} />
-              <span>Contact Trainer</span>
+            <div>
+              <div className="text-sm font-black text-text">{data.trainer.name}</div>
+              <div className="text-[10px] text-muted">{data.trainer.role}</div>
+              <div className="flex items-center gap-1 mt-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={10} className="fill-yellow text-yellow" />
+                ))}
+                <span className="text-[10px] text-muted ml-1">4.9</span>
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={onContactTrainer}
+            className="w-full bg-gradient-to-r from-cyan to-cyan/80 text-bg text-[11px] font-black py-3 rounded-lg transition-all flex items-center justify-center gap-2 shadow-[0_0_24px_rgba(0,245,228,0.2)] hover:shadow-[0_0_32px_rgba(0,245,228,0.35)] hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <MessageSquare size={14} />
+            <span>Contact Trainer</span>
+          </button>
+        </div>
+
+        {/* Schedule card */}
+        <div className="bg-panel border border-line/50 rounded-3xl p-5 space-y-4">
+          <p className="text-[10px] font-black text-muted/60 uppercase tracking-widest">📅 When</p>
+          <div className="bg-bg/60 border border-line/40 rounded-2xl p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-text">Today, June 22nd</span>
+              <span className="text-[10px] bg-cyan/10 text-cyan border border-cyan/20 px-2 py-0.5 rounded-full font-bold">Today</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted">
+              <Clock size={13} className="text-purple/70" />
+              <span>14:30 – 16:00 CET</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <button className="w-full bg-transparent border border-cyan hover:bg-cyan/10 text-cyan text-[10px] font-bold py-2.5 rounded-lg transition-all flex items-center justify-center gap-2">
+              <Plus size={13} />
+              <span>Add to Google Calendar</span>
+            </button>
+            <button className="w-full bg-transparent border border-cyan hover:bg-cyan/10 text-cyan text-[10px] font-bold py-2.5 rounded-lg transition-all flex items-center justify-center gap-2">
+              <Plus size={13} />
+              <span>Add to Outlook / iCal</span>
             </button>
           </div>
-
-          <div className="pt-6 border-t border-line space-y-4">
-            <h3 className="text-[10px] font-bold text-muted uppercase tracking-widest">Schedule</h3>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3 text-xs text-text">
-                <Calendar size={16} className="text-cyan" />
-                <span>Today, June 22nd</span>
-              </div>
-              <div className="flex items-center space-x-3 text-xs text-text">
-                <Clock size={16} className="text-cyan" />
-                <span>14:30 - 16:00 CET</span>
-              </div>
-            </div>
-            <div className="flex flex-col space-y-2">
-              <button className="w-full bg-transparent border border-cyan hover:bg-cyan/10 text-cyan text-[10px] font-bold py-2 rounded-lg transition-all flex items-center justify-center space-x-2">
-                <Plus size={14} />
-                <span>Add to Google Calendar</span>
-              </button>
-              <button className="w-full bg-transparent border border-cyan hover:bg-cyan/10 text-cyan text-[10px] font-bold py-2 rounded-lg transition-all flex items-center justify-center space-x-2">
-                <Plus size={14} />
-                <span>Add to Outlook / iCal</span>
-              </button>
-            </div>
-          </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple/10 to-cyan/10 border border-purple/20 rounded-2xl p-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-2xl -mr-12 -mt-12" />
-          <div className="relative z-10 space-y-3">
-            <div className="flex items-center space-x-2 text-purple font-bold text-[10px] uppercase tracking-widest">
-              <Sparkles size={14} />
-              <span>AI Prep Hint</span>
+        {/* AI Hint — neon card */}
+        <div className="relative rounded-3xl overflow-hidden border border-purple/30">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple/20 via-panel to-cyan/10 opacity-40" />
+          <div className="absolute top-0 right-0 w-20 h-20 bg-cyan/5 blur-xl opacity-50 -mr-4 -mt-4 rounded-full" />
+          <div className="relative z-10 p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-xl bg-purple/5 border border-purple/5 flex items-center justify-center">
+                <BrainCircuit size={13} className="text-purple" />
+              </div>
+              <span className="text-[10px] font-black text-purple uppercase tracking-widest">AI Prep Hint ✨</span>
             </div>
-            <p className="text-xs text-text/80 leading-relaxed italic">
-              "Dr. Sarah often asks about the 'Closure' concept in the first 5 minutes. Refresh your knowledge of Module 2.1 to be ready for the icebreaker poll!"
+            <p className="text-xs text-text/80 leading-relaxed">
+              Dr. Sarah usually kicks off with a quick poll on <span className="text-cyan font-bold">'Closures'</span>. Brush up on Module 2.1 and you'll be the first to answer 💪
             </p>
+            <div className="flex items-center gap-2 pt-1">
+              <div className="h-px flex-1 bg-text/5" />
+              <span className="text-[9px] text-muted/40 font-bold">Powered by Manthio AI</span>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   );
@@ -280,6 +365,7 @@ const ActiveSessionView: React.FC<{
   onNavigate?: (page: string) => void
 }> = ({ data, onLeave, onNavigate }) => {
   const [activeTab, setActiveTab] = useState<'chat' | 'polls' | 'materials' | 'ai-tutor'>('chat');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const [groupChatInput, setGroupChatInput] = useState('');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -388,9 +474,19 @@ const ActiveSessionView: React.FC<{
   };
 
   return (
-    <div className="lg:h-[700px] flex flex-col lg:flex-row gap-4">
+    <div className="flex-1 min-h-0 lg:h-[700px] flex flex-col lg:flex-row gap-4 relative overflow-hidden lg:overflow-visible">
       {/* Video Area */}
-      <div className="flex-1 flex flex-col bg-bg border border-line rounded-2xl overflow-hidden relative group">
+      <div className="w-full flex-1 min-h-0 lg:w-auto lg:h-full lg:aspect-auto lg:flex-1 flex flex-col bg-bg border border-line rounded-2xl overflow-hidden relative group">
+        
+        {/* Right Top Button for Mobile Sidebar */}
+        <button 
+          onClick={() => setIsSidebarOpen(true)}
+          className="lg:hidden absolute top-4 right-4 z-20 bg-cyan hover:bg-cyan/90 text-bg p-2 px-4 rounded-lg shadow-lg shadow-cyan/20 flex items-center gap-2 transition-all active:scale-95"
+        >
+          <MessageSquare size={16} />
+          <span className="text-[10px] font-bold uppercase tracking-wider">Tools</span>
+        </button>
+
         {/* Placeholder for embedded video */}
         <div className="flex-1 bg-panel2 flex flex-col items-center justify-center relative">
           <div className="p-12 text-center space-y-6">
@@ -468,9 +564,30 @@ const ActiveSessionView: React.FC<{
         </div>
       </div>
 
+      {/* Side Panel Overlay Backdrop (Mobile) */}
+      {isSidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Side Panel */}
-      <div className="w-full lg:w-80 h-[800px] lg:h-full bg-panel border border-line rounded-2xl flex flex-col overflow-hidden">
-        <div className="flex border-b border-line">
+      <div className={`
+        fixed inset-y-0 right-0 z-50 w-[85%] max-w-[360px] h-full bg-panel border-l border-line flex flex-col overflow-hidden shadow-2xl
+        transform transition-transform duration-300 ease-in-out
+        ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}
+        lg:relative lg:translate-x-0 lg:z-auto lg:w-80 lg:h-full lg:border lg:rounded-2xl lg:shadow-none
+      `}>
+        {/* Mobile Header with Close Button */}
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-line bg-panel2 shrink-0">
+          <span className="text-sm font-bold text-text">Tools</span>
+          <button onClick={() => setIsSidebarOpen(false)} className="p-2 text-muted hover:text-text hover:bg-line/50 rounded-full transition-colors">
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="flex border-b border-line shrink-0 overflow-x-auto hide-scrollbar">
           {([
             { id: 'chat', icon: MessageSquare, label: 'Chat' },
             { id: 'ai-tutor', icon: Bot, label: 'AI Tutor' },
@@ -480,7 +597,7 @@ const ActiveSessionView: React.FC<{
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-4 flex flex-col items-center space-y-1 transition-all relative ${activeTab === tab.id ? 'text-cyan' : 'text-muted hover:text-text'
+              className={`flex-1 min-w-[70px] py-4 flex flex-col items-center space-y-1 transition-all relative ${activeTab === tab.id ? 'text-cyan' : 'text-muted hover:text-text'
                 }`}
             >
               <tab.icon size={18} />
@@ -633,20 +750,13 @@ const PostSessionView: React.FC<{ data: any, onContactTrainer: () => void }> = (
       <div className="lg:col-span-2 space-y-6">
         {/* Video Recording */}
         <div className="bg-panel border border-line rounded-2xl overflow-hidden group">
-          <div className="aspect-video bg-panel2 flex items-center justify-center relative cursor-pointer">
-            <img
-              src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=450&fit=crop"
-              className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700"
-              alt=""
+          <div className="aspect-video bg-panel2 relative">
+            <video
+              src="https://media.w3.org/2010/05/sintel/trailer.mp4"
+              poster="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=450&fit=crop"
+              controls
+              className="w-full h-full"
             />
-            <div className="absolute inset-0 bg-black/40" />
-            <div className="relative z-10 w-20 h-20 bg-cyan text-bg rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(0,245,228,0.3)] transition-all group-hover:scale-110">
-              <Play size={32} fill="currentColor" />
-            </div>
-            <div className="absolute bottom-6 left-6 flex items-center space-x-2 bg-bg/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-line">
-              <div className="w-1.5 h-1.5 rounded-full bg-cyan shadow-[0_0_8px_var(--cyan)]" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-text">Recording Available</span>
-            </div>
           </div>
           <div className="p-6 flex items-center justify-between border-t border-line">
             <div className="flex items-center space-x-4">
@@ -738,7 +848,7 @@ const PostSessionView: React.FC<{ data: any, onContactTrainer: () => void }> = (
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-6 sticky top-6 self-start">
         <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
           <h3 className="text-[10px] font-bold text-muted uppercase tracking-widest">Follow-up Assignments</h3>
           <div className="space-y-3">
