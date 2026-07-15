@@ -1,24 +1,20 @@
 import React, { useState } from 'react';
 import { COURSES } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronDown, Star, Award, CheckCircle, Clock, BrainCircuit, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, ChevronRight, Users, ArrowRight, Laptop, PlayCircle, Bookmark, Share2, MessageSquare, Info, Eye, Lock, Play, FileText, Code2, Monitor, LayoutGrid, FolderOpen, Route } from 'lucide-react';
+import { ChevronDown, Star, Award, CheckCircle, Clock, BrainCircuit, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, ChevronRight, Users, ArrowRight, Laptop, PlayCircle, Bookmark, Share2, MessageSquare, Info, Eye, Lock, Play, Monitor, LayoutGrid, FolderOpen, Route, MousePointerClick } from 'lucide-react';
 import { useXP } from '../../context/XPContext';
+import { useNotifications } from '../../context/NotificationContext';
 import { useTrack } from '../track-detail/useTrack';
 import { calculateCourseProgress } from '../../services/progressUtils';
 import { AvatarStack } from '../../components/social/SocialKit';
 import { hashNum } from '../../components/social/socialUtils';
+import { LessonIcon } from '../../utils/courseIcons';
 import type { Course, Review, LessonType } from '../../types';
 
-// Lesson-type → icon (module curriculum list)
+// Lesson-type → icon (module curriculum list; Video keeps its filled style here)
 const getLessonTypeIcon = (type: LessonType) => {
-  switch (type) {
-    case 'Video':      return <Play className="w-3.5 h-3.5 fill-current" />;
-    case 'Article':    return <FileText className="w-3.5 h-3.5" />;
-    case 'Quiz':       return <HelpCircle className="w-3.5 h-3.5" />;
-    case 'Code':       return <Code2 className="w-3.5 h-3.5" />;
-    case 'Live Event': return <Users className="w-3.5 h-3.5" />;
-    default:           return <FileText className="w-3.5 h-3.5" />;
-  }
+  if (type === 'Video') return <Play className="w-3.5 h-3.5 fill-current" />;
+  return <LessonIcon type={type} className="w-3.5 h-3.5" />;
 };
 
 interface CourseDetailProps {
@@ -46,6 +42,7 @@ const MOCK_DATES = {
 export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic }) => {
   const { user, activeCourseId, selectedFormat, setSelectedFormat, setActiveCourseId, setActiveTrackId } = useAuth();
   const { addToast, addXp } = useXP();
+  const { addNotification } = useNotifications();
   const { completedLessonIds } = useTrack();
   const [visibleReviews, setVisibleReviews] = useState(3);
   const [savedOn, setSavedOn] = useState(false);
@@ -146,7 +143,12 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
     setReviewText('');
     setShowReviewForm(false);
     addXp(75, 'Shared a course review');
-    addToast('success', '🎉 Thanks! Your testimonial has been posted.');
+    addNotification({
+      category: 'social',
+      title: '🎉 Thanks! Your testimonial has been posted.',
+      message: `Your ${reviewRating}-star review of ${displayTitle} is now live for other learners to see.`,
+      critical: false,
+    });
   };
 
   return (
@@ -522,7 +524,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                   ],
                   details: [
                     { Icon: Monitor, title: 'Self-Paced Access', body: <>Unrestricted access to all materials with AI Tutor available 24/7</> },
-                    { Icon: BookOpen, title: 'Interactive Content', body: <>Coding environments, quizzes & real-world projects</> },
+                    { Icon: MousePointerClick, title: 'Interactive Content', body: <>Coding environments, quizzes & real-world projects</> },
                   ],
                   time: course?.format === 'Multiple formats'
                     ? 'Self-Paced, Cohort, or Flipped'
@@ -1109,7 +1111,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
             {/* More from this Trainer - Integrated List */}
             {trainerCourses.length > 0 && (
               <div className="pt-4 border-t border-line space-y-2">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-muted">More from this expert</h4>
+                <h4 className="text-[11px] font-black tracking-widest text-muted">More from this expert</h4>
                 <div className="space-y-2">
                   {trainerCourses.map(tc => (
                     <button

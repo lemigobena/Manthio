@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  BookOpen, Mic, ThumbsUp, ThumbsDown, Copy, Plus, 
-  ArrowUp, Globe, Check
+import {
+  BookOpen, Mic, ThumbsUp, ThumbsDown, Copy, Plus,
+  ArrowUp, Globe, Check, StickyNote
 } from 'lucide-react';
 import type { ChatMessage } from '../../../types';
 import ReactMarkdown from 'react-markdown';
@@ -230,12 +230,12 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
                     <button className="hover:text-red transition-colors" title="Not helpful"><ThumbsDown size={15} /></button>
                     <button onClick={() => navigator.clipboard.writeText(msg.text)} className="hover:text-cyan transition-colors" title="Copy to clipboard"><Copy size={15} /></button>
                     {onSaveToNotes && (
-                      <button 
-                        onClick={() => onSaveToNotes(msg.text)} 
-                        className="hover:text-cyan transition-colors" 
+                      <button
+                        onClick={() => onSaveToNotes(msg.text)}
+                        className="hover:text-cyan transition-colors"
                         title="Save to Notes"
                       >
-                        <BookOpen size={15} />
+                        <StickyNote size={15} />
                       </button>
                     )}
                   </div>

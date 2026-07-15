@@ -7,7 +7,6 @@ import { ContentPlayer } from '../content-player/ContentPlayer';
 import {
   Play,
   BookOpen,
-  Sparkles,
   ArrowRight,
   ArrowUpRight,
   RefreshCw,
@@ -25,8 +24,15 @@ import {
   Star,
   Users,
   AlertCircle,
-  Globe
+  Globe,
+  BrainCircuit,
+  Code2,
+  CircleUserRound,
+  Compass,
+  Lightbulb,
+  FlaskConical
 } from 'lucide-react';
+import { CourseIcon } from '../../utils/courseIcons';
 
 interface DashboardProps {
   onNavigate: (page: string) => void;
@@ -381,7 +387,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
               <div className="absolute top-0 left-0 w-1 h-full bg-yellow" />
               <div className="flex items-start space-x-3.5 pl-2 max-w-2xl">
                 <div className="p-2.5 bg-yellow/10 border border-yellow/20 text-yellow rounded-xl shrink-0 mt-0.5">
-                  <Sparkles className="w-5 h-5 fill-current" />
+                  <CircleUserRound className="w-5 h-5" />
                 </div>
                 <div className="space-y-1">
                   <h3 className="font-bold text-sm text-text">Complete Your Profile!</h3>
@@ -486,7 +492,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3 pt-2">
                       <button onClick={() => onNavigate('catalog')} className="bg-yellow hover:bg-yellow/90 text-bg text-xs font-black px-6 py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(255,184,0,0.3)] active:scale-95 flex items-center justify-center gap-2">
-                        <Sparkles className="w-4 h-4" /> Explore New Tracks
+                        <Compass className="w-4 h-4" /> Explore New Tracks
                       </button>
                       <button onClick={() => onNavigate('profile')} className="bg-bg border border-line hover:border-yellow/30 text-text text-xs font-bold px-6 py-3 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2">
                         <Award className="w-4 h-4" /> View Certificate
@@ -496,7 +502,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                 ) : primaryActive.type !== 'none' ? (
                   <div className="space-y-2 mt-2">
                     <div className="flex items-center gap-2 mb-2">
-                      <Sparkles className="w-4 h-4 text-cyan" />
+                      <BrainCircuit className="w-4 h-4 text-cyan" />
                       <span className="text-[10px] font-black uppercase tracking-wider text-cyan">Active Journey</span>
                     </div>
                     <p className="text-muted text-sm md:text-base leading-relaxed max-w-xl">
@@ -523,7 +529,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                 ) : (
                   <div className="space-y-4 max-w-xl">
                     <div className="flex items-center gap-2 mb-1">
-                      <Sparkles className="w-4 h-4 text-yellow animate-pulse" />
+                      <Lightbulb className="w-4 h-4 text-yellow animate-pulse" />
                       <span className="text-[10px] font-black uppercase tracking-wider text-yellow">Personalised Recommendation</span>
                     </div>
                     <h2 className="text-xl font-black text-text leading-tight mb-2">Python Fundamentals</h2>
@@ -691,7 +697,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                 <div className="bg-panel border border-line rounded-2xl p-5 md:p-6 flex flex-col hover:border-cyan/30 transition-all duration-300 group shadow-sm hover:shadow-lg">
                   <div className="flex items-start gap-4 mb-4">
                     <div className="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/20 flex items-center justify-center shrink-0">
-                      <BookOpen className="w-5 h-5 text-cyan" />
+                      <CourseIcon hint={`${activeCourse.title} ${activeCourse.id}`} className="w-6 h-6 text-cyan" />
+                      {/*<Code2 className="w-5 h-5 text-cyan" /> */}
                     </div>
                     <div className="min-w-0 flex-1">
                       <span className="text-[10px] font-black tracking-widest text-cyan uppercase">Active Course</span>
@@ -737,7 +744,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                 <div className="bg-panel border border-line rounded-2xl p-5 md:p-6 flex flex-col items-center justify-center gap-4 text-center min-h-[220px] relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan/5 to-transparent pointer-events-none" />
                   <div className="w-12 h-12 rounded-xl bg-cyan/10 border border-cyan/20 flex items-center justify-center relative z-10">
-                    <BookOpen className="w-5 h-5 text-cyan" />
+                    <Code2 className="w-5 h-5 text-cyan" />
                   </div>
                   <div className="relative z-10">
                     <h4 className="font-bold text-text text-base">No Active Course</h4>
@@ -1094,7 +1101,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
       >
         <div className="flex items-center gap-4">
           <div className="p-3 bg-panel rounded-xl shadow-inner border border-line">
-            <Sparkles className="w-6 h-6 text-purple group-hover:text-cyan transition-colors" />
+            <FlaskConical className="w-6 h-6 text-purple group-hover:text-cyan transition-colors" />
           </div>
           <div className="text-left">
             <span className="text-lg font-black text-text group-hover:text-cyan transition-colors tracking-tight">Developer Demo Center</span>

@@ -3,12 +3,12 @@ import { COURSES } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import {
-  Check, Lock, Play, ChevronDown, ChevronUp, Clock, HelpCircle,
+  Check, Lock, Play, ChevronDown, ChevronUp, Clock,
   FileText, Code2, Users, MapPin, Calendar, AlertCircle,
   Target, Award, Bookmark, MessageSquare, ExternalLink,
-  ShieldCheck, CheckCircle, Video, Gamepad2, ClipboardEdit, Flame, StickyNote,
+  ShieldCheck, CheckCircle, Video, Flame, StickyNote,
 } from 'lucide-react';
-import { FaPython, FaCode, FaDatabase, FaMobileAlt, FaFigma, FaGithub, FaGitAlt } from 'react-icons/fa';
+import { CourseIcon, LessonIcon } from '../../utils/courseIcons';
 import { useTrack } from '../track-detail/useTrack';
 import { calculateCourseProgress } from '../../services/progressUtils';
 import { useModal } from '../../context/ModalContext';
@@ -240,19 +240,7 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
     setExpandedModuleId(prev => prev === modId ? null : modId);
   };
 
-  const getLessonIcon = (type: LessonType) => {
-    switch (type) {
-      case 'Video':      return <Play className="w-3.5 h-3.5" />;
-      case 'Article':    return <FileText className="w-3.5 h-3.5" />;
-      case 'Quiz':       return <HelpCircle className="w-3.5 h-3.5" />;
-      case 'Code':       return <Code2 className="w-3.5 h-3.5" />;
-      case 'Live Event': return <Users className="w-3.5 h-3.5" />;
-      case 'H5P':        return <Gamepad2 className="w-3.5 h-3.5" />;
-      case 'Assignment': return <ClipboardEdit className="w-3.5 h-3.5" />;
-      case 'External':   return <ExternalLink className="w-3.5 h-3.5" />;
-      default:           return <FileText className="w-3.5 h-3.5" />;
-    }
-  };
+  const getLessonIcon = (type: LessonType) => <LessonIcon type={type} className="w-3.5 h-3.5" />;
 
   const completedCount    = course.modules.filter(m => m.status === 'Completed').length;
   const courseLearners    = hashNum(course.id, 1200, 8600);
@@ -272,16 +260,8 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
               <div className="flex items-center justify-center rounded-full bg-panel2 shadow-inner"
                 style={{ width: 78, height: 78 }}>
                 {(() => {
-                  const keyword = (course.title + ' ' + course.id).toLowerCase();
-                  if (keyword.includes('python')) return <FaPython className="w-9 h-9 text-cyan" />;
-                  if (keyword.includes("github")) return <FaGithub className="w-9 h-9 text-cyan" />;
-                  if (keyword.includes('git')) return <FaGitAlt className="w-9 h-9 text-cyan" />;
-                  if (keyword.includes('data') || keyword.includes('sql')) return <FaDatabase className="w-9 h-9 text-cyan" />;
-                  if (keyword.includes('mobile') || keyword.includes('app') || keyword.includes('ios') || keyword.includes('android')) return <FaMobileAlt className="w-9 h-9 text-cyan" />;
-                  if (keyword.includes('ui') || keyword.includes('ux') || keyword.includes('design') || keyword.includes('figma')) return <FaFigma className="w-9 h-9 text-cyan" />;
-                  if (keyword.includes('web') || keyword.includes('html') || keyword.includes('css') || keyword.includes('react')) return <FaCode className="w-9 h-9 text-cyan" />;
-                  
-                  return <FaCode className="w-9 h-9 text-cyan" />;
+                  const hint = `${course.title} ${course.id}`;
+                  return <CourseIcon hint={hint} className="w-9 h-9 text-cyan" />;
                 })()}
               </div>
             </ProgressRing>
@@ -752,17 +732,13 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                               }`}
                               title={locked ? (les.unlockCondition || 'Complete previous lesson to unlock') : undefined}
                             >
-                              {/* Lesson type icon — small square badge */}
+                              {/* Lesson type icon — small square badge (completed = cyan variant of the type icon) */}
                               <div className={`w-7 h-7 rounded-lg border flex items-center justify-center shrink-0 ${
-                                done   ? 'bg-green/10 border-green/20 text-green' :
-                                active ? 'bg-cyan/10 border-cyan/20 text-cyan' :
-                                locked ? 'bg-bg border-line text-muted' :
+                                done   ? 'bg-cyan/10 border-cyan/20 text-cyan' :
+                                active ? 'bg-transparent border-cyan text-cyan' :
                                 'bg-bg border-line text-muted'
                               }`}>
-                                {done
-                                  ? <Check className="w-3.5 h-3.5 stroke-[2.5px]" />
-                                  : getLessonIcon(les.type)
-                                }
+                                {getLessonIcon(les.type)}
                               </div>
 
                               {/* Title + meta */}

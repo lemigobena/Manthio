@@ -6,7 +6,6 @@ import {
   Award,
   Clock,
   Flame,
-  Sparkles,
   AlertTriangle,
   FileSpreadsheet,
   AlertCircle,
@@ -17,7 +16,8 @@ import {
   ChevronDown,
   Activity,
   BarChart3,
-  Lock
+  Lock,
+  BrainCircuit
 } from 'lucide-react';
 import { Certificate } from '../../components/ui/Certificate';
 
@@ -478,7 +478,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ onNavigate }) => {
               <div className="absolute top-0 right-0 w-16 h-16 bg-orange/5 rounded-full blur-xl group-hover:scale-150 transition-all duration-700" />
               <div className="flex justify-between items-start text-muted text-[10px] uppercase font-bold tracking-wider">
                 <span>ACTIVE SPENDING</span>
-                <Sparkles className="w-4 h-4 text-orange" />
+                <BrainCircuit className="w-4 h-4 text-orange" />
               </div>
               <div className="text-2xl font-bold mt-2 font-mono">{analyticsData.subscription.tier}</div>
               <span className="text-[10px] text-muted mt-1 block">{analyticsData.subscription.spending} / {analyticsData.subscription.status}</span>

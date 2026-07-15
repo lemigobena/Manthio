@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Check, Lock, Search, ChevronDown, ChevronRight, PanelLeft, PanelLeftClose } from 'lucide-react';
+import { CourseIcon, LessonIcon } from '../../../utils/courseIcons';
 import type { Course, Lesson } from '../../../types';
 
 interface CurriculumPaneProps {
@@ -97,17 +98,24 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
 
             const isCollapsed = searchQuery ? false : collapsedModules[mod.id];
             
+            // Module state → icon tint: cyan when finished, normal when unlocked, muted when locked
+            const allCompleted = mod.lessons.every(l => l.status === 'completed');
+            const allLocked = mod.lessons.every(l => l.status === 'locked');
+            const moduleIconClass = allCompleted ? 'text-cyan' :
+              allLocked ? 'text-muted/50' : 'text-muted';
+
             if (!isOpen) {
               // Icon strip view
               const hasActiveLesson = mod.lessons.some(l => l.id === currentLesson.id);
-              const allCompleted = mod.lessons.every(l => l.status === 'completed');
-              
+
               return (
-                <div 
-                  key={mod.id} 
-                  className={`w-10 h-10 mx-auto rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${
-                    hasActiveLesson ? 'bg-cyan/20 border border-cyan' : 
-                    allCompleted ? 'bg-green/10 text-green' : 'bg-bg hover:bg-line/50 text-muted'
+                <div
+                  key={mod.id}
+                  className={`w-10 h-10 mx-auto rounded-lg flex flex-col items-center justify-center transition-colors ${
+                    hasActiveLesson ? 'bg-cyan/20 border border-cyan text-cyan cursor-pointer' :
+                    allCompleted ? 'bg-cyan/10 text-cyan cursor-pointer' :
+                    allLocked ? 'bg-bg text-muted/50 cursor-not-allowed' :
+                    'bg-bg hover:bg-line/50 text-muted cursor-pointer'
                   }`}
                   title={`Module ${mod.number}: ${mod.title}`}
                   onClick={() => {
@@ -118,8 +126,8 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
                     }
                   }}
                 >
-                  <span className="text-[10px] font-bold">M{mod.number}</span>
-                  {allCompleted && <Check className="w-3 h-3 text-green mt-0.5" />}
+                  <CourseIcon hint={`${mod.title} ${course.title}`} className="w-4 h-4" />
+                  <span className="text-[8px] font-bold mt-0.5">M{mod.number}</span>
                 </div>
               );
             }
@@ -127,20 +135,23 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
             // Full view
             return (
               <div key={mod.id} className="space-y-1">
-                <button 
+                <button
                   onClick={() => toggleModule(mod.id)}
-                  className="w-full text-left px-3 py-1.5 text-[11px] font-bold text-text bg-bg/50 hover:bg-line/50 rounded-lg uppercase tracking-wide flex justify-between items-center transition-colors cursor-pointer"
+                  className="w-full text-left px-3 py-2 text-[11px] font-bold text-text bg-bg/50 hover:bg-line/50 rounded-lg uppercase tracking-wide flex items-center gap-2.5 transition-colors cursor-pointer"
                 >
-                  <span>Module {mod.number}</span>
-                  {isCollapsed ? <ChevronRight className="w-3.5 h-3.5 text-muted" /> : <ChevronDown className="w-3.5 h-3.5 text-muted" />}
+                  <span className={`flex items-center justify-center shrink-0 ${moduleIconClass}`}>
+                    <CourseIcon hint={`${mod.title} ${course.title}`} className="w-4 h-4" />
+                  </span>
+                  <span className="flex-1">Module {mod.number}</span>
+                  {isCollapsed ? <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" /> : <ChevronDown className="w-3.5 h-3.5 text-muted shrink-0" />}
                 </button>
-                
+
                 {!isCollapsed && (
                   <>
                     <div className="px-3 text-xs font-semibold text-text mb-2 pt-1">
                       {mod.title}
                     </div>
-                    <div className="space-y-0.5">
+                    <div className="divide-y divide-line/40">
                       {filteredLessons.map(les => {
                         const isActive = les.id === currentLesson.id;
                         const isLocked = les.status === 'locked';
@@ -158,12 +169,22 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
                               }
                             }}
                             disabled={isLocked}
-                            className={`w-full text-left px-3 py-2.5 rounded-lg text-xs flex items-start justify-between transition-colors ${
-                              isActive ? 'bg-cyan/10 text-cyan font-bold border-l-[3px] border-cyan' :
-                              isLocked ? 'text-muted cursor-not-allowed opacity-60' : 'text-text hover:bg-bg/60 cursor-pointer font-medium'
+                            className={`group w-full text-left pl-2 pr-3 py-2 rounded-lg text-xs flex items-start gap-2.5 transition-all duration-200 ${
+                              isActive ? 'bg-cyan/10 text-cyan font-bold shadow-[inset_0_0_0_1px_rgba(0,245,228,0.25)]' :
+                              isLocked ? 'text-muted cursor-not-allowed opacity-60' :
+                              'text-text hover:bg-bg/80 cursor-pointer font-medium'
                             }`}
                           >
-                            <div className="flex flex-col pr-2 flex-1">
+                            {/* Lesson-type icon chip */}
+                            <span className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 mt-px transition-colors ${
+                              isActive ? 'bg-cyan/15 text-cyan' :
+                              isCompleted ? 'bg-green/10 text-green' :
+                              isLocked ? 'bg-line/30 text-muted' :
+                              'bg-line/40 text-muted group-hover:bg-cyan/10 group-hover:text-cyan'
+                            }`}>
+                              <LessonIcon type={les.type} className="w-3.5 h-3.5" />
+                            </span>
+                            <div className="flex flex-col pr-2 flex-1 min-w-0">
                               <span className="line-clamp-2">{les.title}</span>
                               {les.microChunkable && (
                                 <span className="text-[9px] text-muted mt-1 uppercase font-bold tracking-wider">
@@ -171,8 +192,8 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
                                 </span>
                               )}
                             </div>
-                            <span className="shrink-0 text-[10px] text-muted mt-0.5 flex items-center">
-                              {isCompleted ? <Check className="w-3.5 h-3.5 text-green" /> : 
+                            <span className="shrink-0 text-[10px] text-muted mt-1 flex items-center">
+                              {isCompleted ? <Check className="w-3.5 h-3.5 text-green" /> :
                                isLocked ? <Lock className="w-3.5 h-3.5" /> : les.duration}
                             </span>
                           </button>
