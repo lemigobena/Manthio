@@ -421,7 +421,7 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
           <div className="space-y-3">
             {/* Section label */}
             <div className="flex items-center justify-between px-0.5">
-              <h2 className="text-[11px] font-black text-muted uppercase tracking-[0.15em]">Curriculum</h2>
+              <h2 className="text-[12px] font-black text-muted tracking-[0.15em]">Curriculum</h2>
               <span className="text-[10px] text-muted">{course.modules.length} modules · {completedCount} completed</span>
             </div>
 
@@ -866,24 +866,64 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
               );
             })}
 
-            {/* Certificate milestone row */}
-            <div className={`bg-panel border rounded-2xl p-4 flex items-center gap-4 border-dashed ${displayedProgress === 100 ? 'border-yellow' : 'border-line/50 opacity-55'}`}>
-              <div className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 ${displayedProgress===100 ? 'bg-yellow/10 border-yellow/30 text-yellow' : 'bg-bg border-line text-muted'}`}>
-                <Award className="w-5 h-5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-sm text-text">Course Certificate</h3>
-                <p className="text-muted text-xs mt-0.5">Complete all modules to unlock your official {course.title} diploma.</p>
-              </div>
-              {course.progress === 100
-                ? <button className="bg-yellow text-bg px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shrink-0">
-                    <ExternalLink className="w-3.5 h-3.5" />View
-                  </button>
-                : <div className="flex items-center gap-1.5 text-muted text-[10px] font-bold uppercase tracking-widest shrink-0">
-                    <Lock className="w-3 h-3" /> Locked
+            {/* Certificate milestone — social post style */}
+            {(() => {
+              const certUnlocked = displayedProgress === 100;
+              const certEarners = hashNum(course.id + 'cert', 140, 2400);
+              return (
+                <div className={`bg-panel border rounded-2xl overflow-hidden transition-all ${certUnlocked ? 'border-yellow/40' : 'border-line/50'}`}>
+                  {/* Post header */}
+                  <div className={`flex items-center justify-between gap-3 px-4 sm:px-5 pt-4 ${certUnlocked ? '' : 'opacity-55'}`}>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="relative shrink-0">
+                        <div className={`w-11 h-11 rounded-full flex items-center justify-center ${certUnlocked ? 'bg-yellow/10' : 'bg-bg border border-line'}`}>
+                          <Award className={`w-5 h-5 ${certUnlocked ? 'text-yellow' : 'text-muted'}`} />
+                        </div>
+                        <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-[3px] border-panel ${certUnlocked ? 'bg-yellow' : 'bg-line'}`} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <h3 className="font-bold text-sm text-text truncate">Course Certificate</h3>
+                          {certUnlocked && <CheckCircle className="w-3.5 h-3.5 text-yellow shrink-0" />}
+                        </div>
+                        <span className="text-xs text-muted">Official {course.title} diploma</span>
+                      </div>
+                    </div>
+                    {certUnlocked
+                      ? <span className="shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-full bg-yellow/10 text-yellow">Unlocked</span>
+                      : <span className="shrink-0 flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full bg-bg border border-line text-muted">
+                          <Lock className="w-3 h-3" /> Locked
+                        </span>
+                    }
                   </div>
-              }
-            </div>
+
+                  {/* Post body */}
+                  <p className={`px-4 sm:px-5 pt-3 pb-4 text-xs text-muted leading-relaxed ${certUnlocked ? '' : 'opacity-55'}`}>
+                    {certUnlocked
+                      ? 'You made it — your verifiable credential is ready to view and share with your network.'
+                      : `Complete all modules to unlock your official ${course.title} diploma and share it with your network.`}
+                  </p>
+
+                  {/* Engagement footer */}
+                  <div className="px-4 sm:px-5 py-3 border-t border-line/40 bg-bg/30 flex flex-wrap items-center justify-between gap-3">
+                    <div className={`flex items-center gap-2.5 min-w-0 ${certUnlocked ? '' : 'opacity-55'}`}>
+                      <AvatarStack seed={course.id + 'cert'} />
+                      <span className="text-[10px] sm:text-[11px] text-muted font-semibold truncate">
+                        <span className="text-text font-bold">{certEarners.toLocaleString()}</span> earned this
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {certUnlocked
+                        ? <button className="flex items-center gap-1.5 bg-yellow text-bg px-3 py-1.5 rounded-full text-[11px] font-bold transition-all active:scale-95 hover:bg-yellow/90">
+                            <ExternalLink className="w-3.5 h-3.5" /> View
+                          </button>
+                        : <span className="text-[10px] text-muted font-bold tabular-nums px-2">{displayedProgress}% there</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
       </div>
