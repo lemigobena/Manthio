@@ -4,9 +4,26 @@ import { useXP } from '../../context/XPContext';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { MessageSquare, ArrowUp, ArrowDown, Check, Sparkles, Send, Hash, X, MessageCircle, ChevronRight, PanelLeft, PanelLeftClose, PanelRightClose, Code, Image as ImageIcon, ArrowLeft, Bell, BellOff } from 'lucide-react';
+import { getCourseIconType, GeneralIcon } from '../../utils/courseIcons';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { ForumChannel, ChannelMessage, ForumReply } from '../../types';
+
+// Course-specific channel icon — uses centralized courseIcons util
+const getChannelIcon = (channel: ForumChannel, className = 'w-4 h-4') => {
+  if (channel.courseId === 'all') return <GeneralIcon className={className} />;
+  const Icon = getCourseIconType(channel.name, channel.courseId);
+  return <Icon className={className} />;
+};
+
+// "python-bootcamp" → "Python Bootcamp" (prefers the actual course title when linked)
+const getChannelDisplayName = (channel: ForumChannel, course?: { title: string }) => {
+  if (course?.title) return course.title;
+  return channel.name
+    .split(/[-_]/)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+};
 
 interface CommunityProps {
   onNavigate?: (page: string) => void;
@@ -126,6 +143,9 @@ export const Community: React.FC<CommunityProps> = () => {
   };
 
   const activeChannel = channels.find(c => c.id === activeChannelId);
+  const activeChannelName = activeChannel
+    ? getChannelDisplayName(activeChannel, COURSES.find(c => c.id === activeChannel.courseId))
+    : '';
   const activeThread = activeChannel?.messages.find(m => m.id === activeThreadId);
 
   // Scroll behavior for channels
@@ -202,7 +222,7 @@ export const Community: React.FC<CommunityProps> = () => {
       title: finalTitle,
       author: user?.name || 'Alex Chen',
       body: newThreadBody,
-      category: activeChannel?.name || 'General',
+      category: activeChannelName || 'General',
       upvotes: 1,
       replies: [],
       hasAcceptedAnswer: false,
@@ -339,7 +359,7 @@ export const Community: React.FC<CommunityProps> = () => {
       return next;
     });
     const isMuted = !mutedChannels.has(channelId);
-    addToast('info', isMuted ? `Muted notifications for #${activeChannel?.name}` : `Unmuted notifications for #${activeChannel?.name}`);
+    addToast('info', isMuted ? `Muted notifications for ${activeChannelName}` : `Unmuted notifications for ${activeChannelName}`);
   };
 
   return (
@@ -360,17 +380,19 @@ export const Community: React.FC<CommunityProps> = () => {
           <div className="space-y-0.5 px-2">
             {channels.map(channel => {
               const course = COURSES.find(c => c.id === channel.courseId);
-              const imageUrl = course?.imageUrl || 'https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?auto=format&fit=crop&q=80&w=100&h=100';
+              const isActive = activeChannelId === channel.id;
               return (
                 <button
                   key={channel.id}
                   onClick={() => { setActiveChannelId(channel.id); setActiveThreadId(null); setSelectedTag(null); setIsSidebarOpen(false); }}
                   className={`w-full text-left px-3 py-1.5 rounded-lg flex items-center space-x-3 text-sm transition-colors ${
-                    activeChannelId === channel.id ? 'bg-cyan/10 text-cyan font-bold' : 'text-muted hover:text-cyan'
+                    isActive ? 'bg-cyan/10 text-cyan font-bold' : 'text-muted hover:text-cyan hover:bg-line/30'
                   }`}
                 >
-                  <img src={imageUrl} alt={channel.name} className="w-6 h-6 rounded-md object-cover shrink-0" />
-                  <span className="truncate">{channel.name}</span>
+                  <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${isActive ? 'text-cyan' : 'text-muted'}`}>
+                    {getChannelIcon(channel, 'w-3.5 h-3.5')}
+                  </div>
+                  <span className="truncate">{getChannelDisplayName(channel, course)}</span>
                 </button>
               );
             })}
@@ -392,9 +414,11 @@ export const Community: React.FC<CommunityProps> = () => {
               <PanelLeft size={20} />
             </button>
             <div className="font-bold text-text flex items-center gap-2 whitespace-nowrap">
-              <div className="flex items-center space-x-1">
-                <Hash size={18} className="text-muted shrink-0" />
-                <span>{activeChannel?.name}</span>
+              <div className="flex items-center space-x-1.5">
+                {activeChannel
+                  ? <span className="text-muted shrink-0">{getChannelIcon(activeChannel, 'w-[18px] h-[18px]')}</span>
+                  : <Hash size={18} className="text-muted shrink-0" />}
+                <span>{activeChannelName}</span>
               </div>
               {selectedTag && (
                 <div className="flex items-center space-x-1 px-2 py-0.5 text-xs bg-cyan/10 border border-cyan/30 text-cyan rounded-md shrink-0">
@@ -565,7 +589,7 @@ export const Community: React.FC<CommunityProps> = () => {
             </div>
             <div className="px-3 py-2 border-t border-line/50">
               <textarea 
-                placeholder={`Ask the community in #${activeChannel?.name}...`}
+                placeholder={`Ask the community in ${activeChannelName}...`}
                 value={newThreadBody}
                 onChange={(e) => setNewThreadBody(e.target.value)}
                 rows={2}
@@ -620,7 +644,10 @@ export const Community: React.FC<CommunityProps> = () => {
                 <ArrowLeft size={20} />
               </button>
               <span className="font-bold text-text">Thread</span>
-              <span className="text-xs font-normal text-muted bg-line px-2 py-0.5 rounded">#{activeChannel?.name}</span>
+              <span className="text-xs font-normal text-muted bg-line px-2 py-0.5 rounded flex items-center gap-1">
+                {activeChannel && getChannelIcon(activeChannel, 'w-3 h-3')}
+                {activeChannelName}
+              </span>
             </div>
             <button className="hidden lg:block p-2 text-muted hover:text-text rounded-lg hover:bg-line transition-colors" onClick={() => setActiveThreadId(null)}>
               <PanelRightClose size={20} />
