@@ -732,17 +732,13 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                               }`}
                               title={locked ? (les.unlockCondition || 'Complete previous lesson to unlock') : undefined}
                             >
-                              {/* Lesson type icon — small square badge */}
+                              {/* Lesson type icon — small square badge (completed = cyan variant of the type icon) */}
                               <div className={`w-7 h-7 rounded-lg border flex items-center justify-center shrink-0 ${
-                                done   ? 'bg-green/10 border-green/20 text-green' :
-                                active ? 'bg-cyan/10 border-cyan/20 text-cyan' :
-                                locked ? 'bg-bg border-line text-muted' :
+                                done   ? 'bg-cyan/10 border-cyan/20 text-cyan' :
+                                active ? 'bg-transparent border-cyan text-cyan' :
                                 'bg-bg border-line text-muted'
                               }`}>
-                                {done
-                                  ? <Check className="w-3.5 h-3.5 stroke-[2.5px]" />
-                                  : getLessonIcon(les.type)
-                                }
+                                {getLessonIcon(les.type)}
                               </div>
 
                               {/* Title + meta */}

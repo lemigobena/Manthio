@@ -98,17 +98,24 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
 
             const isCollapsed = searchQuery ? false : collapsedModules[mod.id];
             
+            // Module state → icon tint: cyan when finished, normal when unlocked, muted when locked
+            const allCompleted = mod.lessons.every(l => l.status === 'completed');
+            const allLocked = mod.lessons.every(l => l.status === 'locked');
+            const moduleIconClass = allCompleted ? 'text-cyan' :
+              allLocked ? 'text-muted/50' : 'text-muted';
+
             if (!isOpen) {
               // Icon strip view
               const hasActiveLesson = mod.lessons.some(l => l.id === currentLesson.id);
-              const allCompleted = mod.lessons.every(l => l.status === 'completed');
 
               return (
                 <div
                   key={mod.id}
-                  className={`w-10 h-10 mx-auto rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors ${
-                    hasActiveLesson ? 'bg-cyan/20 border border-cyan text-cyan' :
-                    allCompleted ? 'bg-green/10 text-green' : 'bg-bg hover:bg-line/50 text-muted'
+                  className={`w-10 h-10 mx-auto rounded-lg flex flex-col items-center justify-center transition-colors ${
+                    hasActiveLesson ? 'bg-cyan/20 border border-cyan text-cyan cursor-pointer' :
+                    allCompleted ? 'bg-cyan/10 text-cyan cursor-pointer' :
+                    allLocked ? 'bg-bg text-muted/50 cursor-not-allowed' :
+                    'bg-bg hover:bg-line/50 text-muted cursor-pointer'
                   }`}
                   title={`Module ${mod.number}: ${mod.title}`}
                   onClick={() => {
@@ -119,9 +126,7 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
                     }
                   }}
                 >
-                  {allCompleted
-                    ? <Check className="w-4 h-4" />
-                    : <CourseIcon hint={`${mod.title} ${course.title}`} className="w-4 h-4" />}
+                  <CourseIcon hint={`${mod.title} ${course.title}`} className="w-4 h-4" />
                   <span className="text-[8px] font-bold mt-0.5">M{mod.number}</span>
                 </div>
               );
@@ -134,8 +139,8 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
                   onClick={() => toggleModule(mod.id)}
                   className="w-full text-left px-3 py-2 text-[11px] font-bold text-text bg-bg/50 hover:bg-line/50 rounded-lg uppercase tracking-wide flex items-center gap-2.5 transition-colors cursor-pointer"
                 >
-                  <span className="w-6 h-6 rounded-md bg-cyan/10 text-cyan flex items-center justify-center shrink-0">
-                    <CourseIcon hint={`${mod.title} ${course.title}`} className="w-3.5 h-3.5" />
+                  <span className={`flex items-center justify-center shrink-0 ${moduleIconClass}`}>
+                    <CourseIcon hint={`${mod.title} ${course.title}`} className="w-4 h-4" />
                   </span>
                   <span className="flex-1">Module {mod.number}</span>
                   {isCollapsed ? <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" /> : <ChevronDown className="w-3.5 h-3.5 text-muted shrink-0" />}
@@ -146,7 +151,7 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
                     <div className="px-3 text-xs font-semibold text-text mb-2 pt-1">
                       {mod.title}
                     </div>
-                    <div className="space-y-0.5">
+                    <div className="divide-y divide-line/40">
                       {filteredLessons.map(les => {
                         const isActive = les.id === currentLesson.id;
                         const isLocked = les.status === 'locked';
@@ -167,7 +172,7 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
                             className={`group w-full text-left pl-2 pr-3 py-2 rounded-lg text-xs flex items-start gap-2.5 transition-all duration-200 ${
                               isActive ? 'bg-cyan/10 text-cyan font-bold shadow-[inset_0_0_0_1px_rgba(0,245,228,0.25)]' :
                               isLocked ? 'text-muted cursor-not-allowed opacity-60' :
-                              'text-text hover:bg-bg/80 hover:translate-x-0.5 cursor-pointer font-medium'
+                              'text-text hover:bg-bg/80 cursor-pointer font-medium'
                             }`}
                           >
                             {/* Lesson-type icon chip */}
