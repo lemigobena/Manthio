@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { COURSES } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronDown, Star, Award, CheckCircle, Clock, Sparkles, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, ChevronRight, Users, ArrowRight, Laptop, PlayCircle, Box, Bookmark, Share2, MessageSquare, Info, Eye, Lock, Play, FileText, Code2, Monitor } from 'lucide-react';
+import { ChevronDown, Star, Award, CheckCircle, Clock, BrainCircuit, Globe, User, BookOpen, HelpCircle, ShieldCheck, Zap, ChevronRight, Users, ArrowRight, Laptop, PlayCircle, Bookmark, Share2, MessageSquare, Info, Eye, Lock, Play, FileText, Code2, Monitor, LayoutGrid, FolderOpen, Route } from 'lucide-react';
 import { useXP } from '../../context/XPContext';
 import { useTrack } from '../track-detail/useTrack';
 import { calculateCourseProgress } from '../../services/progressUtils';
@@ -25,6 +25,17 @@ interface CourseDetailProps {
   onNavigate: (page: string) => void;
   isPublic?: boolean;
 }
+
+// Uniform section header: icon chip + title + optional subtitle — keeps every section identical
+const SectionHeader: React.FC<{ icon: React.ReactNode; title: string; subtitle?: string; tint?: string }> = ({ icon, title, subtitle, tint = 'bg-cyan/10' }) => (
+  <div className="flex items-center gap-3">
+    <div className={`p-2 rounded-xl shrink-0 ${tint}`}>{icon}</div>
+    <div>
+      <h2 className="text-xl font-bold text-text tracking-tight">{title}</h2>
+      {subtitle && <p className="text-xs text-muted font-medium mt-0.5">{subtitle}</p>}
+    </div>
+  </div>
+);
 
 const MOCK_DATES = {
   todayStr: new Date(Date.now()).toLocaleDateString(),
@@ -142,7 +153,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
     <div className="relative -mx-3 md:-mx-[44px] -my-6 bg-bg border-y border-line px-3 md:px-[44px] py-6">
       <div className="space-y-8 pb-32 max-w-[1600px] mx-auto">
         {/* Course Hero Header */}
-      <div className="bg-gradient-to-br from-panel via-panel to-cyan/[0.04] border border-line rounded-2xl p-6 relative overflow-hidden flex flex-col md:flex-row gap-6 items-center shadow-sm">
+      <div className="bg-panel border border-line rounded-2xl p-6 relative overflow-hidden flex flex-col md:flex-row gap-6 items-center shadow-sm">
         <div className="w-full md:w-1/3 h-48 bg-bg rounded-xl overflow-hidden border border-line">
           <img src={displayImageUrl} alt={displayTitle} className="w-full h-full object-cover" />
         </div>
@@ -250,7 +261,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                      `Enrol now for ${course!.availableFormats?.find(f => f.format === selectedFormat)?.price || course!.price}`}
                   </button>
                   <div className="flex items-center space-x-2 bg-bg/50 border border-line px-4 py-3.5 rounded-xl">
-                    <Sparkles className="w-4 h-4 text-orange" />
+                    <BrainCircuit className="w-4 h-4 text-orange" />
                     <span className="text-[10px] text-muted font-bold uppercase">Includes Premium AI Access</span>
                   </div>
                 </div>
@@ -307,110 +318,136 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
       {/* Multi-mode Comparison View - Full Width Original Design */}
       {course?.availableFormats && (
         <div className="bg-panel border border-line rounded-2xl p-6 space-y-6 mt-8">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-text">Choose your learning experience</h2>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <SectionHeader icon={<Zap className="w-5 h-5 text-cyan" />} title="Choose your learning experience" />
             <span className="text-[10px] font-bold text-cyan bg-cyan/10 px-3 py-1 rounded-full uppercase tracking-wider">Multi-Format Available</span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-line/50">
-                  <th className="py-4 text-[10px] font-black uppercase text-muted tracking-widest w-1/3">Feature</th>
+          {(() => {
+            const FEATURE_ROWS = [
+              { key: 'aiTutor', label: 'AI Tutor Allowance', sub: '24/7 personalized support', has: (f: NonNullable<Course['availableFormats']>[number]) => !!f.features.aiTutor },
+              { key: 'peerCohort', label: 'Peer Cohort Access', sub: 'Learn with a community', has: (f: NonNullable<Course['availableFormats']>[number]) => !!f.features.peerCohort },
+              { key: 'inPerson', label: 'In-Person Component', sub: 'Expert-led workshops', has: (f: NonNullable<Course['availableFormats']>[number]) => !!f.features.inPerson },
+              { key: 'certificate', label: 'Certificate Eligibility', sub: 'Verified skill credentials', has: (f: NonNullable<Course['availableFormats']>[number]) => !!f.features.certificate },
+            ];
+            const formatLabel = (fmt: string) => fmt === 'flipped' ? 'Flipped' : fmt === 'cohort' ? 'Cohort' : 'Self-Paced';
+            const selectFormat = (fmt: typeof selectedFormat) => {
+              setSelectedFormat(fmt);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+            const selectButton = (f: NonNullable<Course['availableFormats']>[number]) => (
+              <button
+                onClick={() => selectFormat(f.format)}
+                className={`w-full py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                  selectedFormat === f.format
+                    ? 'bg-cyan text-bg shadow-[0_4px_15px_rgba(45,212,191,0.3)]'
+                    : 'bg-bg border border-line text-text hover:border-cyan/50'
+                }`}
+              >
+                {selectedFormat === f.format ? 'Selected' : 'Select'}
+              </button>
+            );
+
+            return (
+              <>
+                {/* Mobile: stacked format cards */}
+                <div className="md:hidden space-y-3">
                   {course?.availableFormats?.map(f => (
-                    <th key={f.format} className="py-4 px-4 text-center">
-                      <div className={`text-[10px] font-black uppercase tracking-widest mb-1 ${selectedFormat === f.format ? 'text-cyan' : 'text-muted'}`}>
-                        {f.format === 'flipped' ? 'Flipped' : f.format === 'cohort' ? 'Cohort' : 'Self-Paced'}
+                    <div
+                      key={f.format}
+                      className={`rounded-2xl border p-4 space-y-3 transition-colors ${
+                        selectedFormat === f.format ? 'border-cyan/50 bg-cyan/5' : 'border-line bg-bg'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <div className={`text-[10px] font-black uppercase tracking-widest ${selectedFormat === f.format ? 'text-cyan' : 'text-muted'}`}>
+                            {formatLabel(f.format)}
+                          </div>
+                          <div className="text-base font-bold text-text">{f.price}</div>
+                        </div>
+                        {f.bundledSubscription && (
+                          <div className="text-right">
+                            <span className="text-xs font-black text-cyan block">+{f.bundledSubscription.durationMonths}m bundle</span>
+                            <span className="text-[9px] text-muted font-bold uppercase">worth {f.bundledSubscription.valueAmount}</span>
+                          </div>
+                        )}
                       </div>
-                      <div className="text-sm font-bold text-text">{f.price}</div>
-                    </th>
+                      <ul className="space-y-1.5">
+                        {FEATURE_ROWS.map(row => (
+                          <li key={row.key} className={`flex items-center gap-2 text-xs ${row.has(f) ? 'text-text font-medium' : 'text-muted/50 line-through'}`}>
+                            {row.has(f)
+                              ? <CheckCircle className="w-3.5 h-3.5 text-green shrink-0" />
+                              : <span className="w-3.5 text-center shrink-0">—</span>}
+                            {row.label}
+                          </li>
+                        ))}
+                      </ul>
+                      {selectButton(f)}
+                    </div>
                   ))}
-                </tr>
-              </thead>
-              <tbody>
-                    <tr className="border-b border-line/30">
-                      <td className="py-4 pr-4">
-                        <div className="text-xs font-bold text-text">AI Tutor Allowance</div>
-                        <div className="text-[10px] text-muted">24/7 personalized support</div>
-                      </td>
-                      {course?.availableFormats?.map(f => (
-                        <td key={f.format} className="py-4 px-4 text-center">
-                          {f.features.aiTutor ? <CheckCircle className="w-4 h-4 text-green mx-auto" /> : <span className="text-muted opacity-20">—</span>}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr className="border-b border-line/30">
-                      <td className="py-4 pr-4">
-                        <div className="text-xs font-bold text-text">Peer Cohort Access</div>
-                        <div className="text-[10px] text-muted">Learn with a community</div>
-                      </td>
-                      {course?.availableFormats?.map(f => (
-                        <td key={f.format} className="py-4 px-4 text-center">
-                          {f.features.peerCohort ? <CheckCircle className="w-4 h-4 text-green mx-auto" /> : <span className="text-muted opacity-20">—</span>}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr className="border-b border-line/30">
-                      <td className="py-4 pr-4">
-                        <div className="text-xs font-bold text-text">In-Person Component</div>
-                        <div className="text-[10px] text-muted">Expert-led workshops</div>
-                      </td>
-                      {course?.availableFormats?.map(f => (
-                        <td key={f.format} className="py-4 px-4 text-center">
-                          {f.features.inPerson ? <CheckCircle className="w-4 h-4 text-green mx-auto" /> : <span className="text-muted opacity-20">—</span>}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr className="border-b border-line/30">
-                      <td className="py-4 pr-4">
-                        <div className="text-xs font-bold text-text">Certificate Eligibility</div>
-                        <div className="text-[10px] text-muted">Verified skill credentials</div>
-                      </td>
-                      {course?.availableFormats?.map(f => (
-                        <td key={f.format} className="py-4 px-4 text-center">
-                          {f.features.certificate ? <CheckCircle className="w-4 h-4 text-green mx-auto" /> : <span className="text-muted opacity-20">—</span>}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr className="border-b border-line/30">
-                      <td className="py-4 pr-4">
-                        <div className="text-xs font-bold text-text">Platform Access Bundle</div>
-                        <div className="text-[10px] text-muted">Premium subscription included</div>
-                      </td>
-                      {course?.availableFormats?.map(f => (
-                        <td key={f.format} className="py-4 px-4 text-center">
-                          {f.bundledSubscription ? (
-                            <div className="flex flex-col items-center">
-                              <span className="text-xs font-black text-cyan">+{f.bundledSubscription.durationMonths}m</span>
-                              <span className="text-[8px] text-muted font-bold uppercase truncate max-w-[80px]">worth {f.bundledSubscription.valueAmount}</span>
+                </div>
+
+                {/* md+: comparison table */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-line/50">
+                        <th className="py-4 text-[10px] font-black uppercase text-muted tracking-widest w-1/3">Feature</th>
+                        {course?.availableFormats?.map(f => (
+                          <th key={f.format} className="py-4 px-4 text-center">
+                            <div className={`text-[10px] font-black uppercase tracking-widest mb-1 ${selectedFormat === f.format ? 'text-cyan' : 'text-muted'}`}>
+                              {formatLabel(f.format)}
                             </div>
-                          ) : <span className="text-muted opacity-20">—</span>}
-                        </td>
+                            <div className="text-sm font-bold text-text">{f.price}</div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {FEATURE_ROWS.map(row => (
+                        <tr key={row.key} className="border-b border-line/30">
+                          <td className="py-4 pr-4">
+                            <div className="text-xs font-bold text-text">{row.label}</div>
+                            <div className="text-[10px] text-muted">{row.sub}</div>
+                          </td>
+                          {course?.availableFormats?.map(f => (
+                            <td key={f.format} className="py-4 px-4 text-center">
+                              {row.has(f) ? <CheckCircle className="w-4 h-4 text-green mx-auto" /> : <span className="text-muted opacity-20">—</span>}
+                            </td>
+                          ))}
+                        </tr>
                       ))}
-                    </tr>
-                    <tr>
-                      <td className="py-6"></td>
-                      {course?.availableFormats?.map(f => (
-                        <td key={f.format} className="py-6 px-4 text-center">
-                          <button
-                            onClick={() => {
-                              setSelectedFormat(f.format);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }}
-                            className={`w-full py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-                              selectedFormat === f.format
-                                ? 'bg-cyan text-bg shadow-[0_4px_15px_rgba(45,212,191,0.3)]'
-                                : 'bg-bg border border-line text-text hover:border-cyan/50'
-                            }`}
-                          >
-                            {selectedFormat === f.format ? 'Selected' : 'Select'}
-                          </button>
+                      <tr className="border-b border-line/30">
+                        <td className="py-4 pr-4">
+                          <div className="text-xs font-bold text-text">Platform Access Bundle</div>
+                          <div className="text-[10px] text-muted">Premium subscription included</div>
                         </td>
-                      ))}
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+                        {course?.availableFormats?.map(f => (
+                          <td key={f.format} className="py-4 px-4 text-center">
+                            {f.bundledSubscription ? (
+                              <div className="flex flex-col items-center">
+                                <span className="text-xs font-black text-cyan">+{f.bundledSubscription.durationMonths}m</span>
+                                <span className="text-[8px] text-muted font-bold uppercase truncate max-w-[80px]">worth {f.bundledSubscription.valueAmount}</span>
+                              </div>
+                            ) : <span className="text-muted opacity-20">—</span>}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <td className="py-6"></td>
+                        {course?.availableFormats?.map(f => (
+                          <td key={f.format} className="py-6 px-4 text-center">
+                            {selectButton(f)}
+                          </td>
+                        ))}
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            );
+          })()}
             </div>
       )}
 
@@ -423,200 +460,169 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
           {/* Format & Delivery Section */}
           <div className="py-6 border-b border-line">
             {/* Section Header */}
-            <div className="flex items-center gap-3 mb-6">
-              <div className="relative">
-                <div className="absolute inset-0 bg-cyan/20 rounded-xl" />
-                <div className="relative p-2.5 rounded-xl bg-gradient-to-br from-cyan/20 to-cyan/5 border border-cyan/30">
-                  <Box className="w-4 h-4 text-cyan" />
-                </div>
-              </div>
-              <div>
-                <h2 className="text-lg font-black text-text tracking-tight uppercase">Format & Delivery</h2>
-                <p className="text-[10px] text-muted tracking-wider">How this course is structured and delivered</p>
-              </div>
+            <div className="mb-6">
+              <SectionHeader
+                icon={<LayoutGrid className="w-5 h-5 text-cyan" />}
+                title="Format & Delivery"
+                subtitle="How this course is structured and delivered"
+              />
             </div>
 
-            {/* Main delivery card */}
-            <div className="relative rounded-2xl overflow-hidden border border-line bg-panel mb-3">
-              {/* Gradient accent bar */}
-              <div className={`absolute top-0 left-0 right-0 h-[2px] ${
-                (selectedFormat === 'flipped' || course?.format === 'flipped')
-                  ? 'bg-gradient-to-r from-cyan via-cyan/60 to-transparent'
-                  : selectedFormat === 'cohort'
-                  ? 'bg-gradient-to-r from-purple via-purple/60 to-transparent'
-                  : 'bg-gradient-to-r from-cyan via-teal-400/60 to-transparent'
-              }`} />
-
-              <div className="p-5 flex flex-col gap-5">
-                {/* Format badge + title row */}
-                <div className="flex items-center justify-between flex-wrap gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className={`relative p-3 rounded-xl border ${
-                      (selectedFormat === 'flipped' || course?.format === 'flipped')
-                        ? 'bg-cyan/10 border-cyan/30'
-                        : selectedFormat === 'cohort'
-                        ? 'bg-purple/10 border-purple/30'
-                        : 'bg-cyan/10 border-cyan/30'
-                    }`}>
-                      {(selectedFormat === 'flipped' || course?.format === 'flipped')
-                        ? <Globe className="w-5 h-5 text-cyan" />
-                        : selectedFormat === 'cohort'
-                        ? <Clock className="w-5 h-5 text-purple" />
-                        : <Monitor className="w-5 h-5 text-cyan" />
-                      }
-                    </div>
-                    <div>
-                      <span className={`text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full mb-1 inline-block ${
-                        (selectedFormat === 'flipped' || course?.format === 'flipped')
-                          ? 'bg-cyan/10 text-cyan'
-                          : selectedFormat === 'cohort'
-                          ? 'bg-purple/10 text-purple'
-                          : 'bg-cyan/10 text-cyan'
-                      }`}>
-                        {(selectedFormat === 'flipped' || course?.format === 'flipped')
-                          ? 'Flipped Bootcamp'
-                          : selectedFormat === 'cohort'
-                          ? 'Cohort-Based'
-                          : 'Self-Paced'
-                        }
-                      </span>
-                      <p className="text-sm font-bold text-text">
-                        {(selectedFormat === 'flipped' || course?.format === 'flipped')
-                          ? 'In-Person + Self-Study Hybrid'
-                          : selectedFormat === 'cohort'
-                          ? 'Live Expert-Led Journey'
-                          : 'Learn At Your Own Rhythm'
-                        }
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse" />
-                    <span className="text-[9px] text-cyan font-bold uppercase tracking-wider">Active</span>
-                  </div>
-                </div>
-
-                {/* Detail rows */}
+            {/* Bento layout: hero tile w/ delivery flow + detail & stat tiles */}
+            {(() => {
+              const fmtKey = (selectedFormat === 'flipped' || course?.format === 'flipped') ? 'flipped' : selectedFormat === 'cohort' ? 'cohort' : 'self';
+              const themes = {
+                flipped: {
+                  Icon: Globe,
+                  badge: 'Flipped Bootcamp',
+                  headline: 'In-Person + Self-Study Hybrid',
+                  tagline: 'Absorb theory at your own pace, then apply it live in the room.',
+                  accent: 'text-cyan', soft: 'bg-cyan/10', border: 'border-cyan/30', dot: 'bg-cyan', glow: 'bg-cyan/10', hoverBorder: 'hover:border-cyan/40',
+                  flow: [
+                    { title: 'Self-Study', sub: 'Units 1–3 online' },
+                    { title: 'Workshop I', sub: `${todayStr} · Muri/Bern` },
+                    { title: 'Self-Study', sub: 'Units 4–7 online' },
+                    { title: 'Capstone', sub: `${nextWeekStr} · Muri/Bern` },
+                  ],
+                  details: [
+                    { Icon: Globe, title: 'In-Person Sessions', body: <>apigenio Training Centre, Muri/Bern<br /><span className="text-text/80 font-medium">{todayStr} & {nextWeekStr}</span></> },
+                    { Icon: BookOpen, title: 'Self-Study Windows', body: <>Units 1–3 before session 1<br />Units 4–7 before capstone</> },
+                  ],
+                  time: '10.5h self-study + 2 half-day workshops',
+                },
+                cohort: {
+                  Icon: Users,
+                  badge: 'Cohort-Based',
+                  headline: 'Live Expert-Led Journey',
+                  tagline: 'Learn alongside a fixed group with weekly live guidance.',
+                  accent: 'text-purple', soft: 'bg-purple/10', border: 'border-purple/30', dot: 'bg-purple', glow: 'bg-purple/20', hoverBorder: 'hover:border-purple/40',
+                  flow: [
+                    { title: 'Enrol', sub: 'Secure your seat' },
+                    { title: 'Kick-Off', sub: nextTwoWeeksStr },
+                    { title: 'Live Sessions', sub: 'Tuesdays 18:00 CET' },
+                    { title: 'Graduation', sub: 'Certificate & outcomes' },
+                  ],
+                  details: [
+                    { Icon: Clock, title: 'Schedule & Start Date', body: <>Next cohort: <span className="text-text/80 font-medium">{nextTwoWeeksStr}</span><br />Live sessions: Tuesdays 18:00 CET</> },
+                    { Icon: Award, title: 'Past Outcomes', body: <ul className="space-y-0.5"><li>85% promotion within 6 months</li><li>+18% avg. salary increase</li><li>100+ satisfied graduates</li></ul> },
+                  ],
+                  time: '8-week journey · weekly live sessions',
+                },
+                self: {
+                  Icon: Monitor,
+                  badge: 'Self-Paced',
+                  headline: 'Learn At Your Own Rhythm',
+                  tagline: 'Full access from day one — you set the tempo, we keep the lights on.',
+                  accent: 'text-amber-400', soft: 'bg-amber-400/10', border: 'border-amber-400/30', dot: 'bg-amber-400', glow: 'bg-amber-400/20', hoverBorder: 'hover:border-amber-400/40',
+                  flow: [
+                    { title: 'Enrol', sub: 'Instant access' },
+                    { title: 'Learn', sub: 'At your own pace' },
+                    { title: 'Practice', sub: 'Labs, quizzes & projects' },
+                    { title: 'Certify', sub: 'Verified credential' },
+                  ],
+                  details: [
+                    { Icon: Monitor, title: 'Self-Paced Access', body: <>Unrestricted access to all materials with AI Tutor available 24/7</> },
+                    { Icon: BookOpen, title: 'Interactive Content', body: <>Coding environments, quizzes & real-world projects</> },
+                  ],
+                  time: course?.format === 'Multiple formats'
+                    ? 'Self-Paced, Cohort, or Flipped'
+                    : `Recommended: 8–10h/week over ${course?.duration}`,
+                },
+              };
+              const t = themes[fmtKey];
+              return (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {(selectedFormat === 'flipped' || course?.format === 'flipped') ? (
-                    <>
-                      <div className="flex items-start gap-3 p-3 rounded-xl bg-bg border border-line/60">
-                        <div className="p-1.5 rounded-lg bg-cyan/10 border border-cyan/20 shrink-0 mt-0.5">
-                          <Globe className="w-3.5 h-3.5 text-cyan" />
-                        </div>
+                  {/* Hero tile */}
+                  <div className="sm:col-span-2 relative rounded-2xl border border-line bg-panel overflow-hidden">
+                    <div className={`absolute -top-16 -left-16 w-52 h-52 rounded-full ${t.glow} blur-3xl opacity-30 pointer-events-none`} />
+                    <t.Icon className={`absolute -right-6 -bottom-10 w-44 h-44 ${t.accent} opacity-6 pointer-events-none`} strokeWidth={1} />
+                    <div className="relative p-5">
+                      <div className="flex items-start justify-between flex-wrap gap-3">
                         <div>
-                          <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">In-Person Sessions</span>
-                          <p className="text-[11px] text-muted leading-relaxed">
-                            apigenio Training Centre, Muri/Bern<br/>
-                            <span className="text-text/80 font-medium">{todayStr} & {nextWeekStr}</span>
-                          </p>
+                          <span className={`inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.15em] px-2.5 py-1 rounded-full border ${t.border} ${t.soft} ${t.accent}`}>
+                            <t.Icon className="w-3 h-3" />
+                            {t.badge}
+                          </span>
+                          <h3 className="text-xl font-black text-text tracking-tight mt-2.5">{t.headline}</h3>
+                          <p className="text-[12px] text-muted mt-1">{t.tagline}</p>
+                        </div>
+                        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${t.border} ${t.soft}`}>
+                          <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${t.dot}`} />
+                          <span className={`text-[9px] font-bold uppercase tracking-wider ${t.accent}`}>Active</span>
                         </div>
                       </div>
-                      <div className="flex items-start gap-3 p-3 rounded-xl bg-bg border border-line/60">
-                        <div className="p-1.5 rounded-lg bg-cyan/10 border border-cyan/20 shrink-0 mt-0.5">
-                          <BookOpen className="w-3.5 h-3.5 text-cyan" />
-                        </div>
-                        <div>
-                          <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Self-Study Windows</span>
-                          <p className="text-[11px] text-muted leading-relaxed">Units 1–3 before session 1<br/>Units 4–7 before capstone</p>
-                        </div>
-                      </div>
-                    </>
-                  ) : selectedFormat === 'cohort' ? (
-                    <>
-                      <div className="flex items-start gap-3 p-3 rounded-xl bg-bg border border-line/60">
-                        <div className="p-1.5 rounded-lg bg-purple/10 border border-purple/20 shrink-0 mt-0.5">
-                          <Clock className="w-3.5 h-3.5 text-purple" />
-                        </div>
-                        <div>
-                          <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Schedule & Start Date</span>
-                          <p className="text-[11px] text-muted leading-relaxed">
-                            Next cohort: <span className="text-text/80 font-medium">{nextTwoWeeksStr}</span><br/>
-                            Live sessions: Tuesdays 18:00 CET
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3 p-3 rounded-xl bg-bg border border-line/60">
-                        <div className="p-1.5 rounded-lg bg-purple/10 border border-purple/20 shrink-0 mt-0.5">
-                          <Award className="w-3.5 h-3.5 text-purple" />
-                        </div>
-                        <div>
-                          <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Past Outcomes</span>
-                          <ul className="text-[11px] text-muted leading-relaxed space-y-0.5">
-                            <li>85% promotion within 6 months</li>
-                            <li>+18% avg. salary increase</li>
-                            <li>100+ satisfied graduates</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex items-start gap-3 p-3 rounded-xl bg-bg border border-line/60">
-                        <div className="p-1.5 rounded-lg bg-cyan/10 border border-cyan/20 shrink-0 mt-0.5">
-                          <Monitor className="w-3.5 h-3.5 text-cyan" />
-                        </div>
-                        <div>
-                          <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Self-Paced Access</span>
-                          <p className="text-[11px] text-muted leading-relaxed">Unrestricted access to all materials with AI Tutor available 24/7</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3 p-3 rounded-xl bg-bg border border-line/60">
-                        <div className="p-1.5 rounded-lg bg-cyan/10 border border-cyan/20 shrink-0 mt-0.5">
-                          <BookOpen className="w-3.5 h-3.5 text-cyan" />
-                        </div>
-                        <div>
-                          <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">Interactive Content</span>
-                          <p className="text-[11px] text-muted leading-relaxed">Coding environments, quizzes & real-world projects</p>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
 
-            {/* Bottom stat cards row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Time Commitment */}
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-panel border border-line hover:border-cyan/30 transition-colors group">
-                <div className="relative shrink-0">
-                  <div className="absolute inset-0 bg-cyan/15 rounded-lg blur-sm group-hover:blur-md transition-all" />
-                  <div className="relative p-2.5 rounded-lg bg-bg border border-line">
-                    <Clock className="w-4 h-4 text-cyan" />
+                      {/* Delivery flow timeline */}
+                      <div className="mt-5 pt-4 border-t border-line/60">
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted">Delivery Flow</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-3 mt-3">
+                          {t.flow.map((step, i) => (
+                            <div key={i} className="relative flex sm:flex-col items-start gap-3 sm:gap-2.5">
+                              {/* connector — vertical on mobile, horizontal on sm+ */}
+                              {i < t.flow.length - 1 && (
+                                <>
+                                  <div className={`sm:hidden absolute left-[13px] top-8 -bottom-3 w-px ${t.soft}`} />
+                                  <div className={`hidden sm:block absolute top-[13px] left-9 right-1 h-px ${t.soft}`} />
+                                </>
+                              )}
+                              <div className={`relative z-10 shrink-0 w-7 h-7 rounded-full ${t.soft} border ${t.border} flex items-center justify-center text-[10px] font-black ${t.accent}`}>
+                                {i + 1}
+                              </div>
+                              <div className="min-w-0">
+                                <span className="text-[11px] font-bold text-text tracking-widest block">{step.title}</span>
+                                <p className="text-[11px] text-muted leading-snug mt-0.5">{step.sub}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Detail tiles */}
+                  {t.details.map((d, i) => (
+                    <div key={i} className={`rounded-2xl border border-line bg-panel p-4 transition-colors ${t.hoverBorder}`}>
+                      <div className="flex items-start gap-3">
+                        <div className={`p-2 rounded-lg border ${t.border} ${t.soft} shrink-0`}>
+                          <d.Icon className={`w-4 h-4 ${t.accent}`} />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-bold text-text uppercase tracking-widest block mb-1">{d.title}</span>
+                          <div className="text-[11px] text-muted leading-relaxed">{d.body}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Time Commitment */}
+                  <div className="rounded-2xl border border-line bg-panel p-4 hover:border-cyan/30 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-cyan/10 border border-cyan/20 shrink-0">
+                        <Clock className="w-4 h-4 text-cyan" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-black text-text uppercase tracking-widest block mb-0.5">Time Commitment</span>
+                        <p className="text-[11px] text-muted leading-snug">{t.time}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Certificate */}
+                  <div className="rounded-2xl border border-line bg-panel p-4 hover:border-cyan/30 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-cyan/10 border border-cyan/20 shrink-0">
+                        <ShieldCheck className="w-4 h-4 text-cyan" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[10px] font-black text-text uppercase tracking-widest block mb-0.5">Verifiable Certificate</span>
+                        <p className="text-[11px] text-muted leading-snug">Industry-recognized credential upon completion</p>
+                      </div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse shrink-0" />
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <span className="text-[10px] font-black text-text uppercase tracking-widest block mb-0.5">Time Commitment</span>
-                  <p className="text-[11px] text-muted leading-snug">
-                    {selectedFormat === 'flipped'
-                      ? '10.5h self-study + 2 half-day workshops'
-                      : selectedFormat === 'cohort'
-                      ? '8-week journey · weekly live sessions'
-                      : course?.format === 'Multiple formats'
-                      ? 'Self-Paced, Cohort, or Flipped'
-                      : `Recommended: 8–10h/week over ${course?.duration}`}
-                  </p>
-                </div>
-              </div>
-
-              {/* Certificate */}
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-panel border border-line hover:border-cyan/30 transition-colors group">
-                <div className="relative shrink-0">
-                  <div className="absolute inset-0 bg-cyan/15 rounded-lg blur-sm group-hover:blur-md transition-all" />
-                  <div className="relative p-2.5 rounded-lg bg-bg border border-line">
-                    <ShieldCheck className="w-4 h-4 text-cyan" />
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span className="text-[10px] font-black text-text uppercase tracking-widest block mb-0.5">Verifiable Certificate</span>
-                  <p className="text-[11px] text-muted leading-snug">Industry-recognized credential upon completion</p>
-                </div>
-                <div className="shrink-0 flex flex-col items-center gap-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse" />
-                </div>
-              </div>
-            </div>
+              );
+            })()}
           </div>
 
           {/* Preparation & Onboarding Surface (REQ-CHECKOUT-020 & 021) - Flipped only */}
@@ -627,8 +633,8 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
             return (
               <div className="py-6 border-b border-line space-y-4">
                 <div className={`rounded-2xl border p-5 space-y-4 shadow-sm transition-all duration-500 ${enrolled ? 'bg-cyan/5 border-cyan/30' : 'bg-panel border-line'}`}>
-                  <h3 className="text-xs font-black uppercase text-text tracking-wider flex items-center gap-2">
-                    {enrolled ? <Sparkles className="w-4 h-4 text-cyan" /> : <Laptop className="w-4 h-4 text-cyan" />}
+                  <h3 className="font-lg font-black text-text tracking-wider flex items-center gap-2">
+                    {enrolled ? <BrainCircuit className="w-4 h-4 text-cyan" /> : <Laptop className="w-4 h-4 text-cyan" />}
                     {enrolled ? 'Get Ready Path' : 'Pre-Course Preparation'}
                   </h3>
 
@@ -694,12 +700,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
           {/* Preparation & Readiness (REQ-CHECKOUT-020) */}
           {(course && course.preCourseRequirements) && (
             <div className="py-8 border-b border-line space-y-6">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 rounded-xl bg-cyan/10">
-                  <Zap className="w-5 h-5 text-cyan" />
-                </div>
-                <h2 className="text-xl font-bold text-text">Preparation & Readiness</h2>
-              </div>
+              <SectionHeader icon={<Zap className="w-5 h-5 text-cyan" />} title="Preparation & Readiness" />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
                 <div className="space-y-4">
@@ -772,7 +773,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
           {/* Learning Outcomes */}
           {course?.learningOutcomes && (
             <div className="py-6 border-b border-line space-y-4">
-              <h2 className="text-xl font-bold text-text">What you will learn in this course</h2>
+              <SectionHeader icon={<Award className="w-5 h-5 text-cyan" />} title="What you will learn in this course" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {course?.learningOutcomes?.map((outcome, idx) => (
                   <div key={idx} className="flex items-start space-x-2 text-sm text-text leading-relaxed">
@@ -787,12 +788,11 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
           {/* Curriculum Preview */}
           <div className="py-8 border-b border-line space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-bold text-text">Curriculum & Modules</h2>
-                <p className="text-muted text-xs font-medium mt-1">
-                  Foundations of {course?.topic} build block by block.
-                </p>
-              </div>
+              <SectionHeader
+                icon={<FolderOpen className="w-5 h-5 text-cyan" />}
+                title="Curriculum & Modules"
+                subtitle={`Foundations of ${course?.topic} build block by block.`}
+              />
               {course?.modules && course.modules.length > 0 && (
                 <button
                   onClick={() => onNavigate('content-player')}
@@ -871,12 +871,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
           {/* Reviews and Testimonials Section (Moved Up) */}
           <div className="py-8 border-b border-line space-y-8">
             <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 rounded-xl bg-orange/10">
-                  <Star className="w-5 h-5 text-orange fill-orange" />
-                </div>
-                <h2 className="text-xl font-bold text-text tracking-tight">Reviews & Testimonials</h2>
-              </div>
+              <SectionHeader icon={<Star className="w-5 h-5 text-orange fill-orange" />} title="Reviews & Testimonials" tint="bg-orange/10" />
               {!showReviewForm && (
                 <button
                   onClick={() => setShowReviewForm(true)}
@@ -1033,12 +1028,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
 
           {/* FAQ Section */}
           <div className="py-8 space-y-6">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 rounded-xl bg-cyan/10">
-                <HelpCircle className="w-5 h-5 text-cyan" />
-              </div>
-              <h2 className="text-xl font-bold text-text tracking-tight">Frequently Asked Questions</h2>
-            </div>
+            <SectionHeader icon={<HelpCircle className="w-5 h-5 text-cyan" />} title="Frequently Asked Questions" />
 
             <div className="space-y-4">
               {faqs.map((faq, i) => {
@@ -1092,16 +1082,19 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
               </div>
               <div className="flex items-center gap-3">
                 <img src={course?.trainer?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150'} alt={course?.trainer?.name || 'Lead Trainer'} className="w-12 h-12 rounded-full border border-line object-cover shrink-0" />
-                <div className="min-w-0">
-                  <h4 className="font-bold text-text text-sm truncate">{course?.trainer?.name || 'Multiple Trainers'}</h4>
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-bold text-text text-sm leading-snug">{course?.trainer?.name || 'Multiple Trainers'}</h4>
                   <p className="text-muted text-xs truncate">{course?.trainer?.title || 'Industry Experts'}</p>
-                  <p className="text-[10px] text-muted font-semibold mt-0.5">
-                    <span className="text-text font-bold">{hashNum((course?.trainer?.name || 'trainer') + 'f', 4, 42)}.{hashNum(course?.trainer?.name || 'trainer', 0, 9)}k</span> followers
-                  </p>
                 </div>
+              </div>
+              {/* Followers + Follow — social profile stats row */}
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[11px] text-muted font-semibold">
+                  <span className="text-text font-bold">{hashNum((course?.trainer?.name || 'trainer') + 'f', 4, 42)}.{hashNum(course?.trainer?.name || 'trainer', 0, 9)}k</span> followers
+                </p>
                 <button
                   onClick={() => { setFollowOn(v => !v); if (!followOn) addToast('success', `You're now following ${course?.trainer?.name || 'this trainer'}.`); }}
-                  className={`ml-auto shrink-0 text-[10px] font-black uppercase tracking-wider px-3.5 py-2 rounded-lg border transition-all active:scale-95 ${
+                  className={`shrink-0 text-[10px] font-black uppercase tracking-wider px-4 py-1.5 rounded-lg border transition-all active:scale-95 ${
                     followOn ? 'bg-bg border-line text-muted' : 'bg-cyan border-cyan text-bg hover:bg-cyan/90'
                   }`}
                 >
@@ -1242,7 +1235,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
       {/* Related Courses */}
       <div className="space-y-6 pt-8">
         <div className="flex items-center justify-between border-b border-line pb-4">
-          <h2 className="text-2xl font-black text-text tracking-tight uppercase">Similar Learning Paths</h2>
+          <SectionHeader icon={<Route className="w-5 h-5 text-cyan" />} title="Similar Learning Paths" />
           <button className="text-cyan text-xs font-bold hover:underline">View All Courses</button>
         </div>
 
@@ -1290,6 +1283,6 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
 
       </div>
     </div>
-      </div>
+  </div>
   );
 };
