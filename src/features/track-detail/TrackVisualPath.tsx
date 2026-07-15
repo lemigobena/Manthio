@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, Lock, Clock, User, Zap, Layers, Eye } from 'lucide-react';
+import { CheckCircle, Lock, Clock, User, Zap, Layers, Eye, Star, BookOpen, BarChart3 } from 'lucide-react';
 import { COURSES } from '../../services/mockData';
 import type { Course, SelfAssessmentLevel } from '../../types';
 import { calculateCourseProgress } from '../../services/progressUtils';
@@ -209,6 +209,8 @@ const CourseCard: React.FC<{
 
   // Calculate dynamic progress
   const progress = calculateCourseProgress(course, completedLessonIds);
+  const moduleCount = course.modules?.length ?? 0;
+  const lessonCount = course.modules?.reduce((sum, m) => sum + (m.lessons?.length ?? 0), 0) ?? 0;
 
   return (
     <div className={`w-full ${fullWidth ? 'max-w-3xl' : 'max-w-[520px]'} mx-auto relative z-10 isolate bg-panel rounded-2xl transition-all duration-300 shadow-md`}>
@@ -220,7 +222,7 @@ const CourseCard: React.FC<{
             </div>
           </div>
         )}
-        <div className="flex h-40">
+        <div className={`flex ${fullWidth ? 'min-h-40' : 'h-40'}`}>
         {/* Thumbnail (Fixed Width) */}
         <div className="relative hidden min-[450px]:block w-28 min-[530px]:w-40 shrink-0 overflow-hidden bg-bg border-r border-line/50 transition-all duration-300">
           <img 
@@ -241,7 +243,7 @@ const CourseCard: React.FC<{
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-3 flex flex-col justify-between min-w-0">
+        <div className="flex-1 p-3 flex flex-col justify-between gap-2 min-w-0">
           <div className="space-y-1">
             <div className={`flex items-start justify-between gap-2 ${isOptional ? 'pr-7' : ''}`}>
               <h4 className="text-[12px] font-black leading-tight text-text group-hover:text-cyan transition-colors line-clamp-2">{course.title}</h4>
@@ -250,8 +252,22 @@ const CourseCard: React.FC<{
             <div className="flex items-center gap-3 text-[9px] text-muted font-bold">
               <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {course.duration}</span>
               <span className="flex items-center gap-1 truncate"><User className="w-3 h-3" /> {course.trainer.name.split(' ')[0]}</span>
+              {fullWidth && course.rating && (
+                <span className="flex items-center gap-1 text-amber-400"><Star className="w-3 h-3 fill-current" /> {course.rating.toFixed(1)}</span>
+              )}
             </div>
-            <p className="text-[10px] text-text/80 line-clamp-2 mt-1.5 leading-tight">{course.description}</p>
+            {fullWidth && (
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[9px] text-muted font-bold pt-0.5">
+                <span className="flex items-center gap-1"><BarChart3 className="w-3 h-3" /> {course.level}</span>
+                {moduleCount > 0 && (
+                  <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> {moduleCount} mod · {lessonCount} lessons</span>
+                )}
+                {course.xpReward > 0 && (
+                  <span className="flex items-center gap-1 text-cyan"><Zap className="w-3 h-3 fill-current" /> {course.xpReward} XP</span>
+                )}
+              </div>
+            )}
+            <p className={`text-[10px] text-text/80 mt-1.5 leading-tight ${fullWidth ? 'line-clamp-3' : 'line-clamp-2'}`}>{course.description}</p>
           </div>
           
           <div className="flex flex-col gap-1.5">
