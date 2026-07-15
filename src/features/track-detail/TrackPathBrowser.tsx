@@ -91,8 +91,7 @@ export const TrackPathBrowser: React.FC<TrackPathBrowserProps> = ({
   }, [milestones, selfAssessmentLevel]);
 
   const enriched = useMemo(() => {
-    let currentAssigned = false;
-    return filteredMilestones.map((ms, idx) => {
+    const base = filteredMilestones.map((ms, idx) => {
       const isCompleted = completedMilestoneIds.includes(ms.id);
       const isPrevDoneOrSkippable = idx === 0 || (() => {
         const prev = filteredMilestones[idx - 1];
@@ -100,18 +99,17 @@ export const TrackPathBrowser: React.FC<TrackPathBrowserProps> = ({
         const prevSkip = isEnrolled && (SKIPPABLE[selfAssessmentLevel as keyof typeof SKIPPABLE]?.includes(prev.courseId) || false);
         return prevDone || prevSkip;
       })();
-      // Only the first unlocked, uncompleted milestone is 'current' (where the user
-      // should resume) — any further unlocked ones are 'available'.
-      let state: MilestoneState;
-      if (isCompleted) {
-        state = 'completed';
-      } else if (isPrevDoneOrSkippable) {
-        state = currentAssigned ? 'available' : 'current';
-        currentAssigned = true;
-      } else {
-        state = 'locked';
-      }
-      return { ms, state };
+      return { ms, isCompleted, isUnlocked: isPrevDoneOrSkippable };
+    });
+    // Only the first unlocked, uncompleted milestone is 'current' (where the user
+    // should resume) — any further unlocked ones are 'available'.
+    const currentIdx = base.findIndex(b => !b.isCompleted && b.isUnlocked);
+    return base.map((b, idx) => {
+      const state: MilestoneState = b.isCompleted ? 'completed'
+        : !b.isUnlocked ? 'locked'
+        : idx === currentIdx ? 'current'
+        : 'available';
+      return { ms: b.ms, state };
     });
   }, [filteredMilestones, completedMilestoneIds, isEnrolled, selfAssessmentLevel]);
 
@@ -130,7 +128,9 @@ export const TrackPathBrowser: React.FC<TrackPathBrowserProps> = ({
 
   const orderedIds = useMemo(() => enriched.map(e => e.ms.id), [enriched]);
   const orderedIdsRef = React.useRef(orderedIds);
-  orderedIdsRef.current = orderedIds;
+  useEffect(() => {
+    orderedIdsRef.current = orderedIds;
+  }, [orderedIds]);
 
   // Scroll-driven selection never jumps: it walks one course per frame toward the
   // course under the reading line, so a fast fling still selects every course in
@@ -143,7 +143,7 @@ export const TrackPathBrowser: React.FC<TrackPathBrowserProps> = ({
     selectedIdRef.current = selectedId;
   }, [selectedId]);
 
-  const stepTowardTarget = React.useCallback(() => {
+  const stepTowardTarget = React.useCallback(function step() {
     stepRafRef.current = null;
     const ids = orderedIdsRef.current;
     const target = targetIdxRef.current;
@@ -157,7 +157,7 @@ export const TrackPathBrowser: React.FC<TrackPathBrowserProps> = ({
     selectedIdRef.current = ids[nextIdx];
     setSelectedId(ids[nextIdx]);
     if (nextIdx !== target) {
-      stepRafRef.current = requestAnimationFrame(stepTowardTarget);
+      stepRafRef.current = requestAnimationFrame(step);
     }
   }, []);
 
@@ -198,11 +198,11 @@ export const TrackPathBrowser: React.FC<TrackPathBrowserProps> = ({
     }
   }, [stepTowardTarget]);
 
-  useEffect(() => {
-    if (!selectedId || !enriched.some(e => e.ms.id === selectedId)) {
-      setSelectedId(defaultId);
-    }
-  }, [defaultId, enriched, selectedId]);
+  // Reset a stale selection (e.g. the milestone was filtered out) during render,
+  // so the corrected value is used on this very pass instead of one render later.
+  if (selectedId !== defaultId && (!selectedId || !enriched.some(e => e.ms.id === selectedId))) {
+    setSelectedId(defaultId);
+  }
 
   // Measure the list overflow (desktop only — mobile scrolls the list natively).
   useEffect(() => {

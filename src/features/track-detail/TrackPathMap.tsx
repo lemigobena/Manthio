@@ -86,8 +86,7 @@ export const TrackPathMap: React.FC<TrackPathMapProps> = ({
   }, [milestones, selfAssessmentLevel]);
 
   const enriched = useMemo(() => {
-    let currentAssigned = false;
-    return filteredMilestones.map((ms, idx) => {
+    const base = filteredMilestones.map((ms, idx) => {
       const isCompleted = completedMilestoneIds.includes(ms.id);
       const isPrevDoneOrSkippable = idx === 0 || (() => {
         const prev = filteredMilestones[idx - 1];
@@ -95,19 +94,19 @@ export const TrackPathMap: React.FC<TrackPathMapProps> = ({
         const prevSkip = isEnrolled && (SKIPPABLE[selfAssessmentLevel as keyof typeof SKIPPABLE]?.includes(prev.courseId) || false);
         return prevDone || prevSkip;
       })();
-      let state: MilestoneState;
-      if (isCompleted) {
-        state = 'completed';
-      } else if (isPrevDoneOrSkippable) {
-        state = currentAssigned ? 'available' : 'current';
-        currentAssigned = true;
-      } else {
-        state = 'locked';
-      }
+      return { ms, isCompleted, isUnlocked: isPrevDoneOrSkippable };
+    });
+    // Only the first unlocked, uncompleted milestone is 'current' — the rest are 'available'.
+    const currentIdx = base.findIndex(b => !b.isCompleted && b.isUnlocked);
+    return base.map((b, idx) => {
+      const state: MilestoneState = b.isCompleted ? 'completed'
+        : !b.isUnlocked ? 'locked'
+        : idx === currentIdx ? 'current'
+        : 'available';
       // Node position on the winding path
       const x = X_PATTERN[idx % X_PATTERN.length];
       const y = TOP_PAD + idx * SEGMENT_H;
-      return { ms, state, x, y };
+      return { ms: b.ms, state, x, y };
     });
   }, [filteredMilestones, completedMilestoneIds, isEnrolled, selfAssessmentLevel]);
 
