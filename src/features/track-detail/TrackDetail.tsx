@@ -9,6 +9,8 @@ import { useTrack } from './useTrack';
 import { RingProgress } from '../dashboard/Dashboard';
 import { SelfAssessmentStrip } from './SelfAssessmentStrip';
 import { TrackPathBrowser } from './TrackPathBrowser';
+import { TrackVisualPath } from './TrackVisualPath';
+import { TrackPathMap } from './TrackPathMap';
 import { TrackCompletionModal } from './TrackCompletionModal';
 import { useNotifications } from '../../context/NotificationContext';
 import { calculateTrackProgress } from '../../services/progressUtils';
@@ -95,6 +97,21 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
   const [showEnrollConfirm, setShowEnrollConfirm] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
+  // Learning path per viewport: phones (<768px) keep the original vertical path,
+  // tablets and small desktops (768–1279px) get the game-style course map, and
+  // large desktops (≥1280px) get the pinned roadmap browser.
+  const getViewport = () =>
+    window.matchMedia('(max-width: 767px)').matches ? 'phone'
+    : window.matchMedia('(max-width: 1279px)').matches ? 'tablet'
+    : 'desktop';
+  const [viewport, setViewport] = useState<'phone' | 'tablet' | 'desktop'>(getViewport);
+
+  useEffect(() => {
+    const queries = ['(max-width: 767px)', '(max-width: 1279px)'].map(q => window.matchMedia(q));
+    const onChange = () => setViewport(getViewport());
+    queries.forEach(mq => mq.addEventListener('change', onChange));
+    return () => queries.forEach(mq => mq.removeEventListener('change', onChange));
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setIsPageLoading(false), 600);
@@ -523,14 +540,34 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          <TrackPathBrowser
-            milestones={mappedMilestones}
-            completedMilestoneIds={completedMilestoneIds}
-            selfAssessmentLevel={selfLevel}
-            isEnrolled={displayAsEnrolled}
-            completedLessonIds={completedLessonIds}
-            onNavigateToCourse={(id, target) => handleNavigateToCourse(id, target)}
-          />
+          {viewport === 'phone' ? (
+            <TrackVisualPath
+              milestones={mappedMilestones}
+              completedMilestoneIds={completedMilestoneIds}
+              selfAssessmentLevel={selfLevel}
+              isEnrolled={displayAsEnrolled}
+              completedLessonIds={completedLessonIds}
+              onNavigateToCourse={(id, target) => handleNavigateToCourse(id, target)}
+            />
+          ) : viewport === 'tablet' ? (
+            <TrackPathMap
+              milestones={mappedMilestones}
+              completedMilestoneIds={completedMilestoneIds}
+              selfAssessmentLevel={selfLevel}
+              isEnrolled={displayAsEnrolled}
+              onNavigateToCourse={(id, target) => handleNavigateToCourse(id, target)}
+            />
+          ) : (
+            <TrackPathBrowser
+              trackTitle={track.title}
+              milestones={mappedMilestones}
+              completedMilestoneIds={completedMilestoneIds}
+              selfAssessmentLevel={selfLevel}
+              isEnrolled={displayAsEnrolled}
+              completedLessonIds={completedLessonIds}
+              onNavigateToCourse={(id, target) => handleNavigateToCourse(id, target)}
+            />
+          )}
         </div>
 
         {/* ── Sibling Tracks ── */}
@@ -545,7 +582,7 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
                 View all <ArrowRight className="w-3.5 h-3.5 shrink-0" />
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {TRACKS.filter(t => t.id !== track.id).slice(0, 3).map(sibling => (
                 <button
                   key={sibling.id}
@@ -554,18 +591,53 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
                     // Already on track-detail, just reload
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className="group flex flex-col min-h-[260px] bg-panel border border-line rounded-2xl overflow-hidden hover:border-cyan/40 transition-all text-left hover:shadow-xl hover:translate-y-[-2px] duration-300"
+                  className="group relative flex flex-col min-h-[300px] bg-panel border border-line rounded-3xl overflow-hidden text-left transition-all duration-300 hover:border-cyan/50 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.25)] hover:-translate-y-1"
                 >
-                  <div className="h-36 w-full shrink-0 overflow-hidden relative">
-                    <img src={sibling.imageUrl} alt={sibling.title} className="w-full h-full object-cover opacity-100 group-hover:scale-105 transition-all duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-panel via-transparent to-transparent opacity-80" />
+                  {/* Cover image with scrim + floating badges */}
+                  <div className="h-44 w-full shrink-0 overflow-hidden relative">
+                    <img
+                      src={sibling.imageUrl}
+                      alt={sibling.title}
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                      style={{
+                        // Dissolve the image itself into the card panel: fully opaque
+                        // until ~60% down, then a smooth fade to nothing at the bottom.
+                        maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)',
+                        WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)',
+                      }}
+                    />
+
+                    <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-bg/70 backdrop-blur-md border border-line/50 text-[9px] font-black uppercase tracking-widest text-text">
+                      <TrendingUp className="w-3 h-3 text-cyan" />
+                      {sibling.level}
+                    </span>
+
+                    <span className="absolute bottom-3 right-3 flex items-center justify-center w-8 h-8 rounded-full bg-cyan text-bg shadow-lg opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
                   </div>
-                  <div className="p-4 flex-1 flex flex-col space-y-2">
-                    <h4 className="font-black text-sm text-text group-hover:text-cyan transition-colors line-clamp-2">{sibling.title}</h4>
-                    <p className="text-[11px] text-muted line-clamp-3 leading-relaxed flex-1">{sibling.outcomeStatement}</p>
-                    <div className="flex items-center gap-3 text-[10px] text-muted font-bold pt-2 mt-auto border-t border-line/50">
+
+                  <div className="p-5 flex-1 flex flex-col gap-2.5">
+                    <h4 className="font-black text-sm text-text group-hover:text-cyan transition-colors line-clamp-2 leading-snug">
+                      {sibling.title}
+                    </h4>
+                    <p className="text-[11px] text-muted line-clamp-2 leading-relaxed flex-1">
+                      {sibling.outcomeStatement}
+                    </p>
+
+                    {sibling.tags && sibling.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {sibling.tags.slice(0, 3).map(tag => (
+                          <span key={tag} className="px-2 py-0.5 rounded-full bg-panel2 border border-line/60 text-[9px] font-bold text-muted">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-4 text-[10px] text-muted font-bold pt-3 mt-auto border-t border-line/50">
                       <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-cyan" />{sibling.estimatedTime}</span>
-                      <span className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5 text-cyan" />{sibling.level}</span>
+                      <span className="flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5 text-cyan" />{sibling.coursesCount} courses</span>
                     </div>
                   </div>
                 </button>
