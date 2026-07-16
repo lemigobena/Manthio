@@ -41,6 +41,7 @@ interface FeedComment {
   avatar: string;
   text: string;
   time: string;
+  rating?: number;
 }
 
 // Course or track — anything the social rail (like/comment/save/share) can target.
@@ -72,6 +73,7 @@ const getSeededComments = (subject: FeedSubject): FeedComment[] => {
     avatar: LEARNER_AVATARS[(offset + i) % LEARNER_AVATARS.length],
     text: SEED_TEXTS[(offset + i) % SEED_TEXTS.length],
     time: `${hashNum(subject.id + i, 1, 6)}d`,
+    rating: hashNum(subject.id + '-stars' + i, 4, 5),
   }));
 };
 
@@ -104,7 +106,7 @@ interface CatalogFeedProps {
 
 export const CatalogFeed: React.FC<CatalogFeedProps> = ({ onNavigate }) => {
   const { user, setActiveCourseId, setActiveTrackId } = useAuth();
-  const { addToast } = useXP();
+  const { addToast, addXp } = useXP();
   const { resolvedTheme } = useTheme();
 
   // Resolve each track's courses from its milestones (deduped, unknown ids skipped)
@@ -163,6 +165,7 @@ export const CatalogFeed: React.FC<CatalogFeedProps> = ({ onNavigate }) => {
   const [commentsFor, setCommentsFor] = useState<FeedSubject | null>(null);
   const [userComments, setUserComments] = useState<FeedComment[]>([]);
   const [commentDraft, setCommentDraft] = useState('');
+  const [reviewRating, setReviewRating] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
 
   const toggleLike = (courseId: string) => {
@@ -186,22 +189,30 @@ export const CatalogFeed: React.FC<CatalogFeedProps> = ({ onNavigate }) => {
   const openComments = (subject: FeedSubject) => {
     setUserComments(readJson<FeedComment[]>(commentsKey(subject.id), []));
     setCommentDraft('');
+    setReviewRating(0);
     setCommentsFor(subject);
   };
 
   const postComment = () => {
     if (!commentsFor || !commentDraft.trim()) return;
+    if (reviewRating === 0) {
+      addToast('error', 'Please tap a star rating before posting.');
+      return;
+    }
     const comment: FeedComment = {
       id: `user-${Date.now()}`,
       author: user?.name || 'You',
       avatar: user?.avatar || LEARNER_AVATARS[0],
       text: commentDraft.trim(),
       time: 'now',
+      rating: reviewRating,
     };
     const next = [comment, ...userComments];
     setUserComments(next);
     localStorage.setItem(commentsKey(commentsFor.id), JSON.stringify(next));
     setCommentDraft('');
+    setReviewRating(0);
+    addXp(75, 'Shared a testimonial');
   };
 
   const shareSubject = async (subject: FeedSubject, kind: 'course' | 'track') => {
@@ -586,49 +597,113 @@ export const CatalogFeed: React.FC<CatalogFeedProps> = ({ onNavigate }) => {
             </div>
 
             <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 min-h-[180px]">
-              {[...userComments, ...getSeededComments(commentsFor)].map(comment => (
-                <div key={comment.id} className="flex items-start gap-3">
-                  <img
-                    src={comment.avatar}
-                    alt={comment.author}
-                    className="w-8 h-8 rounded-full border border-line object-cover shrink-0"
-                  />
-                  <div className="min-w-0">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-[11px] font-bold text-text">{comment.author}</span>
-                      <span className="text-[9px] text-muted">{comment.time}</span>
+              {(() => {
+                const all = [...userComments, ...getSeededComments(commentsFor)];
+                const avg = all.length
+                  ? all.reduce((sum, c) => sum + (c.rating ?? 5), 0) / all.length
+                  : 0;
+                return (
+                  <>
+                    {/* Rating summary */}
+                    <div className="flex items-center gap-4 pb-4 border-b border-line">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-3xl font-black text-text">{avg.toFixed(1)}</span>
+                        <span className="text-muted font-bold text-[10px]">/ 5</span>
+                      </div>
+                      <div>
+                        <div className="flex text-orange">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className={`w-3.5 h-3.5 ${i < Math.round(avg) ? 'fill-orange' : 'opacity-20'}`} />
+                          ))}
+                        </div>
+                        <p className="text-[10px] text-muted font-medium mt-1">
+                          Based on {all.length} testimonial{all.length === 1 ? '' : 's'}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-xs text-text/80 leading-relaxed break-words">{comment.text}</p>
-                  </div>
-                </div>
-              ))}
+
+                    {all.map(comment => {
+                      const isMine = comment.id.startsWith('user-');
+                      return (
+                        <div key={comment.id} className={`flex items-start gap-3 ${isMine ? 'bg-cyan/[0.06] -mx-2 px-2 py-2 rounded-xl' : ''}`}>
+                          <img
+                            src={comment.avatar}
+                            alt={comment.author}
+                            className="w-8 h-8 rounded-full border border-line object-cover shrink-0"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-baseline gap-2 min-w-0">
+                                <span className="text-[11px] font-bold text-text truncate">{comment.author}</span>
+                                {isMine && (
+                                  <span className="text-[8px] bg-cyan/15 text-cyan px-1.5 py-0.5 rounded font-black tracking-wider shrink-0">Yours</span>
+                                )}
+                                <span className="text-[9px] text-muted shrink-0">{comment.time}</span>
+                              </div>
+                              <div className="flex shrink-0">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star key={i} className={`w-2.5 h-2.5 ${i < (comment.rating ?? 5) ? 'text-cyan fill-cyan' : 'text-line'}`} />
+                                ))}
+                              </div>
+                            </div>
+                            <p className="text-xs text-text/80 leading-relaxed break-words mt-0.5">"{comment.text}"</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </>
+                );
+              })()}
             </div>
 
-            {/* Composer */}
-            <div className="flex items-center gap-2 px-4 py-3 border-t border-line shrink-0 pb-[max(12px,env(safe-area-inset-bottom))]">
-              <img
-                src={user?.avatar || LEARNER_AVATARS[0]}
-                alt=""
-                className="w-8 h-8 rounded-full border border-line object-cover shrink-0"
-              />
-              <input
-                type="text"
-                value={commentDraft}
-                onChange={e => setCommentDraft(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') postComment(); }}
-                placeholder="Add a comment..."
-                className="flex-1 bg-bg border border-line rounded-full px-4 py-2 text-xs text-text focus:border-cyan focus:outline-none transition-colors"
-              />
-              <button
-                onClick={postComment}
-                disabled={!commentDraft.trim()}
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all shrink-0 ${commentDraft.trim()
-                    ? 'bg-cyan text-bg hover:opacity-90 active:scale-90 cursor-pointer'
-                    : 'bg-line text-muted cursor-not-allowed'
-                  }`}
-              >
-                <Send className="w-4 h-4" />
-              </button>
+            {/* Composer: star rating + testimonial text */}
+            <div className="px-4 py-3 border-t border-line shrink-0 space-y-2.5 pb-[max(12px,env(safe-area-inset-bottom))]">
+              <div className="flex items-center gap-2.5">
+                <span className="text-[10px] font-bold text-muted uppercase tracking-wider">Your rating</span>
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewRating(star)}
+                      className="p-0.5 active:scale-90 transition-transform cursor-pointer"
+                      aria-label={`${star} star${star > 1 ? 's' : ''}`}
+                    >
+                      <Star className={`w-5 h-5 transition-colors ${star <= reviewRating ? 'text-orange fill-orange' : 'text-line'}`} />
+                    </button>
+                  ))}
+                </div>
+                <span className="text-[10px] font-bold text-muted">
+                  {reviewRating > 0
+                    ? ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'][reviewRating]
+                    : 'Tap to rate'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <img
+                  src={user?.avatar || LEARNER_AVATARS[0]}
+                  alt=""
+                  className="w-8 h-8 rounded-full border border-line object-cover shrink-0"
+                />
+                <input
+                  type="text"
+                  value={commentDraft}
+                  onChange={e => setCommentDraft(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') postComment(); }}
+                  placeholder="Share your experience..."
+                  className="flex-1 bg-bg rounded-full px-4 py-2 text-xs text-text outline-none !outline-none focus:outline-none focus:ring-0 transition-colors"
+                />
+                <button
+                  onClick={postComment}
+                  disabled={!commentDraft.trim() || reviewRating === 0}
+                  className={`w-9 h-9 rounded-full flex items-center justify-center transition-all shrink-0 ${commentDraft.trim() && reviewRating > 0
+                      ? 'bg-cyan text-bg hover:opacity-90 active:scale-90 cursor-pointer'
+                      : 'bg-line text-muted cursor-not-allowed'
+                    }`}
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
