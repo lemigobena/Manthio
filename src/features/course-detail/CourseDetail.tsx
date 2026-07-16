@@ -179,7 +179,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                   Multi-Mode Available
                 </span>
               ) : (
-                <span className={`text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm ${formatTagClasses[selectedFormat] ?? 'bg-cyan text-bg'}`}>
+                <span className={`text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm ${formatTagClasses[selectedFormat || ''] ?? 'bg-cyan text-bg'}`}>
                   {selectedFormat === 'flipped' ? 'Flipped Bootcamp' :
                    selectedFormat === 'cohort' ? 'Cohort-Based' :
                    'Self-Paced'}
