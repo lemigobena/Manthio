@@ -1130,7 +1130,7 @@ export const COURSES: Course[] = [
         venue: 'apigenio Training Centre, Muri',
         prepModules: ['py-mod-1', 'py-mod-2'],
         lessons: [
-          { id: 'py-les-3-1', title: 'Setup verification, first scripts live', type: 'Article', duration: '15min', status: 'in_progress', required: true, bloomLevel: 'Analyse', completionCriteria: { type: 'scroll', threshold: 0.9 } },
+          { id: 'py-les-3-1', title: 'Confirm your environment is configured correctly, then write and run your very first working scripts', type: 'Article', duration: '15min', status: 'in_progress', required: true, bloomLevel: 'Analyse', completionCriteria: { type: 'scroll', threshold: 0.9 } },
           { id: 'py-les-3-2', title: 'Joint Debugging & Peer Review', type: 'Live Event', duration: '90min', status: 'not_started', required: true, bloomLevel: 'Analyse' }
         ]
       },
@@ -1260,7 +1260,7 @@ export const COURSES: Course[] = [
     topic: 'Python',
     duration: '3 Days',
     language: 'English',
-    tags: ['Advanced', 'Intensive'],
+    tags: ['Intensive'],
     priceStatus: 'employer',
     xpReward: 1200,
     price: 'CHF 1\'800.00',
@@ -2469,7 +2469,7 @@ export const FORUM_CHANNELS: ForumChannel[] = [
       {
         id: 'msg-react-1',
         title: 'useEffect vs useLayoutEffect?',
-        author: 'Alex Chen',
+        author: 'Demo Chen',
         body: 'When exactly should I reach for useLayoutEffect instead of useEffect? The docs say it fires synchronously after all DOM mutations but before browser paint.',
         category: 'Web Development with React',
         moduleName: 'Hooks',
@@ -2478,6 +2478,232 @@ export const FORUM_CHANNELS: ForumChannel[] = [
         hasAcceptedAnswer: false,
         timestamp: '2 hours ago',
         tags: ['hooks', 'useEffect']
+      }
+    ]
+  },
+  {
+    id: 'ch-github-actions-automation',
+    name: 'github-actions-automation',
+    courseId: 'github-actions-automation',
+    description: 'CI/CD pipelines, workflow YAML, runners, and deployment automation.',
+    isJoined: true,
+    messages: [
+      {
+        id: 'msg-gha-1',
+        title: 'Workflow not triggering on pull_request from forks',
+        author: 'Lena Hofmann',
+        body: 'My CI workflow runs fine on pushes to main, but when an external contributor opens a PR from a fork, nothing happens. The `on: pull_request` trigger is set. Is this a permissions thing?',
+        category: 'GitHub Actions & CI/CD Mastery',
+        moduleName: 'Workflows & Events',
+        upvotes: 31,
+        replies: [
+          {
+            id: 'rep-gha-1-1',
+            author: 'Marc Kaufmann',
+            body: 'Fork PRs run with a read-only GITHUB_TOKEN and secrets are not passed by default — this is a security feature. If your workflow needs secrets (e.g. for a deploy preview), use the `pull_request_target` event carefully, or split the pipeline so untrusted code only runs the build/test stage.',
+            timestamp: 'Jun 28, 2026',
+            upvotes: 18,
+            isAcceptedAnswer: true,
+          },
+          {
+            id: 'rep-gha-1-2',
+            author: 'Jonas Weber',
+            body: 'Also check Settings → Actions → "Fork pull request workflows" — your org may require approval for first-time contributors, so the run sits there waiting until a maintainer approves it.',
+            timestamp: 'Jun 28, 2026',
+            upvotes: 9,
+          },
+          {
+            id: 'rep-gha-1-3',
+            author: 'Lena Hofmann',
+            body: 'That was it — the runs were queued waiting for approval. Thanks both!',
+            timestamp: 'Jun 29, 2026',
+            upvotes: 4,
+          }
+        ],
+        hasAcceptedAnswer: true,
+        timestamp: 'Jun 28, 2026',
+        tags: ['workflows', 'security', 'forks']
+      },
+      {
+        id: 'msg-gha-2',
+        title: 'Matrix builds: exclude one combination without listing all?',
+        author: 'Priya Nair',
+        body: 'I have a matrix of 3 OSes × 4 Node versions but need to skip Node 18 on Windows only. Do I really have to enumerate every valid pair manually?',
+        category: 'GitHub Actions & CI/CD Mastery',
+        moduleName: 'Workflows & Events',
+        upvotes: 22,
+        replies: [
+          {
+            id: 'rep-gha-2-1',
+            author: 'Marc Kaufmann',
+            body: 'Use the `exclude` key inside the matrix:\n\n```yaml\nstrategy:\n  matrix:\n    os: [ubuntu-latest, macos-latest, windows-latest]\n    node: [18, 20, 22, 24]\n    exclude:\n      - os: windows-latest\n        node: 18\n```\n\nThere is also `include` for adding one-off combinations with extra variables.',
+            timestamp: 'Jul 02, 2026',
+            upvotes: 15,
+            isAcceptedAnswer: true,
+          },
+          {
+            id: 'rep-gha-2-2',
+            author: 'AI Tutor',
+            body: 'Socratic follow-up: now that you can exclude combinations, what do you think happens to the job count and your billable minutes when a matrix expands? Try computing how many jobs your 3×4 matrix spawns with and without the exclusion.',
+            timestamp: 'Jul 02, 2026',
+            upvotes: 3,
+            isAiSuggested: true
+          }
+        ],
+        hasAcceptedAnswer: true,
+        timestamp: 'Jul 02, 2026',
+        tags: ['matrix', 'yaml']
+      },
+      {
+        id: 'msg-gha-3',
+        title: 'Best practice for sharing secrets across repos?',
+        author: 'Tomás Rivera',
+        body: 'We have ~15 microservice repos that all deploy to the same AWS account. Copying the same AWS_ACCESS_KEY secret into every repo feels wrong. What is the recommended pattern?',
+        category: 'GitHub Actions & CI/CD Mastery',
+        moduleName: 'Workflows & Events',
+        upvotes: 27,
+        replies: [
+          {
+            id: 'rep-gha-3-1',
+            author: 'Dr. Sarah Chen',
+            body: 'Two better options: (1) Organization-level secrets — define once, scope to selected repos. (2) Even better, drop long-lived keys entirely and use OIDC federation: `aws-actions/configure-aws-credentials` can assume an IAM role via GitHub\'s OIDC provider, so there is no static secret to leak or rotate.',
+            timestamp: 'Jul 08, 2026',
+            upvotes: 21,
+            isAcceptedAnswer: true,
+          },
+          {
+            id: 'rep-gha-3-2',
+            author: 'Tomás Rivera',
+            body: 'Migrated to OIDC over the weekend — worked flawlessly and security team is happy. Highly recommend the lesson on environment protection rules for the role-trust setup.',
+            timestamp: 'Jul 10, 2026',
+            upvotes: 8,
+          }
+        ],
+        hasAcceptedAnswer: true,
+        timestamp: 'Jul 08, 2026',
+        tags: ['secrets', 'oidc', 'aws']
+      },
+      {
+        id: 'msg-gha-own-1',
+        title: 'My deploy job runs even when tests fail — what am I missing?',
+        author: 'Demo Chen',
+        body: 'I have `test` and `deploy` as separate jobs in one workflow, but yesterday a broken build still went out to staging. I thought jobs ran in order? Here is the relevant part of my YAML:\n\n```yaml\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps: [...]\n  deploy:\n    runs-on: ubuntu-latest\n    steps: [...]\n```',
+        category: 'GitHub Actions & CI/CD Mastery',
+        moduleName: 'Workflows & Events',
+        upvotes: 17,
+        replies: [
+          {
+            id: 'rep-gha-own-1-1',
+            author: 'Marc Kaufmann',
+            body: 'Jobs run in **parallel** by default — order in the file means nothing. You need an explicit dependency:\n\n```yaml\n  deploy:\n    needs: test\n    runs-on: ubuntu-latest\n```\n\nWith `needs: test`, the deploy job is skipped automatically if the test job fails.',
+            timestamp: 'Jul 11, 2026',
+            upvotes: 14,
+            isAcceptedAnswer: true,
+          },
+          {
+            id: 'rep-gha-own-1-2',
+            author: 'Lena Hofmann',
+            body: 'Bit me too in week one. Also worth adding an environment protection rule on staging so a human approves deploys until you trust the pipeline.',
+            timestamp: 'Jul 11, 2026',
+            upvotes: 5,
+          }
+        ],
+        hasAcceptedAnswer: true,
+        timestamp: 'Jul 11, 2026',
+        tags: ['jobs', 'needs', 'deployment']
+      },
+      {
+        id: 'msg-gha-4',
+        title: 'Self-hosted runner keeps going offline',
+        author: 'Yuki Tanaka',
+        body: 'Our self-hosted runner on an on-prem VM shows "offline" every few days and jobs pile up in the queue. The runner service is installed with `./svc.sh install`. Any ideas what to check first?',
+        category: 'GitHub Actions & CI/CD Mastery',
+        moduleName: 'Workflows & Events',
+        upvotes: 14,
+        replies: [
+          {
+            id: 'rep-gha-4-1',
+            author: 'Jonas Weber',
+            body: 'Check `journalctl -u actions.runner.*` for OOM kills — the runner agent is memory-hungry when jobs use container actions. Also verify your proxy/firewall isn\'t dropping the long-poll connection to github.com; the runner needs persistent HTTPS outbound.',
+            timestamp: 'Jul 12, 2026',
+            upvotes: 7,
+          },
+          {
+            id: 'rep-gha-4-2',
+            author: 'AI Tutor',
+            body: 'Socratic assistance: a runner appears "offline" when its long-poll session ends without reconnecting. What component in your network path might terminate idle-looking HTTPS connections after a fixed timeout? Checking that device\'s idle-timeout setting is a good next step.',
+            timestamp: 'Jul 12, 2026',
+            upvotes: 2,
+            isAiSuggested: true
+          }
+        ],
+        hasAcceptedAnswer: false,
+        timestamp: 'Jul 12, 2026',
+        tags: ['self-hosted', 'runners', 'debugging']
+      },
+      {
+        id: 'msg-gha-5',
+        title: 'Caching node_modules vs caching ~/.npm — which is faster?',
+        author: 'Fatima Al-Rashid',
+        body: 'The course caches the npm cache directory, but a teammate insists caching node_modules directly is faster. Our install step still takes 2+ minutes. What does everyone do in practice?',
+        category: 'GitHub Actions & CI/CD Mastery',
+        moduleName: 'Workflows & Events',
+        upvotes: 19,
+        replies: [
+          {
+            id: 'rep-gha-5-1',
+            author: 'Marc Kaufmann',
+            body: 'Caching `~/.npm` keyed on the lockfile hash is the safe default — node_modules caching breaks across Node version bumps and postinstall scripts. If you want real speed, look at `npm ci --prefer-offline` plus the setup-node built-in cache, or switch to pnpm which is dramatically faster in CI.',
+            timestamp: 'Yesterday, 09:41',
+            upvotes: 11,
+            isAcceptedAnswer: true,
+          },
+          {
+            id: 'rep-gha-5-2',
+            author: 'Demo Chen',
+            body: 'We moved to pnpm with a store cache — install went from 2m10s to 25s on warm cache. Worth the migration.',
+            timestamp: 'Yesterday, 11:15',
+            upvotes: 6,
+          },
+          {
+            id: 'rep-gha-5-3',
+            author: 'Fatima Al-Rashid',
+            body: 'Tried the setup-node cache option first since it was a one-line change — already down to 40s. Will evaluate pnpm next sprint. Thanks!',
+            timestamp: 'Yesterday, 16:02',
+            upvotes: 3,
+          }
+        ],
+        hasAcceptedAnswer: true,
+        timestamp: 'Yesterday, 09:41',
+        tags: ['caching', 'performance', 'npm']
+      },
+      {
+        id: 'msg-gha-6',
+        title: 'How do you test workflow YAML locally before pushing?',
+        author: 'David Osei',
+        body: 'My commit history is full of "fix ci", "fix ci again", "really fix ci". Is there a way to run workflows locally instead of push-and-pray?',
+        category: 'GitHub Actions & CI/CD Mastery',
+        moduleName: 'Workflows & Events',
+        upvotes: 42,
+        replies: [
+          {
+            id: 'rep-gha-6-1',
+            author: 'Jonas Weber',
+            body: '`act` (nektos/act) runs workflows in local Docker containers and covers ~90% of cases. It won\'t emulate GitHub-hosted runner images perfectly, but for syntax and logic errors it kills the push-and-pray loop entirely.',
+            timestamp: '3 hours ago',
+            upvotes: 12,
+          },
+          {
+            id: 'rep-gha-6-2',
+            author: 'Priya Nair',
+            body: 'Also add `actionlint` as a pre-commit hook — it catches YAML typos, invalid event names, and shellcheck issues in run blocks before they ever reach CI.',
+            timestamp: '2 hours ago',
+            upvotes: 9,
+          }
+        ],
+        hasAcceptedAnswer: false,
+        timestamp: '3 hours ago',
+        tags: ['act', 'local-testing', 'productivity']
       }
     ]
   }

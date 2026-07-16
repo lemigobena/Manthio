@@ -1,5 +1,6 @@
 import { FaPython, FaCode, FaDatabase, FaMobileAlt, FaFigma, FaGithub, FaGitAlt, FaReact, FaLinux, FaDocker, FaJava, FaJs, FaRegFilePdf } from 'react-icons/fa';
-import { Play, FileText, HelpCircle, Code2, Users, MousePointerClick, ClipboardEdit, ExternalLink, type LucideIcon } from 'lucide-react';
+import { SiKubernetes, SiNginx, SiApache } from "react-icons/si";
+import { Play, FileText, HelpCircle, Code2, Users, MousePointerClick, ClipboardEdit, ExternalLink, Zap, Wifi, Layers3, Server, Monitor, type LucideIcon } from 'lucide-react';
 import type { IconType } from 'react-icons';
 import type { LessonType } from '../types';
 
@@ -12,6 +13,10 @@ const ICON_RULES: Array<{ keywords: string[]; Icon: IconType }> = [
   { keywords: ['python'],                              Icon: FaPython },
   { keywords: ['github'],                              Icon: FaGithub },
   { keywords: ['git'],                                 Icon: FaGitAlt },
+  { keywords: ["fastapi"],                             Icon: Zap},
+  { keywords: ["nginx"],                               Icon: SiNginx},
+  { keywords: ["apache"],                              Icon: SiApache},
+  { keywords: ["kubernetes"],                          Icon: SiKubernetes},
   { keywords: ['react'],                               Icon: FaReact },
   { keywords: ['javascript', 'typescript', 'node'],    Icon: FaJs },
   { keywords: ['java'],                                Icon: FaJava },
@@ -21,6 +26,10 @@ const ICON_RULES: Array<{ keywords: string[]; Icon: IconType }> = [
   { keywords: ['mobile', 'app', 'ios', 'android'],     Icon: FaMobileAlt },
   { keywords: ['ui', 'ux', 'design', 'figma'],         Icon: FaFigma },
   { keywords: ['web', 'html', 'css'],                  Icon: FaCode },
+  { keywords: ['network', 'networking'],               Icon: Wifi },
+  { keywords: ["backend"],                             Icon: Server},
+  { keywords: ["monitor", "frontend"],                 Icon: Monitor},
+  { keywords: ["fullstack", "comprehensive"],          Icon: Layers3}
 ];
 
 /** Resolve the icon component for a course/channel from free-text hints

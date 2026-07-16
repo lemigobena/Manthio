@@ -19,6 +19,14 @@
   --green: #2BDE7E;
   --orange: #FF8C42;
   --scrollbar-hover: #243340;
+  /* Accent card surface (Quick Session / bar chart) — muted teal in dark mode */
+  --accent-card: #12877D;
+  --accent-card2: #0F6F67;
+  --accent-card-fg: #FAF6EE;
+  
+  --tag-cohort: #C09EFC;
+  --tag-selfpaced: #FFAE7A;
+  --tag-skill: #6366F1;
   
   --font-display: 'Syne', sans-serif;
   --font-sans: 'DM Sans', sans-serif;
@@ -42,6 +50,14 @@
   --green: #15803D;
   --orange: #C2410C;
   --scrollbar-hover: #9E947A;
+  /* Accent card surface (Quick Session / bar chart) — unchanged from cyan in light mode */
+  --accent-card: #0D7D6E;
+  --accent-card2: #0A5E54;
+  --accent-card-fg: #FAF6EE;
+  
+  --tag-cohort: #5B2AA8;
+  --tag-selfpaced: #B4530E;
+  --tag-skill: #4338CA;
 }
 
 @theme {
@@ -58,6 +74,13 @@
   --color-red: var(--red);
   --color-green: var(--green);
   --color-orange: var(--orange);
+  --color-accent-card: var(--accent-card);
+  --color-accent-card2: var(--accent-card2);
+  --color-accent-card-fg: var(--accent-card-fg);
+  
+  --color-tag-cohort: var(--tag-cohort);
+  --color-tag-selfpaced: var(--tag-selfpaced);
+  --color-tag-skill: var(--tag-skill);
   
   --font-display: var(--font-display);
   --font-sans: var(--font-sans);

@@ -39,6 +39,14 @@ const MOCK_DATES = {
   nextTwoWeeksStr: new Date(Date.now() + 86400000 * 14).toLocaleDateString(),
 };
 
+// Theme-responsive tag colors per course format (static classes for the Tailwind scanner)
+const formatTagClasses: Record<string, string> = {
+  'self-paced': 'bg-tag-selfpaced text-bg',
+  'cohort': 'bg-tag-cohort text-bg',
+  'flipped': 'bg-cyan text-bg',
+  'Multiple formats': 'bg-green text-bg',
+};
+
 export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic }) => {
   const { user, activeCourseId, selectedFormat, setSelectedFormat, setActiveCourseId, setActiveTrackId } = useAuth();
   const { addToast, addXp } = useXP();
@@ -162,20 +170,16 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
 
         <div className="flex-1 space-y-4 text-center md:text-left">
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-            <span className="bg-bg border border-line text-[10px] px-2.5 py-1 rounded font-bold uppercase text-text shadow-sm">
+            <span className="bg-bg text-[10px] px-2.5 py-1 rounded font-bold uppercase text-text shadow-sm">
               {displayLevel}
             </span>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {course?.format === 'Multiple formats' ? (
-                <span className="bg-bg border border-cyan text-cyan text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm">
+                <span className="bg-green text-bg text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm">
                   Multi-Mode Available
                 </span>
               ) : (
-                <span className={`text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm ${
-                  selectedFormat === 'flipped' ? 'bg-cyan text-bg' :
-                  selectedFormat === 'cohort' ? 'bg-purple text-white' :
-                  'bg-amber-500 text-white'
-                }`}>
+                <span className={`text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm ${formatTagClasses[selectedFormat] ?? 'bg-cyan text-bg'}`}>
                   {selectedFormat === 'flipped' ? 'Flipped Bootcamp' :
                    selectedFormat === 'cohort' ? 'Cohort-Based' :
                    'Self-Paced'}
@@ -497,7 +501,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                   badge: 'Cohort-Based',
                   headline: 'Live Expert-Led Journey',
                   tagline: 'Learn alongside a fixed group with weekly live guidance.',
-                  accent: 'text-purple', soft: 'bg-purple/10', border: 'border-purple/30', dot: 'bg-purple', glow: 'bg-purple/20', hoverBorder: 'hover:border-purple/40',
+                  accent: 'text-tag-cohort', soft: 'bg-tag-cohort/10', border: 'border-tag-cohort/30', dot: 'bg-tag-cohort', glow: 'bg-tag-cohort/20', hoverBorder: 'hover:border-tag-cohort/40',
                   flow: [
                     { title: 'Enrol', sub: 'Secure your seat' },
                     { title: 'Kick-Off', sub: nextTwoWeeksStr },
@@ -515,7 +519,7 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
                   badge: 'Self-Paced',
                   headline: 'Learn At Your Own Rhythm',
                   tagline: 'Full access from day one — you set the tempo, we keep the lights on.',
-                  accent: 'text-amber-400', soft: 'bg-amber-400/10', border: 'border-amber-400/30', dot: 'bg-amber-400', glow: 'bg-amber-400/20', hoverBorder: 'hover:border-amber-400/40',
+                  accent: 'text-tag-selfpaced', soft: 'bg-tag-selfpaced/10', border: 'border-tag-selfpaced/30', dot: 'bg-tag-selfpaced', glow: 'bg-tag-selfpaced/20', hoverBorder: 'hover:border-tag-selfpaced/40',
                   flow: [
                     { title: 'Enrol', sub: 'Instant access' },
                     { title: 'Learn', sub: 'At your own pace' },
@@ -1249,11 +1253,11 @@ export const CourseDetail: React.FC<CourseDetailProps> = ({ onNavigate, isPublic
             >
               <div className="h-44 relative bg-bg overflow-hidden border-b border-line">
                 <img src={rc.imageUrl} alt={rc.title} className="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-                  <span className="bg-bg/90 backdrop-blur border border-line text-[9px] px-2 py-0.5 rounded font-bold uppercase text-text">
+                <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2">
+                  <span className="bg-bg/90 backdrop-blur text-[9px] px-2 py-0.5 rounded font-bold uppercase text-text">
                     {rc.level}
                   </span>
-                  <span className="bg-cyan text-bg text-[9px] px-2 py-0.5 rounded font-bold uppercase">
+                  <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase ${formatTagClasses[rc.format] ?? 'bg-cyan text-bg'}`}>
                     {rc.format}
                   </span>
                 </div>

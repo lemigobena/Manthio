@@ -23,9 +23,14 @@ interface FlattenedLesson extends Lesson {
   moduleNumber: number;
 }
 
-// Flatten all lessons across courses (pre-calculated once at module level)
-const allLessons: FlattenedLesson[] = COURSES.flatMap(course => 
-  course.modules.flatMap(module => 
+// Search scope: enrolled courses + courses included in your plan or provided by your employer
+const searchableCourses = COURSES.filter(course =>
+  course.enrolled || course.priceStatus === 'included' || course.priceStatus === 'employer'
+);
+
+// Flatten lessons from enrolled courses only (pre-calculated once at module level)
+const allLessons: FlattenedLesson[] = COURSES.filter(course => course.enrolled).flatMap(course =>
+  course.modules.flatMap(module =>
     module.lessons.map(lesson => ({
       ...lesson,
       courseId: course.id,
@@ -133,7 +138,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
       ignoreLocation: true
     };
 
-    const courseFuse = new Fuse(COURSES, { ...fuseOptions, keys: ['title', 'description', 'level', 'format', 'learningOutcomes'] });
+    const courseFuse = new Fuse(searchableCourses, { ...fuseOptions, keys: ['title', 'description', 'level', 'format', 'learningOutcomes'] });
     const lessonFuse = new Fuse(allLessons, { ...fuseOptions, keys: ['title', 'courseTitle', 'moduleTitle'] });
     const resourceFuse = new Fuse(RESOURCES, { ...fuseOptions, keys: ['name', 'courseName', 'type'] });
     const threadFuse = new Fuse(allMessages, { ...fuseOptions, keys: ['title', 'body', 'category', 'moduleName'] });
