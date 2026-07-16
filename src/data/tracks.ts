@@ -9,7 +9,6 @@ export const TRACKS: CareerTrack[] = [
     "imageUrl": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=800&q=80",
     "level": "Advanced",
     "tags": [
-      "Career Track",
       "Top Rated"
     ],
     "outcomeStatement": "Master Python from base syntax to production-grade services, testing structures, database integrations, and automated pipelines.",
@@ -121,7 +120,6 @@ export const TRACKS: CareerTrack[] = [
     "imageUrl": "https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?auto=format&fit=crop&w=800&q=80",
     "level": "Intermediate",
     "tags": [
-      "Career Track",
       "New"
     ],
     "outcomeStatement": "Design and operate cloud-native infrastructure pipelines using Docker, Kubernetes, Terraform, and GitHub Actions on AWS or Azure.",
@@ -277,7 +275,6 @@ export const TRACKS: CareerTrack[] = [
     "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
     "level": "Intermediate",
     "tags": [
-      "Career Track",
       "Intensive"
     ],
     "outcomeStatement": "Design ETL pipelines, model relational data warehouses, and deliver analytics-ready datasets using Python, SQL, dbt, and Apache Airflow.",
@@ -355,7 +352,6 @@ export const TRACKS: CareerTrack[] = [
     "imageUrl": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
     "level": "Foundation",
     "tags": [
-      "Career Track",
       "Beginner Friendly"
     ],
     "outcomeStatement": "Learn basic programming concepts, write logic, and build simple applications from scratch.",
@@ -411,7 +407,6 @@ export const TRACKS: CareerTrack[] = [
     "imageUrl": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80",
     "level": "Foundation",
     "tags": [
-      "Career Track",
       "Popular"
     ],
     "outcomeStatement": "Build responsive websites and understand the core technologies of the web.",
@@ -467,7 +462,6 @@ export const TRACKS: CareerTrack[] = [
     "imageUrl": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
     "level": "Foundation",
     "tags": [
-      "Career Track",
       "Data"
     ],
     "outcomeStatement": "Analyze datasets, create visualizations, and derive insights using basic tools.",
@@ -523,7 +517,6 @@ export const TRACKS: CareerTrack[] = [
     "imageUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
     "level": "Intermediate",
     "tags": [
-      "Career Track",
       "In Demand"
     ],
     "outcomeStatement": "Develop scalable frontends with React and robust backends with Node.js and Express.",
@@ -590,7 +583,6 @@ export const TRACKS: CareerTrack[] = [
     "imageUrl": "https://images.unsplash.com/photo-1527474305487-b87b222841cc?auto=format&fit=crop&w=800&q=80",
     "level": "Advanced",
     "tags": [
-      "Career Track",
       "AI"
     ],
     "outcomeStatement": "Design neural networks, optimize models, and deploy AI services to production environments.",
@@ -657,7 +649,6 @@ export const TRACKS: CareerTrack[] = [
     "imageUrl": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
     "level": "Advanced",
     "tags": [
-      "Career Track",
       "Leadership"
     ],
     "outcomeStatement": "Architect microservices, implement event-driven systems, and ensure high availability.",

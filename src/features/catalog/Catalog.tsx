@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
@@ -16,7 +16,9 @@ interface CatalogDropdownProps {
 
 const CatalogDropdown: React.FC<CatalogDropdownProps> = ({ label, value, options, onChange }) => {
   const [open, setOpen] = useState(false);
+  const [alignRight, setAlignRight] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const selectedLabel = options.find(o => o.value === value)?.label ?? value;
   const isFiltered = value !== 'All' && value !== options[0]?.value;
 
@@ -28,11 +30,20 @@ const CatalogDropdown: React.FC<CatalogDropdownProps> = ({ label, value, options
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  // Flip the menu to right-aligned when it would overflow the viewport's right edge
+  useLayoutEffect(() => {
+    if (open && ref.current && menuRef.current) {
+      const triggerRect = ref.current.getBoundingClientRect();
+      const menuWidth = menuRef.current.offsetWidth;
+      setAlignRight(triggerRect.left + menuWidth > window.innerWidth - 8);
+    }
+  }, [open]);
+
   return (
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(o => !o)}
-        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
           isFiltered
             ? 'bg-cyan/15 border-cyan text-cyan shadow-[0_0_10px_rgba(0,255,242,0.15)]'
             : 'bg-panel border-line text-muted hover:border-cyan/50 hover:text-text'
@@ -43,13 +54,13 @@ const CatalogDropdown: React.FC<CatalogDropdownProps> = ({ label, value, options
       </button>
 
       {open && (
-        <div className="absolute top-full mt-2 left-0 z-50 min-w-[150px] bg-panel/95 backdrop-blur-xl border border-line/80 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div ref={menuRef} className={`absolute top-full mt-2 z-50 min-w-[150px] bg-panel/95 backdrop-blur-xl border border-line/80 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in zoom-in-95 duration-150 ${alignRight ? 'right-0' : 'left-0'}`}>
           <div className="p-1.5 space-y-0.5">
             {options.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => { onChange(opt.value); setOpen(false); }}
-                className={`w-full flex items-center justify-between gap-3 px-3 py-2 rounded-xl text-[11px] font-medium transition-all duration-150 text-left cursor-pointer ${
+                className={`w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-[11px] font-medium transition-all duration-150 text-left cursor-pointer ${
                   opt.value === value
                     ? 'bg-cyan/15 text-cyan'
                     : 'text-muted hover:bg-line/50 hover:text-text'
@@ -87,6 +98,17 @@ const levenshtein = (a: string, b: string): number => {
 };
 
 const stem = (word: string) => word.toLowerCase().replace(/(ing|ed|s)$/i, '');
+
+// Theme-responsive tag colors per course format (static classes for the Tailwind scanner)
+const formatTagClasses: Record<string, string> = {
+  'self-paced': 'bg-tag-selfpaced text-bg',
+  'cohort': 'bg-tag-cohort text-bg',
+  'flipped': 'bg-cyan/80 text-bg',
+  'Multiple formats': 'bg-green/80 text-bg',
+};
+
+// Level badge (Foundation, Intermediate, Advanced) — theme-responsive over the card image
+const levelTagClasses = 'bg-panel/90 backdrop-blur-md text-text';
 
 const fuzzyMatch = (query: string, text: string): boolean => {
   if (!query || !text) return false;
@@ -642,15 +664,15 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                 <div className="h-44 relative bg-bg overflow-hidden border-b border-line">
                   <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover opacity-100 group-hover:scale-110 transition-all duration-700" />
                   <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
-                  <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-                    <span className="bg-bg/40 backdrop-blur-md border border-white/20 text-[10px] px-2.5 py-1 rounded font-bold uppercase text-white shadow-sm">
+                  <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2">
+                    <span className={`text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm ${levelTagClasses}`}>
                       {course.level}
                     </span>
-                    <span className="bg-cyan/80 backdrop-blur-md text-bg text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm">
+                    <span className={`backdrop-blur-md text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm ${formatTagClasses[course.format] ?? 'bg-cyan/80 text-bg'}`}>
                       {course.format}
                     </span>
                     {course.tags?.map(tag => (
-                      <span key={tag} className="bg-amber-500/80 backdrop-blur-md text-white text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm whitespace-nowrap">
+                      <span key={tag} className={`backdrop-blur-md text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm whitespace-nowrap bg-tag-skill text-bg`}>
                         {tag}
                       </span>
                     ))}
@@ -767,12 +789,15 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
                 <div className="h-44 relative bg-bg overflow-hidden border-b border-line">
                   <img src={track.imageUrl} alt={track.title} className="w-full h-full object-cover opacity-100 group-hover:scale-110 transition-all duration-700" />
                   <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
-                  <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-                    <span className="bg-bg/40 backdrop-blur-md border border-white/20 text-[10px] px-2.5 py-1 rounded font-bold uppercase text-white shadow-sm">
+                  <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2">
+                    <span className={`text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm ${levelTagClasses}`}>
                       {track.level}
                     </span>
+                    <span className={`backdrop-blur-md text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm whitespace-nowrap bg-cyan text-bg`}>
+                        Career Track
+                      </span>
                     {track.tags?.map(tag => (
-                      <span key={tag} className={`${tag=="Career Track"  ? "bg-cyan/80" : "bg-amber-500/80"}  backdrop-blur-md text-bg text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm whitespace-nowrap`}>
+                      <span key={tag} className={`backdrop-blur-md text-[10px] px-2.5 py-1 rounded font-bold uppercase shadow-sm whitespace-nowrap bg-tag-skill text-bg`}>
                         {tag}
                       </span>
                     ))}

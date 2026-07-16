@@ -275,7 +275,7 @@ export const LearningPath: React.FC<LearningPathProps> = ({ onNavigate }) => {
                   {course.format === 'flipped' ? 'Flipped Bootcamp' : course.format === 'cohort' ? 'Cohort Based' : 'Self-Paced'}
                 </span>
               </div>
-              <h1 className="text-2xl md:text-3xl font-black text-text leading-tight">{course.title} Learning Path</h1>
+              <h1 className="text-2xl md:text-3xl font-black text-text leading-tight">{course.title}</h1>
               <p className="text-muted text-sm mt-1.5 leading-relaxed max-w-2xl mx-auto md:mx-0">{course.description}</p>
 
               {/* Social proof strip */}

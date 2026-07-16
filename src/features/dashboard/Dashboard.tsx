@@ -214,16 +214,16 @@ const AnalyticGraphCard: React.FC<{ heroState?: string }> = ({ heroState }) => {
   const maxMins = Math.max(1, ...data.map(d => d.mins));
 
   return (
-    <div className="bg-[#24968B] rounded-2xl p-5 md:p-6 text-white flex flex-col h-full relative overflow-hidden shadow-lg">
-      <div className="flex justify-between items-start mb-6 z-10">
-        <div>
-          <h3 className="text-lg md:text-xl font-medium mb-1">Neural Velocity</h3>
-          <div className="flex items-center gap-2">
-            <span className="text-xl md:text-2xl font-bold">{data.reduce((s, d) => s + d.mins, 0)} min</span>
-            <span className="bg-[#5AC6B9] text-white text-[10px] md:text-xs px-2 py-1 rounded-md font-medium">+3.4%</span>
+    <div className="bg-accent-card rounded-2xl p-5 md:p-6 lg:p-4 xl:p-6 text-accent-card-fg flex flex-col h-full relative overflow-hidden shadow-lg">
+      <div className="flex justify-between items-start gap-2 mb-6 lg:mb-4 xl:mb-6 z-10">
+        <div className="min-w-0">
+          <h3 className="text-lg md:text-xl lg:text-base xl:text-xl font-medium mb-1">Neural Velocity</h3>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xl md:text-2xl lg:text-lg xl:text-2xl font-bold">{data.reduce((s, d) => s + d.mins, 0)} min</span>
+            <span className="bg-accent-card-fg/15 text-accent-card-fg text-[10px] md:text-xs lg:text-[10px] xl:text-xs px-2 py-1 rounded-md font-medium">+3.4%</span>
           </div>
         </div>
-        <button className="bg-[#5AC6B9] hover:bg-[#4EAD9F] text-white text-[10px] md:text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors font-medium">
+        <button className="bg-accent-card-fg/15 hover:bg-accent-card-fg/25 text-accent-card-fg text-[10px] md:text-xs lg:text-[10px] xl:text-xs px-3 py-1.5 lg:px-2.5 xl:px-3 rounded-lg flex items-center gap-1.5 transition-colors font-medium shrink-0">
           12 Days
           <Calendar className="w-3.5 h-3.5" />
         </button>
@@ -233,7 +233,7 @@ const AnalyticGraphCard: React.FC<{ heroState?: string }> = ({ heroState }) => {
       {/* Empty State Overlay for Long Break */}
       {heroState === 'long-break' && (
         <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none mt-10">
-          <span className="bg-[#1C7A70]/90 backdrop-blur-sm px-4 py-2 rounded-xl text-[11px] font-bold text-white shadow-sm uppercase tracking-wider">
+          <span className="bg-accent-card2/90 backdrop-blur-sm px-4 py-2 rounded-xl text-[11px] font-bold text-accent-card-fg shadow-sm uppercase tracking-wider">
             No actions this week
           </span>
         </div>
@@ -242,15 +242,15 @@ const AnalyticGraphCard: React.FC<{ heroState?: string }> = ({ heroState }) => {
         {data.map((d, i) => {
           const ratio = d.mins / maxMins;
           return (
-            <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group relative">
+            <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group relative min-w-0">
 
               {/* Tooltip */}
               <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[9px] px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity font-bold whitespace-nowrap z-20 pointer-events-none shadow-xl">
                 {d.day}: {d.mins} min
               </div>
-              <div className="w-full h-24 md:h-32 flex items-end justify-center">
+              <div className="w-full h-24 md:h-32 lg:h-28 xl:h-32 flex items-end justify-center">
                 <div
-                  className={`w-full max-w-[16px] md:max-w-[20px] rounded-sm transition-all duration-500 ${d.highlight ? 'bg-transparent border-t-2 border-x-2 border-[#FFE8B3] relative' : 'bg-[#FFE8B3]'}`}
+                  className={`w-full max-w-[16px] md:max-w-[22px] rounded-sm transition-all duration-500 ${d.highlight ? 'bg-transparent border-t-2 border-x-2 border-[#FFE8B3] relative' : 'bg-[#FFE8B3]'}`}
                   style={{ height: `${Math.max(5, ratio * 100)}%` }}
                 >
                   {d.highlight && (
@@ -260,7 +260,7 @@ const AnalyticGraphCard: React.FC<{ heroState?: string }> = ({ heroState }) => {
                   )}
                 </div>
               </div>
-              <span className="text-[9px] md:text-[10px] text-white/80 font-medium transition-colors group-hover:text-white">
+              <span className="text-[9px] md:text-[10px] lg:text-[8px] xl:text-[10px] text-accent-card-fg/80 font-medium transition-colors truncate max-w-full group-hover:text-accent-card-fg">
                 {d.day}
               </span>
             </div>
@@ -552,23 +552,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                 <div className="lg:w-[350px] shrink-0 flex items-center lg:items-end pb-2 lg:pb-0">
                   <div
                     onClick={() => setShowQuickSession(true)}
-                    className="w-full bg-cyan hover:bg-cyan2 text-bg p-5 rounded-2xl flex flex-col justify-between cursor-pointer transition-all duration-300 shadow-[0_0_15px_rgba(0,255,242,0.2)] hover:shadow-[0_0_20px_rgba(0,255,242,0.4)] hover:-translate-y-1 group/quick relative overflow-hidden"
+                    className="w-full bg-accent-card hover:bg-accent-card2 text-accent-card-fg p-5 rounded-2xl flex flex-col justify-between cursor-pointer transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 group/quick relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover/quick:bg-white/20 transition-all duration-700" />
                     <div className="relative z-10 flex items-start justify-between mb-4">
                       <div>
-                        <div className="text-[10px] font-black uppercase tracking-wider text-bg/80 mb-1 flex items-center gap-1.5">
+                        <div className="text-[10px] font-black uppercase tracking-wider text-accent-card-fg/80 mb-1 flex items-center gap-1.5">
                           Quick Session <ChevronRight className="w-3 h-3 group-hover/quick:translate-x-1 transition-transform" />
                         </div>
                         <p className="font-bold text-sm leading-snug">
                           {lastViewedLesson.lesson.title}
                         </p>
                       </div>
-                      <div className="bg-bg/10 rounded-full p-2 group-hover/quick:scale-110 transition-transform duration-300">
+                      <div className="bg-accent-card-fg/10 rounded-full p-2 group-hover/quick:scale-110 transition-transform duration-300">
                         <PlayCircle className="w-6 h-6 fill-current" />
                       </div>
                     </div>
-                    <div className="relative z-10 text-[11px] font-medium text-bg/70 bg-bg/5 p-2 rounded-lg backdrop-blur-sm">
+                    <div className="relative z-10 text-[11px] font-medium text-accent-card-fg/70 bg-accent-card-fg/5 p-2 rounded-lg backdrop-blur-sm">
                       Mod: {lastViewedLesson.module?.title} • {lastViewedLesson.lesson.duration}m
                     </div>
                   </div>
@@ -791,20 +791,27 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                     const progress = isCompleted ? 100 : course.progress;
 
                     // SVG progress ring values
-                    const radius = 22;
+                    const radius = 26;
                     const circumference = 2 * Math.PI * radius;
                     const strokeOffset = circumference * (1 - progress / 100);
 
                     // Color mapping for SVG stroke
                     const strokeColor = color === 'cyan' ? 'var(--color-cyan)' : color === 'purple' ? '#b624ff' : color === 'yellow' ? '#ffb800' : '#00ff9d';
 
-                    // Static class map so Tailwind can detect these at build time
+                    // Static class maps so Tailwind v4 scanner can detect all color classes
                     const upNextClasses = {
                       cyan:   { wrap: 'bg-cyan/5 border-cyan/15',     icon: 'text-cyan' },
                       purple: { wrap: 'bg-purple/5 border-purple/15', icon: 'text-purple' },
                       yellow: { wrap: 'bg-yellow/5 border-yellow/15', icon: 'text-yellow' },
                       green:  { wrap: 'bg-green/5 border-green/15',   icon: 'text-green' },
                     }[color] ?? { wrap: 'bg-cyan/5 border-cyan/15', icon: 'text-cyan' };
+
+                    const colorClasses = {
+                      cyan:   { badge: 'bg-cyan text-bg',        pill: 'bg-cyan/10 border-cyan/20 text-cyan',     icon: 'text-cyan',   format: 'bg-cyan/10 text-cyan border-cyan/20' },
+                      purple: { badge: 'bg-purple text-bg',      pill: 'bg-purple/10 border-purple/20 text-purple', icon: 'text-purple', format: 'bg-purple/10 text-purple border-purple/20' },
+                      yellow: { badge: 'bg-yellow text-bg',      pill: 'bg-yellow/10 border-yellow/20 text-yellow', icon: 'text-yellow', format: 'bg-yellow/10 text-yellow border-yellow/20' },
+                      green:  { badge: 'bg-green text-bg',       pill: 'bg-green/10 border-green/20 text-green',   icon: 'text-green',  format: 'bg-green/10 text-green border-green/20' },
+                    }[color] ?? { badge: 'bg-cyan text-bg', pill: 'bg-cyan/10 border-cyan/20 text-cyan', icon: 'text-cyan', format: 'bg-cyan/10 text-cyan border-cyan/20' };
 
                     return (
                       <div
@@ -822,15 +829,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                           {/* Status badge */}
                           {isCompleted ? (
-                            <span className="absolute top-3 left-3 bg-yellow/90 text-black text-[10px] font-black tracking-widest uppercase px-2.5 py-1 rounded-lg backdrop-blur-sm flex items-center gap-1">
+                            <span className="absolute top-3 left-3 bg-yellow/90 text-bg text-[10px] font-black tracking-widest uppercase px-2.5 py-1 rounded-md backdrop-blur-sm flex items-center gap-1">
                               <Check className="w-3 h-3" /> Completed
                             </span>
                           ) : (
-                            <span className={`absolute top-3 left-3 bg-${color}/90 text-bg text-[10px] font-black tracking-widest uppercase px-2.5 py-1 rounded-lg backdrop-blur-sm`}>
+                            <span className={`absolute top-3 left-3 ${colorClasses.badge} text-[10px] font-black tracking-widest uppercase px-2.5 py-1 rounded-md backdrop-blur-sm`}>
                               In Progress
                             </span>
                           )}
-                          <span className="absolute top-3 right-3 bg-black/50 text-white text-[10px] font-bold uppercase px-2 py-1 rounded-lg backdrop-blur-sm">
+                          <span className="absolute top-3 right-3 bg-panel/90 text-text border border-line/50 text-[10px] font-bold uppercase px-2 py-1 rounded-md backdrop-blur-sm">
                             {course.level}
                           </span>
                           {/* XP badge on image bottom */}
@@ -849,7 +856,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
 
                           {/* Tags / Format pills */}
                           <div className="flex flex-wrap gap-1.5 mb-4">
-                            <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-${color}/10 text-${color} border border-${color}/20`}>
+                            <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${colorClasses.format}`}>
                               {course.format}
                             </span>
                             {(course.tags ?? []).slice(0, 2).map((tag) => (
@@ -932,11 +939,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                               <ChevronRight className="w-4 h-4 text-yellow" />
                             </div>
                           ) : (
-                            <div className={`bg-${color}/10 border border-${color}/20 rounded-xl px-4 py-2.5 flex items-center justify-between`}>
-                              <span className={`text-xs font-semibold text-${color} flex items-center gap-1.5`}>
+                            <div className={`${colorClasses.pill} border rounded-xl px-4 py-2.5 flex items-center justify-between`}>
+                              <span className={`text-xs font-semibold flex items-center gap-1.5`}>
                                 <Play className="w-3 h-3 fill-current" /> Continue where you left off
                               </span>
-                              <ChevronRight className={`w-4 h-4 text-${color}`} />
+                              <ChevronRight className="w-4 h-4" />
                             </div>
                           )}
                         </div>

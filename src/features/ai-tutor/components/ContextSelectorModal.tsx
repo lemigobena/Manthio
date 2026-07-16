@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  X, ChevronRight, ChevronDown, BookOpen, Layers, PlayCircle, MessageSquarePlus,
-  Video, Code, Award, Clock, Gamepad2, ClipboardEdit, ExternalLink, FileText, Check
+import {
+  X, ChevronRight, ChevronDown, BookOpen, Layers, PlayCircle, MessageSquarePlus, Check
 } from 'lucide-react';
-import { COURSES } from '../../../data/courses';
+import { COURSES } from '../../../services/mockData';
+import { CourseIcon, LessonIcon } from '../../../utils/courseIcons';
 import type { Course, Module, Lesson } from '../../../types';
 
 interface ContextSelectorModalProps {
@@ -11,20 +11,6 @@ interface ContextSelectorModalProps {
   onClose: () => void;
   onStartChat: (context: { course?: Course; module?: Module; lesson?: Lesson }) => void;
 }
-
-const getLessonIcon = (type: string) => {
-  switch (type) {
-    case 'Video': return <Video className="w-4 h-4" />;
-    case 'Code': return <Code className="w-4 h-4" />;
-    case 'Quiz': return <Award className="w-4 h-4" />;
-    case 'Live Event': return <Clock className="w-4 h-4" />;
-    case 'H5P': return <Gamepad2 className="w-4 h-4" />;
-    case 'Assignment': return <ClipboardEdit className="w-4 h-4" />;
-    case 'External': return <ExternalLink className="w-4 h-4" />;
-    case 'Article': return <FileText className="w-4 h-4" />;
-    default: return <PlayCircle className="w-4 h-4" />;
-  }
-};
 
 // Shared item renderer
 const ItemButton = ({
@@ -204,7 +190,7 @@ export const ContextSelectorModal: React.FC<ContextSelectorModalProps> = ({ isOp
             {COURSES.map((course) => (
               <ItemButton
                 key={course.id}
-                icon={<BookOpen className="w-4 h-4" />}
+                icon={<CourseIcon hint={`${course.title} ${course.id}`} className="w-4 h-4" />}
                 label={course.title}
                 sublabel={course.topic}
                 isSelected={selectedCourseId === course.id}
@@ -234,7 +220,7 @@ export const ContextSelectorModal: React.FC<ContextSelectorModalProps> = ({ isOp
             {selectedCourse?.modules.map((mod) => (
               <ItemButton
                 key={mod.id}
-                icon={<Layers className="w-4 h-4" />}
+                icon={<CourseIcon hint={`${selectedCourse.title} ${selectedCourse.id}`} className="w-4 h-4" />}
                 label={mod.title}
                 sublabel={`${mod.lessons.length} lessons`}
                 isSelected={selectedModuleId === mod.id}
@@ -264,7 +250,7 @@ export const ContextSelectorModal: React.FC<ContextSelectorModalProps> = ({ isOp
             {selectedModule?.lessons.map((lesson) => (
               <ItemButton
                 key={lesson.id}
-                icon={getLessonIcon(lesson.type)}
+                icon={<LessonIcon type={lesson.type} className="w-4 h-4" />}
                 label={lesson.title}
                 sublabel={`${lesson.type} • ${lesson.duration}`}
                 isSelected={selectedLessonId === lesson.id}
@@ -287,7 +273,7 @@ export const ContextSelectorModal: React.FC<ContextSelectorModalProps> = ({ isOp
               {COURSES.map((course) => (
                 <ItemButton
                   key={course.id}
-                  icon={<BookOpen className="w-4 h-4" />}
+                  icon={<CourseIcon hint={`${course.title} ${course.id}`} className="w-4 h-4" />}
                   label={course.title}
                   sublabel={course.topic}
                   isSelected={selectedCourseId === course.id}
@@ -309,7 +295,7 @@ export const ContextSelectorModal: React.FC<ContextSelectorModalProps> = ({ isOp
                 {selectedCourse.modules.map((mod) => (
                   <ItemButton
                     key={mod.id}
-                    icon={<Layers className="w-4 h-4" />}
+                    icon={<CourseIcon hint={`${selectedCourse.title} ${selectedCourse.id}`} className="w-4 h-4" />}
                     label={mod.title}
                     sublabel={`${mod.lessons.length} lessons`}
                     isSelected={selectedModuleId === mod.id}
@@ -332,7 +318,7 @@ export const ContextSelectorModal: React.FC<ContextSelectorModalProps> = ({ isOp
                 {selectedModule.lessons.map((lesson) => (
                   <ItemButton
                     key={lesson.id}
-                    icon={getLessonIcon(lesson.type)}
+                    icon={<LessonIcon type={lesson.type} className="w-4 h-4" />}
                     label={lesson.title}
                     sublabel={`${lesson.type} • ${lesson.duration}`}
                     isSelected={selectedLessonId === lesson.id}

@@ -463,6 +463,7 @@ export const Community: React.FC<CommunityProps> = () => {
               const currentDate = getDateGroup(msg.timestamp);
               const prevMessage = activeChannel.messages[index - 1];
               const showDateHeader = index === 0 || getDateGroup(prevMessage.timestamp) !== currentDate;
+              const isOwnMessage = msg.author === (user?.name || 'Demo Chen');
 
               return (
                 <React.Fragment key={msg.id}>
@@ -473,13 +474,13 @@ export const Community: React.FC<CommunityProps> = () => {
                       <div className="h-px bg-line flex-1" />
                     </div>
                   )}
-                  <div 
+                  <div
                     onClick={() => setActiveThreadId(msg.id)}
-                    className={`flex space-x-3 group cursor-pointer p-3 -mx-3 rounded-xl transition-all duration-200 ${
-                      activeThreadId === msg.id 
-                        ? 'bg-cyan/5 border border-cyan/20 shadow-sm' 
+                    className={`flex space-x-3 group cursor-pointer p-3 -mx-3 rounded-xl transition-all duration-200 border-l-4 ${
+                      activeThreadId === msg.id
+                        ? 'bg-cyan/5 border border-cyan/20 shadow-sm'
                         : 'hover:bg-panel/40 border border-transparent hover:shadow-sm'
-                    }`}
+                    } ${isOwnMessage ? 'border-l-purple/50' : ''}`}
                   >
                     <div className="w-10 h-10 rounded-xl bg-purple/20 flex items-center justify-center shrink-0 text-purple font-bold">
                       {msg.author.charAt(0)}
@@ -487,6 +488,9 @@ export const Community: React.FC<CommunityProps> = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline space-x-2">
                         <span className="font-bold text-text text-sm">{msg.author}</span>
+                        {isOwnMessage && (
+                          <span className="text-[9px] font-bold uppercase tracking-wider text-purple bg-purple/10 border border-purple/20 px-1.5 py-0.5 rounded">You</span>
+                        )}
                         <span className="text-[10px] text-muted">{msg.timestamp}</span>
                       </div>
                       <div className="mt-1">
@@ -722,6 +726,7 @@ export const Community: React.FC<CommunityProps> = () => {
                     <div className="flex items-baseline space-x-2">
                       <span className="font-bold text-text text-sm">{reply.author}</span>
                       {reply.isAiSuggested && <span className="text-[9px] bg-purple/20 text-purple px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">AI</span>}
+                      {reply.author === (user?.name || 'Demo Chen') && <span className="text-[9px] font-bold uppercase tracking-wider text-purple bg-purple/10 border border-purple/20 px-1.5 py-0.5 rounded">You</span>}
                       <span className="text-[10px] text-muted">{reply.timestamp}</span>
                     </div>
                     

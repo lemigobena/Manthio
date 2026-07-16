@@ -185,7 +185,7 @@ export const CurriculumPane: React.FC<CurriculumPaneProps> = ({
                               <LessonIcon type={les.type} className="w-3.5 h-3.5" />
                             </span>
                             <div className="flex flex-col pr-2 flex-1 min-w-0">
-                              <span className="line-clamp-2">{les.title}</span>
+                              <span className={isActive ? 'line-clamp-2' : 'line-clamp-1'}>{les.title}</span>
                               {les.microChunkable && (
                                 <span className="text-[9px] text-muted mt-1 uppercase font-bold tracking-wider">
                                   Micro-chunks
