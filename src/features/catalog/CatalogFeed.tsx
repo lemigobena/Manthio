@@ -260,19 +260,19 @@ export const CatalogFeed: React.FC<CatalogFeedProps> = ({ onNavigate }) => {
   const isDark = resolvedTheme === 'dark';
 
   return (
-    <div className="fixed inset-0 z-40 bg-bg overflow-hidden">
-      {/* HEADER — category tabs + search, below the app top bar */}
-      <div className="absolute inset-x-0 top-[76px] z-30 flex flex-col justify-center pointer-events-none">
+    <div className={`fixed inset-0 bg-bg overflow-hidden ${searchOpen ? 'z-[64]' : 'z-40'}`}>
+      {/* HEADER — category tabs + search at the very top (floating hamburger sits left) */}
+      <div className="absolute inset-x-0 top-[22px] z-30 flex flex-col justify-center pointer-events-none">
         {/* CATEGORY TABS (TikTok-style: plain text, active one highlighted) */}
-        <div className="relative flex items-center px-4">
-          <div className="pointer-events-auto flex-1 flex items-center justify-center gap-5 overflow-x-auto scrollbar-hide">
+        <div className="relative flex items-center pl-14 pr-4">
+          <div className="pointer-events-auto flex-1 flex items-center justify-center gap-[clamp(6px,2.5vw,20px)] overflow-x-auto scrollbar-hide">
             {categories.map(cat => {
               const active = cat.id === selectedCategory;
               return (
                 <button
                   key={cat.id}
                   onClick={() => selectCategory(cat.id)}
-                  className={`relative shrink-0 pb-1.5 text-[11px] font-black tracking-wide transition-all duration-200 cursor-pointer whitespace-nowrap [text-shadow:0_1px_4px_rgba(0,0,0,0.6)] ${active ? 'text-white' : 'text-white/60 hover:text-white'
+                  className={`relative shrink-0 pb-1.5 text-[clamp(8px,2.6vw,11px)] font-black tracking-wide transition-all duration-200 cursor-pointer whitespace-nowrap [text-shadow:0_1px_4px_rgba(0,0,0,0.6)] ${active ? 'text-white' : 'text-white/60 hover:text-white'
                     }`}
                 >
                   {cat.label}
@@ -290,7 +290,7 @@ export const CatalogFeed: React.FC<CatalogFeedProps> = ({ onNavigate }) => {
             title="Search"
             className="pointer-events-auto shrink-0 ml-3 -mt-1.5 p-1.5 text-white/80 hover:text-white transition-colors cursor-pointer drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]"
           >
-            <Search className="w-5 h-5" />
+            <Search className="w-[clamp(12px,3.4vw,15px)] h-[clamp(12px,3.4vw,15px)]" />
           </button>
         </div>
       </div>
