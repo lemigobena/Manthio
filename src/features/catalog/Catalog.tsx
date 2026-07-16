@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
-import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, CheckCircle, X, ChevronDown, Check } from 'lucide-react';
+import { Search, SlidersHorizontal, BookOpen, Award, Clock, AlertCircle, CheckCircle, X, ChevronDown, Check, GalleryVerticalEnd } from 'lucide-react';
 import { useTrack } from '../track-detail/useTrack';
+import { CatalogFeed } from './CatalogFeed';
 import type { CareerTrack } from '../../types';
 
 interface CatalogDropdownOption { label: string; value: string; }
@@ -136,6 +137,18 @@ const fuzzyMatch = (query: string, text: string): boolean => {
   return true;
 };
 
+// Tracks whether the viewport is phone sized (below Tailwind's md breakpoint).
+const useIsMobileViewport = () => {
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 767px)').matches);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return isMobile;
+};
+
 interface CatalogProps {
   onNavigate: (page: string) => void;
 }
@@ -144,6 +157,16 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
   const { setActiveCourseId, setActiveTrackId } = useAuth();
   const { addToast } = useXP();
   const { getTrackPercentage, getProgress } = useTrack();
+  // TikTok-style feed vs classic grid on phones (REQ: immersive mobile catalog)
+  const isMobileViewport = useIsMobileViewport();
+  const [viewMode, setViewMode] = useState<'feed' | 'grid'>(() => {
+    const saved = localStorage.getItem('catalogViewMode');
+    return (saved as 'feed' | 'grid') || 'feed';
+  });
+  const handleViewModeChange = (mode: 'feed' | 'grid') => {
+    setViewMode(mode);
+    localStorage.setItem('catalogViewMode', mode);
+  };
   const [discoveryMode, setDiscoveryMode] = useState<'courses' | 'tracks'>(() => {
     const lastUsed = localStorage.getItem('catalogDiscoveryMode');
     return (lastUsed as 'courses' | 'tracks') || (COURSES.some(c => c.enrolled) ? 'courses' : 'tracks');
@@ -283,6 +306,11 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
     return true;
   }) : [];
 
+  // Phone/tablet: immersive TikTok-style feed (vertical = tracks, horizontal = courses)
+  if (isMobileViewport && viewMode === 'feed') {
+    return <CatalogFeed onNavigate={onNavigate} onSwitchToGrid={() => handleViewModeChange('grid')} />;
+  }
+
   return (
     <div className="space-y-6">
       {/* REQ-CATALOG-002: Discovery Modes */}
@@ -315,16 +343,25 @@ export const Catalog: React.FC<CatalogProps> = ({ onNavigate }) => {
           </p>
         </div>
         
-        {/* Search Bar */}
-        <div className="relative w-full md:w-80">
-          <input 
-            type="text" 
-            placeholder={discoveryMode === 'tracks' ? "Search tracks..." : "Search for courses or topics..."} 
-            value={searchQuery}
-            onChange={(e) => { setSearchQuery(e.target.value); simulateLoad(); }}
-            className="w-full bg-panel border border-line rounded-xl pl-10 pr-4 py-2 text-sm text-text focus:border-cyan focus:outline-none !outline-none transition-colors shadow-sm"
-          />
-          <Search className="absolute left-3 top-2.5 w-4.5 h-4.5 text-muted" />
+        {/* Search Bar + mobile feed toggle */}
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <div className="relative w-full md:w-80">
+            <input
+              type="text"
+              placeholder={discoveryMode === 'tracks' ? "Search tracks..." : "Search for courses or topics..."}
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); simulateLoad(); }}
+              className="w-full bg-panel border border-line rounded-xl pl-10 pr-4 py-2 text-sm text-text focus:border-cyan focus:outline-none !outline-none transition-colors shadow-sm"
+            />
+            <Search className="absolute left-3 top-2.5 w-4.5 h-4.5 text-muted" />
+          </div>
+          <button
+            onClick={() => handleViewModeChange('feed')}
+            title="Switch to feed view"
+            className="md:hidden shrink-0 w-9 h-9 flex items-center justify-center bg-panel border border-line rounded-xl text-muted hover:text-cyan hover:border-cyan/50 transition-colors shadow-sm cursor-pointer"
+          >
+            <GalleryVerticalEnd className="w-4 h-4" />
+          </button>
         </div>
       </div>
 

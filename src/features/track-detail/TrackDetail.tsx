@@ -12,6 +12,7 @@ import { TrackPathBrowser } from './TrackPathBrowser';
 import { TrackVisualPath } from './TrackVisualPath';
 import { TrackPathMap } from './TrackPathMap';
 import { TrackCompletionModal } from './TrackCompletionModal';
+import { TrackTestimonials } from './TrackTestimonials';
 import { useNotifications } from '../../context/NotificationContext';
 import { calculateTrackProgress } from '../../services/progressUtils';
 import type { Course, CareerTrack } from '../../types';
@@ -569,6 +570,9 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
             />
           )}
         </div>
+
+        {/* ── Reviews & Testimonials ── */}
+        <TrackTestimonials trackId={track.id} trackTitle={track.title} />
 
         {/* ── Sibling Tracks ── */}
         {TRACKS.filter(t => t.id !== track.id).length > 0 && (
