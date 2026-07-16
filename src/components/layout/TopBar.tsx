@@ -14,10 +14,11 @@ interface TopBarProps {
   isPublicView?: boolean;
 }
 
-export const TopBar: React.FC<TopBarProps> = ({ 
+export const TopBar: React.FC<TopBarProps> = ({
   onNavigate,
   isMobileOpen,
   setIsMobileOpen,
+  activePage,
   isPublicView
 }) => {
   const { user, signOut, isAuthenticated } = useAuth();
@@ -72,16 +73,25 @@ export const TopBar: React.FC<TopBarProps> = ({
   const recentNotifications = notifications.slice(0, 20);
   const [scrolled, setScrolled] = useState(false);
 
+  // Phone-sized viewport (below Tailwind's md breakpoint)
+  const [isPhone, setIsPhone] = useState(() => window.matchMedia('(max-width: 767px)').matches);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const handler = (e: MediaQueryListEvent) => setIsPhone(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
   useEffect(() => {
     if (!isPublicView) return;
     // main is the scroll container in AppLayout
     const mainElement = document.querySelector('main');
     if (!mainElement) return;
-    
+
     const handleScroll = () => {
       setScrolled(mainElement.scrollTop > 20);
     };
-    
+
     mainElement.addEventListener('scroll', handleScroll);
     // trigger once on mount
     handleScroll();
@@ -93,9 +103,9 @@ export const TopBar: React.FC<TopBarProps> = ({
       <div className={`fixed top-0 left-0 right-0 h-16 transition-all duration-300 z-[100] ${scrolled ? 'bg-panel/90 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
         <div className="max-w-[1430px] mx-auto h-full flex items-center justify-between pr-4 md:px-[44px] w-full">
           <div className="flex items-center shrink-0">
-            <img 
-              src="/Branding/primary/logo_7_prio_1_variation.png" 
-              alt="Manthio Logo" 
+            <img
+              src="/Branding/primary/logo_7_prio_1_variation.png"
+              alt="Manthio Logo"
               className="h-[80px] sm:h-[100px] md:h-[120px] -ml-[20px] sm:-ml-[30px] md:-ml-[40px] cursor-pointer object-left object-contain transition-transform hover:scale-105"
               onClick={() => onNavigate('explore')}
             />
@@ -103,31 +113,31 @@ export const TopBar: React.FC<TopBarProps> = ({
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center space-x-8 text-sm font-semibold">
-             {[
-               { label: 'Features', id: 'section-features', offset: 80 },
-               { label: 'Tech', id: 'section-stack', offset: 16 },
-               { label: 'Course', id: 'section-courses', offset: 80 },
-               { label: 'Testimonials', id: 'section-testimonials', offset: 80 },
-             ].map(({ label, id, offset }) => (
-               <button
-                 key={id}
-                 onClick={() => {
-                   const mainEl = document.querySelector('main');
-                   const target = document.getElementById(id);
-                   if (mainEl && target) {
-                     const topOffset = target.getBoundingClientRect().top + mainEl.scrollTop - offset;
-                     mainEl.scrollTo({ top: topOffset, behavior: 'smooth' });
-                   }
-                 }}
-                 className="text-muted hover:text-text transition-colors"
-               >
-                 {label}
-               </button>
-             ))}
+            {[
+              { label: 'Features', id: 'section-features', offset: 80 },
+              { label: 'Tech', id: 'section-stack', offset: 16 },
+              { label: 'Course', id: 'section-courses', offset: 80 },
+              { label: 'Testimonials', id: 'section-testimonials', offset: 80 },
+            ].map(({ label, id, offset }) => (
+              <button
+                key={id}
+                onClick={() => {
+                  const mainEl = document.querySelector('main');
+                  const target = document.getElementById(id);
+                  if (mainEl && target) {
+                    const topOffset = target.getBoundingClientRect().top + mainEl.scrollTop - offset;
+                    mainEl.scrollTo({ top: topOffset, behavior: 'smooth' });
+                  }
+                }}
+                className="text-muted hover:text-text transition-colors"
+              >
+                {label}
+              </button>
+            ))}
           </div>
 
           <div className="flex items-center space-x-4 shrink-0">
-            <button 
+            <button
               onClick={toggleTheme}
               className="h-9 w-9 max-[374px]:h-8 max-[374px]:w-8 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer"
               title={resolvedTheme === 'dark' ? 'Switch to light design' : 'Switch to dark design'}
@@ -149,11 +159,28 @@ export const TopBar: React.FC<TopBarProps> = ({
     );
   }
 
+  // Phone catalog: the immersive feed replaces the bar — keep only a floating hamburger
+  if (isPhone && activePage === 'catalog') {
+    return (
+      <div className="fixed top-2 left-3 z-[60]">
+        <button
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          className="w-10 h-10 flex items-center justify-center text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)] active:scale-90 transition-all cursor-pointer"
+          title="Toggle menu"
+        >
+          {isMobileOpen
+            ? <X className="w-[clamp(12px,3.4vw,15px)] h-[clamp(12px,3.4vw,15px)]" />
+            : <Menu className="w-[clamp(12px,3.4vw,15px)] h-[clamp(12px,3.4vw,15px)]" />}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-panel border-b border-line h-16 max-[374px]:px-2 px-3 md:px-6 lg:px-8 shrink-0 relative z-[60]">
       <div className="max-w-[1400px] mx-auto h-full flex items-center justify-between gap-5 max-[374px]:gap-2 w-full">
         {/* Mobile/Tablet Menu Button Toggle */}
-        <button 
+        <button
           onClick={() => setIsMobileOpen(!isMobileOpen)}
           className="lg:hidden h-9 w-9 flex items-center justify-center rounded-xl text-muted hover:text-cyan transition-colors cursor-pointer shrink-0"
           title="Toggle menu"
@@ -163,18 +190,18 @@ export const TopBar: React.FC<TopBarProps> = ({
 
         {/* Global Search Component (Handles both Desktop Input and full overlay) */}
         <div className={`relative flex-1 hidden md:block z-[65] transition-all duration-300 ease-out ${searchOpen ? 'max-w-[1000px]' : 'max-w-xl'}`}>
-          <SearchOverlay 
-            isOpen={searchOpen} 
-            onClose={() => setSearchOpen(false)} 
+          <SearchOverlay
+            isOpen={searchOpen}
+            onClose={() => setSearchOpen(false)}
             onOpen={() => setSearchOpen(true)}
-            onNavigate={onNavigate} 
+            onNavigate={onNavigate}
           />
         </div>
 
         <div className="flex items-center space-x-4 max-[374px]:space-x-2 ml-auto shrink-0">
-          
+
           {/* Mobile Search Icon (<768px) */}
-          <button 
+          <button
             onClick={handleOpenSearch}
             className="md:hidden h-9 w-9 max-[374px]:h-8 max-[374px]:w-8 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer"
             title="Search"
@@ -183,7 +210,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           </button>
 
           {/* Streak Flame Indicator (REQ-TOPBAR-003) */}
-          <button 
+          <button
             onClick={() => onNavigate('analytics')}
             className="h-9 max-[374px]:h-8 flex items-center space-x-1.5 px-3 max-[374px]:px-2 rounded-full bg-bg border border-line hover:border-yellow group transition-all duration-300 cursor-pointer"
             title="Your daily activity"
@@ -198,7 +225,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           </button>
 
           {/* Theme Toggle (REQ-NFR-053) */}
-          <button 
+          <button
             onClick={toggleTheme}
             className="h-9 w-9 max-[374px]:h-8 max-[374px]:w-8 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer"
             title={resolvedTheme === 'dark' ? 'Switch to light design' : 'Switch to dark design'}
@@ -208,7 +235,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
           {/* Notifications Dropdown (REQ-TOPBAR-002) */}
           <div className="relative" ref={notificationsRef}>
-            <button 
+            <button
               onClick={handleToggleNotifications}
               className="h-9 w-9 max-[374px]:h-8 max-[374px]:w-8 flex items-center justify-center rounded-xl bg-bg border border-line text-muted hover:text-text transition-colors cursor-pointer relative"
             >
@@ -226,7 +253,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <div className="flex justify-between items-center border-b border-line p-3 shrink-0 bg-panel">
                   <h4 className="font-bold text-xs uppercase text-muted tracking-wider">Notifications</h4>
                   {unreadCount > 0 && (
-                    <button 
+                    <button
                       onClick={markAllAsRead}
                       className="text-[10px] text-cyan hover:underline font-semibold"
                     >
@@ -239,52 +266,51 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <div className="p-4 text-center text-muted text-xs">No notifications yet.</div>
                   ) : (
                     recentNotifications.map(n => {
-                        const accentMap: Record<string, string> = {
-                          course: 'border-l-cyan bg-cyan/5',
-                          social: 'border-l-purple bg-purple/5',
-                          system: 'border-l-yellow bg-yellow/5',
-                          gamification: 'border-l-green bg-green/5',
-                          marketing: 'border-l-orange bg-orange/5',
-                        };
-                        const iconMap: Record<string, React.ReactNode> = {
-                          course: <BookOpen className="w-3.5 h-3.5 text-cyan" />,
-                          social: <MessageSquare className="w-3.5 h-3.5 text-purple" />,
-                          system: <AlertCircle className="w-3.5 h-3.5 text-yellow" />,
-                          gamification: <Award className="w-3.5 h-3.5 text-green" />,
-                          marketing: <Target className="w-3.5 h-3.5 text-orange" />,
-                        };
-                        const criticalOverride = n.critical ? 'border-l-red bg-red/5' : '';
-                        return (
-                          <div 
-                            key={n.id} 
-                            onClick={() => {
-                              if (!n.read) markAsRead(n.id);
-                              if (n.link) {
-                                onNavigate(n.link);
-                                setNotificationsOpen(false);
-                              }
-                            }}
-                            className={`flex items-start gap-2.5 p-3 rounded-xl border-l-[3px] border border-line/40 text-xs cursor-pointer transition-all shadow-sm ${
-                              !n.read
-                                ? (criticalOverride || accentMap[n.category] || 'bg-bg border-l-cyan bg-cyan/5')
-                                : 'bg-bg/30 border-l-line opacity-60 hover:opacity-80'
+                      const accentMap: Record<string, string> = {
+                        course: 'border-l-cyan bg-cyan/5',
+                        social: 'border-l-purple bg-purple/5',
+                        system: 'border-l-yellow bg-yellow/5',
+                        gamification: 'border-l-green bg-green/5',
+                        marketing: 'border-l-orange bg-orange/5',
+                      };
+                      const iconMap: Record<string, React.ReactNode> = {
+                        course: <BookOpen className="w-3.5 h-3.5 text-cyan" />,
+                        social: <MessageSquare className="w-3.5 h-3.5 text-purple" />,
+                        system: <AlertCircle className="w-3.5 h-3.5 text-yellow" />,
+                        gamification: <Award className="w-3.5 h-3.5 text-green" />,
+                        marketing: <Target className="w-3.5 h-3.5 text-orange" />,
+                      };
+                      const criticalOverride = n.critical ? 'border-l-red bg-red/5' : '';
+                      return (
+                        <div
+                          key={n.id}
+                          onClick={() => {
+                            if (!n.read) markAsRead(n.id);
+                            if (n.link) {
+                              onNavigate(n.link);
+                              setNotificationsOpen(false);
+                            }
+                          }}
+                          className={`flex items-start gap-2.5 p-3 rounded-xl border-l-[3px] border border-line/40 text-xs cursor-pointer transition-all shadow-sm ${!n.read
+                            ? (criticalOverride || accentMap[n.category] || 'bg-bg border-l-cyan bg-cyan/5')
+                            : 'bg-bg/30 border-l-line opacity-60 hover:opacity-80'
                             }`}
-                          >
-                            <div className="shrink-0 mt-0.5 p-1.5 rounded-lg bg-bg/80 border border-line/30">
-                              {n.critical
-                                ? <AlertCircle className="w-3.5 h-3.5 text-red" />
-                                : (iconMap[n.category] ?? <Bell className="w-3.5 h-3.5 text-muted" />)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex justify-between items-start gap-1">
-                                <p className={`font-bold leading-tight truncate ${n.critical ? 'text-red' : 'text-text'}`}>{n.title}</p>
-                                <span className="text-[9px] text-muted whitespace-nowrap shrink-0 pt-0.5">{n.time}</span>
-                              </div>
-                              <p className="text-muted line-clamp-2 leading-relaxed mt-0.5">{n.message}</p>
-                            </div>
+                        >
+                          <div className="shrink-0 mt-0.5 p-1.5 rounded-lg bg-bg/80 border border-line/30">
+                            {n.critical
+                              ? <AlertCircle className="w-3.5 h-3.5 text-red" />
+                              : (iconMap[n.category] ?? <Bell className="w-3.5 h-3.5 text-muted" />)}
                           </div>
-                        );
-                      })
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-start gap-1">
+                              <p className={`font-bold leading-tight truncate ${n.critical ? 'text-red' : 'text-text'}`}>{n.title}</p>
+                              <span className="text-[9px] text-muted whitespace-nowrap shrink-0 pt-0.5">{n.time}</span>
+                            </div>
+                            <p className="text-muted line-clamp-2 leading-relaxed mt-0.5">{n.message}</p>
+                          </div>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
                 <div className="p-2 border-t border-line shrink-0 bg-panel">
@@ -305,11 +331,10 @@ export const TopBar: React.FC<TopBarProps> = ({
           {/* User Profile avatar & Dropdown */}
           {user && (
             <div className="relative" ref={profileMenuRef}>
-              <button 
+              <button
                 onClick={handleToggleProfile}
-                className={`h-9 w-9 max-[374px]:h-8 max-[374px]:w-8 flex items-center justify-center rounded-full bg-bg border transition-all cursor-pointer ${
-                  profileOpen ? 'border-cyan ring-1 ring-cyan' : 'border-line hover:border-cyan'
-                }`}
+                className={`h-9 w-9 max-[374px]:h-8 max-[374px]:w-8 flex items-center justify-center rounded-full bg-bg border transition-all cursor-pointer ${profileOpen ? 'border-cyan ring-1 ring-cyan' : 'border-line hover:border-cyan'
+                  }`}
               >
                 <div className="relative w-8 h-8 max-[374px]:w-7 max-[374px]:h-7">
                   <img src={user.avatar} alt={user.name} className="w-8 h-8 max-[374px]:w-7 max-[374px]:h-7 rounded-full object-cover" />
@@ -327,9 +352,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <p className="text-xs font-bold text-text truncate">{user.name}</p>
                     <p className="text-[10px] text-muted truncate">{user.email}</p>
                   </div>
-                  
+
                   {/* Profile Link */}
-                  <button 
+                  <button
                     onClick={() => {
                       onNavigate('profile');
                       setProfileOpen(false);
@@ -339,9 +364,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <User className="w-4 h-4 text-cyan" />
                     <span>Profile</span>
                   </button>
-                  
+
                   {/* Settings Link */}
-                  <button 
+                  <button
                     onClick={() => {
                       onNavigate('settings:preferences');
                       setProfileOpen(false);
@@ -351,9 +376,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Sliders className="w-4 h-4 text-cyan" />
                     <span>Settings</span>
                   </button>
-                  
+
                   {/* Sign out */}
-                  <button 
+                  <button
                     onClick={() => {
                       signOut();
                       onNavigate('signin');
@@ -371,14 +396,14 @@ export const TopBar: React.FC<TopBarProps> = ({
 
         </div>
       </div>
-      
+
       {/* Mobile Search Overlay Wrapper */}
       <div className="md:hidden">
-        <SearchOverlay 
-          isOpen={searchOpen} 
-          onClose={() => setSearchOpen(false)} 
+        <SearchOverlay
+          isOpen={searchOpen}
+          onClose={() => setSearchOpen(false)}
           onOpen={() => setSearchOpen(true)}
-          onNavigate={onNavigate} 
+          onNavigate={onNavigate}
         />
       </div>
     </div>

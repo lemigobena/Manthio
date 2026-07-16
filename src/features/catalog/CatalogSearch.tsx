@@ -106,7 +106,7 @@ export const CatalogSearch: React.FC<CatalogSearchProps> = ({ isOpen, onClose, o
   if (!isOpen) return null;
 
   return (
-    <div className="absolute inset-0 z-50 bg-bg flex flex-col animate-[fadeIn_0.15s_ease-out] pt-[76px]">
+    <div className="absolute inset-0 z-50 bg-bg flex flex-col animate-[fadeIn_0.15s_ease-out]">
       {/* Search header: back button + visible text box */}
       <div className="flex items-center px-3 py-3 border-b border-line gap-2 shrink-0">
         <button
