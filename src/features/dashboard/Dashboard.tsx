@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
+import { useTheme } from '../../context/ThemeContext';
 import { useTrack } from '../track-detail/useTrack';
 import { COURSES, TRACKS } from '../../services/mockData';
 import { ContentPlayer } from '../content-player/ContentPlayer';
@@ -163,27 +164,30 @@ const StatCard: React.FC<{
   color: 'peach' | 'lavender' | 'sky' | 'mint';
   onClick?: () => void;
 }> = ({ label, value, subtext, color, onClick }) => {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+
   const bgStyles = {
-    peach: 'bg-[#FFF0EB] text-[#333] dark:bg-orange/20 dark:text-text dark:border dark:border-orange/30',
-    mint: 'bg-[#EFFDF5] text-[#333] dark:bg-green/20 dark:text-text dark:border dark:border-green/30',
-    lavender: 'bg-[#F5F0FF] text-[#333] dark:bg-purple/20 dark:text-text dark:border dark:border-purple/30',
-    sky: 'bg-[#E8F8FF] text-[#333] dark:bg-cyan/20 dark:text-text dark:border dark:border-cyan/30',
+    peach: isDark ? 'bg-orange/20 text-text border border-orange/30' : 'bg-[#FFF0EB] text-[#333]',
+    mint: isDark ? 'bg-green/20 text-text border border-green/30' : 'bg-[#EFFDF5] text-[#333]',
+    lavender: isDark ? 'bg-purple/20 text-text border border-purple/30' : 'bg-[#F5F0FF] text-[#333]',
+    sky: isDark ? 'bg-cyan/20 text-text border border-cyan/30' : 'bg-[#E8F8FF] text-[#333]',
   }[color];
 
   return (
     <div
       onClick={onClick}
-      className={`relative ${bgStyles} p-4 md:p-5 rounded-2xl flex flex-col justify-between h-full cursor-pointer transition-all hover:-translate-y-1 hover:scale-[1.02] shadow-sm dark:shadow-none`}
+      className={`relative ${bgStyles} p-4 md:p-5 rounded-2xl flex flex-col justify-between h-full cursor-pointer transition-all hover:-translate-y-1 hover:scale-[1.02] ${isDark ? 'shadow-none' : 'shadow-sm'}`}
     >
       <div className="flex justify-between items-start mb-2">
-        <span className="text-sm font-medium text-gray-700 dark:text-text/80">{label}</span>
-        <div className="bg-white dark:bg-panel rounded-xl p-1.5 shadow-sm border border-transparent dark:border-line">
-          <ArrowUpRight className="w-4 h-4 text-gray-500 dark:text-muted" />
+        <span className={`text-sm font-medium ${isDark ? 'text-text/80' : 'text-gray-700'}`}>{label}</span>
+        <div className={`rounded-xl p-1.5 shadow-sm border ${isDark ? 'bg-panel border-line' : 'bg-white border-transparent'}`}>
+          <ArrowUpRight className={`w-4 h-4 ${isDark ? 'text-muted' : 'text-gray-500'}`} />
         </div>
       </div>
       <div className="mt-2">
         <div className="text-2xl font-bold tracking-tight mb-1">{value}</div>
-        <div className="text-[10px] text-gray-500 dark:text-muted font-medium">{subtext}</div>
+        <div className={`text-[10px] font-medium ${isDark ? 'text-muted' : 'text-gray-500'}`}>{subtext}</div>
       </div>
     </div>
   );

@@ -409,17 +409,17 @@ export const Community: React.FC<CommunityProps> = () => {
       {/* 2. Main Feed (Channel Messages) */}
       <div className={`flex-1 flex flex-col min-w-0 ${activeThreadId ? 'hidden lg:flex' : 'flex'}`}>
         {/* Header */}
-        <div className="h-14 border-b border-line flex items-center px-4 justify-between bg-bg/50 backdrop-blur-md shrink-0 relative gap-4">
-          <div className="flex items-center space-x-3 min-w-0 shrink-0">
+        <div className="h-14 border-b border-line flex items-center px-4 justify-between bg-bg/50 backdrop-blur-md shrink-0 relative gap-2 sm:gap-4">
+          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 shrink-0 max-w-[50%] sm:max-w-[60%] md:max-w-[70%]">
             <button className={`${activeThreadId ? 'min-[1400px]:hidden' : 'md:hidden'} text-muted hover:text-text shrink-0`} onClick={() => setIsSidebarOpen(true)}>
               <PanelLeft size={20} />
             </button>
-            <div className="font-bold text-text flex items-center gap-2 whitespace-nowrap">
-              <div className="flex items-center space-x-1.5">
+            <div className="font-bold text-text flex items-center gap-2 whitespace-nowrap min-w-0">
+              <div className="flex items-center space-x-1.5 min-w-0">
                 {activeChannel
                   ? <span className="text-muted shrink-0">{getChannelIcon(activeChannel, 'w-[18px] h-[18px]')}</span>
                   : <Hash size={18} className="text-muted shrink-0" />}
-                <span>{activeChannelName}</span>
+                <span className="truncate">{activeChannelName}</span>
               </div>
               {selectedTag && (
                 <div className="flex items-center space-x-1 px-2 py-0.5 text-xs bg-cyan/10 border border-cyan/30 text-cyan rounded-md shrink-0">
@@ -435,7 +435,7 @@ export const Community: React.FC<CommunityProps> = () => {
             </div>
           </div>
           <div className="flex items-center space-x-4 min-w-0 flex-1 justify-end">
-            <div className="text-xs text-muted truncate hidden sm:block text-right flex-1 min-w-0">
+            <div className="text-xs text-muted truncate hidden sm:block text-right min-w-0">
               {activeChannel?.description}
             </div>
             {activeChannel && (
