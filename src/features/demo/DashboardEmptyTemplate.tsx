@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight, X, MessageSquare, Cpu, BookOpen, Award, Clock } from 'lucide-react';
+import { Sparkles, ArrowRight, X, MessageSquare, BrainCircuit, BookOpen, Award, Clock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { COURSES } from '../../services/mockData';
 
@@ -323,7 +323,7 @@ export const DashboardEmptyTemplate: React.FC<{ onNavigate: (p: string) => void 
           <div className="bg-panel border border-line rounded-2xl p-6 space-y-6">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-cyan/10 border border-cyan/20 rounded-xl text-cyan">
-                <Cpu className="w-5 h-5" />
+                <BrainCircuit className="w-5 h-5" />
               </div>
               <h3 className="text-lg font-bold text-text">Neural Insights</h3>
             </div>

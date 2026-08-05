@@ -14,7 +14,7 @@ interface SettingsProps {
 }
 
 export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account', onNavigate }) => {
-  const { user, is2FAEnabled, setIs2FAEnabled } = useAuth();
+  const { user, is2FAEnabled, setIs2FAEnabled, resetOnboarding } = useAuth();
   const { addToast } = useXP();
   const { theme, setTheme } = useTheme();
   
@@ -166,7 +166,10 @@ export const Settings: React.FC<SettingsProps> = ({ initialTab = 'account', onNa
                       onEditAddress={() => openPersonalInfoModal('address')}
                       onExport={handleDataExport}
                       onDelete={() => openConfirmModal('delete')}
-                      onRestartOnboarding={() => onNavigate?.('onboarding')}
+                      onRestartOnboarding={() => {
+                        resetOnboarding();
+                        onNavigate?.('onboarding');
+                      }}
                     />
                   )}
                   {isActive && tab.id === 'billing' && (

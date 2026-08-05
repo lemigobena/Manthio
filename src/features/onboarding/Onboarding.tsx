@@ -10,7 +10,7 @@ import {
   ChevronRight,
   Sun,
   Moon,
-  Sparkles,
+  BrainCircuit,
   BookOpen,
   Code2,
   Globe,
@@ -246,7 +246,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
     }
     completeOnboarding({ reason: reason || 'Curiosity', timePerWeek: timeCommitment || '2-5 Hrs' });
     addXp(150, 'Completed first-time onboarding (+150 XP)');
-    onNavigate('dashboard');
+    onNavigate('course-detail');
   };
 
   const handleBrowseCatalog = () => {
@@ -937,7 +937,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onNavigate }) => {
               <div className="absolute bottom-[-10%] left-[-10%] w-80 h-80 bg-purple/10 blur-[120px] rounded-full pointer-events-none" />
               <div className="relative z-10 space-y-5">
                 <div className="w-12 h-12 border border-cyan rounded-xl flex items-center justify-center text-cyan shadow-sm">
-                  <Sparkles className="w-6 h-6" />
+                  <BrainCircuit className="w-6 h-6" />
                 </div>
                 <div className="space-y-3">
                   <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-text font-sans tracking-tight leading-tight">

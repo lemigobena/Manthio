@@ -105,7 +105,7 @@ interface CatalogFeedProps {
 }
 
 export const CatalogFeed: React.FC<CatalogFeedProps> = ({ onNavigate }) => {
-  const { user, setActiveCourseId, setActiveTrackId } = useAuth();
+  const { user, isAuthenticated, setActiveCourseId, setActiveTrackId } = useAuth();
   const { addToast, addXp } = useXP();
   const { resolvedTheme } = useTheme();
 
@@ -403,7 +403,7 @@ export const CatalogFeed: React.FC<CatalogFeedProps> = ({ onNavigate }) => {
                           onClick={() => openTrack(track)}
                           className="h-9 px-5 rounded-lg bg-cyan text-bg text-[11px] font-black uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all shadow-md cursor-pointer"
                         >
-                          {track.progress === 100 ? 'Review' : track.enrolled ? 'Continue' : 'View Track'}
+                          {isAuthenticated && track.progress === 100 ? 'Review' : (isAuthenticated && track.enrolled) ? 'Continue' : 'Enrol'}
                         </button>
                         <button
                           onClick={() => scrollToCourse(sectionKey, 1)}
@@ -487,7 +487,7 @@ export const CatalogFeed: React.FC<CatalogFeedProps> = ({ onNavigate }) => {
                             onClick={() => openCourse(course)}
                             className="h-9 px-5 rounded-lg bg-cyan text-bg text-[11px] font-black uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all shadow-md cursor-pointer"
                           >
-                            {course.progress === 100 ? 'Review' : course.enrolled ? 'Continue' : 'View Course'}
+                            {isAuthenticated && course.progress === 100 ? 'Review' : (isAuthenticated && course.enrolled) ? 'Continue' : 'Enrol'}
                           </button>
                           <button
                             onClick={() => openLearningPath(course)}
