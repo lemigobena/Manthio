@@ -40,7 +40,7 @@ const ResourceDropdown: React.FC<ResDropdownProps> = ({ label, icon, value, opti
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(o => !o)}
-        className={`flex items-center gap-2 pl-3 pr-3 py-2 rounded-xl border text-[11px] font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+        className={`flex items-center gap-2 pl-3 pr-3 py-2 rounded-lg border text-[11px] font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
           isFiltered
             ? 'bg-cyan/15 border-cyan text-cyan shadow-[0_0_10px_rgba(0,255,242,0.12)]'
             : 'bg-panel border-line text-muted hover:border-cyan/50 hover:text-text'
@@ -58,7 +58,7 @@ const ResourceDropdown: React.FC<ResDropdownProps> = ({ label, icon, value, opti
               <button
                 key={opt.value}
                 onClick={() => { onChange(opt.value); setOpen(false); }}
-                className={`w-full flex items-center justify-between gap-3 px-3 py-2 rounded-xl text-[11px] font-medium transition-all duration-150 text-left cursor-pointer ${
+                className={`w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-[11px] font-medium transition-all duration-150 text-left cursor-pointer ${
                   opt.value === value
                     ? 'bg-cyan/15 text-cyan'
                     : 'text-muted hover:bg-line/50 hover:text-text'
@@ -75,12 +75,105 @@ const ResourceDropdown: React.FC<ResDropdownProps> = ({ label, icon, value, opti
   );
 };
 
+interface DateRangeDropdownProps {
+  value: { type: string; start?: string; end?: string };
+  onChange: (v: { type: string; start?: string; end?: string }) => void;
+}
+
+const DateRangeDropdown: React.FC<DateRangeDropdownProps> = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  
+  const isFiltered = value.type !== 'All Time';
+  const label = isFiltered ? (value.type === 'Custom' ? 'Custom Date' : value.type) : 'Date Range';
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const options = ['All Time', 'Last 7 Days', 'Last 30 Days', 'Last 3 Months', 'Last Year', 'Custom'];
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={`flex items-center gap-2 pl-3 pr-3 py-2 rounded-lg border text-[11px] font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+          isFiltered
+            ? 'bg-cyan/15 border-cyan text-cyan shadow-[0_0_10px_rgba(0,255,242,0.12)]'
+            : 'bg-panel border-line text-muted hover:border-cyan/50 hover:text-text'
+        } ${open ? 'border-cyan/60' : ''}`}
+      >
+        <Calendar className={`w-3.5 h-3.5 shrink-0 ${isFiltered ? 'text-cyan' : 'text-muted'}`} />
+        <span>{label}</span>
+        <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div className="absolute top-full mt-2 left-0 z-50 min-w-[210px] bg-panel/95 backdrop-blur-xl border border-line/80 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="p-1.5 space-y-0.5">
+            {options.map(opt => (
+              <button
+                key={opt}
+                onClick={() => {
+                  if (opt === 'Custom') {
+                    onChange({ type: opt, start: value.start || '', end: value.end || '' });
+                  } else {
+                    onChange({ type: opt });
+                    setOpen(false);
+                  }
+                }}
+                className={`w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-[11px] font-medium transition-all duration-150 text-left cursor-pointer ${
+                  opt === value.type
+                    ? 'bg-cyan/15 text-cyan'
+                    : 'text-muted hover:bg-line/50 hover:text-text'
+                }`}
+              >
+                <span>{opt}</span>
+                {opt === value.type && <Check className="w-3 h-3 shrink-0" />}
+              </button>
+            ))}
+            
+            {value.type === 'Custom' && (
+              <div className="mt-1 pt-1.5 border-t border-line/50 p-1.5 flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-muted uppercase tracking-wider pl-1">Start Date</label>
+                  <input 
+                    type="date" 
+                    value={value.start || ''} 
+                    onChange={e => onChange({ ...value, start: e.target.value })}
+                    className="w-full bg-bg border border-line rounded-lg px-2.5 py-1.5 text-xs text-text focus:border-cyan !outline-none transition-colors [color-scheme:dark]"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-muted uppercase tracking-wider pl-1">End Date</label>
+                  <input 
+                    type="date" 
+                    value={value.end || ''} 
+                    onChange={e => onChange({ ...value, end: e.target.value })}
+                    className="w-full bg-bg border border-line rounded-lg px-2.5 py-1.5 text-xs text-text focus:border-cyan !outline-none transition-colors [color-scheme:dark]"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+
 
 export const Resources: React.FC<ResourcesProps> = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState<string>('All');
   const [selectedCourse, setSelectedCourse] = useState<string>('All Courses');
   const [selectedAccessLevel, setSelectedAccessLevel] = useState<string>('All Levels');
+  const [selectedDateRange, setSelectedDateRange] = useState<{type: string, start?: string, end?: string}>({ type: 'All Time' });
   const [view, setView] = useState<'My Files' | 'Knowledge Base'>('My Files');
   const [layout, setLayout] = useState<'table' | 'grid'>('table');
   const [previewFile, setPreviewFile] = useState<ResourceFile | null>(null);
@@ -142,6 +235,39 @@ export const Resources: React.FC<ResourcesProps> = () => {
     if (selectedType !== 'All' && file.type !== selectedType) return false;
     if (selectedCourse !== 'All Courses' && file.courseName !== selectedCourse) return false;
     if (selectedAccessLevel !== 'All Levels' && file.accessLevel !== selectedAccessLevel) return false;
+    
+    if (selectedDateRange.type !== 'All Time') {
+      const fileDate = new Date(file.uploadDate);
+      if (selectedDateRange.type === 'Last 7 Days') {
+        const threshold = new Date();
+        threshold.setDate(threshold.getDate() - 7);
+        if (fileDate < threshold) return false;
+      } else if (selectedDateRange.type === 'Last 30 Days') {
+        const threshold = new Date();
+        threshold.setDate(threshold.getDate() - 30);
+        if (fileDate < threshold) return false;
+      } else if (selectedDateRange.type === 'Last 3 Months') {
+        const threshold = new Date();
+        threshold.setMonth(threshold.getMonth() - 3);
+        if (fileDate < threshold) return false;
+      } else if (selectedDateRange.type === 'Last Year') {
+        const threshold = new Date();
+        threshold.setFullYear(threshold.getFullYear() - 1);
+        if (fileDate < threshold) return false;
+      } else if (selectedDateRange.type === 'Custom') {
+        if (selectedDateRange.start) {
+          const startD = new Date(selectedDateRange.start);
+          startD.setHours(0, 0, 0, 0);
+          if (fileDate < startD) return false;
+        }
+        if (selectedDateRange.end) {
+          const endD = new Date(selectedDateRange.end);
+          endD.setHours(23, 59, 59, 999);
+          if (fileDate > endD) return false;
+        }
+      }
+    }
+    
     return true;
   }).sort((a, b) => a.courseName.localeCompare(b.courseName));
 
@@ -301,11 +427,10 @@ export const Resources: React.FC<ResourcesProps> = () => {
             ]}
           />
 
-          <button className="flex items-center gap-2 pl-3 pr-3 py-2 rounded-xl border border-line bg-panel text-[11px] font-semibold text-muted hover:border-cyan/50 hover:text-text transition-all duration-200 cursor-pointer whitespace-nowrap">
-            <Calendar className="w-3.5 h-3.5 shrink-0" />
-            <span>Date Range</span>
-            <ChevronDown className="w-3 h-3" />
-          </button>
+          <DateRangeDropdown 
+            value={selectedDateRange} 
+            onChange={(v) => { setSelectedDateRange(v); simulateLoad(); }} 
+          />
         </div>
       </div>
 
@@ -369,7 +494,7 @@ export const Resources: React.FC<ResourcesProps> = () => {
                <FolderOpen className="w-12 h-12 text-muted mx-auto mb-3" />
                <p className="font-bold text-text">No resource files found</p>
                <button 
-                  onClick={() => { setSelectedType('All'); setSearchQuery(''); setSelectedCourse('All Courses'); setSelectedAccessLevel('All Levels'); }}
+                  onClick={() => { setSelectedType('All'); setSearchQuery(''); setSelectedCourse('All Courses'); setSelectedAccessLevel('All Levels'); setSelectedDateRange({ type: 'All Time' }); }}
                   className="mt-4 bg-cyan hover:bg-cyan2 text-bg text-[10px] font-bold px-4 py-2 rounded-xl"
                 >
                   Reset Filters
@@ -479,7 +604,7 @@ export const Resources: React.FC<ResourcesProps> = () => {
                     <p className="font-bold text-text">No resource files found</p>
                     <p className="text-muted text-xs mt-1 max-w-xs mx-auto">No resources match your search criteria or type filter settings.</p>
                     <button 
-                      onClick={() => { setSelectedType('All'); setSearchQuery(''); setSelectedCourse('All Courses'); setSelectedAccessLevel('All Levels'); }}
+                      onClick={() => { setSelectedType('All'); setSearchQuery(''); setSelectedCourse('All Courses'); setSelectedAccessLevel('All Levels'); setSelectedDateRange({ type: 'All Time' }); }}
                       className="mt-4 bg-cyan hover:bg-cyan2 text-bg text-[10px] font-bold px-4 py-2 rounded-xl transition-colors cursor-pointer"
                     >
                       Reset Filters
