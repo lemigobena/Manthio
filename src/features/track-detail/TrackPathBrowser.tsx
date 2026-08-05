@@ -107,8 +107,8 @@ export const TrackPathBrowser: React.FC<TrackPathBrowserProps> = ({
     return base.map((b, idx) => {
       const state: MilestoneState = b.isCompleted ? 'completed'
         : !b.isUnlocked ? 'locked'
-        : idx === currentIdx ? 'current'
-        : 'available';
+          : idx === currentIdx ? 'current'
+            : 'available';
       return { ms: b.ms, state };
     });
   }, [filteredMilestones, completedMilestoneIds, isEnrolled, selfAssessmentLevel]);
@@ -291,236 +291,229 @@ export const TrackPathBrowser: React.FC<TrackPathBrowserProps> = ({
 
   return (
     <div ref={wrapperRef} className="relative z-10">
-    {/* Pinned row: roadmap + course content at equal height. Both go static together,
+      {/* Pinned row: roadmap + course content at equal height. Both go static together,
         then the remaining page scroll (the spacer below) drives the course list. */}
-    <div className="lg:sticky lg:top-4 flex flex-col lg:flex-row gap-6 lg:gap-8">
-      {/* ── Left: roadmap container — same height as the course content panel. */}
-      <aside className="w-full lg:w-[320px] lg:shrink-0">
-        <div className="bg-panel border border-line rounded-2xl p-5 shadow-sm overflow-hidden flex flex-col h-[600px] lg:h-[calc(100dvh-5rem)] lg:max-h-[850px]">
-          {/* Header — stays put */}
-          <div className="flex items-center gap-2 px-1 pb-3 border-b border-line/60 shrink-0">
-            <GraduationCap className="w-4 h-4 text-cyan" />
-            <span className="text-[10px] font-black uppercase text-text tracking-widest">Course Roadmap</span>
-            <span className="ml-auto text-[10px] font-bold text-muted">
-              {enriched.length} steps
-            </span>
-          </div>
+      <div className="lg:sticky lg:top-4 flex flex-col lg:flex-row gap-6 lg:gap-8">
+        {/* ── Left: roadmap container — same height as the course content panel. */}
+        <aside className="w-full lg:w-[320px] lg:shrink-0">
+          <div className="bg-panel border border-line rounded-2xl p-5 shadow-sm overflow-hidden flex flex-col h-[600px] lg:h-[calc(100dvh-5rem)] lg:max-h-[850px]">
+            {/* Header — stays put */}
+            <div className="flex items-center gap-2 px-1 pb-3 border-b border-line/60 shrink-0">
+              <GraduationCap className="w-4 h-4 text-cyan" />
+              <span className="text-[10px] font-black uppercase text-text tracking-widest">Course Roadmap</span>
+              <span className="ml-auto text-[10px] font-bold text-muted">
+                {enriched.length} steps
+              </span>
+            </div>
 
-          {/* Internal scroller — directly scrollable (hidden scrollbar) without affecting
+            {/* Internal scroller — directly scrollable (hidden scrollbar) without affecting
               the selected course; the page scroll still drives it while pinned. */}
-          <div
-            ref={listScrollRef}
-            className="flex-1 min-h-0 overflow-y-auto scrollbar-hide overscroll-contain pt-4 -mr-3 pr-3"
-          >
-            {/* Track title — fills the gap above the first course */}
-            <h3 className="pl-6 pr-2 pb-1 text-sm font-black text-text leading-snug tracking-tight">
-              {trackTitle}
-            </h3>
-            <ul className="relative space-y-1.5 mt-2 pl-6">
-            {/* Continuous vertical rod for the timeline — neutral spine; the completed stretch is painted green per item */}
-            <div className="absolute left-[5px] top-10 bottom-8 w-[3px] rounded-full bg-line/60 z-0" />
+            <div
+              ref={listScrollRef}
+              className="flex-1 min-h-0 overflow-y-auto scrollbar-hide overscroll-contain pt-4 -mr-3 pr-3"
+            >
+              {/* Track title — fills the gap above the first course */}
+              <h3 className="pl-6 pr-2 pb-1 text-sm font-black text-text leading-snug tracking-tight">
+                {trackTitle}
+              </h3>
+              <ul className="relative space-y-1.5 mt-2 pl-6">
+                {/* Continuous vertical rod for the timeline — neutral spine; the completed stretch is painted green per item */}
+                <div className="absolute left-[5px] top-10 bottom-8 w-[3px] rounded-full bg-line/60 z-0" />
 
-            {enriched.map(({ ms, state }, idx) => {
-              const course = COURSES.find(c => c.id === ms.courseId);
-              const isSelected = ms.id === selectedId;
-              const isSub = ms.isSubCourse || false;
-              const nextIsSub = enriched[idx + 1]?.ms.isSubCourse || false;
+                {enriched.map(({ ms, state }, idx) => {
+                  const course = COURSES.find(c => c.id === ms.courseId);
+                  const isSelected = ms.id === selectedId;
+                  const isSub = ms.isSubCourse || false;
+                  const nextIsSub = enriched[idx + 1]?.ms.isSubCourse || false;
 
-              return (
-                <li key={ms.id} data-milestone-id={ms.id} className="relative z-10">
-                  {/* Green overlay on the spine for the completed stretch of the track */}
-                  {state === 'completed' && (
-                    <div
-                      className={`absolute left-[-19px] w-[3px] rounded-full bg-green -z-10 ${
-                        idx === 0 ? 'top-10' : 'top-[-8px]'
-                      } ${idx === enriched.length - 1 ? 'bottom-8' : 'bottom-[-8px]'}`}
-                    />
-                  )}
+                  return (
+                    <li key={ms.id} data-milestone-id={ms.id} className="relative z-10">
+                      {/* Green overlay on the spine for the completed stretch of the track */}
+                      {state === 'completed' && (
+                        <div
+                          className={`absolute left-[-19px] w-[3px] rounded-full bg-green -z-10 ${idx === 0 ? 'top-10' : 'top-[-8px]'
+                            } ${idx === enriched.length - 1 ? 'bottom-8' : 'bottom-[-8px]'}`}
+                        />
+                      )}
 
-                  {isSub ? (
-                    nextIsSub ? (
-                      <>
-                        {/* Rod drops from the initial course's dot and continues straight down to the next sub-course… */}
-                        <div className={`absolute left-[21px] top-[-26px] bottom-[-6px] w-[2px] -z-10 ${
-                          state === 'completed' ? 'bg-green' : 'bg-cyan/30'
-                        }`} />
-                        {/* …with a stub arm into this sub-course's dot */}
-                        <div className={`absolute left-[21px] top-[29px] w-[25px] h-[2px] -z-10 ${
-                          state === 'completed' ? 'bg-green' : 'bg-cyan/30'
-                        }`} />
-                      </>
-                    ) : (
-                      /* Bended rod: drops from the initial course's dot and bends into this last sub-course's dot */
-                      <div className={`absolute left-[21px] top-[-26px] w-[25px] h-[57px] border-l-2 border-b-2 rounded-bl-[10px] -z-10 ${
-                        state === 'completed' ? 'border-green' : 'border-cyan/30'
-                      }`} />
-                    )
-                  ) : (
-                    /* Branch: rod from the spine directly into the milestone's initial course dot */
-                    <div className={`absolute left-[-18px] top-[68px] w-10 h-[2px] -z-10 ${
-                      state === 'completed' ? 'bg-green' : 'bg-cyan/30'
-                    }`} />
-                  )}
+                      {isSub ? (
+                        nextIsSub ? (
+                          <>
+                            {/* Rod drops from the initial course's dot and continues straight down to the next sub-course… */}
+                            <div className={`absolute left-[21px] top-[-26px] bottom-[-6px] w-[2px] -z-10 ${state === 'completed' ? 'bg-green' : 'bg-cyan/30'
+                              }`} />
+                            {/* …with a stub arm into this sub-course's dot */}
+                            <div className={`absolute left-[21px] top-[29px] w-[25px] h-[2px] -z-10 ${state === 'completed' ? 'bg-green' : 'bg-cyan/30'
+                              }`} />
+                          </>
+                        ) : (
+                          /* Bended rod: drops from the initial course's dot and bends into this last sub-course's dot */
+                          <div className={`absolute left-[21px] top-[-26px] w-[25px] h-[57px] border-l-2 border-b-2 rounded-bl-[10px] -z-10 ${state === 'completed' ? 'border-green' : 'border-cyan/30'
+                            }`} />
+                        )
+                      ) : (
+                        /* Branch: rod from the spine directly into the milestone's initial course dot */
+                        <div className={`absolute left-[-18px] top-[68px] w-10 h-[2px] -z-10 ${state === 'completed' ? 'bg-green' : 'bg-cyan/30'
+                          }`} />
+                      )}
 
-                  {/* Continue the green fill from the last completed course down to the
+                      {/* Continue the green fill from the last completed course down to the
                       "you are here" beacon — on the spine for initial courses, on the
                       drop rod for sub-courses */}
-                  {state === 'current' && idx > 0 && enriched[idx - 1].state === 'completed' && (
-                    isSub ? (
-                      <div className="absolute left-[21px] top-[-26px] h-[56px] w-[2px] bg-green -z-10" />
-                    ) : (
-                      <div className="absolute left-[-19px] top-[-8px] h-[77px] w-[3px] rounded-full bg-green -z-10" />
-                    )
-                  )}
-
-                  {/* "You are here" beacon: circular green light fading in and out, sitting ON the rod
-                      — on the main spine for initial courses, on the branch rod for sub-courses */}
-                  {state === 'current' && (
-                    <div
-                      className={`absolute w-[14px] h-[14px] z-20 pointer-events-none ${
-                        isSub ? 'left-[15px] top-[23px]' : 'left-[-25px] top-[62px]'
-                      }`}
-                    >
-                      <span className="absolute inset-0 rounded-full bg-green/60 animate-ping [animation-duration:2s]" />
-                      <span className="absolute inset-[3px] rounded-full bg-green animate-pulse [animation-duration:2s] shadow-[0_0_10px_rgba(43,222,126,0.8)]" />
-                    </div>
-                  )}
-
-                  {!isSub && (
-                    <div className="pt-4 pb-2 pl-3">
-                      <span className="text-[10px] font-black uppercase text-muted/60 tracking-widest">
-                        {ms.label}
-                      </span>
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      manualSelectRef.current = true;
-                      cancelStepper();
-                      targetIdxRef.current = null;
-                      setSelectedId(ms.id);
-
-                      // Scroll so the reading line lands on this item (keeps click + scrollspy in agreement)
-                      const scroller = listScrollRef.current;
-                      const el = scroller?.querySelector(`[data-milestone-id="${ms.id}"]`) as HTMLElement | null;
-                      if (scroller && el) {
-                        const r = el.getBoundingClientRect();
-                        const sRect = scroller.getBoundingClientRect();
-                        const itemCenter = r.top - sRect.top + scroller.scrollTop + r.height / 2;
-                        const maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
-                        const target = maxScroll > 0
-                          ? Math.min(maxScroll, Math.max(0, (itemCenter * maxScroll) / (maxScroll + scroller.clientHeight)))
-                          : 0;
-                        const wrapper = wrapperRef.current;
-                        if (window.innerWidth >= 1024 && pinScrollRange > 0 && wrapper) {
-                          // Desktop: the list is driven by the page scroll — move the
-                          // scroll parent to the position that maps to this list offset
-                          // (inverse of the damped mapping, hence / PIN_SCROLL_SPEED).
-                          const scrollParent = getScrollParent(wrapper);
-                          const pinTop = (scrollParent ? scrollParent.getBoundingClientRect().top : 0) + 16;
-                          const delta = wrapper.getBoundingClientRect().top - pinTop + target / PIN_SCROLL_SPEED;
-                          (scrollParent ?? window).scrollBy({ top: delta, behavior: 'smooth' });
-                        } else {
-                          scroller.scrollTo({ top: target, behavior: 'smooth' });
-                        }
-                      }
-
-                      // Release manual override after scroll completes
-                      setTimeout(() => { manualSelectRef.current = false; }, 1000);
-                    }}
-                    className={`text-left group relative flex items-center gap-3.5 py-3 px-3 rounded-2xl transition-all duration-300 bg-bg/60 ${isSub ? 'ml-6 w-[calc(100%-1.5rem)]' : 'w-full'
-                      } ${isSelected
-                        ? 'bg-bg border border-line shadow-md z-20'
-                        : 'border border-transparent hover:bg-bg'
-                      }`}
-                  >
-                    {/* State icon: completed / current / available / locked */}
-                    <div className="relative flex items-center justify-center w-5 h-5 shrink-0 bg-bg rounded-full">
-                      <span
-                        className={`absolute inset-0 rounded-full transition-transform duration-300 ${isSelected ? 'scale-100 opacity-20' : 'scale-50 opacity-0 group-hover:scale-100 group-hover:opacity-10'
-                          } ${
-                            state === 'completed' ? 'bg-green'
-                            : state === 'current' ? 'bg-green'
-                            : state === 'available' ? 'bg-cyan'
-                            : 'bg-muted'
-                          }`}
-                      />
-                      {state === 'completed' ? (
-                        <CheckCircle2 className="w-4 h-4 shrink-0 relative z-10 text-green" />
-                      ) : state === 'current' ? (
-                        <Play className="w-3.5 h-3.5 shrink-0 relative z-10 text-green fill-green" />
-                      ) : state === 'locked' ? (
-                        <Lock className="w-3.5 h-3.5 shrink-0 relative z-10 text-muted" />
-                      ) : (
-                        <Circle className="w-3.5 h-3.5 shrink-0 relative z-10 text-cyan/60" />
+                      {state === 'current' && idx > 0 && enriched[idx - 1].state === 'completed' && (
+                        isSub ? (
+                          <div className="absolute left-[21px] top-[-26px] h-[56px] w-[2px] bg-green -z-10" />
+                        ) : (
+                          <div className="absolute left-[-19px] top-[-8px] h-[77px] w-[3px] rounded-full bg-green -z-10" />
+                        )
                       )}
-                    </div>
 
-                    {/* Title + meta */}
-                    <div className="min-w-0 flex-1">
-                      <p className={`text-xs font-bold leading-tight truncate transition-colors ${isSelected ? 'text-text' : state === 'locked' ? 'text-muted/70' : 'text-text/90 group-hover:text-text'
-                        }`}>
-                        {course?.title ?? ms.label}
-                      </p>
-                      {course && (
-                        <div className="flex items-center gap-2 mt-1">
-                          <p className="text-[10px] text-muted font-medium flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {course.duration}
-                          </p>
-                          {ms.isOptional && (
-                            <span className="text-[8px] font-black uppercase text-purple tracking-widest bg-purple/10 px-1.5 py-0.5 rounded">
-                              Optional
-                            </span>
-                          )}
+                      {/* "You are here" beacon: circular green light fading in and out, sitting ON the rod
+                      — on the main spine for initial courses, on the branch rod for sub-courses */}
+                      {state === 'current' && (
+                        <div
+                          className={`absolute w-[14px] h-[14px] z-20 pointer-events-none ${isSub ? 'left-[15px] top-[23px]' : 'left-[-25px] top-[62px]'
+                            }`}
+                        >
+                          <span className="absolute inset-0 rounded-full bg-green/60 animate-ping [animation-duration:2s]" />
+                          <span className="absolute inset-[3px] rounded-full bg-green animate-pulse [animation-duration:2s] shadow-[0_0_10px_rgba(43,222,126,0.8)]" />
                         </div>
                       )}
-                    </div>
 
-                    <ChevronRight
-                      className={`w-4 h-4 shrink-0 transition-all ${isSelected ? 'text-cyan opacity-100 translate-x-0' : 'text-muted/30 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-cyan'
-                        }`}
-                    />
-                  </button>
-                </li>
-              );
-            })}
-            </ul>
+                      {!isSub && (
+                        <div className="pt-4 pb-2 pl-3">
+                          <span className="text-[10px] font-black uppercase text-muted/60 tracking-widest">
+                            {ms.label}
+                          </span>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          manualSelectRef.current = true;
+                          cancelStepper();
+                          targetIdxRef.current = null;
+                          setSelectedId(ms.id);
+
+                          // Scroll so the reading line lands on this item (keeps click + scrollspy in agreement)
+                          const scroller = listScrollRef.current;
+                          const el = scroller?.querySelector(`[data-milestone-id="${ms.id}"]`) as HTMLElement | null;
+                          if (scroller && el) {
+                            const r = el.getBoundingClientRect();
+                            const sRect = scroller.getBoundingClientRect();
+                            const itemCenter = r.top - sRect.top + scroller.scrollTop + r.height / 2;
+                            const maxScroll = Math.max(0, scroller.scrollHeight - scroller.clientHeight);
+                            const target = maxScroll > 0
+                              ? Math.min(maxScroll, Math.max(0, (itemCenter * maxScroll) / (maxScroll + scroller.clientHeight)))
+                              : 0;
+                            const wrapper = wrapperRef.current;
+                            if (window.innerWidth >= 1024 && pinScrollRange > 0 && wrapper) {
+                              // Desktop: the list is driven by the page scroll — move the
+                              // scroll parent to the position that maps to this list offset
+                              // (inverse of the damped mapping, hence / PIN_SCROLL_SPEED).
+                              const scrollParent = getScrollParent(wrapper);
+                              const pinTop = (scrollParent ? scrollParent.getBoundingClientRect().top : 0) + 16;
+                              const delta = wrapper.getBoundingClientRect().top - pinTop + target / PIN_SCROLL_SPEED;
+                              (scrollParent ?? window).scrollBy({ top: delta, behavior: 'smooth' });
+                            } else {
+                              scroller.scrollTo({ top: target, behavior: 'smooth' });
+                            }
+                          }
+
+                          // Release manual override after scroll completes
+                          setTimeout(() => { manualSelectRef.current = false; }, 1000);
+                        }}
+                        className={`text-left group relative flex items-center gap-3.5 py-3 px-3 rounded-2xl transition-all duration-300 bg-bg/60 ${isSub ? 'ml-6 w-[calc(100%-1.5rem)]' : 'w-full'
+                          } ${isSelected
+                            ? 'bg-bg border border-line shadow-md z-20'
+                            : 'border border-transparent hover:bg-bg'
+                          }`}
+                      >
+                        {/* State icon: completed / current / available / locked */}
+                        <div className="relative flex items-center justify-center w-5 h-5 shrink-0 bg-bg rounded-full">
+                          <span
+                            className={`absolute inset-0 rounded-full transition-transform duration-300 ${isSelected ? 'scale-100 opacity-20' : 'scale-50 opacity-0 group-hover:scale-100 group-hover:opacity-10'
+                              } ${state === 'completed' ? 'bg-green'
+                                : state === 'current' ? 'bg-green'
+                                  : state === 'available' ? 'bg-cyan'
+                                    : 'bg-muted'
+                              }`}
+                          />
+                          {state === 'completed' ? (
+                            <CheckCircle2 className="w-4 h-4 shrink-0 relative z-10 text-green" />
+                          ) : state === 'current' ? (
+                            <Play className="w-3.5 h-3.5 shrink-0 relative z-10 text-green fill-green" />
+                          ) : state === 'locked' ? (
+                            <Lock className="w-3.5 h-3.5 shrink-0 relative z-10 text-muted" />
+                          ) : (
+                            <Circle className="w-3.5 h-3.5 shrink-0 relative z-10 text-cyan/60" />
+                          )}
+                        </div>
+
+                        {/* Title + meta */}
+                        <div className="min-w-0 flex-1">
+                          <p className={`text-xs font-bold leading-tight truncate transition-colors ${isSelected ? 'text-text' : state === 'locked' ? 'text-muted/70' : 'text-text/90 group-hover:text-text'
+                            }`}>
+                            {course?.title ?? ms.label}
+                          </p>
+                          {course && (
+                            <div className="flex items-center gap-2 mt-1">
+                              <p className="text-[10px] text-muted font-medium flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {course.duration}
+                              </p>
+                              {ms.isOptional && (
+                                <span className="text-[8px] font-black uppercase text-purple tracking-widest bg-purple/10 px-1.5 py-0.5 rounded">
+                                  Optional
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        <ChevronRight
+                          className={`w-4 h-4 shrink-0 transition-all ${isSelected ? 'text-cyan opacity-100 translate-x-0' : 'text-muted/30 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-cyan'
+                            }`}
+                        />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           </div>
-        </div>
-      </aside>
+        </aside>
 
-      {/* ── Right: course content panel — equal height, static alongside the roadmap ── */}
-      <section className="relative flex-1 min-w-0 h-[600px] lg:h-[calc(100dvh-5rem)] lg:max-h-[850px]">
-        {selected && selectedCourse ? (
-          <>
-            {/* Outgoing card holds still underneath while the new one slides over it */}
-            {outgoing && outgoingCourse && (
-              <div key={outgoing.ms.id} className="absolute inset-0 z-0">
+        {/* ── Right: course content panel — equal height, static alongside the roadmap ── */}
+        <section className="relative flex-1 min-w-0 h-[600px] lg:h-[calc(100dvh-5rem)] lg:max-h-[850px]">
+          {selected && selectedCourse ? (
+            <>
+              {/* Outgoing card holds still underneath while the new one slides over it */}
+              {outgoing && outgoingCourse && (
+                <div key={outgoing.ms.id} className="absolute inset-0 z-0">
+                  <CourseDetailPanel
+                    course={outgoingCourse}
+                    milestone={outgoing.ms}
+                    state={outgoing.state}
+                    completedLessonIds={completedLessonIds}
+                    onNavigateToCourse={onNavigateToCourse}
+                    animateEntry={false}
+                  />
+                </div>
+              )}
+              {/* Incoming card slides in from the right, landing exactly on top */}
+              <div key={selected.ms.id} className="absolute inset-0 z-10 slide-over-card">
                 <CourseDetailPanel
-                  course={outgoingCourse}
-                  milestone={outgoing.ms}
-                  state={outgoing.state}
+                  course={selectedCourse}
+                  milestone={selected.ms}
+                  state={selected.state}
                   completedLessonIds={completedLessonIds}
                   onNavigateToCourse={onNavigateToCourse}
-                  animateEntry={false}
+                  animateEntry={!outgoing}
                 />
               </div>
-            )}
-            {/* Incoming card slides in from the right, landing exactly on top */}
-            <div key={selected.ms.id} className="absolute inset-0 z-10 slide-over-card">
-              <CourseDetailPanel
-                course={selectedCourse}
-                milestone={selected.ms}
-                state={selected.state}
-                completedLessonIds={completedLessonIds}
-                onNavigateToCourse={onNavigateToCourse}
-                animateEntry={!outgoing}
-              />
-            </div>
-            <style>{`
+              <style>{`
               @keyframes slide-over-from-right {
                 from { transform: translateX(calc(100% + 2rem)); }
                 to { transform: translateX(0); }
@@ -529,24 +522,24 @@ export const TrackPathBrowser: React.FC<TrackPathBrowserProps> = ({
                 animation: slide-over-from-right ${SLIDE_DURATION_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both;
               }
             `}</style>
-          </>
-        ) : (
-          <div className="bg-panel border border-line rounded-2xl p-8 text-center text-muted">
-            No course selected.
-          </div>
-        )}
-      </section>
-    </div>
+            </>
+          ) : (
+            <div className="bg-panel border border-line rounded-2xl p-8 text-center text-muted">
+              No course selected.
+            </div>
+          )}
+        </section>
+      </div>
 
-    {/* Spacer: page-scroll distance consumed while pinned — translated into the course
+      {/* Spacer: page-scroll distance consumed while pinned — translated into the course
         list scrolling through the roadmap at PIN_SCROLL_SPEED (page distance grows by
         its inverse). The extra PIN_HOLD_PX keeps both panels static after the LAST
         course is reached, so its content is shown before they release. */}
-    <div
-      style={{ height: pinScrollRange > 0 ? pinScrollRange / PIN_SCROLL_SPEED + PIN_HOLD_PX : 0 }}
-      className="hidden lg:block"
-      aria-hidden="true"
-    />
+      <div
+        style={{ height: pinScrollRange > 0 ? pinScrollRange / PIN_SCROLL_SPEED + PIN_HOLD_PX : 0 }}
+        className="hidden lg:block"
+        aria-hidden="true"
+      />
     </div>
   );
 };
@@ -582,17 +575,42 @@ const CourseDetailPanel: React.FC<{
         }`}
     >
       {/* ── Full-bleed Background Image — soft-fades out toward every edge ── */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <img
-          src={imageUrl}
-          alt={course.title}
-          className={`w-full h-full object-cover transition-transform duration-[1500ms] ease-out ${entered ? 'scale-100' : 'scale-105'
-            } ${state === 'locked' ? 'opacity-40 grayscale blur-[2px]' : ''}`}
-          style={{
-            maskImage: 'radial-gradient(ellipse 75% 75% at center, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 75% 75% at center, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%)',
-          }}
-        />
+      <div
+        className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
+        style={{
+          maskImage: 'radial-gradient(ellipse 75% 75% at center, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 75% 75% at center, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%)',
+        }}
+      >
+        <div className={`absolute right-[-100px] bottom-0 h-[70%] aspect-[1.5] pointer-events-none transition-transform duration-[1500ms] ease-out ${entered ? 'scale-100' : 'scale-105'
+          }`}>
+          <img
+            src={imageUrl}
+            alt={course.title}
+            className={`w-full h-full object-fill ${state === 'locked' ? 'opacity-40 grayscale blur-[2px]' : ''}`}
+          />
+          {/* Overlay current course image over the desktop monitor screen in pythonbg.png */}
+          <div
+            className={`absolute overflow-hidden rounded-[2px] bg-black shadow-inner transition-all duration-[1500ms] ease-out ${state === 'locked' ? 'opacity-40 grayscale blur-[1px]' : 'opacity-100'
+              }`}
+            style={{
+              top: '28.71%',
+              right: '16.08%',
+              width: '33.5%',
+              height: '35.5%',
+              clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% calc(100% - 13px))',
+              WebkitClipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% calc(100% - 13px))',
+            }}
+          >
+            <img
+              src={course.imageUrl}
+              alt={course.title}
+              className="w-full h-full object-cover"
+            />
+            {/* Screen glare gloss */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/20 pointer-events-none" />
+          </div>
+        </div>
       </div>
 
       {/* ── Animated particle network (same as the landing hero) filling the empty top
