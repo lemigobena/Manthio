@@ -103,8 +103,8 @@ export const TrackDetail: React.FC<TrackDetailProps> = ({ onNavigate }) => {
   // large desktops (≥1280px) get the pinned roadmap browser.
   const getViewport = () =>
     window.matchMedia('(max-width: 767px)').matches ? 'phone'
-    : window.matchMedia('(max-width: 1279px)').matches ? 'tablet'
-    : 'desktop';
+      : window.matchMedia('(max-width: 1279px)').matches ? 'tablet'
+        : 'desktop';
   const [viewport, setViewport] = useState<'phone' | 'tablet' | 'desktop'>(getViewport);
 
   useEffect(() => {

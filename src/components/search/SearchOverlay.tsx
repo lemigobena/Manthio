@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Search, X, BookOpen, Clock, FileText, MessageSquare, 
   Trash2, Video, Code, Award, CheckCircle, HelpCircle as QuestionIcon,
-  Gamepad2, ClipboardEdit, ExternalLink
+  Gamepad2, ClipboardEdit, ExternalLink, BrainCircuit
 } from 'lucide-react';
 import { COURSES, RESOURCES, FORUM_CHANNELS, MOCK_NOTES, MOCK_TUTOR_CONVERSATIONS } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
@@ -176,7 +176,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
     results.courses.forEach(c => flatResults.push({ type: 'course', id: `c-${c.id}`, title: c.title, courseId: c.id, enrolled: c.enrolled, data: c }));
     results.lessons.forEach(l => flatResults.push({ type: 'lesson', id: `l-${l.id}`, title: l.title, courseId: l.courseId, data: l }));
     results.resources.forEach(r => flatResults.push({ type: 'resource', id: `r-${r.id}`, title: r.name, data: r }));
-    results.threads.forEach(t => flatResults.push({ type: 'thread', id: `t-${t.id}`, title: t.title, data: t }));
+    results.threads.forEach(t => flatResults.push({ type: 'thread', id: `t-${t.id}`, title: t.title || t.body.slice(0, 40), data: t }));
     results.notes.forEach(n => flatResults.push({ type: 'note', id: `n-${n.id}`, title: n.title, data: n }));
     results.tutor.forEach(t => flatResults.push({ type: 'tutor', id: `tu-${t.id}`, title: t.title, data: t }));
   }
@@ -515,7 +515,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
                               <MessageSquare className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
-                              <h4 className="text-xs font-bold text-text truncate">{thread.title}</h4>
+                              <h4 className="text-xs font-bold text-text truncate">{thread.title || thread.body.slice(0, 40)}</h4>
                               <p className="text-[10px] text-muted truncate mt-0.5">
                                 by {thread.author} in {thread.category} • {thread.replies.length} replies
                               </p>
@@ -591,8 +591,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
                           }`}
                         >
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="p-2 bg-panel border border-line rounded-lg text-green">
-                              <MessageSquare className="w-4 h-4" />
+                            <div className="p-2 bg-panel border border-line rounded-lg text-cyan">
+                              <BrainCircuit className="w-4 h-4" />
                             </div>
                             <div className="min-w-0">
                               <h4 className="text-xs font-bold text-text truncate">{chat.title}</h4>

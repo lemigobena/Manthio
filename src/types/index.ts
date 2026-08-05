@@ -366,7 +366,7 @@ export interface ForumReply {
 
 export interface ChannelMessage {
   id: string;
-  title: string;
+  title?: string;
   author: string;
   avatar?: string;
   body: string;

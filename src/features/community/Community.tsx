@@ -3,12 +3,45 @@ import { FORUM_CHANNELS, COURSES } from '../../services/mockData';
 import { useXP } from '../../context/XPContext';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { MessageSquare, ArrowUp, ArrowDown, Check, Sparkles, Send, Hash, X, MessageCircle, ChevronRight, PanelLeft, PanelLeftClose, PanelRightClose, Code, Image as ImageIcon, ArrowLeft, Bell, BellOff } from 'lucide-react';
+import { MessageSquare, ArrowUp, ArrowDown, Check, Send, Hash, X, MessageCircle, ChevronRight, PanelLeft, PanelLeftClose, PanelRightClose, Code, Image as ImageIcon, ArrowLeft, Bell, BellOff, BrainCircuit } from 'lucide-react';
 import { getCourseIconType } from '../../utils/courseIconUtils';
 import { GeneralIcon } from '../../utils/courseIcons';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import type { ForumChannel, ChannelMessage, ForumReply } from '../../types';
+import boy from '../../assets/avatars/boy.png';
+import girl from '../../assets/avatars/girl.png';
+import man from '../../assets/avatars/man.png';
+import man1 from '../../assets/avatars/man(1).png';
+import woman from '../../assets/avatars/woman.png';
+import woman1 from '../../assets/avatars/woman(1).png';
+import woman2 from '../../assets/avatars/woman(2).png';
+import fox from '../../assets/avatars/fox.png';
+import rabbit from '../../assets/avatars/rabbit.png';
+import profile from '../../assets/avatars/profile.png';
+import defaultAvatar from '../../assets/avatars/avatar.png';
+
+const getAuthorAvatar = (author: string, customAvatar?: string, userAvatar?: string, userName?: string): string => {
+  if (customAvatar) return customAvatar;
+  if (userAvatar && (author === userName || author === 'Alex Chen' || author === 'Demo Chen')) {
+    return userAvatar;
+  }
+  const avatarMap: Record<string, string> = {
+    'Dr. Sarah Chen': woman,
+    'Marc K.': man,
+    'Marc Kaufmann': man,
+    'Tanya S.': woman1,
+    'Lena Hofmann': woman2,
+    'Jonas Weber': man1,
+    'Priya Nair': girl,
+    'Tomás Rivera': boy,
+    'Yuki Tanaka': fox,
+    'Fatima Al-Rashid': rabbit,
+    'David Osei': profile,
+    'System': defaultAvatar,
+  };
+  return avatarMap[author] || userAvatar || defaultAvatar;
+};
 
 // Course-specific channel icon — uses centralized courseIcons util
 const getChannelIcon = (channel: ForumChannel, className = 'w-4 h-4') => {
@@ -199,7 +232,7 @@ export const Community: React.FC<CommunityProps> = () => {
                 replies: [...msg.replies, {
                   id: generateId(),
                   author: 'AI Tutor',
-                  body: `Socratic assistance: Based on your question about "${latestMessage.title}", have you considered reviewing the core documentation for this topic? Often, the solution lies in understanding the base paradigm. What specific part is causing the error?`,
+                  body: `Socratic assistance: Based on your question${latestMessage.title && !/^Question\s+\d+$/i.test(latestMessage.title) ? ` about "${latestMessage.title}"` : ''}, have you considered reviewing the core documentation for this topic? Often, the solution lies in understanding the base paradigm. What specific part is causing the error?`,
                   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                   upvotes: 0,
                   isAiSuggested: true
@@ -217,11 +250,12 @@ export const Community: React.FC<CommunityProps> = () => {
 
   const handlePostThread = () => {
     if (!newThreadBody.trim()) return;
-    const finalTitle = newThreadTitle.trim() || `Question ${activeChannel ? activeChannel.messages.length + 1 : 1}`;
+    const finalTitle = newThreadTitle.trim() || undefined;
     const newMsg: ChannelMessage = {
       id: generateId(),
       title: finalTitle,
       author: user?.name || 'Alex Chen',
+      avatar: user?.avatar,
       body: newThreadBody,
       category: activeChannelName || 'General',
       upvotes: 1,
@@ -245,6 +279,7 @@ export const Community: React.FC<CommunityProps> = () => {
     const newRep: ForumReply = {
       id: generateId(),
       author: user?.name || 'Alex Chen',
+      avatar: user?.avatar,
       body: replyInput,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       upvotes: 1
@@ -482,9 +517,11 @@ export const Community: React.FC<CommunityProps> = () => {
                         : 'hover:bg-panel/40 border border-transparent hover:shadow-sm'
                     } ${isOwnMessage ? 'border-l-purple/50' : ''}`}
                   >
-                    <div className="w-10 h-10 rounded-xl bg-purple/20 flex items-center justify-center shrink-0 text-purple font-bold">
-                      {msg.author.charAt(0)}
-                    </div>
+                    <img
+                      src={getAuthorAvatar(msg.author, msg.avatar, user?.avatar, user?.name)}
+                      alt={msg.author}
+                      className="w-10 h-10 rounded-xl object-cover shrink-0 border border-line/50"
+                    />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline space-x-2">
                         <span className="font-bold text-text text-sm">{msg.author}</span>
@@ -494,8 +531,10 @@ export const Community: React.FC<CommunityProps> = () => {
                         <span className="text-[10px] text-muted">{msg.timestamp}</span>
                       </div>
                       <div className="mt-1">
-                        <h4 className="font-bold text-text text-base">{msg.title}</h4>
-                        <div className="text-text/90 text-sm mt-1 whitespace-pre-wrap">{renderBody(msg.body)}</div>
+                        {msg.title && msg.title.trim() && !/^Question\s+\d+$/i.test(msg.title.trim()) && (
+                          <h4 className="font-bold text-text text-base mb-1">{msg.title}</h4>
+                        )}
+                        <div className="text-text/90 text-sm whitespace-pre-wrap">{renderBody(msg.body)}</div>
                       </div>
                       
                       {msg.tags && msg.tags.length > 0 && (
@@ -663,15 +702,19 @@ export const Community: React.FC<CommunityProps> = () => {
             {/* Original Post */}
             <div className="p-5 border-b border-line">
               <div className="flex space-x-3">
-                <div className="w-10 h-10 rounded-xl bg-purple/20 flex items-center justify-center shrink-0 text-purple font-bold">
-                  {activeThread.author.charAt(0)}
-                </div>
+                <img
+                  src={getAuthorAvatar(activeThread.author, activeThread.avatar, user?.avatar, user?.name)}
+                  alt={activeThread.author}
+                  className="w-10 h-10 rounded-xl object-cover shrink-0 border border-line/50"
+                />
                 <div>
                   <div className="flex items-baseline space-x-2">
                     <span className="font-bold text-text text-sm">{activeThread.author}</span>
                     <span className="text-[10px] text-muted">{activeThread.timestamp}</span>
                   </div>
-                  <h4 className="font-bold text-text text-base mt-1">{activeThread.title}</h4>
+                  {activeThread.title && activeThread.title.trim() && !/^Question\s+\d+$/i.test(activeThread.title.trim()) && (
+                    <h4 className="font-bold text-text text-base mt-1">{activeThread.title}</h4>
+                  )}
                   <div className="text-text/90 text-sm mt-2 whitespace-pre-wrap">{renderBody(activeThread.body)}</div>
                   {activeThread.tags && activeThread.tags.length > 0 && (
                     <div className="flex items-center flex-wrap gap-1.5 mt-3">
@@ -714,14 +757,22 @@ export const Community: React.FC<CommunityProps> = () => {
               <div className="flex items-center space-x-4">
                 <div className="h-px bg-line flex-1" />
                 <span className="text-[10px] font-bold text-muted uppercase">{activeThread.replies.length} replies</span>
-                <div className="h-px bg-line flex-1" />
+                        <div className="h-px bg-line flex-1" />
               </div>
 
               {activeThread.replies.map(reply => (
                 <div key={reply.id} className="flex space-x-3 relative group">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 font-bold ${reply.isAiSuggested ? 'bg-purple text-bg' : 'bg-cyan/20 text-cyan'}`}>
-                    {reply.isAiSuggested ? <Sparkles size={16} /> : reply.author.charAt(0)}
-                  </div>
+                  {reply.isAiSuggested ? (
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 font-bold bg-purple text-bg">
+                      <BrainCircuit size={16} />
+                    </div>
+                  ) : (
+                    <img
+                      src={getAuthorAvatar(reply.author, reply.avatar, user?.avatar, user?.name)}
+                      alt={reply.author}
+                      className="w-8 h-8 rounded-lg object-cover shrink-0 border border-line/50"
+                    />
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline space-x-2">
                       <span className="font-bold text-text text-sm">{reply.author}</span>

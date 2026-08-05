@@ -3,7 +3,7 @@ import { useXP } from '../../context/XPContext';
 import {
   Video, Users, MessageSquare, BookOpen, Clock, Calendar,
   Download, ArrowRight, CheckCircle2, Sparkles,
-  Send, Hand, BarChart3, Bot, ChevronRight, Check,
+  Send, Hand, BarChart3, ChevronRight, Check,
   ExternalLink, Info, Star, Plus, ShieldCheck, ArrowUp,
   MessageCircle, ChevronDown, X, CalendarPlus,
   BrainCircuit
@@ -590,7 +590,7 @@ const ActiveSessionView: React.FC<{
         <div className="flex border-b border-line shrink-0 overflow-x-auto hide-scrollbar">
           {([
             { id: 'chat', icon: MessageSquare, label: 'Chat' },
-            { id: 'ai-tutor', icon: Bot, label: 'AI Tutor' },
+            { id: 'ai-tutor', icon: BrainCircuit, label: 'AI Tutor' },
             { id: 'polls', icon: BarChart3, label: 'Polls' },
             { id: 'materials', icon: BookOpen, label: 'Resources' }
           ] as const).map((tab) => (
@@ -615,7 +615,7 @@ const ActiveSessionView: React.FC<{
                   if (msg.isTutor) {
                     return (
                       <div key={msg.id} className="bg-purple/5 border border-purple/20 rounded-xl p-3 flex space-x-3">
-                        <Bot size={16} className="text-purple shrink-0" />
+                        <BrainCircuit size={16} className="text-purple shrink-0" />
                         <div className="space-y-1">
                           <span className="text-[9px] font-bold text-purple uppercase tracking-widest">{msg.sender}</span>
                           <p className="text-[10px] text-text/90 italic">{msg.text}</p>
@@ -1451,7 +1451,7 @@ const TrainerDirectView: React.FC<{
         <div className={`max-w-[90%] md:max-w-[65%] transition-all duration-500 overflow-hidden ${isAnswerExpanded ? 'bg-purple/10 border-purple/40 ring-1 ring-purple/20' : 'bg-purple/5 border-purple/20'
           } border rounded-2xl p-4 flex flex-col space-y-3 relative`}>
           <div className="flex items-start space-x-3">
-            <Bot size={18} className="text-purple shrink-0 mt-1" />
+            <BrainCircuit size={18} className="text-purple shrink-0 mt-1" />
             <div className="flex-1 space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex flex-wrap items-center gap-1.5">

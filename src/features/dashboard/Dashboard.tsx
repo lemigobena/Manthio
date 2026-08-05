@@ -786,10 +786,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {displayCourses.map((course, index) => {
-                    const colors = ['cyan', 'purple', 'yellow', 'green'];
-                    const color = colors[index % colors.length];
+                  {displayCourses.map((course) => {
                     const isCompleted = course.progress === 100 || heroState === 'all-completed' || course.title === 'Command Line Basics';
+                    const color = isCompleted ? 'green' : 'yellow';
                     const completedModules = course.modules.filter(m => m.status === 'Completed').length;
                     const totalModules = course.modules.length;
                     const progress = isCompleted ? 100 : course.progress;
@@ -800,21 +799,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                     const strokeOffset = circumference * (1 - progress / 100);
 
                     // Color mapping for SVG stroke
-                    const strokeColor = color === 'cyan' ? 'var(--color-cyan)' : color === 'purple' ? '#b624ff' : color === 'yellow' ? '#ffb800' : '#00ff9d';
+                    const strokeColor = color === 'green' ? '#00ff9d' : color === 'yellow' ? '#ffb800' : color === 'cyan' ? 'var(--color-cyan)' : '#b624ff';
 
                     // Static class maps so Tailwind v4 scanner can detect all color classes
                     const upNextClasses = {
-                      cyan:   { wrap: 'bg-cyan/5 border-cyan/15',     icon: 'text-cyan' },
+                      cyan: { wrap: 'bg-cyan/5 border-cyan/15', icon: 'text-cyan' },
                       purple: { wrap: 'bg-purple/5 border-purple/15', icon: 'text-purple' },
                       yellow: { wrap: 'bg-yellow/5 border-yellow/15', icon: 'text-yellow' },
-                      green:  { wrap: 'bg-green/5 border-green/15',   icon: 'text-green' },
+                      green: { wrap: 'bg-green/5 border-green/15', icon: 'text-green' },
                     }[color] ?? { wrap: 'bg-cyan/5 border-cyan/15', icon: 'text-cyan' };
 
                     const colorClasses = {
-                      cyan:   { badge: 'bg-cyan text-bg',        pill: 'bg-cyan/10 border-cyan/20 text-cyan',     icon: 'text-cyan',   format: 'bg-cyan/10 text-cyan border-cyan/20' },
-                      purple: { badge: 'bg-purple text-bg',      pill: 'bg-purple/10 border-purple/20 text-purple', icon: 'text-purple', format: 'bg-purple/10 text-purple border-purple/20' },
-                      yellow: { badge: 'bg-yellow text-bg',      pill: 'bg-yellow/10 border-yellow/20 text-yellow', icon: 'text-yellow', format: 'bg-yellow/10 text-yellow border-yellow/20' },
-                      green:  { badge: 'bg-green text-bg',       pill: 'bg-green/10 border-green/20 text-green',   icon: 'text-green',  format: 'bg-green/10 text-green border-green/20' },
+                      cyan: { badge: 'bg-cyan text-bg', pill: 'bg-cyan/10 border-cyan/20 text-cyan', icon: 'text-cyan', format: 'bg-cyan/10 text-cyan border-cyan/20' },
+                      purple: { badge: 'bg-purple text-bg', pill: 'bg-purple/10 border-purple/20 text-purple', icon: 'text-purple', format: 'bg-purple/10 text-purple border-purple/20' },
+                      yellow: { badge: 'bg-yellow text-bg', pill: 'bg-yellow/10 border-yellow/20 text-yellow', icon: 'text-yellow', format: 'bg-yellow/10 text-yellow border-yellow/20' },
+                      green: { badge: 'bg-green text-bg', pill: 'bg-green/10 border-green/20 text-green', icon: 'text-green', format: 'bg-green/10 text-green border-green/20' },
                     }[color] ?? { badge: 'bg-cyan text-bg', pill: 'bg-cyan/10 border-cyan/20 text-cyan', icon: 'text-cyan', format: 'bg-cyan/10 text-cyan border-cyan/20' };
 
                     return (
@@ -833,7 +832,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                           {/* Status badge */}
                           {isCompleted ? (
-                            <span className="absolute top-3 left-3 bg-yellow/90 text-bg text-[10px] font-black tracking-widest uppercase px-2.5 py-1 rounded-md backdrop-blur-sm flex items-center gap-1">
+                            <span className="absolute top-3 left-3 bg-green/90 text-bg text-[10px] font-black tracking-widest uppercase px-2.5 py-1 rounded-md backdrop-blur-sm flex items-center gap-1">
                               <Check className="w-3 h-3" /> Completed
                             </span>
                           ) : (
@@ -872,13 +871,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
 
                           {/* Next lesson / completion strip — always shown for equal height */}
                           {isCompleted ? (
-                            <div className="flex items-center gap-2 bg-yellow/5 border border-yellow/15 rounded-xl px-3 py-2.5 mb-4">
-                              <Trophy className="w-4 h-4 text-yellow shrink-0" />
+                            <div className="flex items-center gap-2 bg-green/5 border border-green/15 rounded-xl px-3 py-2.5 mb-4">
+                              <Trophy className="w-4 h-4 text-green shrink-0" />
                               <div className="min-w-0">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-muted mb-0.5">All Done</p>
                                 <p className="text-xs font-semibold text-text truncate">All modules completed</p>
                               </div>
-                              <span className="ml-auto text-[10px] font-bold text-yellow shrink-0">100%</span>
+                              <span className="ml-auto text-[10px] font-bold text-green shrink-0">100%</span>
                             </div>
                           ) : course.modules[0]?.lessons[0] ? (
                             <div className={`flex items-center gap-2 ${upNextClasses.wrap} border rounded-xl px-3 py-2.5 mb-4`}>
@@ -936,11 +935,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate, mockState }) =
 
                           {/* Bottom Pill */}
                           {isCompleted ? (
-                            <div className="bg-yellow/10 border border-yellow/20 rounded-xl px-4 py-2.5 flex items-center justify-between">
-                              <span className="text-xs font-semibold text-yellow flex items-center gap-1.5">
+                            <div className="bg-green/10 border border-green/20 rounded-xl px-4 py-2.5 flex items-center justify-between">
+                              <span className="text-xs font-semibold text-green flex items-center gap-1.5">
                                 <Trophy className="w-3 h-3" /> Course completed — Review
                               </span>
-                              <ChevronRight className="w-4 h-4 text-yellow" />
+                              <ChevronRight className="w-4 h-4 text-green" />
                             </div>
                           ) : (
                             <div className={`${colorClasses.pill} border rounded-xl px-4 py-2.5 flex items-center justify-between`}>

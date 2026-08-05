@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   BookOpen, Mic, ThumbsUp, ThumbsDown, Copy, Plus,
-  ArrowUp, Globe, Check, StickyNote
+  ArrowUp, Globe, Check, StickyNote, BrainCircuit
 } from 'lucide-react';
 import type { ChatMessage } from '../../../types';
 import ReactMarkdown from 'react-markdown';
@@ -170,6 +170,7 @@ export const AITutorChat: React.FC<AITutorChatProps> = ({
       {embedded && (
         <div className="flex items-center justify-between px-4 py-3 border-b border-line bg-panel/50 backdrop-blur-md z-10 shrink-0">
           <div className="flex items-center space-x-2">
+            <BrainCircuit size={16} className="text-cyan" />
             <h3 className="text-xs font-bold text-text">AI Tutor</h3>
             <span className="px-2 py-0.5 bg-cyan/10 text-cyan rounded text-[9px] font-bold uppercase tracking-widest">Active</span>
           </div>
