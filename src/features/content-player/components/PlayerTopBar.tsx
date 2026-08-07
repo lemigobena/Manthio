@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Bookmark, PanelLeft, PanelLeftClose, PanelRight, PanelRightClose } from 'lucide-react';
+import { ChevronLeft, Bookmark, PanelLeft, PanelLeftClose, PanelRight, PanelRightClose, PanelTopClose, PanelTop } from 'lucide-react';
 import { useXP } from '../../../context/XPContext';
+import { useTopBar } from '../../../context/TopBarContext';
 import type { Course, Lesson } from '../../../types';
 
 interface PlayerTopBarProps {
@@ -27,6 +28,7 @@ export const PlayerTopBar: React.FC<PlayerTopBarProps> = ({
   onCloseQuickSession
 }) => {
   const { addToast } = useXP();
+  const { isCollapsed, toggleTopBar } = useTopBar();
   const [isBookmarked, setIsBookmarked] = useState(false);
 
   const handleBookmark = () => {
@@ -132,6 +134,17 @@ export const PlayerTopBar: React.FC<PlayerTopBarProps> = ({
                 title="Toggle AI Tutor & Tools"
               >
                 {toolsOpen ? <PanelRightClose className="w-5 h-5" /> : <PanelRight className="w-5 h-5" />}
+              </button>
+
+              <button 
+                onClick={toggleTopBar}
+                className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg transition-all cursor-pointer text-xs font-bold ${
+                  isCollapsed ? 'bg-cyan/15 text-cyan border border-cyan/30' : 'bg-bg border border-line text-muted hover:text-text'
+                }`}
+                title={isCollapsed ? "Show Top Navigation Bar" : "Collapse Top Navigation Bar (Focus Mode)"}
+              >
+                {isCollapsed ? <PanelTop className="w-4 h-4 text-cyan" /> : <PanelTopClose className="w-4 h-4 text-muted" />}
+                <span className="hidden sm:inline text-[10px] uppercase tracking-wider">{isCollapsed ? 'Show Top Bar' : 'Focus'}</span>
               </button>
             </>
           )}

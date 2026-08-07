@@ -3,6 +3,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { analyticsService } from './services/analyticsService';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { XPProvider } from './context/XPContext';
+import { TopBarProvider } from './context/TopBarContext';
 import { AppLayout } from './components/layout/AppLayout';
 import { NotificationProvider } from './context/NotificationContext';
 import { ModalProvider, useModal } from './context/ModalContext';
@@ -201,9 +202,11 @@ const MainApp: React.FC = () => {
   return (
     <>
       <div className={`transition-all duration-300 ${activeModal ? 'blur-sm pointer-events-none select-none' : ''}`}>
-        <AppLayout activePage={page} onNavigate={handleNavigate}>
-          {renderPage()}
-        </AppLayout>
+        <TopBarProvider activePage={currentPage}>
+          <AppLayout activePage={page} onNavigate={handleNavigate}>
+            {renderPage()}
+          </AppLayout>
+        </TopBarProvider>
       </div>
       <ModalManager />
     </>

@@ -187,7 +187,7 @@ export const ToolsPane: React.FC<ToolsPaneProps> = ({
       )}
       <div className={`bg-panel border-l border-line flex flex-col overflow-hidden shrink-0 transition-all absolute right-0 min-[1024px]:relative z-40 h-full ${
         isOpen 
-          ? 'w-[320px] max-w-[85vw] opacity-100 pointer-events-auto shadow-2xl min-[1024px]:shadow-none' 
+          ? 'w-[320px] min-[1600px]:w-[380px] min-[1920px]:w-[440px] min-[2560px]:w-[500px] max-w-[85vw] opacity-100 pointer-events-auto shadow-2xl min-[1024px]:shadow-none' 
           : 'w-0 opacity-0 pointer-events-none min-[1024px]:w-0'
       }`}>
       {/* Header Tabs */}
