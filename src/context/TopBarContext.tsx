@@ -23,11 +23,8 @@ export const TopBarProvider: React.FC<TopBarProviderProps> = ({ activePage, chil
   // When activePage changes, automatically collapse top bar for course player parts
   // and restore top bar for non-player pages
   useEffect(() => {
-    if (isPlayerPage) {
-      setIsCollapsed(true);
-    } else {
-      setIsCollapsed(false);
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsCollapsed(isPlayerPage);
   }, [activePage, isPlayerPage]);
 
   const toggleTopBar = () => {
