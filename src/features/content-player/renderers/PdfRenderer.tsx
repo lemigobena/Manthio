@@ -109,7 +109,7 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson, onClose }) => 
   };
 
   // Dynamic PDF width based on container and zoom
-  const pdfWidth = Math.min(containerWidth, 900) * scale;
+  const pdfWidth = Math.min(containerWidth, 1600) * scale;
 
   return (
     <div ref={containerRef} className="flex flex-col h-full w-full overflow-hidden bg-bg relative font-sans text-text">
@@ -225,7 +225,7 @@ export const PdfRenderer: React.FC<PdfRendererProps> = ({ lesson, onClose }) => 
                    <Page 
                      pageNumber={index + 1} 
                      scale={scale} 
-                     width={Math.min(containerWidth, 900)}
+                     width={Math.min(containerWidth, 1600)}
                      renderTextLayer={true}
                      renderAnnotationLayer={false}
                      className="max-w-full"

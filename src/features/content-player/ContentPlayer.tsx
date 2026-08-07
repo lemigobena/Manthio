@@ -3,6 +3,7 @@ import { COURSES } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { useModal } from '../../context/ModalContext';
+import { useTopBar } from '../../context/TopBarContext';
 import type { Lesson, Course } from '../../types';
 
 // Components
@@ -32,6 +33,7 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
   const { activeCourseId } = useAuth();
   const { addXp, addToast } = useXP();
   const { openModal } = useModal();
+  const { isCollapsed } = useTopBar();
   
   // Find current course and module
   const [course, setCourse] = useState<Course>(() => {
@@ -240,10 +242,10 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
   };
 
   return (
-    <div className={`flex flex-col bg-bg overflow-hidden relative ${
+    <div className={`flex flex-col bg-bg overflow-hidden relative transition-all duration-300 ${
       isQuickSession 
         ? 'w-full h-full' 
-        : 'h-[calc(100dvh-64px)] -mx-3 md:-mx-[44px] -my-6 border-y border-line'
+        : (isCollapsed ? 'h-[100dvh] -mx-3 md:-mx-[44px] -my-6 border-y border-line' : 'h-[calc(100dvh-64px)] -mx-3 md:-mx-[44px] -my-6 border-y border-line')
     }`}>
       <PlayerTopBar 
         course={course}
@@ -274,7 +276,11 @@ export const ContentPlayer: React.FC<ContentPlayerProps> = ({ onNavigate, initia
             ? 'p-2 md:py-3 md:px-4 overflow-hidden' 
             : 'px-2 py-4 sm:p-4 md:p-6 overflow-y-auto'
         }`}>
-          <div className={`w-full ${((!curriculumOpen && !toolsOpen) || ['PDF', 'Code', 'H5P'].includes(currentLesson.type)) ? 'max-w-[1400px]' : 'max-w-4xl'} transition-all duration-500 ease-in-out flex-1 flex flex-col items-center min-h-0`}>
+          <div className={`w-full max-w-full min-w-0 ${
+            ((!curriculumOpen && !toolsOpen) || ['PDF', 'Code', 'H5P'].includes(currentLesson.type)) 
+              ? 'max-w-none' 
+              : 'max-w-6xl min-[1600px]:max-w-none'
+          } transition-all duration-500 ease-in-out flex-1 flex flex-col items-center min-h-0`}>
             {renderCenterContent()}
           </div>
         </div>

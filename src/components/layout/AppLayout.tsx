@@ -5,6 +5,7 @@ import { Footer } from './Footer';
 import { useAuth } from '../../context/AuthContext';
 import { useXP } from '../../context/XPContext';
 import { useNotifications } from '../../context/NotificationContext';
+import { useTopBar } from '../../context/TopBarContext';
 import type { LiveNotificationToast } from '../../context/NotificationContext';
 import type { ToastMessage } from '../../context/XPContext';
 import { AlertCircle, CheckCircle, Sparkles, Info, X, Bell, BookOpen, MessageSquare, Award, Target } from 'lucide-react';
@@ -193,6 +194,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const { toasts, removeToast, celebrationActive, dismissCelebration, levelUpTo } = useXP();
   const { liveToasts, dismissLiveToast, markAsRead } = useNotifications();
   const { isAuthenticated } = useAuth();
+  const { isCollapsed, isPlayerPage } = useTopBar();
   
   const mainRef = useRef<HTMLElement>(null);
   
@@ -220,19 +222,30 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       )}
 
       {/* Main View Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Topbar */}
-        <TopBar 
-          onNavigate={onNavigate} 
-          isMobileOpen={isMobileOpen}
-          setIsMobileOpen={setIsMobileOpen}
-          activePage={activePage}
-          isPublicView={isPublicView}
-        />
+      <div className="flex-1 flex flex-col overflow-hidden relative">
+
+        {/* Collapsible Topbar Container */}
+        <div className={`transition-all duration-300 ease-in-out relative z-[60] shrink-0 ${
+          isPlayerPage && isCollapsed 
+            ? 'h-0 overflow-hidden opacity-0 pointer-events-none' 
+            : 'h-16 opacity-100'
+        }`}>
+          <TopBar 
+            onNavigate={onNavigate} 
+            isMobileOpen={isMobileOpen}
+            setIsMobileOpen={setIsMobileOpen}
+            activePage={activePage}
+            isPublicView={isPublicView}
+          />
+        </div>
 
         {/* Content View Body */}
         <main ref={mainRef} className="relative flex-1 overflow-y-auto overflow-x-hidden px-3 md:px-[44px] py-6 flex flex-col">
-          <div className={`${activePage === 'explore' ? 'max-w-[1300px]' : 'max-w-7xl'} mx-auto w-full flex-1`}>
+          <div className={`${
+            activePage === 'explore' ? 'max-w-[1300px]' : 
+            isPlayerPage ? 'max-w-none w-full' : 
+            'max-w-7xl'
+          } mx-auto w-full flex-1`}>
             {children}
           </div>
           
